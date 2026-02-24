@@ -1,90 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+
+<!-- GOOGLE SEARCH CONSOLE -->
+<meta name="google-site-verification" content="kArH4xWq801qr9Cgp3OcuqWtYWf7X-r5sv-v5TqVWCQ" />
+
+<!-- GOOGLE ANALYTICS GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KGJRE4BJYQ"></script>
+<script>
+window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-KGJRE4BJYQ');
+</script>
+
+<!-- FONT AWESOME -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<title>FluxAI | Marketing Digital</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #ffffff;
+  color: #000;
+}
+
+/* ===== HERO ===== */
+
+.container {
+  max-width: 480px;
+  margin: auto;
+  padding: 50px 20px 40px 20px;
+  text-align: center;
+}
+
+.logo img {
+  max-width: 120px;
+  margin-bottom: 20px;
+}
+
+h1 {
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 14px;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 35px;
+}
+
+.btn {
+  display: block;
+  background: linear-gradient(90deg, #8a2be2, #ff6a00);
+  color: #fff;
+  text-decoration: none;
+  padding: 15px;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.btn i {
+  margin-right: 8px;
+}
+
+/* ===== PORTFÓLIO ===== */
+
+.portfolio-section {
+  padding: 70px 20px;
+  background: #fafafa;
+  text-align: center;
+}
+
+.portfolio-title {
+  font-size: 24px;
+  margin-bottom: 8px;
+}
+
+.portfolio-line {
+  width: 70px;
+  height: 3px;
+  margin: 15px auto 40px auto;
+  background: linear-gradient(90deg, #8a2be2, #ff6a00);
+  border-radius: 2px;
+}
+
+.tabs {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.tab-btn {
+  padding: 8px 18px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  background: #fff;
+  cursor: pointer;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.tab-btn.active,
+.tab-btn:hover {
+  background: linear-gradient(90deg, #8a2be2, #ff6a00);
+  color: #fff;
+  border: none;
+}
+
+.projects {
+  max-width: 1000px;
+  margin: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 25px;
+}
+
+.project-card {
+  background: #fff;
+  border-radius: 14px;
+  padding: 20px;
+  border: 1px solid #eee;
+  transition: 0.3s;
+}
+
+.project-card:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+  transform: translateY(-4px);
+}
+
+.project-card img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 15px;
+}
+
+.project-category {
+  font-size: 11px;
+  color: #888;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.project-result {
+  margin-top: 10px;
+  font-weight: bold;
+  color: #ff6a00;
+}
+
+footer {
+  padding: 30px;
+  text-align: center;
+  font-size: 12px;
+  color: #777;
+}
+</style>
+</head>
+
 <body>
 
-  <div class="container">
+<div class="container">
 
-    <!-- LOGO -->
-    <div class="logo">
-      <img src="logo.png" alt="FluxAI">
+  <div class="logo">
+    <img src="logo.png" alt="FluxAI">
+  </div>
+
+  <h1>FluxAI Marketing Digital</h1>
+
+  <div class="subtitle">
+    Posicionamento digital para grandes negócios.<br><br>
+    <strong>Autoridade • Estratégia • Crescimento</strong><br><br>
+    Gestão profissional de redes sociais e IA aplicada.
+  </div>
+
+  <a class="btn" href="https://wa.me/5571981114694" target="_blank">
+    <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
+  </a>
+
+  <a class="btn" href="https://instagram.com/fluxai.mark" target="_blank">
+    <i class="fa-brands fa-instagram"></i> Instagram
+  </a>
+
+</div>
+
+<!-- ===== PORTFÓLIO ===== -->
+
+<section class="portfolio-section" id="portfolio">
+
+  <h2 class="portfolio-title">Nossos Projetos</h2>
+  <div class="portfolio-line"></div>
+
+  <div class="tabs">
+    <button class="tab-btn active" onclick="filterProjects('all', event)">Todos</button>
+    <button class="tab-btn" onclick="filterProjects('criacao', event)">Criação</button>
+    <button class="tab-btn" onclick="filterProjects('ia', event)">Inteligência Artificial</button>
+  </div>
+
+  <div class="projects">
+
+    <div class="project-card criacao">
+      <img src="portfolio/projeto-social.webp">
+      <div class="project-category">Criação</div>
+      <h3>Gestão Estratégica Instagram</h3>
+      <div class="project-result">+180% geração de leads</div>
     </div>
 
-    <!-- TEXTO PRINCIPAL -->
-    <h1>FluxAI Marketing Digital</h1>
-
-    <div class="subtitle">
-      Posicionamento digital para grandes negócios.<br><br>
-      <strong>Autoridade • Estratégia • Crescimento</strong><br><br>
-      Gestão profissional de redes sociais e Inteligência Artificial.
+    <div class="project-card ia">
+      <img src="portfolio/projeto-chatbot.webp">
+      <div class="project-category">Inteligência Artificial</div>
+      <h3>Chatbot Automatizado</h3>
+      <div class="project-result">60% mais conversões</div>
     </div>
-
-    <!-- BOTÕES PRINCIPAIS -->
-    <a class="btn" href="https://wa.me/5571981114694" target="_blank">
-      <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
-    </a>
-
-    <a class="btn" href="https://instagram.com/fluxai.mark" target="_blank">
-      <i class="fa-brands fa-instagram"></i> Instagram
-    </a>
-
-    <!-- BOTÃO PORTFÓLIO -->
-    <a class="btn" href="#portfolio">
-      <i class="fa-solid fa-briefcase"></i> Ver Projetos de Criação & IA
-    </a>
 
   </div>
 
-  <!-- ================= PORTFÓLIO ================= -->
+</section>
 
-  <section id="portfolio" style="padding:60px 20px; background:#000; color:#fff; text-align:center;">
+<footer>
+© 2026 · FluxAI
+</footer>
 
-    <h2 style="font-size:26px; margin-bottom:40px;">
-      Projetos que unem Criatividade & Inteligência Artificial
-    </h2>
+<script>
+function filterProjects(category, event) {
+  const cards = document.querySelectorAll('.project-card');
+  const buttons = document.querySelectorAll('.tab-btn');
 
-    <div style="max-width:900px; margin:auto; display:grid; gap:40px;">
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
 
-      <!-- PROJETO 1 -->
-      <div style="background:#111; padding:25px; border-radius:16px;">
-        <img src="portfolio/projeto-social.webp" style="width:100%; border-radius:12px; margin-bottom:20px;">
-        <h3 style="margin-bottom:10px;">Gestão Estratégica de Instagram</h3>
-        <p style="color:#bbb;">
-          <strong>Problema:</strong> Baixo engajamento e poucos leads.
-        </p>
-        <p style="color:#ff6a00; font-weight:bold;">
-          Resultado: +180% geração de leads.
-        </p>
-      </div>
-
-      <!-- PROJETO 2 -->
-      <div style="background:#111; padding:25px; border-radius:16px;">
-        <img src="portfolio/projeto-chatbot.webp" style="width:100%; border-radius:12px; margin-bottom:20px;">
-        <h3 style="margin-bottom:10px;">Chatbot Inteligente com IA</h3>
-        <p style="color:#bbb;">
-          <strong>Problema:</strong> Atendimento manual e demorado.
-        </p>
-        <p style="color:#ff6a00; font-weight:bold;">
-          Resultado: 60% mais conversões automatizadas.
-        </p>
-      </div>
-
-    </div>
-
-    <!-- CTA FINAL -->
-    <div style="margin-top:50px;">
-      <a href="https://wa.me/5571981114694" target="_blank"
-         style="background:linear-gradient(90deg,#8a2be2,#ff6a00);
-                padding:18px 30px;
-                border-radius:14px;
-                color:#fff;
-                text-decoration:none;
-                font-weight:bold;">
-        Quero um projeto estratégico
-      </a>
-    </div>
-
-  </section>
-
-  <footer style="text-align:center; padding:30px; font-size:12px; color:#777;">
-    © 2026 · FluxAI
-  </footer>
+  cards.forEach(card => {
+    if (category === 'all') {
+      card.style.display = 'block';
+    } else {
+      card.style.display = card.classList.contains(category) ? 'block' : 'none';
+    }
+  });
+}
+</script>
 
 </body>
+</html>
