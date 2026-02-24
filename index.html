@@ -15,7 +15,6 @@ gtag('js', new Date());
 gtag('config', 'G-KGJRE4BJYQ');
 </script>
 
-<!-- FONT AWESOME -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
 <title>FluxAI | Marketing Digital</title>
@@ -36,7 +35,7 @@ body {
 .container {
   max-width: 480px;
   margin: auto;
-  padding: 50px 20px 40px 20px;
+  padding: 50px 20px 40px;
   text-align: center;
 }
 
@@ -72,10 +71,6 @@ h1 {
 .btn:hover {
   transform: translateY(-2px);
   opacity: 0.9;
-}
-
-.btn i {
-  margin-right: 8px;
 }
 
 /* ===== PORTFÓLIO ===== */
@@ -128,16 +123,17 @@ h1 {
   max-width: 1000px;
   margin: auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
 }
 
 .project-card {
   background: #fff;
   border-radius: 14px;
-  padding: 20px;
+  padding: 22px;
   border: 1px solid #eee;
   transition: 0.3s;
+  text-align: left;
 }
 
 .project-card:hover {
@@ -156,6 +152,12 @@ h1 {
   color: #888;
   text-transform: uppercase;
   margin-bottom: 8px;
+}
+
+.project-card p {
+  font-size: 14px;
+  color: #444;
+  line-height: 1.5;
 }
 
 .project-result {
@@ -199,8 +201,6 @@ footer {
 
 </div>
 
-<!-- ===== PORTFÓLIO ===== -->
-
 <section class="portfolio-section" id="portfolio">
 
   <h2 class="portfolio-title">Nossos Projetos</h2>
@@ -214,18 +214,28 @@ footer {
 
   <div class="projects">
 
+    <!-- PROJETO CRIAÇÃO -->
     <div class="project-card criacao">
       <img src="portfolio/projeto-social.webp">
-      <div class="project-category">Criação</div>
-      <h3>Gestão Estratégica Instagram</h3>
-      <div class="project-result">+180% geração de leads</div>
+      <div class="project-category">Criação Estratégica</div>
+      <h3>Clínica Odontológica - Gestão Instagram</h3>
+      <p><strong>Problema:</strong> Baixo engajamento e ausência de leads qualificados.</p>
+      <p><strong>Estratégia:</strong> Reestruturação de posicionamento, funil de conteúdo e anúncios estratégicos.</p>
+      <div class="project-result">
+        Resultado: +180% geração de leads em 90 dias.
+      </div>
     </div>
 
+    <!-- PROJETO IA -->
     <div class="project-card ia">
       <img src="portfolio/projeto-chatbot.webp">
       <div class="project-category">Inteligência Artificial</div>
-      <h3>Chatbot Automatizado</h3>
-      <div class="project-result">60% mais conversões</div>
+      <h3>Automação de Atendimento com IA</h3>
+      <p><strong>Problema:</strong> Atendimento manual e perda de oportunidades fora do horário comercial.</p>
+      <p><strong>Estratégia:</strong> Implementação de chatbot inteligente com qualificação automática de leads.</p>
+      <div class="project-result">
+        Resultado: 60% mais conversões e atendimento 24h.
+      </div>
     </div>
 
   </div>
