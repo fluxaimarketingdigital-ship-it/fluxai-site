@@ -15,254 +15,316 @@ gtag('js', new Date());
 gtag('config', 'G-KGJRE4BJYQ');
 </script>
 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FluxAI | Branding Estratégico em Salvador</title>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-<title>FluxAI | Marketing Digital</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-* { box-sizing: border-box; }
+:root{
+  --olive:#556B2F;
+  --orange:#FF6A00;
+  --black:#0B0B0B;
+  --white:#FFFFFF;
+}
 
-body {
-  margin: 0;
-  font-family: Arial, Helvetica, sans-serif;
-  background: #ffffff;
-  color: #000;
+*{box-sizing:border-box;margin:0;padding:0}
+
+body{
+  font-family: 'Segoe UI', sans-serif;
+  background: var(--black);
+  color: var(--white);
+  line-height:1.6;
 }
 
 /* ===== HERO ===== */
 
-.container {
-  max-width: 480px;
-  margin: auto;
-  padding: 50px 20px 40px;
-  text-align: center;
+.hero{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding:40px 20px;
+  background:linear-gradient(145deg, #0B0B0B 60%, #111 100%);
 }
 
-.logo img {
-  max-width: 120px;
-  margin-bottom: 20px;
+.logo img{
+  max-width:120px;
+  margin-bottom:25px;
 }
 
-h1 {
-  font-size: 22px;
-  margin-bottom: 10px;
+.hero h1{
+  font-size:28px;
+  max-width:700px;
 }
 
-.subtitle {
-  font-size: 14px;
-  color: #555;
-  line-height: 1.6;
-  margin-bottom: 35px;
+.hero span{
+  color:var(--orange);
 }
 
-.btn {
-  display: block;
-  background: linear-gradient(90deg, #8a2be2, #ff6a00);
-  color: #fff;
-  text-decoration: none;
-  padding: 15px;
-  border-radius: 12px;
-  margin-bottom: 15px;
-  font-weight: bold;
-  transition: 0.2s;
+.hero p{
+  max-width:600px;
+  margin:20px 0 35px;
+  color:#ccc;
 }
 
-.btn:hover {
-  transform: translateY(-2px);
-  opacity: 0.9;
+.btn{
+  display:inline-block;
+  padding:14px 28px;
+  border-radius:12px;
+  text-decoration:none;
+  font-weight:bold;
+  margin:8px;
+  transition:0.3s ease;
+}
+
+.btn-primary{
+  background:var(--orange);
+  color:#fff;
+}
+
+.btn-primary:hover{
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(255,106,0,0.4);
+}
+
+.btn-secondary{
+  border:2px solid var(--olive);
+  color:var(--olive);
+}
+
+.btn-secondary:hover{
+  background:var(--olive);
+  color:#fff;
+}
+
+/* ===== SERVIÇOS ===== */
+
+.services{
+  padding:80px 20px;
+  text-align:center;
+}
+
+.services h2{
+  margin-bottom:50px;
+  font-size:26px;
+}
+
+.service-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+  max-width:1100px;
+  margin:auto;
+}
+
+.card{
+  background:#141414;
+  padding:30px;
+  border-radius:16px;
+  transition:0.3s;
+  border:1px solid #222;
+}
+
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 12px 25px rgba(0,0,0,0.4);
+}
+
+.card i{
+  font-size:28px;
+  color:var(--orange);
+  margin-bottom:15px;
+}
+
+.card h3{
+  margin-bottom:15px;
 }
 
 /* ===== PORTFÓLIO ===== */
 
-.portfolio-section {
-  padding: 70px 20px;
-  background: #fafafa;
-  text-align: center;
+.portfolio{
+  background:#111;
+  padding:80px 20px;
+  text-align:center;
 }
 
-.portfolio-title {
-  font-size: 24px;
-  margin-bottom: 8px;
+.portfolio h2{
+  margin-bottom:50px;
 }
 
-.portfolio-line {
-  width: 70px;
-  height: 3px;
-  margin: 15px auto 40px auto;
-  background: linear-gradient(90deg, #8a2be2, #ff6a00);
-  border-radius: 2px;
+.projects{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:30px;
+  max-width:1100px;
+  margin:auto;
 }
 
-.tabs {
-  display: flex;
-  justify-content: center;
-  gap: 12px;
-  margin-bottom: 40px;
-  flex-wrap: wrap;
+.project-card{
+  background:#1a1a1a;
+  border-radius:16px;
+  padding:20px;
+  transition:0.3s;
 }
 
-.tab-btn {
-  padding: 8px 18px;
-  border-radius: 25px;
-  border: 1px solid #ddd;
-  background: #fff;
-  cursor: pointer;
-  font-size: 14px;
-  transition: 0.3s;
+.project-card:hover{
+  transform:scale(1.03);
 }
 
-.tab-btn.active,
-.tab-btn:hover {
-  background: linear-gradient(90deg, #8a2be2, #ff6a00);
-  color: #fff;
-  border: none;
+.project-card img{
+  width:100%;
+  border-radius:12px;
+  margin-bottom:15px;
 }
 
-.projects {
-  max-width: 1000px;
-  margin: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 30px;
+.project-result{
+  margin-top:10px;
+  font-weight:bold;
+  color:var(--orange);
 }
 
-.project-card {
-  background: #fff;
-  border-radius: 14px;
-  padding: 22px;
-  border: 1px solid #eee;
-  transition: 0.3s;
-  text-align: left;
+/* ===== CTA FINAL ===== */
+
+.cta{
+  padding:100px 20px;
+  text-align:center;
+  background:linear-gradient(90deg,var(--olive),var(--orange));
+  color:#fff;
 }
 
-.project-card:hover {
-  box-shadow: 0 8px 20px rgba(0,0,0,0.06);
-  transform: translateY(-4px);
+.cta h2{
+  font-size:28px;
+  margin-bottom:30px;
 }
 
-.project-card img {
-  width: 100%;
-  border-radius: 10px;
-  margin-bottom: 15px;
+/* ===== FOOTER ===== */
+
+footer{
+  padding:30px;
+  text-align:center;
+  font-size:14px;
+  background:#000;
+  color:#aaa;
 }
 
-.project-category {
-  font-size: 11px;
-  color: #888;
-  text-transform: uppercase;
-  margin-bottom: 8px;
+/* ===== WHATSAPP FLOAT ===== */
+
+.whatsapp-float{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  background:#25D366;
+  color:#fff;
+  padding:15px;
+  border-radius:50%;
+  font-size:22px;
+  box-shadow:0 5px 15px rgba(0,0,0,0.4);
+  transition:0.3s;
 }
 
-.project-card p {
-  font-size: 14px;
-  color: #444;
-  line-height: 1.5;
-}
-
-.project-result {
-  margin-top: 10px;
-  font-weight: bold;
-  color: #ff6a00;
-}
-
-footer {
-  padding: 30px;
-  text-align: center;
-  font-size: 12px;
-  color: #777;
+.whatsapp-float:hover{
+  transform:scale(1.1);
 }
 </style>
 </head>
 
 <body>
 
-<div class="container">
-
+<section class="hero">
   <div class="logo">
     <img src="logo.png" alt="FluxAI">
   </div>
 
-  <h1>FluxAI Marketing Digital</h1>
+  <h1>Sua empresa já existe.<br>
+  <span>Agora ela precisa se tornar uma marca forte em Salvador.</span></h1>
 
-  <div class="subtitle">
-    Posicionamento digital para grandes negócios.<br><br>
-    <strong>Autoridade • Estratégia • Crescimento</strong><br><br>
-    Gestão profissional de redes sociais e IA aplicada.
-  </div>
+  <p>Criamos identidade visual estratégica, posicionamento e estrutura digital para médias e pequenas empresas da Bahia atraírem clientes certos.</p>
 
-  <a class="btn" href="https://wa.me/5571981114694" target="_blank">
-    <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
+  <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank">
+    Quero fortalecer minha marca
   </a>
 
-  <a class="btn" href="https://instagram.com/fluxai.mark" target="_blank">
-    <i class="fa-brands fa-instagram"></i> Instagram
+  <a class="btn btn-secondary" href="#portfolio">
+    Ver projetos
   </a>
+</section>
 
-</div>
 
-<section class="portfolio-section" id="portfolio">
+<section class="services">
+  <h2>O que construímos para sua empresa</h2>
 
-  <h2 class="portfolio-title">Nossos Projetos</h2>
-  <div class="portfolio-line"></div>
+  <div class="service-grid">
 
-  <div class="tabs">
-    <button class="tab-btn active" onclick="filterProjects('all', event)">Todos</button>
-    <button class="tab-btn" onclick="filterProjects('criacao', event)">Criação</button>
-    <button class="tab-btn" onclick="filterProjects('ia', event)">Inteligência Artificial</button>
+    <div class="card">
+      <i class="fa-solid fa-palette"></i>
+      <h3>Identidade Visual</h3>
+      <p>Logo estratégico, paleta de cores e manual completo da marca.</p>
+    </div>
+
+    <div class="card">
+      <i class="fa-solid fa-bullseye"></i>
+      <h3>Posicionamento</h3>
+      <p>Público ideal, diferenciação e autoridade no mercado local.</p>
+    </div>
+
+    <div class="card">
+      <i class="fa-solid fa-chart-line"></i>
+      <h3>Atração de Clientes</h3>
+      <p>Estratégia digital estruturada para gerar leads e vendas.</p>
+    </div>
+
   </div>
+</section>
+
+
+<section class="portfolio" id="portfolio">
+  <h2>Projetos Estratégicos</h2>
 
   <div class="projects">
 
-    <!-- PROJETO CRIAÇÃO -->
-    <div class="project-card criacao">
+    <div class="project-card">
       <img src="portfolio/projeto-social.webp">
-      <div class="project-category">Criação Estratégica</div>
-      <h3>Clínica Odontológica - Gestão Instagram</h3>
-      <p><strong>Problema:</strong> Baixo engajamento e ausência de leads qualificados.</p>
-      <p><strong>Estratégia:</strong> Reestruturação de posicionamento, funil de conteúdo e anúncios estratégicos.</p>
+      <h3>Clínica Odontológica</h3>
+      <p>Reposicionamento completo de marca e estratégia digital.</p>
       <div class="project-result">
-        Resultado: +180% geração de leads em 90 dias.
+        +180% geração de leads
       </div>
     </div>
 
-    <!-- PROJETO IA -->
-    <div class="project-card ia">
+    <div class="project-card">
       <img src="portfolio/projeto-chatbot.webp">
-      <div class="project-category">Inteligência Artificial</div>
-      <h3>Automação de Atendimento com IA</h3>
-      <p><strong>Problema:</strong> Atendimento manual e perda de oportunidades fora do horário comercial.</p>
-      <p><strong>Estratégia:</strong> Implementação de chatbot inteligente com qualificação automática de leads.</p>
+      <h3>Automação com IA</h3>
+      <p>Chatbot inteligente com qualificação automática de clientes.</p>
       <div class="project-result">
-        Resultado: 60% mais conversões e atendimento 24h.
+        60% mais conversões
       </div>
     </div>
 
   </div>
-
 </section>
 
+
+<section class="cta">
+  <h2>Pronta para transformar sua empresa em uma marca forte?</h2>
+  <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank">
+    Quero meu diagnóstico estratégico
+  </a>
+</section>
+
+
 <footer>
-© 2026 · FluxAI
+© 2026 · FluxAI Marketing Digital · Salvador / Bahia
 </footer>
 
-<script>
-function filterProjects(category, event) {
-  const cards = document.querySelectorAll('.project-card');
-  const buttons = document.querySelectorAll('.tab-btn');
 
-  buttons.forEach(btn => btn.classList.remove('active'));
-  event.target.classList.add('active');
-
-  cards.forEach(card => {
-    if (category === 'all') {
-      card.style.display = 'block';
-    } else {
-      card.style.display = card.classList.contains(category) ? 'block' : 'none';
-    }
-  });
-}
-</script>
+<a href="https://wa.me/5571981114694" class="whatsapp-float" target="_blank">
+<i class="fa-brands fa-whatsapp"></i>
+</a>
 
 </body>
 </html>
+
+
