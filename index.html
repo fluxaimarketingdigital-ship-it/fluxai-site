@@ -26,6 +26,10 @@ gtag('config', 'G-KGJRE4BJYQ');
   --orange:#FF6A00;
   --black:#111111;
   --white:#FFFFFF;
+
+  /* extras do banner */
+  --bannerBlue:#006BA1; /* do pattern */
+  --bannerRadius:18px;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -37,38 +41,7 @@ body{
   line-height:1.6;
 }
 
-/* ===== HERO ===== */
-
-.hero{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  padding:60px 20px;
-}
-
-.logo img{
-  max-width:180px; /* aumentamos a marca */
-  margin-bottom:30px;
-}
-
-.hero h1{
-  font-size:32px;
-  max-width:700px;
-}
-
-.hero span{
-  color:var(--orange);
-}
-
-.hero p{
-  max-width:600px;
-  margin:25px 0 40px;
-  color:#444;
-}
-
+/* ===== BOTÕES (mantidos) ===== */
 .btn{
   display:inline-block;
   padding:14px 28px;
@@ -92,6 +65,7 @@ body{
 .btn-secondary{
   border:2px solid var(--olive);
   color:var(--olive);
+  background:transparent;
 }
 
 .btn-secondary:hover{
@@ -99,8 +73,206 @@ body{
   color:#fff;
 }
 
-/* ===== SERVIÇOS ===== */
+/* =========================================================
+   ✅ BANNER / HERO (inspirado no pattern do WP)
+   ========================================================= */
+.banner-section{
+  position:relative;
+  min-height: 92vh;
+  display:flex;
+  align-items:center;
+  padding: 72px 20px;
+  overflow:hidden;
+  background: var(--bannerBlue);
+}
 
+.banner-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  opacity:0.25;
+  pointer-events:none;
+}
+
+.banner-container{
+  width:min(1120px, 100%);
+  margin:0 auto;
+  position:relative;
+  z-index:2;
+}
+
+.banner-grid{
+  display:flex;
+  gap: 30px;
+  align-items:center;
+}
+
+.banner-left,
+.banner-right{
+  flex: 1 1 0;
+}
+
+.banner-logo{
+  display:flex;
+  justify-content:flex-start;
+  margin-bottom: 18px;
+}
+
+.banner-logo img{
+  max-width:170px;
+  height:auto;
+  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.18));
+}
+
+.banner-title{
+  color:#fff;
+  font-size: 34px;
+  line-height: 1.15;
+  max-width: 560px;
+}
+
+.banner-title .accent{
+  color: #f8bc3d; /* igual ao pattern no botão */
+}
+
+.banner-sub{
+  color: rgba(255,255,255,0.88);
+  margin-top: 14px;
+  max-width: 520px;
+  font-size: 16px;
+}
+
+.banner-actions{
+  display:flex;
+  align-items:center;
+  gap: 14px;
+  flex-wrap:wrap;
+  margin-top: 26px;
+}
+
+/* botão “Get Free Quote” (adaptado) */
+.banner-quote{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-weight: 800;
+  text-decoration:none;
+  color: var(--black);
+  background: #f8bc3d;
+  border: 1px solid rgba(0,0,0,0.08);
+  transition: .25s ease;
+}
+.banner-quote:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.18);
+}
+
+/* botão play “How We Work” (adaptado) */
+.banner-play{
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+  color: #fff;
+  text-decoration:none;
+  font-weight: 700;
+  padding: 10px 12px;
+  border-radius: 10px;
+  transition: .25s ease;
+  background: rgba(0,0,0,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.banner-play i{
+  font-size: 24px;
+}
+.banner-play:hover{
+  transform: translateY(-2px);
+  background: rgba(0,0,0,0.16);
+}
+
+.banner-social{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+/* lado direito */
+.banner-right{
+  position:relative;
+  min-height: 420px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.banner-figure{
+  width: min(420px, 100%);
+  aspect-ratio: 1 / 1;
+  border-radius: 26px;
+  overflow:hidden;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.22);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.banner-figure img{
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+}
+
+/* chips/ícones “serviços” flutuantes */
+.icon-chip{
+  position:absolute;
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.94);
+  color: #111;
+  font-weight: 800;
+  font-size: 14px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.22);
+  border: 1px solid rgba(0,0,0,0.06);
+  user-select:none;
+}
+.icon-chip i{
+  color: var(--orange);
+  font-size: 16px;
+}
+
+/* posições (inspiradas no pattern, ajustadas) */
+.chip-1{ top: 18px; left: 10px; }
+.chip-2{ top: 90px; right: 6px; }
+.chip-3{ bottom: 88px; left: 0px; }
+.chip-4{ bottom: 18px; right: 18px; }
+.chip-5{ top: 190px; left: 22px; }
+.chip-6{ top: 250px; right: 20px; }
+
+/* responsivo */
+@media (max-width: 900px){
+  .banner-grid{ flex-direction:column; }
+  .banner-title{ font-size: 30px; }
+  .banner-right{ width:100%; }
+  .banner-logo{ justify-content:center; }
+  .banner-left{ text-align:center; }
+  .banner-sub{ margin-left:auto; margin-right:auto; }
+  .banner-actions{ justify-content:center; }
+  .icon-chip{ font-size: 13px; }
+}
+
+/* =========================================================
+   SEÇÕES EXISTENTES (mantidas)
+   ========================================================= */
+
+/* ===== SERVIÇOS ===== */
 .services{
   padding:80px 20px;
   text-align:center;
@@ -144,7 +316,6 @@ body{
 }
 
 /* ===== PORTFÓLIO ===== */
-
 .portfolio{
   padding:80px 20px;
   text-align:center;
@@ -187,7 +358,6 @@ body{
 }
 
 /* ===== CTA FINAL ===== */
-
 .cta{
   padding:100px 20px;
   text-align:center;
@@ -201,7 +371,6 @@ body{
 }
 
 /* ===== FOOTER ===== */
-
 footer{
   padding:30px;
   text-align:center;
@@ -211,7 +380,6 @@ footer{
 }
 
 /* ===== WHATSAPP FLOAT ===== */
-
 .whatsapp-float{
   position:fixed;
   bottom:20px;
@@ -233,27 +401,76 @@ footer{
 
 <body>
 
-<section class="hero">
-  <div class="logo">
-    <img src="logo.png" alt="FluxAI">
+<!-- ✅ NOVO HERO/BANNER (substitui o hero antigo) -->
+<section class="banner-section" id="inicio">
+  <!-- background do pattern -->
+  <img
+    class="banner-bg"
+    src="https://wp-themes.com/wp-content/themes/services-landing-page/inc/block-patterns/images/banner-bg.png"
+    alt=""
+    decoding="async"
+  >
+
+  <div class="banner-container">
+    <div class="banner-grid">
+
+      <div class="banner-left">
+        <div class="banner-logo">
+          <img src="logo.png" alt="FluxAI">
+        </div>
+
+        <h1 class="banner-title">
+          Sua empresa já existe.<br>
+          <span class="accent">Agora ela precisa virar uma marca forte em Salvador.</span>
+        </h1>
+
+        <p class="banner-sub">
+          Criamos identidade visual estratégica, posicionamento e estrutura digital para médias e pequenas empresas da Bahia atraírem clientes certos.
+        </p>
+
+        <div class="banner-actions">
+          <a class="banner-quote" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
+            <i class="fa-brands fa-whatsapp"></i>&nbsp; Quero meu diagnóstico
+          </a>
+
+          <a class="banner-play" href="#como-trabalhamos">
+            <i class="fa-solid fa-circle-play"></i>
+            Como trabalhamos
+          </a>
+
+          <div class="banner-social">
+            <a class="btn btn-secondary" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
+              <i class="fa-brands fa-instagram"></i> Instagram
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <div class="banner-right">
+        <div class="banner-figure">
+          <!-- imagem do pattern (você pode trocar por sua foto/arte) -->
+          <img
+            src="https://wp-themes.com/wp-content/themes/services-landing-page/inc/block-patterns/images/cleaner-free.png"
+            alt="Ilustração"
+            decoding="async"
+          >
+        </div>
+
+        <!-- chips flutuantes (adaptados para seus serviços) -->
+        <div class="icon-chip chip-1"><i class="fa-solid fa-palette"></i> Identidade</div>
+        <div class="icon-chip chip-2"><i class="fa-solid fa-bullseye"></i> Posicionamento</div>
+        <div class="icon-chip chip-3"><i class="fa-solid fa-chart-line"></i> Tráfego</div>
+        <div class="icon-chip chip-4"><i class="fa-solid fa-robot"></i> Automação IA</div>
+        <div class="icon-chip chip-5"><i class="fa-solid fa-pen-nib"></i> Conteúdo</div>
+        <div class="icon-chip chip-6"><i class="fa-solid fa-globe"></i> Site & Landing</div>
+      </div>
+
+    </div>
   </div>
-
-  <h1>Sua empresa já existe.<br>
-  <span>Agora ela precisa se tornar uma marca forte em Salvador.</span></h1>
-
-  <p>Criamos identidade visual estratégica, posicionamento e estrutura digital para médias e pequenas empresas da Bahia atraírem clientes certos.</p>
-
-  <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank">
-    <i class="fa-brands fa-whatsapp"></i> Falar no WhatsApp
-  </a>
-
-  <a class="btn btn-secondary" href="https://instagram.com/fluxai.mark" target="_blank">
-    <i class="fa-brands fa-instagram"></i> Instagram
-  </a>
 </section>
 
-
-<section class="services">
+<!-- âncora do “Como trabalhamos” -->
+<section id="como-trabalhamos" class="services">
   <h2>O que construímos para sua empresa</h2>
 
   <div class="service-grid">
@@ -279,14 +496,13 @@ footer{
   </div>
 </section>
 
-
 <section class="portfolio">
   <h2>Projetos Estratégicos</h2>
 
   <div class="projects">
 
     <div class="project-card">
-      <img src="portfolio/projeto-social.webp">
+      <img src="portfolio/projeto-social.webp" alt="Projeto Clínica Odontológica">
       <h3>Clínica Odontológica</h3>
       <p>Reposicionamento completo de marca e estratégia digital.</p>
       <div class="project-result">
@@ -295,7 +511,7 @@ footer{
     </div>
 
     <div class="project-card">
-      <img src="portfolio/projeto-chatbot.webp">
+      <img src="portfolio/projeto-chatbot.webp" alt="Projeto Automação com IA">
       <h3>Automação com IA</h3>
       <p>Chatbot inteligente com qualificação automática de clientes.</p>
       <div class="project-result">
@@ -306,22 +522,19 @@ footer{
   </div>
 </section>
 
-
 <section class="cta">
   <h2>Pronta para transformar sua empresa em uma marca forte?</h2>
-  <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank">
+  <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
     Quero meu diagnóstico estratégico
   </a>
 </section>
-
 
 <footer>
 © 2026 · FluxAI Marketing Digital · Salvador / Bahia
 </footer>
 
-
-<a href="https://wa.me/5571981114694" class="whatsapp-float" target="_blank">
-<i class="fa-brands fa-whatsapp"></i>
+<a href="https://wa.me/5571981114694" class="whatsapp-float" target="_blank" rel="noopener">
+  <i class="fa-brands fa-whatsapp"></i>
 </a>
 
 </body>
