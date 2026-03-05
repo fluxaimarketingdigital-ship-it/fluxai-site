@@ -241,7 +241,7 @@
     color:#555;
   }
 
-  /* ====== PARCEIROS (LOOP CONTÍNUO CORRETO) ====== */
+  /* ====== PARCEIROS (cinza + loop contínuo) ====== */
   .partners{
     max-width:1100px;
     margin:0 auto 18px;
@@ -297,17 +297,13 @@
     background:linear-gradient(270deg, rgba(250,250,250,0.98), rgba(250,250,250,0));
   }
 
-  /* A sacada: 2 sets iguais dentro do .partners-marquee */
   .partners-marquee{
     display:flex;
     width:max-content;
     align-items:center;
     gap:56px;
     animation: partnersMove 18s linear infinite;
-    opacity:0.68;
-    filter: grayscale(1);
-    will-change: transform;
-    padding-left:24px; /* “respiro” inicial */
+    padding-left:24px;
   }
   .partners-set{
     display:flex;
@@ -315,15 +311,26 @@
     gap:56px;
     flex:0 0 auto;
   }
+
+  /* ✅ AQUI deixa CINZA (premium) */
   .partners-set img{
     height:34px;
     width:auto;
     display:block;
+    opacity:0.55; /* mais “cinza”/suave */
+    filter: grayscale(1) contrast(0.9) brightness(0.85);
+    transition:0.25s ease;
+  }
+  /* opcional: ao passar o mouse, fica um pouco mais nítido */
+  .partners-set img:hover{
+    opacity:0.8;
+    filter: grayscale(1) contrast(1) brightness(0.95);
+    transform:translateY(-1px);
   }
 
   @keyframes partnersMove{
     0%{ transform:translateX(0); }
-    100%{ transform:translateX(-50%); } /* move exatamente 1 set (porque temos 2 sets iguais) */
+    100%{ transform:translateX(-50%); }
   }
 
   /* SERVIÇOS */
