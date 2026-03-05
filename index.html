@@ -27,9 +27,8 @@ gtag('config', 'G-KGJRE4BJYQ');
   --black:#111111;
   --white:#FFFFFF;
 
-  /* extras do banner */
-  --bannerVerde:#727944; /* do pattern */
-  --bannerRadius:18px;
+  /* BANNER */
+  --bannerBg:#727944;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -41,7 +40,7 @@ body{
   line-height:1.6;
 }
 
-/* ===== BOTÕES (mantidos) ===== */
+/* ===== BOTÕES (base) ===== */
 .btn{
   display:inline-block;
   padding:14px 28px;
@@ -74,7 +73,7 @@ body{
 }
 
 /* =========================================================
-   ✅ BANNER / HERO (inspirado no pattern do WP)
+   BANNER / HERO (2 colunas)
    ========================================================= */
 .banner-section{
   position:relative;
@@ -83,7 +82,7 @@ body{
   align-items:center;
   padding: 72px 20px;
   overflow:hidden;
-  background: var(--bannerBlue);
+  background: var(--bannerBg);
 }
 
 .banner-bg{
@@ -92,7 +91,7 @@ body{
   width:100%;
   height:100%;
   object-fit:cover;
-  opacity:0.25;
+  opacity:0.18;
   pointer-events:none;
 }
 
@@ -109,36 +108,36 @@ body{
   align-items:center;
 }
 
-.banner-left,
-.banner-right{
+.banner-left{
+  position:relative;
   flex: 1 1 0;
+  padding-top: 90px; /* espaço para logo no topo */
 }
 
 .banner-logo{
-  display:flex;
-  justify-content:flex-start;
-  margin-bottom: 18px;
+  position:absolute;
+  top: -10px;
+  left: 0;
+  margin: 0;
 }
 
 .banner-logo img{
-  max-width:170px;
+  max-width: 260px; /* logo maior */
   height:auto;
   filter: drop-shadow(0 10px 18px rgba(0,0,0,0.18));
 }
 
 .banner-title{
   color:#fff;
-  font-size: 34px;
-  line-height: 1.15;
+  font-size: 42px;
+  line-height: 1.1;
   max-width: 560px;
-}
-
-.banner-title .accent{
-  color: #f8bc3d; /* igual ao pattern no botão */
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
 }
 
 .banner-sub{
-  color: rgba(255,255,255,0.88);
+  color: rgba(255,255,255,0.9);
   margin-top: 14px;
   max-width: 520px;
   font-size: 16px;
@@ -152,26 +151,28 @@ body{
   margin-top: 26px;
 }
 
-/* botão “Get Free Quote” (adaptado) */
+/* WhatsApp (outline estilo “Instagram”) mantendo link */
 .banner-quote{
   display:inline-flex;
   align-items:center;
   justify-content:center;
+  gap:10px;
   padding: 12px 18px;
-  border-radius: 10px;
+  border-radius: 12px;
   font-weight: 800;
   text-decoration:none;
-  color: var(--black);
-  background: #f8bc3d;
-  border: 1px solid rgba(0,0,0,0.08);
+  color: #fff;
+  background: transparent;
+  border: 2px solid rgba(255,255,255,0.85);
   transition: .25s ease;
 }
 .banner-quote:hover{
   transform: translateY(-2px);
+  background: rgba(255,255,255,0.12);
   box-shadow: 0 10px 24px rgba(0,0,0,0.18);
 }
 
-/* botão play “How We Work” (adaptado) */
+/* Como trabalhamos */
 .banner-play{
   display:inline-flex;
   align-items:center;
@@ -182,26 +183,19 @@ body{
   padding: 10px 12px;
   border-radius: 10px;
   transition: .25s ease;
-  background: rgba(0,0,0,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(0,0,0,0.10);
+  border: 1px solid rgba(255,255,255,0.18);
 }
-.banner-play i{
-  font-size: 24px;
-}
+.banner-play i{ font-size: 24px; }
 .banner-play:hover{
   transform: translateY(-2px);
-  background: rgba(0,0,0,0.16);
+  background: rgba(0,0,0,0.18);
 }
 
-.banner-social{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-
-/* lado direito */
+/* Instagram (mantém seu btn-secondary padrão) */
 .banner-right{
   position:relative;
+  flex: 1 1 0;
   min-height: 420px;
   display:flex;
   align-items:center;
@@ -227,7 +221,6 @@ body{
   object-fit: contain;
 }
 
-/* chips/ícones “serviços” flutuantes */
 .icon-chip{
   position:absolute;
   display:inline-flex;
@@ -248,7 +241,7 @@ body{
   font-size: 16px;
 }
 
-/* posições (inspiradas no pattern, ajustadas) */
+/* posições dos chips */
 .chip-1{ top: 18px; left: 10px; }
 .chip-2{ top: 90px; right: 6px; }
 .chip-3{ bottom: 88px; left: 0px; }
@@ -259,18 +252,12 @@ body{
 /* responsivo */
 @media (max-width: 900px){
   .banner-grid{ flex-direction:column; }
-  .banner-title{ font-size: 30px; }
-  .banner-right{ width:100%; }
-  .banner-logo{ justify-content:center; }
-  .banner-left{ text-align:center; }
+  .banner-title{ font-size: 34px; text-align:center; margin-top: 10px; }
+  .banner-left{ text-align:center; padding-top: 130px; }
+  .banner-logo{ left: 50%; transform: translateX(-50%); }
   .banner-sub{ margin-left:auto; margin-right:auto; }
   .banner-actions{ justify-content:center; }
-  .icon-chip{ font-size: 13px; }
 }
-
-/* =========================================================
-   SEÇÕES EXISTENTES (mantidas)
-   ========================================================= */
 
 /* ===== SERVIÇOS ===== */
 .services{
@@ -401,9 +388,8 @@ footer{
 
 <body>
 
-<!-- ✅ NOVO HERO/BANNER (substitui o hero antigo) -->
+<!-- HERO/BANNER NOVO -->
 <section class="banner-section" id="inicio">
-  <!-- background do pattern -->
   <img
     class="banner-bg"
     src="https://wp-themes.com/wp-content/themes/services-landing-page/inc/block-patterns/images/banner-bg.png"
@@ -419,18 +405,16 @@ footer{
           <img src="logo.png" alt="FluxAI">
         </div>
 
-        <h1 class="banner-title">
-          Sua empresa já existe.<br>
-          <span class="accent">Agora ela precisa virar uma marca forte em Salvador.</span>
-        </h1>
+        <h1 class="banner-title">SUA EMPRESA, SUA MARCA</h1>
 
         <p class="banner-sub">
           Criamos identidade visual estratégica, posicionamento e estrutura digital para médias e pequenas empresas da Bahia atraírem clientes certos.
         </p>
 
         <div class="banner-actions">
+          <!-- botão WhatsApp estilo outline, mantendo o link -->
           <a class="banner-quote" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
-            <i class="fa-brands fa-whatsapp"></i>&nbsp; Quero meu diagnóstico
+            <i class="fa-brands fa-whatsapp"></i> WHATSAPP
           </a>
 
           <a class="banner-play" href="#como-trabalhamos">
@@ -438,17 +422,14 @@ footer{
             Como trabalhamos
           </a>
 
-          <div class="banner-social">
-            <a class="btn btn-secondary" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
-              <i class="fa-brands fa-instagram"></i> Instagram
-            </a>
-          </div>
+          <a class="btn btn-secondary" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
+            <i class="fa-brands fa-instagram"></i> Instagram
+          </a>
         </div>
       </div>
 
       <div class="banner-right">
         <div class="banner-figure">
-          <!-- imagem do pattern (você pode trocar por sua foto/arte) -->
           <img
             src="https://wp-themes.com/wp-content/themes/services-landing-page/inc/block-patterns/images/cleaner-free.png"
             alt="Ilustração"
@@ -456,7 +437,6 @@ footer{
           >
         </div>
 
-        <!-- chips flutuantes (adaptados para seus serviços) -->
         <div class="icon-chip chip-1"><i class="fa-solid fa-palette"></i> Identidade</div>
         <div class="icon-chip chip-2"><i class="fa-solid fa-bullseye"></i> Posicionamento</div>
         <div class="icon-chip chip-3"><i class="fa-solid fa-chart-line"></i> Tráfego</div>
@@ -474,7 +454,6 @@ footer{
   <h2>O que construímos para sua empresa</h2>
 
   <div class="service-grid">
-
     <div class="card">
       <i class="fa-solid fa-palette"></i>
       <h3>Identidade Visual</h3>
@@ -492,7 +471,6 @@ footer{
       <h3>Atração de Clientes</h3>
       <p>Estratégia digital estruturada para gerar leads e vendas.</p>
     </div>
-
   </div>
 </section>
 
@@ -500,25 +478,19 @@ footer{
   <h2>Projetos Estratégicos</h2>
 
   <div class="projects">
-
     <div class="project-card">
       <img src="portfolio/projeto-social.webp" alt="Projeto Clínica Odontológica">
       <h3>Clínica Odontológica</h3>
       <p>Reposicionamento completo de marca e estratégia digital.</p>
-      <div class="project-result">
-        +180% geração de leads
-      </div>
+      <div class="project-result">+180% geração de leads</div>
     </div>
 
     <div class="project-card">
       <img src="portfolio/projeto-chatbot.webp" alt="Projeto Automação com IA">
       <h3>Automação com IA</h3>
       <p>Chatbot inteligente com qualificação automática de clientes.</p>
-      <div class="project-result">
-        60% mais conversões
-      </div>
+      <div class="project-result">60% mais conversões</div>
     </div>
-
   </div>
 </section>
 
@@ -539,4 +511,3 @@ footer{
 
 </body>
 </html>
-
