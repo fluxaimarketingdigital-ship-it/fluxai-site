@@ -241,21 +241,18 @@
     color:#555;
   }
 
-  /* ====== MARCAS PARCEIRAS (repetindo e passando) ====== */
+  /* ====== PARCEIROS (LOOP CONTÍNUO CORRETO) ====== */
   .partners{
     max-width:1100px;
     margin:0 auto 18px;
     padding:0 20px;
   }
-
-  /* título na MESMA formatação do "Cases de Sucesso" (linhas + uppercase) */
   .partners-title{
     max-width:1100px;
     margin:0 auto 10px;
     display:flex;
     align-items:center;
     gap:18px;
-    padding:0 0;
   }
   .partners-title .line{
     height:2px;
@@ -300,29 +297,33 @@
     background:linear-gradient(270deg, rgba(250,250,250,0.98), rgba(250,250,250,0));
   }
 
-  .marquee{
+  /* A sacada: 2 sets iguais dentro do .partners-marquee */
+  .partners-marquee{
     display:flex;
-    width:100%;
-    overflow:hidden;
+    width:max-content;
+    align-items:center;
+    gap:56px;
+    animation: partnersMove 18s linear infinite;
+    opacity:0.68;
+    filter: grayscale(1);
+    will-change: transform;
+    padding-left:24px; /* “respiro” inicial */
   }
-  .marquee-content{
+  .partners-set{
     display:flex;
     align-items:center;
     gap:56px;
-    width:max-content;
-    animation: marquee 18s linear infinite;
-    opacity:0.65;
-    filter: grayscale(1);
-    will-change: transform;
+    flex:0 0 auto;
   }
-  .marquee-content img{
+  .partners-set img{
     height:34px;
     width:auto;
     display:block;
   }
-  @keyframes marquee{
+
+  @keyframes partnersMove{
     0%{ transform:translateX(0); }
-    100%{ transform:translateX(-50%); }
+    100%{ transform:translateX(-50%); } /* move exatamente 1 set (porque temos 2 sets iguais) */
   }
 
   /* SERVIÇOS */
@@ -465,7 +466,6 @@
     color:#777;
   }
 
-  /* RESPONSIVO */
   @media (max-width:1150px){
     .topbar-inner,.hero-inner,.about-inner,.stats-inner{width:92%;}
   }
@@ -492,10 +492,8 @@
 
 <section class="hero">
   <div class="hero-inner">
-
     <div>
       <h1 class="hero-title">SUA EMPRESA, SUA MARCA</h1>
-
       <p class="hero-sub">
         Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.
       </p>
@@ -504,7 +502,6 @@
         <a class="btn btn-outline" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
           <i class="fa-brands fa-whatsapp"></i> WhatsApp
         </a>
-
         <a class="btn btn-outline" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
           <i class="fa-brands fa-instagram"></i> Instagram
         </a>
@@ -514,14 +511,12 @@
     <div class="hero-right">
       <img src="inteligencia-artificial-no-marketing-digital.jpg" alt="Marketing Digital e IA">
     </div>
-
   </div>
 </section>
 
 <!-- SOBRE A FLUXAI -->
 <section class="about" id="sobre">
   <div class="about-inner">
-
     <div class="about-left">
       <div class="about-kicker reveal">A agencia FluxAI | Marketing digital</div>
 
@@ -530,11 +525,9 @@
       <p class="about-text reveal">
         A FluxAI é uma agência especializada em posicionamento digital, estratégia de marketing e automação com inteligência artificial.
       </p>
-
       <p class="about-text reveal">
         Nosso foco é ajudar empresas a saírem do anonimato e se tornarem marcas fortes, com presença estratégica nas redes sociais, conteúdo profissional e processos automatizados que geram mais clientes.
       </p>
-
       <p class="about-text reveal">
         Unimos criatividade, tecnologia e estratégia para construir negócios sólidos no ambiente digital.
       </p>
@@ -563,7 +556,6 @@
         </div>
       </div>
     </div>
-
   </div>
 </section>
 
@@ -601,7 +593,7 @@
 <!-- SERVIÇOS -->
 <section class="services">
 
-  <!-- MARCAS PARCEIRAS (com título) -->
+  <!-- PARCEIROS -->
   <div class="partners">
     <div class="partners-title reveal">
       <div class="line"></div>
@@ -610,18 +602,21 @@
     </div>
 
     <div class="partners-track reveal">
-      <div class="marquee" aria-label="Marcas parceiras">
-        <div class="marquee-content">
-          <!-- SET 1 -->
+      <div class="partners-marquee" aria-label="Marcas parceiras">
+        <!-- SET 1 -->
+        <div class="partners-set">
           <img src="parceiro-01.png" alt="Parceiro 01">
           <img src="parceiro-02.png" alt="Parceiro 02">
           <img src="parceiro-01.png" alt="Parceiro 01">
           <img src="parceiro-02.png" alt="Parceiro 02">
-          <!-- SET 2 (cópia idêntica para loop contínuo) -->
-          <img src="parceiro-01.png" alt="Parceiro 01">
-          <img src="parceiro-02.png" alt="Parceiro 02">
-          <img src="parceiro-01.png" alt="Parceiro 01">
-          <img src="parceiro-02.png" alt="Parceiro 02">
+        </div>
+
+        <!-- SET 2 (cópia idêntica) -->
+        <div class="partners-set" aria-hidden="true">
+          <img src="parceiro-01.png" alt="">
+          <img src="parceiro-02.png" alt="">
+          <img src="parceiro-01.png" alt="">
+          <img src="parceiro-02.png" alt="">
         </div>
       </div>
     </div>
@@ -714,7 +709,7 @@
 </footer>
 
 <script>
-  // Reveal ao rolar (clean e premium)
+  // Reveal ao rolar
   const observer = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       if(entry.isIntersecting){
@@ -726,7 +721,7 @@
   },{threshold:0.14});
   document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
-  // Contador (count-up) quando entrar na tela
+  // Contador (count-up)
   const counters = document.querySelectorAll('.count');
   let counted = false;
 
