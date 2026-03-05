@@ -16,33 +16,37 @@
   </script>
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FluxAI | Branding Estratégico em Salvador</title>
+  <title>FluxAI | Salvador</title>
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --green:#727944;       /* NOVA COR */
-      --orange:#FF6A00;
-      --black:#111111;
-      --white:#FFFFFF;
+      --green:#727944;
+      --bg:#0b0b0b;
+      --card:rgba(255,255,255,0.06);
+      --stroke:rgba(255,255,255,0.12);
+      --stroke2:rgba(255,255,255,0.22);
+      --text:rgba(255,255,255,0.88);
+      --muted:rgba(255,255,255,0.72);
+      --line:rgba(255,255,255,0.38);
+      --radius:18px;
     }
 
     *{box-sizing:border-box;margin:0;padding:0}
-
     body{
-      font-family: "Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background: var(--white);
-      color: var(--black);
+      font-family:"Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      background:#fff;
+      color:#111;
       line-height:1.6;
     }
 
-    /* ===== TOP BAR (BRANCA) COM LOGO NO CANTO ESQUERDO ===== */
+    /* ===== TOP WHITE BAR ===== */
     .topbar{
       position:sticky;
       top:0;
@@ -66,7 +70,7 @@
       color:inherit;
     }
     .brand-logo img{
-      height:56px; /* AUMENTA A MARCA */
+      height:56px;
       width:auto;
       display:block;
       object-fit:contain;
@@ -74,22 +78,20 @@
 
     /* ===== HERO ===== */
     .hero{
-      background: var(--green);
-      position:relative;
+      background:var(--green);
       overflow:hidden;
+      position:relative;
     }
-
     .hero .container{
       max-width:1200px;
       margin:0 auto;
       padding:56px 20px 64px;
       display:grid;
-      grid-template-columns: 1.1fr 0.9fr;
+      grid-template-columns:1.1fr 0.9fr;
       gap:34px;
       align-items:center;
     }
 
-    /* “SUA EMPRESA, SUA MARCA” em uma linha, outra fonte */
     .hero h1{
       font-family:"Montserrat", sans-serif;
       font-weight:800;
@@ -101,7 +103,7 @@
       white-space:nowrap;
     }
 
-    /* Frase com traço vertical pegando duas linhas */
+    /* Traço vertical pegando as 2 linhas */
     .hero .lead{
       position:relative;
       color:rgba(255,255,255,0.88);
@@ -115,12 +117,13 @@
       position:absolute;
       left:0;
       top:2px;
-      bottom:2px; /* pega o bloco todo (2 linhas) */
+      bottom:2px;
       width:4px;
       border-radius:999px;
       background:rgba(255,255,255,0.85);
     }
 
+    /* ===== BOTÕES (mesmo layout / interação) ===== */
     .btn-row{
       display:flex;
       flex-wrap:wrap;
@@ -128,7 +131,6 @@
       align-items:center;
       margin-top:8px;
     }
-
     .btn{
       display:inline-flex;
       align-items:center;
@@ -145,8 +147,8 @@
       cursor:pointer;
       min-width:190px;
     }
+    .btn:active{ transform:translateY(-1px) scale(0.99); }
 
-    /* WhatsApp - mantém link e escreve WHATSAPP */
     .btn-whatsapp{
       background:#25D366;
       color:#fff;
@@ -158,7 +160,6 @@
       filter:saturate(1.05);
     }
 
-    /* Instagram - estilo gradiente e ao lado do WhatsApp */
     .btn-instagram{
       color:#fff;
       background: linear-gradient(135deg, #f58529 0%, #dd2a7b 35%, #8134af 70%, #515bd4 100%);
@@ -185,18 +186,22 @@
       object-fit:cover;
     }
 
-    /* ===== SEÇÃO SERVIÇOS ===== */
-    .services{
-      padding:64px 20px 74px;
-      background:#0f0f0f; /* fundo escuro para linhas brancas ficarem bonitas */
+    /* ===== DARK SECTIONS ===== */
+    .dark{
+      background:var(--bg);
       color:#fff;
     }
-    .services .container{
+
+    .section{
+      padding:64px 20px 74px;
+      border-top:1px solid rgba(255,255,255,0.06);
+    }
+    .section .container{
       max-width:1200px;
       margin:0 auto;
     }
 
-    /* Logos parceiras (marquee) acima do título */
+    /* Logos parceiras passando em transparência */
     .partners{
       width:100%;
       overflow:hidden;
@@ -215,7 +220,7 @@
     .partners img{
       height:38px;
       width:auto;
-      opacity:0.55; /* transparência */
+      opacity:0.55;
       filter: grayscale(100%);
       display:block;
     }
@@ -224,44 +229,46 @@
       100%{ transform:translateX(-50%); }
     }
 
-    /* Título com linhas (mesmo estilo do "Cases de Sucesso") */
-    .lined-title{
+    /* ===== TITLES COM LINHAS (mesma formatação do “Cases de Sucesso”) ===== */
+    .title-lined{
       display:flex;
       align-items:center;
       gap:18px;
+      justify-content:center;
+      margin: 18px 0 26px;
       font-family:"Montserrat", sans-serif;
       font-weight:800;
-      font-size:26px;
-      margin: 18px 0 26px;
+      font-size:24px;
+      text-align:center;
     }
-    .lined-title::before,
-    .lined-title::after{
+    .title-lined::before,
+    .title-lined::after{
       content:"";
       height:3px;
       flex:1;
-      background:rgba(255,255,255,0.38); /* branco com transparência e grande */
+      background:var(--line);
       border-radius:999px;
     }
 
+    /* ===== SERVICES GRID ===== */
     .service-grid{
       display:grid;
       grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));
       gap:18px;
       margin-top:18px;
     }
-
     .card{
-      background:rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
+      background:var(--card);
+      border:1px solid var(--stroke);
       padding:22px;
-      border-radius:18px;
+      border-radius:var(--radius);
       transition:0.25s ease;
       backdrop-filter: blur(6px);
       min-height:150px;
     }
     .card:hover{
       transform:translateY(-6px);
-      border-color: rgba(255,255,255,0.22);
+      border-color: var(--stroke2);
       box-shadow:0 14px 34px rgba(0,0,0,0.35);
     }
     .card i{
@@ -275,88 +282,143 @@
       margin-bottom:8px;
       font-weight:800;
       letter-spacing:0.2px;
+      color:#fff;
     }
     .card p{
       font-size:14px;
-      color:rgba(255,255,255,0.78);
+      color:var(--muted);
     }
 
-    /* ===== “CASES DE SUCESSO” COM LINHAS GRANDES ===== */
-    .cases-title{
-      display:flex;
-      align-items:center;
-      gap:18px;
-      justify-content:center;
-      margin: 34px 0 18px;
-      font-family:"Montserrat", sans-serif;
-      font-weight:800;
-      font-size:24px;
-      text-transform:none;
+    /* ===== CASES (mesma formatação anterior “bonita”) ===== */
+    .cases{
+      padding-top:10px;
     }
-    .cases-title::before,
-    .cases-title::after{
-      content:"";
-      height:3px;
-      width:34%;
-      max-width:360px;
-      background:rgba(255,255,255,0.38);
-      border-radius:999px;
-    }
-
-    /* ===== PORTFÓLIO / CASES ===== */
-    .portfolio{
-      padding:70px 20px;
-      background:#0b0b0b;
-      color:#fff;
-      border-top:1px solid rgba(255,255,255,0.06);
-    }
-    .portfolio .container{
-      max-width:1200px;
-      margin:0 auto;
+    .cases-sub{
       text-align:center;
+      color:var(--muted);
+      margin-top:-8px;
+      margin-bottom:18px;
+      font-size:14px;
     }
     .projects{
       display:grid;
       grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
       gap:18px;
-      margin-top:22px;
-    }
-    .project-card{
-      text-align:left;
-      background:rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
-      border-radius:18px;
-      padding:18px;
-      transition:0.25s ease;
-    }
-    .project-card:hover{
-      transform:translateY(-6px);
-      box-shadow:0 14px 34px rgba(0,0,0,0.35);
-      border-color:rgba(255,255,255,0.22);
-    }
-    .project-card img{
-      width:100%;
-      border-radius:14px;
-      margin-bottom:12px;
-      display:block;
-    }
-    .project-card h3{
-      font-family:"Montserrat", sans-serif;
-      font-weight:800;
-      margin-bottom:6px;
-    }
-    .project-card p{
-      color:rgba(255,255,255,0.78);
-      font-size:14px;
-    }
-    .project-result{
-      margin-top:10px;
-      font-weight:900;
-      color:#fff;
-      opacity:0.9;
+      margin-top:18px;
     }
 
-    /* ===== CTA FINAL ===== */
+    /* Card com imagem + overlay + chip de resultado */
+    .case-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:20px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,0.04);
+      transition:0.25s ease;
+      min-height:320px;
+    }
+    .case-card:hover{
+      transform:translateY(-6px);
+      border-color:var(--stroke2);
+      box-shadow:0 18px 46px rgba(0,0,0,0.45);
+    }
+    .case-card img{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      filter:saturate(1.05) contrast(1.02);
+      transform:scale(1.02);
+    }
+    .case-card::after{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.78) 100%);
+    }
+    .case-content{
+      position:relative;
+      z-index:2;
+      height:100%;
+      padding:18px;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      gap:8px;
+    }
+    .case-tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      width:max-content;
+      padding:8px 10px;
+      border-radius:999px;
+      background:rgba(255,255,255,0.14);
+      border:1px solid rgba(255,255,255,0.18);
+      color:#fff;
+      font-weight:800;
+      font-size:12px;
+      letter-spacing:0.2px;
+      backdrop-filter: blur(8px);
+    }
+    .case-title{
+      font-family:"Montserrat", sans-serif;
+      font-weight:800;
+      font-size:18px;
+      color:#fff;
+      margin-top:4px;
+    }
+    .case-desc{
+      color:rgba(255,255,255,0.80);
+      font-size:14px;
+      max-width:95%;
+    }
+    .case-result{
+      margin-top:10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .result-chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:14px;
+      background:rgba(255,255,255,0.12);
+      border:1px solid rgba(255,255,255,0.18);
+      color:#fff;
+      font-weight:900;
+      font-size:13px;
+      backdrop-filter: blur(8px);
+    }
+    .mini-actions{
+      display:flex;
+      gap:8px;
+    }
+    .mini-btn{
+      width:40px;
+      height:40px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:12px;
+      background:rgba(255,255,255,0.10);
+      border:1px solid rgba(255,255,255,0.16);
+      color:#fff;
+      text-decoration:none;
+      transition:0.2s ease;
+    }
+    .mini-btn:hover{
+      transform:translateY(-2px);
+      background:rgba(255,255,255,0.14);
+      border-color:rgba(255,255,255,0.22);
+    }
+
+    /* ===== FINAL CTA ===== */
     .cta{
       padding:72px 20px;
       text-align:center;
@@ -370,7 +432,6 @@
       font-weight:800;
     }
 
-    /* ===== FOOTER ===== */
     footer{
       padding:22px;
       text-align:center;
@@ -379,7 +440,6 @@
       color:rgba(255,255,255,0.65);
     }
 
-    /* ===== WHATSAPP FLOAT ===== */
     .whatsapp-float{
       position:fixed;
       bottom:20px;
@@ -402,20 +462,14 @@
 
     /* ===== RESPONSIVO ===== */
     @media (max-width: 920px){
-      .hero .container{
-        grid-template-columns: 1fr;
-      }
-      .hero h1{
-        font-size:36px;
-        white-space:normal; /* no mobile pode quebrar */
-      }
+      .hero .container{ grid-template-columns:1fr; }
+      .hero h1{ font-size:36px; white-space:normal; }
       .btn{ min-width: 170px; }
     }
     @media (max-width: 480px){
       .brand-logo img{ height:48px; }
       .hero .container{ padding:42px 16px 54px; }
       .hero h1{ font-size:32px; }
-      .cases-title::before, .cases-title::after{ width:28%; }
     }
   </style>
 </head>
@@ -425,14 +479,14 @@
   <!-- BARRA BRANCA (logo no topo esquerdo) -->
   <header class="topbar">
     <div class="wrap">
-      <a class="brand-logo" href="#" aria-label="FluxAI">
-        <!-- Troque o arquivo para o seu logo final -->
+      <a class="brand-logo" href="#inicio" aria-label="FluxAI">
+        <!-- Troque para seu logo -->
         <img src="logo.png" alt="FluxAI">
       </a>
     </div>
   </header>
 
-  <!-- HERO (retângulo verde menor / principal) -->
+  <!-- HERO -->
   <section class="hero" id="inicio">
     <div class="container">
 
@@ -443,6 +497,7 @@
           Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.
         </p>
 
+        <!-- BOTÕES (mesma formatação/interação) -->
         <div class="btn-row">
           <a class="btn btn-whatsapp" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
             <i class="fa-brands fa-whatsapp"></i> WHATSAPP
@@ -455,31 +510,31 @@
       </div>
 
       <div class="hero-media" aria-label="Imagem principal">
-        <!-- Imagem anexada (suba para o seu site e mantenha o mesmo nome ou ajuste aqui) -->
+        <!-- Sua imagem anexada -->
         <img src="inteligencia-artificial-no-marketing-digital.jpg" alt="Marketing com IA e soluções digitais">
       </div>
 
     </div>
   </section>
 
-  <!-- SERVIÇOS -->
-  <section class="services" id="servicos">
+  <!-- SERVIÇOS (DARK) -->
+  <section class="dark section" id="servicos">
     <div class="container">
 
-      <!-- Logos parceiras (marquee). DICA: renomeie arquivos SEM espaços para web, ex: sil-sabores.jpg -->
+      <!-- Logos parceiras passando em transparência -->
       <div class="partners" aria-label="Marcas parceiras">
         <div class="partners-track">
           <img src="Marca PB 1 JPG.jpg" alt="Sil Sabores" />
           <img src="Grupo de 8 objetos (2).png" alt="Executa Group" />
 
-          <!-- repete para o loop ficar contínuo -->
+          <!-- repete para loop contínuo -->
           <img src="Marca PB 1 JPG.jpg" alt="Sil Sabores" />
           <img src="Grupo de 8 objetos (2).png" alt="Executa Group" />
         </div>
       </div>
 
-      <!-- Título com linhas (mesmo estilo do Cases) -->
-      <div class="lined-title">O que construímos para sua empresa</div>
+      <!-- O que construímos... com a MESMA formatação de linhas do Cases -->
+      <div class="title-lined">O que construímos para sua empresa</div>
 
       <div class="service-grid">
         <div class="card">
@@ -519,41 +574,74 @@
         </div>
       </div>
 
-      <!-- “CASES DE SUCESSO” logo após serviços -->
-      <div class="cases-title">Cases de Sucesso</div>
-
-    </div>
-  </section>
-
-  <!-- CASES/PORTFÓLIO -->
-  <section class="portfolio" id="cases">
-    <div class="container">
+      <!-- CASES DE SUCESSO (mesma formatação com linhas) -->
+      <div class="title-lined" style="margin-top:40px;">Cases de Sucesso</div>
+      <div class="cases-sub">Alguns resultados reais que entregamos com estratégia + execução.</div>
 
       <div class="projects">
-        <div class="project-card">
-          <img src="portfolio/projeto-social.webp" alt="Case 1">
-          <h3>Clínica Odontológica</h3>
-          <p>Reposicionamento completo de marca e estratégia digital.</p>
-          <div class="project-result">+180% geração de leads</div>
-        </div>
+        <!-- CASE 1 -->
+        <article class="case-card">
+          <img src="portfolio/case-1.jpg" alt="Case de Sucesso 1">
+          <div class="case-content">
+            <span class="case-tag"><i class="fa-solid fa-chart-line"></i> Estratégia + Tráfego</span>
+            <div class="case-title">Clínica Odontológica</div>
+            <div class="case-desc">Reposicionamento + criativos + funil de captação para agendamentos.</div>
+            <div class="case-result">
+              <span class="result-chip"><i class="fa-solid fa-bolt"></i> +180% em leads</span>
+              <div class="mini-actions">
+                <a class="mini-btn" href="#contato" aria-label="Quero isso"><i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </article>
 
-        <div class="project-card">
-          <img src="portfolio/projeto-chatbot.webp" alt="Case 2">
-          <h3>Automação com IA</h3>
-          <p>Chatbot inteligente com qualificação automática de clientes.</p>
-          <div class="project-result">60% mais conversões</div>
-        </div>
+        <!-- CASE 2 -->
+        <article class="case-card">
+          <img src="portfolio/case-2.jpg" alt="Case de Sucesso 2">
+          <div class="case-content">
+            <span class="case-tag"><i class="fa-solid fa-robot"></i> Automação IA</span>
+            <div class="case-title">Atendimento Inteligente</div>
+            <div class="case-desc">Qualificação automática no WhatsApp + organização de pedidos.</div>
+            <div class="case-result">
+              <span class="result-chip"><i class="fa-solid fa-star"></i> 60% mais conversões</span>
+              <div class="mini-actions">
+                <a class="mini-btn" href="#contato" aria-label="Quero isso"><i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- CASE 3 (opcional) -->
+        <article class="case-card">
+          <img src="portfolio/case-3.jpg" alt="Case de Sucesso 3">
+          <div class="case-content">
+            <span class="case-tag"><i class="fa-solid fa-photo-film"></i> Conteúdo + Design</span>
+            <div class="case-title">Marca Local (Salvador)</div>
+            <div class="case-desc">Identidade, feed consistente e produção de criativos para anúncios.</div>
+            <div class="case-result">
+              <span class="result-chip"><i class="fa-solid fa-arrow-up-right-dots"></i> +3.2x alcance</span>
+              <div class="mini-actions">
+                <a class="mini-btn" href="#contato" aria-label="Quero isso"><i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
+        </article>
       </div>
 
     </div>
   </section>
 
-  <!-- CTA -->
+  <!-- CTA FINAL -->
   <section class="cta" id="contato">
     <h2>Quer um diagnóstico estratégico?</h2>
-    <a class="btn btn-whatsapp" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
-      <i class="fa-brands fa-whatsapp"></i> WHATSAPP
-    </a>
+    <div class="btn-row" style="justify-content:center;">
+      <a class="btn btn-whatsapp" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
+        <i class="fa-brands fa-whatsapp"></i> WHATSAPP
+      </a>
+      <a class="btn btn-instagram" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
+        <i class="fa-brands fa-instagram"></i> INSTAGRAM
+      </a>
+    </div>
   </section>
 
   <footer>
