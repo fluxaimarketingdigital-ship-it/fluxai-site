@@ -1,656 +1,424 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FluxAI | Marketing Digital em Salvador</title>
 
-  <!-- GOOGLE SEARCH CONSOLE -->
-  <meta name="google-site-verification" content="kArH4xWq801qr9Cgp3OcuqWtYWf7X-r5sv-v5TqVWCQ" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 
-  <!-- GOOGLE ANALYTICS GA4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-KGJRE4BJYQ"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-KGJRE4BJYQ');
-  </script>
+<style>
+body{
+  font-family:Arial;
+  margin:0;
+  background:#fff;
+  color:#111;
+}
 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FluxAI | Salvador</title>
+/* TOPO */
+.topbar{
+  background:#fff;
+  border-bottom:1px solid #eee;
+}
+.topbar-inner{
+  width:1100px;
+  margin:auto;
+  padding:20px;
+}
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+/* HERO */
+.hero{
+  background:#727944;
+  padding:60px 20px;
+}
+.hero-inner{
+  width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  gap:40px;
+}
+.hero-title{
+  font-family:Montserrat;
+  color:#fff;
+  font-size:44px;
+  margin-bottom:20px;
+}
+.hero-sub{
+  color:#fff;
+  font-size:17px;
+  border-left:5px solid rgba(255,255,255,0.95);
+  padding-left:15px;
+  max-width:520px;
+}
+.hero-actions{
+  margin-top:25px;
+  display:flex;
+  gap:15px;
+}
 
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+/* BOTÕES INTERATIVOS */
+.btn{
+  padding:14px 22px;
+  border-radius:10px;
+  text-decoration:none;
+  font-weight:bold;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  transition:0.3s;
+  font-size:15px;
+}
+.btn-outline{
+  border:2px solid #fff;
+  color:#fff;
+  background:transparent;
+}
+.btn-outline:hover{
+  transform:translateY(-4px);
+  background:#fff;
+  color:#727944;
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
+.hero-right img{
+  width:100%;
+  border-radius:12px;
+}
 
-  <style>
-    :root{
-      --green:#727944;
-      --bg:#0b0b0b;
-      --card:rgba(255,255,255,0.06);
-      --stroke:rgba(255,255,255,0.12);
-      --stroke2:rgba(255,255,255,0.22);
-      --text:rgba(255,255,255,0.88);
-      --muted:rgba(255,255,255,0.72);
-      --line:rgba(255,255,255,0.38);
-      --radius:18px;
-    }
+/* SERVIÇOS */
+.services{
+  padding:80px 20px;
+  background:#fafafa;
+  text-align:center;
+}
 
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{
-      font-family:"Plus Jakarta Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
-      background:#fff;
-      color:#111;
-      line-height:1.6;
-    }
+/* ====== MARCAS PARCEIRAS (marquee em transparência) ====== */
+.partners{
+  max-width:1100px;
+  margin:0 auto 18px; /* fica acima do título */
+  overflow:hidden;
+  padding:10px 0;
+  border-top:1px solid rgba(0,0,0,0.06);
+  border-bottom:1px solid rgba(0,0,0,0.06);
+}
+.partners-track{
+  display:flex;
+  align-items:center;
+  gap:26px;
+  width:max-content;
+  animation: partnersScroll 16s linear infinite;
+}
+.partners-track img{
+  height:38px;
+  width:auto;
+  opacity:0.45;           /* transparência */
+  filter:grayscale(100%); /* deixa PB e discreto */
+  display:block;
+}
+@keyframes partnersScroll{
+  0%{ transform:translateX(0); }
+  100%{ transform:translateX(-50%); }
+}
 
-    /* ===== TOP WHITE BAR ===== */
-    .topbar{
-      position:sticky;
-      top:0;
-      z-index:50;
-      background:#fff;
-      border-bottom:1px solid rgba(0,0,0,0.06);
-    }
-    .topbar .wrap{
-      max-width:1200px;
-      margin:0 auto;
-      padding:14px 20px;
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
-    }
-    .brand-logo{
-      display:flex;
-      align-items:center;
-      gap:12px;
-      text-decoration:none;
-      color:inherit;
-    }
-    .brand-logo img{
-      height:56px;
-      width:auto;
-      display:block;
-      object-fit:contain;
-    }
+/* ====== TÍTULO SERVIÇOS (mesma formatação de Cases de Sucesso) ====== */
+.services-title{
+  max-width:1100px;
+  margin:20px auto 50px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:18px;
+}
+.services-title .line{
+  height:2px;
+  flex:1;
+  background:rgba(0,0,0,0.18); /* linhas discretas no fundo claro */
+  border-radius:999px;
+}
+.services-title .text{
+  font-family:Montserrat;
+  font-size:18px;
+  color:#111;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
 
-    /* ===== HERO ===== */
-    .hero{
-      background:var(--green);
-      overflow:hidden;
-      position:relative;
-    }
-    .hero .container{
-      max-width:1200px;
-      margin:0 auto;
-      padding:56px 20px 64px;
-      display:grid;
-      grid-template-columns:1.1fr 0.9fr;
-      gap:34px;
-      align-items:center;
-    }
+.service-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:30px;
+  max-width:1100px;
+  margin:auto;
+}
+.card{
+  background:#fff;
+  padding:30px;
+  border-radius:14px;
+  border:1px solid #eee;
+  transition:0.3s;
+}
+.card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 10px 25px rgba(0,0,0,0.08);
+}
+.card i{
+  font-size:30px;
+  color:#ff6a00;
+  margin-bottom:15px;
+}
+.card h3{ margin-bottom:15px; }
 
-    .hero h1{
-      font-family:"Montserrat", sans-serif;
-      font-weight:800;
-      letter-spacing:0.5px;
-      color:#fff;
-      font-size:42px;
-      line-height:1.1;
-      margin-bottom:18px;
-      white-space:nowrap;
-    }
+/* DIVISÓRIA CASES */
+.cases-divider{
+  max-width:1100px;
+  margin:55px auto 10px;
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+.cases-divider .line{
+  height:2px;
+  flex:1;
+  background:rgba(255,255,255,0.55); /* branco com transparência */
+  border-radius:999px;
+}
+.cases-divider .text{
+  font-family:Montserrat;
+  font-size:18px;
+  color:#fff;
+  letter-spacing:1px;
+  text-transform:uppercase;
+  white-space:nowrap;
+}
 
-    /* Traço vertical pegando as 2 linhas */
-    .hero .lead{
-      position:relative;
-      color:rgba(255,255,255,0.88);
-      max-width:680px;
-      padding-left:18px;
-      margin: 8px 0 26px;
-      font-size:16px;
-    }
-    .hero .lead::before{
-      content:"";
-      position:absolute;
-      left:0;
-      top:2px;
-      bottom:2px;
-      width:4px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.85);
-    }
+/* CASES (cards) */
+.cases{
+  padding:10px 20px 90px;
+  background:#727944; /* para as linhas brancas aparecerem */
+}
+.cases-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:22px;
+  max-width:1100px;
+  margin:25px auto 0;
+}
+.case-card{
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.18);
+  border-radius:14px;
+  padding:22px;
+  color:#fff;
+  text-align:left;
+  transition:0.3s;
+}
+.case-card:hover{
+  transform:translateY(-6px);
+  box-shadow:0 16px 35px rgba(0,0,0,0.20);
+}
+.case-card h3{
+  margin:0 0 8px;
+  font-family:Montserrat;
+  font-size:18px;
+}
+.case-card p{
+  margin:0 0 12px;
+  opacity:0.95;
+}
+.case-result{
+  font-weight:800;
+  color:#fff;
+  opacity:0.95;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+}
 
-    /* ===== BOTÕES (mesmo layout / interação) ===== */
-    .btn-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:12px;
-      align-items:center;
-      margin-top:8px;
-    }
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding:14px 18px;
-      border-radius:14px;
-      text-decoration:none;
-      font-weight:800;
-      letter-spacing:0.2px;
-      transition:0.25s ease;
-      border:2px solid transparent;
-      user-select:none;
-      cursor:pointer;
-      min-width:190px;
-    }
-    .btn:active{ transform:translateY(-1px) scale(0.99); }
+/* CTA */
+.cta{
+  padding:100px 20px;
+  background:linear-gradient(90deg,#556B2F,#FF6A00);
+  text-align:center;
+  color:#fff;
+}
+.cta h2{ margin-bottom:25px; }
+.btn-primary{
+  background:#ff6a00;
+  color:#fff;
+  border:2px solid transparent;
+  justify-content:center;
+}
+.btn-primary:hover{
+  transform:translateY(-4px);
+  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+}
 
-    .btn-whatsapp{
-      background:#25D366;
-      color:#fff;
-      box-shadow:0 10px 24px rgba(0,0,0,0.18);
-    }
-    .btn-whatsapp:hover{
-      transform:translateY(-3px);
-      box-shadow:0 14px 34px rgba(0,0,0,0.22);
-      filter:saturate(1.05);
-    }
+/* FOOTER */
+footer{
+  background:#f5f5f5;
+  text-align:center;
+  padding:25px;
+  font-size:14px;
+  color:#777;
+}
 
-    .btn-instagram{
-      color:#fff;
-      background: linear-gradient(135deg, #f58529 0%, #dd2a7b 35%, #8134af 70%, #515bd4 100%);
-      box-shadow:0 10px 24px rgba(0,0,0,0.18);
-    }
-    .btn-instagram:hover{
-      transform:translateY(-3px);
-      box-shadow:0 14px 34px rgba(0,0,0,0.22);
-      filter:saturate(1.05);
-    }
-
-    .hero-media{
-      width:100%;
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.18);
-      border-radius:22px;
-      overflow:hidden;
-      box-shadow:0 16px 40px rgba(0,0,0,0.25);
-    }
-    .hero-media img{
-      width:100%;
-      height:auto;
-      display:block;
-      object-fit:cover;
-    }
-
-    /* ===== DARK SECTIONS ===== */
-    .dark{
-      background:var(--bg);
-      color:#fff;
-    }
-
-    .section{
-      padding:64px 20px 74px;
-      border-top:1px solid rgba(255,255,255,0.06);
-    }
-    .section .container{
-      max-width:1200px;
-      margin:0 auto;
-    }
-
-    /* Logos parceiras passando em transparência */
-    .partners{
-      width:100%;
-      overflow:hidden;
-      margin: 0 auto 18px;
-      padding: 10px 0;
-      border-top:1px solid rgba(255,255,255,0.08);
-      border-bottom:1px solid rgba(255,255,255,0.08);
-    }
-    .partners-track{
-      display:flex;
-      gap:28px;
-      align-items:center;
-      width:max-content;
-      animation: scrollPartners 18s linear infinite;
-    }
-    .partners img{
-      height:38px;
-      width:auto;
-      opacity:0.55;
-      filter: grayscale(100%);
-      display:block;
-    }
-    @keyframes scrollPartners{
-      0%{ transform:translateX(0); }
-      100%{ transform:translateX(-50%); }
-    }
-
-    /* ===== TITLES COM LINHAS (mesma formatação do “Cases de Sucesso”) ===== */
-    .title-lined{
-      display:flex;
-      align-items:center;
-      gap:18px;
-      justify-content:center;
-      margin: 18px 0 26px;
-      font-family:"Montserrat", sans-serif;
-      font-weight:800;
-      font-size:24px;
-      text-align:center;
-    }
-    .title-lined::before,
-    .title-lined::after{
-      content:"";
-      height:3px;
-      flex:1;
-      background:var(--line);
-      border-radius:999px;
-    }
-
-    /* ===== SERVICES GRID ===== */
-    .service-grid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit, minmax(230px, 1fr));
-      gap:18px;
-      margin-top:18px;
-    }
-    .card{
-      background:var(--card);
-      border:1px solid var(--stroke);
-      padding:22px;
-      border-radius:var(--radius);
-      transition:0.25s ease;
-      backdrop-filter: blur(6px);
-      min-height:150px;
-    }
-    .card:hover{
-      transform:translateY(-6px);
-      border-color: var(--stroke2);
-      box-shadow:0 14px 34px rgba(0,0,0,0.35);
-    }
-    .card i{
-      font-size:26px;
-      color:#fff;
-      opacity:0.95;
-      margin-bottom:12px;
-    }
-    .card h3{
-      font-size:16px;
-      margin-bottom:8px;
-      font-weight:800;
-      letter-spacing:0.2px;
-      color:#fff;
-    }
-    .card p{
-      font-size:14px;
-      color:var(--muted);
-    }
-
-    /* ===== CASES (mesma formatação anterior “bonita”) ===== */
-    .cases{
-      padding-top:10px;
-    }
-    .cases-sub{
-      text-align:center;
-      color:var(--muted);
-      margin-top:-8px;
-      margin-bottom:18px;
-      font-size:14px;
-    }
-    .projects{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-      gap:18px;
-      margin-top:18px;
-    }
-
-    /* Card com imagem + overlay + chip de resultado */
-    .case-card{
-      position:relative;
-      overflow:hidden;
-      border-radius:20px;
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,0.04);
-      transition:0.25s ease;
-      min-height:320px;
-    }
-    .case-card:hover{
-      transform:translateY(-6px);
-      border-color:var(--stroke2);
-      box-shadow:0 18px 46px rgba(0,0,0,0.45);
-    }
-    .case-card img{
-      position:absolute;
-      inset:0;
-      width:100%;
-      height:100%;
-      object-fit:cover;
-      filter:saturate(1.05) contrast(1.02);
-      transform:scale(1.02);
-    }
-    .case-card::after{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:
-        linear-gradient(180deg, rgba(0,0,0,0.10) 0%, rgba(0,0,0,0.55) 55%, rgba(0,0,0,0.78) 100%);
-    }
-    .case-content{
-      position:relative;
-      z-index:2;
-      height:100%;
-      padding:18px;
-      display:flex;
-      flex-direction:column;
-      justify-content:flex-end;
-      gap:8px;
-    }
-    .case-tag{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      width:max-content;
-      padding:8px 10px;
-      border-radius:999px;
-      background:rgba(255,255,255,0.14);
-      border:1px solid rgba(255,255,255,0.18);
-      color:#fff;
-      font-weight:800;
-      font-size:12px;
-      letter-spacing:0.2px;
-      backdrop-filter: blur(8px);
-    }
-    .case-title{
-      font-family:"Montserrat", sans-serif;
-      font-weight:800;
-      font-size:18px;
-      color:#fff;
-      margin-top:4px;
-    }
-    .case-desc{
-      color:rgba(255,255,255,0.80);
-      font-size:14px;
-      max-width:95%;
-    }
-    .case-result{
-      margin-top:10px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-    .result-chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border-radius:14px;
-      background:rgba(255,255,255,0.12);
-      border:1px solid rgba(255,255,255,0.18);
-      color:#fff;
-      font-weight:900;
-      font-size:13px;
-      backdrop-filter: blur(8px);
-    }
-    .mini-actions{
-      display:flex;
-      gap:8px;
-    }
-    .mini-btn{
-      width:40px;
-      height:40px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:12px;
-      background:rgba(255,255,255,0.10);
-      border:1px solid rgba(255,255,255,0.16);
-      color:#fff;
-      text-decoration:none;
-      transition:0.2s ease;
-    }
-    .mini-btn:hover{
-      transform:translateY(-2px);
-      background:rgba(255,255,255,0.14);
-      border-color:rgba(255,255,255,0.22);
-    }
-
-    /* ===== FINAL CTA ===== */
-    .cta{
-      padding:72px 20px;
-      text-align:center;
-      background:linear-gradient(90deg, var(--green), #4e532f);
-      color:#fff;
-    }
-    .cta h2{
-      font-family:"Montserrat", sans-serif;
-      font-size:26px;
-      margin-bottom:18px;
-      font-weight:800;
-    }
-
-    footer{
-      padding:22px;
-      text-align:center;
-      font-size:14px;
-      background:#070707;
-      color:rgba(255,255,255,0.65);
-    }
-
-    .whatsapp-float{
-      position:fixed;
-      bottom:20px;
-      right:20px;
-      background:#25D366;
-      color:#fff;
-      width:54px;
-      height:54px;
-      border-radius:50%;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      font-size:24px;
-      box-shadow:0 8px 20px rgba(0,0,0,0.28);
-      transition:0.25s ease;
-      z-index:60;
-      text-decoration:none;
-    }
-    .whatsapp-float:hover{ transform:scale(1.08); }
-
-    /* ===== RESPONSIVO ===== */
-    @media (max-width: 920px){
-      .hero .container{ grid-template-columns:1fr; }
-      .hero h1{ font-size:36px; white-space:normal; }
-      .btn{ min-width: 170px; }
-    }
-    @media (max-width: 480px){
-      .brand-logo img{ height:48px; }
-      .hero .container{ padding:42px 16px 54px; }
-      .hero h1{ font-size:32px; }
-    }
-  </style>
+/* RESPONSIVO */
+@media (max-width:1150px){
+  .topbar-inner,.hero-inner{width:92%;}
+}
+@media (max-width:900px){
+  .hero-inner{flex-direction:column;}
+  .hero-title{font-size:36px;}
+  .hero-right{width:100%;}
+  .hero-actions{flex-wrap:wrap; justify-content:center;}
+}
+</style>
 </head>
 
 <body>
 
-  <!-- BARRA BRANCA (logo no topo esquerdo) -->
-  <header class="topbar">
-    <div class="wrap">
-      <a class="brand-logo" href="#inicio" aria-label="FluxAI">
-        <!-- Troque para seu logo -->
-        <img src="logo.png" alt="FluxAI">
-      </a>
+<header class="topbar">
+  <div class="topbar-inner">
+    <img src="logo.png" width="220" alt="FluxAI">
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero-inner">
+
+    <div>
+      <h1 class="hero-title">SUA EMPRESA, SUA MARCA</h1>
+
+      <p class="hero-sub">
+        Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn btn-outline" href="https://wa.me/5571981114694" target="_blank">
+          <i class="fa-brands fa-whatsapp"></i> WhatsApp
+        </a>
+
+        <a class="btn btn-outline" href="https://instagram.com/fluxai.mark" target="_blank">
+          <i class="fa-brands fa-instagram"></i> Instagram
+        </a>
+      </div>
     </div>
-  </header>
 
-  <!-- HERO -->
-  <section class="hero" id="inicio">
-    <div class="container">
-
-      <div class="hero-copy">
-        <h1>SUA EMPRESA, SUA MARCA</h1>
-
-        <p class="lead">
-          Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.
-        </p>
-
-        <!-- BOTÕES (mesma formatação/interação) -->
-        <div class="btn-row">
-          <a class="btn btn-whatsapp" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
-            <i class="fa-brands fa-whatsapp"></i> WHATSAPP
-          </a>
-
-          <a class="btn btn-instagram" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
-            <i class="fa-brands fa-instagram"></i> INSTAGRAM
-          </a>
-        </div>
-      </div>
-
-      <div class="hero-media" aria-label="Imagem principal">
-        <!-- Sua imagem anexada -->
-        <img src="inteligencia-artificial-no-marketing-digital.jpg" alt="Marketing com IA e soluções digitais">
-      </div>
-
+    <div class="hero-right">
+      <img src="inteligencia-artificial-no-marketing-digital.jpg" alt="Marketing Digital e IA">
     </div>
-  </section>
 
-  <!-- SERVIÇOS (DARK) -->
-  <section class="dark section" id="servicos">
-    <div class="container">
+  </div>
+</section>
 
-      <!-- Logos parceiras passando em transparência -->
-      <div class="partners" aria-label="Marcas parceiras">
-        <div class="partners-track">
-          <img src="Marca PB 1 JPG.jpg" alt="Sil Sabores" />
-          <img src="Grupo de 8 objetos (2).png" alt="Executa Group" />
+<!-- SERVIÇOS -->
+<section class="services">
 
-          <!-- repete para loop contínuo -->
-          <img src="Marca PB 1 JPG.jpg" alt="Sil Sabores" />
-          <img src="Grupo de 8 objetos (2).png" alt="Executa Group" />
-        </div>
-      </div>
+  <!-- MARCAS PARCEIRAS EM TRANSPARÊNCIA PASSANDO (acima do título) -->
+  <div class="partners" aria-label="Marcas parceiras">
+    <div class="partners-track">
+      <!-- troque pelos seus arquivos reais -->
+      <img src="Marca PB 1 JPG.jpg" alt="Marca parceira 1">
+      <img src="Grupo de 8 objetos (2).png" alt="Marca parceira 2">
 
-      <!-- O que construímos... com a MESMA formatação de linhas do Cases -->
-      <div class="title-lined">O que construímos para sua empresa</div>
-
-      <div class="service-grid">
-        <div class="card">
-          <i class="fa-solid fa-palette"></i>
-          <h3>Identidade visual</h3>
-          <p>Criação de marca, manual e presença visual consistente.</p>
-        </div>
-
-        <div class="card">
-          <i class="fa-solid fa-hashtag"></i>
-          <h3>Gerenciamento de redes sociais</h3>
-          <p>Planejamento, calendário e execução com consistência.</p>
-        </div>
-
-        <div class="card">
-          <i class="fa-solid fa-bullhorn"></i>
-          <h3>Social media</h3>
-          <p>Estratégia de conteúdo e comunicação que gera interação.</p>
-        </div>
-
-        <div class="card">
-          <i class="fa-solid fa-robot"></i>
-          <h3>Automação em IA</h3>
-          <p>Automatizações para acelerar atendimento e conversões.</p>
-        </div>
-
-        <div class="card">
-          <i class="fa-solid fa-pen-nib"></i>
-          <h3>Criação de conteúdo</h3>
-          <p>Textos, criativos e conteúdos que vendem sem parecer anúncio.</p>
-        </div>
-
-        <div class="card">
-          <i class="fa-solid fa-video"></i>
-          <h3>Produção de vídeo</h3>
-          <p>Reels, anúncios e vídeos que prendem atenção e geram leads.</p>
-        </div>
-      </div>
-
-      <!-- CASES DE SUCESSO (mesma formatação com linhas) -->
-      <div class="title-lined" style="margin-top:40px;">Cases de Sucesso</div>
-      <div class="cases-sub">Alguns resultados reais que entregamos com estratégia + execução.</div>
-
-      <div class="projects">
-        <!-- CASE 1 -->
-        <article class="case-card">
-          <img src="portfolio/case-1.jpg" alt="Case de Sucesso 1">
-          <div class="case-content">
-            <span class="case-tag"><i class="fa-solid fa-chart-line"></i> Estratégia + Tráfego</span>
-            <div class="case-title">Clínica Odontológica</div>
-            <div class="case-desc">Reposicionamento + criativos + funil de captação para agendamentos.</div>
-            <div class="case-result">
-              <span class="result-chip"><i class="fa-solid fa-bolt"></i> +180% em leads</span>
-              <div class="mini-actions">
-                <a class="mini-btn" href="#contato" aria-label="Quero isso"><i class="fa-solid fa-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- CASE 2 -->
-        <article class="case-card">
-          <img src="portfolio/case-2.jpg" alt="Case de Sucesso 2">
-          <div class="case-content">
-            <span class="case-tag"><i class="fa-solid fa-robot"></i> Automação IA</span>
-            <div class="case-title">Atendimento Inteligente</div>
-            <div class="case-desc">Qualificação automática no WhatsApp + organização de pedidos.</div>
-            <div class="case-result">
-              <span class="result-chip"><i class="fa-solid fa-star"></i> 60% mais conversões</span>
-              <div class="mini-actions">
-                <a class="mini-btn" href="#contato" aria-label="Quero isso"><i class="fa-solid fa-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
-        </article>
-
-        <!-- CASE 3 (opcional) -->
-        <article class="case-card">
-          <img src="portfolio/case-3.jpg" alt="Case de Sucesso 3">
-          <div class="case-content">
-            <span class="case-tag"><i class="fa-solid fa-photo-film"></i> Conteúdo + Design</span>
-            <div class="case-title">Marca Local (Salvador)</div>
-            <div class="case-desc">Identidade, feed consistente e produção de criativos para anúncios.</div>
-            <div class="case-result">
-              <span class="result-chip"><i class="fa-solid fa-arrow-up-right-dots"></i> +3.2x alcance</span>
-              <div class="mini-actions">
-                <a class="mini-btn" href="#contato" aria-label="Quero isso"><i class="fa-solid fa-arrow-right"></i></a>
-              </div>
-            </div>
-          </div>
-        </article>
-      </div>
-
+      <!-- repete para loop infinito -->
+      <img src="Marca PB 1 JPG.jpg" alt="Marca parceira 1 (repete)">
+      <img src="Grupo de 8 objetos (2).png" alt="Marca parceira 2 (repete)">
     </div>
-  </section>
+  </div>
 
-  <!-- CTA FINAL -->
-  <section class="cta" id="contato">
-    <h2>Quer um diagnóstico estratégico?</h2>
-    <div class="btn-row" style="justify-content:center;">
-      <a class="btn btn-whatsapp" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
-        <i class="fa-brands fa-whatsapp"></i> WHATSAPP
-      </a>
-      <a class="btn btn-instagram" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
-        <i class="fa-brands fa-instagram"></i> INSTAGRAM
-      </a>
+  <!-- TÍTULO com mesma fonte/maiúscula estilo “Cases de Sucesso” -->
+  <div class="services-title">
+    <div class="line"></div>
+    <div class="text">O que construímos para sua empresa</div>
+    <div class="line"></div>
+  </div>
+
+  <div class="service-grid">
+    <div class="card">
+      <i class="fa-solid fa-palette"></i>
+      <h3>Identidade Visual</h3>
+      <p>Logo, cores e posicionamento estratégico para sua marca se destacar.</p>
     </div>
-  </section>
 
-  <footer>
-    © 2026 · FluxAI Marketing Digital · Salvador / Bahia
-  </footer>
+    <div class="card">
+      <i class="fa-solid fa-mobile-screen"></i>
+      <h3>Gestão de Redes Sociais</h3>
+      <p>Planejamento e crescimento estratégico no Instagram e redes sociais.</p>
+    </div>
 
-  <a href="https://wa.me/5571981114694" class="whatsapp-float" target="_blank" rel="noopener" aria-label="WhatsApp">
-    <i class="fa-brands fa-whatsapp"></i>
+    <div class="card">
+      <i class="fa-solid fa-bullhorn"></i>
+      <h3>Social Media</h3>
+      <p>Conteúdo pensado para gerar engajamento e autoridade.</p>
+    </div>
+
+    <div class="card">
+      <i class="fa-solid fa-robot"></i>
+      <h3>Automação com IA</h3>
+      <p>Chatbots e automação inteligente para vender mais.</p>
+    </div>
+
+    <div class="card">
+      <i class="fa-solid fa-pen-nib"></i>
+      <h3>Criação de Conteúdo</h3>
+      <p>Conteúdos estratégicos que atraem clientes certos.</p>
+    </div>
+
+    <div class="card">
+      <i class="fa-solid fa-video"></i>
+      <h3>Produção de Vídeo</h3>
+      <p>Reels, anúncios e vídeos profissionais para sua marca.</p>
+    </div>
+  </div>
+</section>
+
+<!-- CASES (logo após serviços) -->
+<section class="cases">
+
+  <div class="cases-divider">
+    <div class="line"></div>
+    <div class="text">Cases de Sucesso</div>
+    <div class="line"></div>
+  </div>
+
+  <div class="cases-grid">
+    <div class="case-card">
+      <h3>Clínica Odontológica</h3>
+      <p>Reposicionamento da marca + tráfego pago + conteúdo estratégico.</p>
+      <div class="case-result"><i class="fa-solid fa-arrow-trend-up"></i> +180% leads</div>
+    </div>
+
+    <div class="case-card">
+      <h3>Empresa de Serviços</h3>
+      <p>Gestão de redes sociais + identidade visual + campanhas locais.</p>
+      <div class="case-result"><i class="fa-solid fa-arrow-trend-up"></i> +65% conversões</div>
+    </div>
+
+    <div class="case-card">
+      <h3>Automação com IA</h3>
+      <p>Chatbot inteligente + funil de atendimento + qualificação automática.</p>
+      <div class="case-result"><i class="fa-solid fa-arrow-trend-up"></i> -40% tempo de resposta</div>
+    </div>
+  </div>
+
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <h2>Pronto para transformar sua empresa em uma marca forte?</h2>
+
+  <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank">
+    Quero meu diagnóstico
   </a>
+</section>
+
+<footer>
+  © 2026 • FluxAI Marketing Digital • Salvador / Bahia
+</footer>
 
 </body>
 </html>
