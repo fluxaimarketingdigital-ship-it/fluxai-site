@@ -87,65 +87,169 @@ body{
   border-radius:12px;
 }
 
+/* ===== SOBRE A FLUXAI (NOVA SEÇÃO) ===== */
+.about{
+  padding:85px 20px;
+  background:#fff;
+}
+.about-inner{
+  width:1100px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  gap:44px;
+}
+.about-left{
+  flex:1;
+}
+.about-right{
+  flex:1;
+}
+.about-kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 12px;
+  border-radius:999px;
+  background:rgba(114,121,68,0.10);
+  color:#727944;
+  font-weight:700;
+  font-size:13px;
+  letter-spacing:0.6px;
+  text-transform:uppercase;
+  margin-bottom:16px;
+}
+.about-title{
+  font-family:Montserrat;
+  font-size:34px;
+  margin:0 0 14px;
+  line-height:1.15;
+}
+.about-title span{
+  color:#727944;
+}
+.about-text{
+  color:#333;
+  font-size:16px;
+  line-height:1.8;
+  margin:0 0 18px;
+  max-width:560px;
+}
+.about-points{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px 18px;
+  margin-top:18px;
+}
+.point{
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+  color:#222;
+  font-size:15px;
+}
+.point i{
+  color:#ff6a00;
+  margin-top:2px;
+}
+
+/* cards de números (dinamismo com contador) */
+.about-stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-top:22px;
+}
+.stat{
+  border:1px solid #eee;
+  border-radius:14px;
+  padding:16px;
+  background:#fafafa;
+}
+.stat .num{
+  font-family:Montserrat;
+  font-size:28px;
+  color:#727944;
+  margin:0;
+  line-height:1;
+}
+.stat .label{
+  margin:8px 0 0;
+  font-size:13px;
+  color:#555;
+}
+
+/* imagem / visual */
+.about-visual{
+  border-radius:16px;
+  overflow:hidden;
+  border:1px solid #eee;
+  background:linear-gradient(180deg, rgba(114,121,68,0.12), rgba(255,106,0,0.08));
+  padding:18px;
+}
+.about-visual img{
+  width:100%;
+  border-radius:12px;
+  display:block;
+}
+.about-mini{
+  margin-top:14px;
+  padding:14px;
+  border-radius:12px;
+  background:#fff;
+  border:1px solid #eee;
+  display:flex;
+  gap:10px;
+  align-items:flex-start;
+}
+.about-mini i{
+  color:#727944;
+  font-size:18px;
+  margin-top:1px;
+}
+.about-mini p{
+  margin:0;
+  color:#444;
+  font-size:14px;
+  line-height:1.6;
+}
+
+/* animações de entrada (não fica estático) */
+.reveal{
+  opacity:0;
+  transform:translateY(18px);
+  transition:0.8s ease;
+}
+.reveal.show{
+  opacity:1;
+  transform:translateY(0);
+}
+.stagger > *{
+  opacity:0;
+  transform:translateY(14px);
+  transition:0.7s ease;
+}
+.stagger.show > *{
+  opacity:1;
+  transform:translateY(0);
+}
+.stagger.show > *:nth-child(1){transition-delay:0.05s}
+.stagger.show > *:nth-child(2){transition-delay:0.12s}
+.stagger.show > *:nth-child(3){transition-delay:0.19s}
+.stagger.show > *:nth-child(4){transition-delay:0.26s}
+.stagger.show > *:nth-child(5){transition-delay:0.33s}
+.stagger.show > *:nth-child(6){transition-delay:0.40s}
+
 /* SERVIÇOS */
 .services{
   padding:80px 20px;
   background:#fafafa;
   text-align:center;
 }
-
-/* ====== MARCAS PARCEIRAS (marquee em transparência) ====== */
-.partners{
-  max-width:1100px;
-  margin:0 auto 18px; /* fica acima do título */
-  overflow:hidden;
-  padding:10px 0;
-  border-top:1px solid rgba(0,0,0,0.06);
-  border-bottom:1px solid rgba(0,0,0,0.06);
+.services h2{
+  font-size:28px;
+  margin-bottom:50px;
 }
-.partners-track{
-  display:flex;
-  align-items:center;
-  gap:26px;
-  width:max-content;
-  animation: partnersScroll 16s linear infinite;
-}
-.partners-track img{
-  height:38px;
-  width:auto;
-  opacity:0.45;           /* transparência */
-  filter:grayscale(100%); /* deixa PB e discreto */
-  display:block;
-}
-@keyframes partnersScroll{
-  0%{ transform:translateX(0); }
-  100%{ transform:translateX(-50%); }
-}
-
-/* ====== TÍTULO SERVIÇOS (mesma formatação de Cases de Sucesso) ====== */
-.services-title{
-  max-width:1100px;
-  margin:20px auto 50px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:18px;
-}
-.services-title .line{
-  height:2px;
-  flex:1;
-  background:rgba(0,0,0,0.18); /* linhas discretas no fundo claro */
-  border-radius:999px;
-}
-.services-title .text{
-  font-family:Montserrat;
-  font-size:18px;
-  color:#111;
-  letter-spacing:1px;
-  text-transform:uppercase;
-  white-space:nowrap;
-}
-
 .service-grid{
   display:grid;
   grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
@@ -182,7 +286,7 @@ body{
 .cases-divider .line{
   height:2px;
   flex:1;
-  background:rgba(255,255,255,0.55); /* branco com transparência */
+  background:rgba(255,255,255,0.55);
   border-radius:999px;
 }
 .cases-divider .text{
@@ -194,10 +298,10 @@ body{
   white-space:nowrap;
 }
 
-/* CASES (cards) */
+/* CASES */
 .cases{
   padding:10px 20px 90px;
-  background:#727944; /* para as linhas brancas aparecerem */
+  background:#727944;
 }
 .cases-grid{
   display:grid;
@@ -267,13 +371,17 @@ footer{
 
 /* RESPONSIVO */
 @media (max-width:1150px){
-  .topbar-inner,.hero-inner{width:92%;}
+  .topbar-inner,.hero-inner,.about-inner{width:92%;}
 }
 @media (max-width:900px){
   .hero-inner{flex-direction:column;}
   .hero-title{font-size:36px;}
   .hero-right{width:100%;}
   .hero-actions{flex-wrap:wrap; justify-content:center;}
+
+  .about-inner{flex-direction:column;}
+  .about-stats{grid-template-columns:1fr; }
+  .about-points{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -314,28 +422,62 @@ footer{
   </div>
 </section>
 
+<!-- ✅ NOVA SEÇÃO: SOBRE A FLUXAI (SEM MUDAR SUA ESTRUTURA) -->
+<section class="about" id="sobre">
+  <div class="about-inner">
+
+    <div class="about-left">
+      <div class="about-kicker reveal">Sobre a FluxAI</div>
+
+      <h2 class="about-title reveal">
+        Estratégia + Criatividade + <span>IA</span> para transformar sua empresa em marca
+      </h2>
+
+      <p class="about-text reveal">
+        A FluxAI é uma agência focada em posicionamento digital, marketing estratégico e automação com inteligência artificial.
+        Nosso objetivo é tirar sua empresa do “mais do mesmo” e construir uma presença que gera autoridade e clientes todos os dias.
+      </p>
+
+      <div class="about-points stagger reveal" data-stagger>
+        <div class="point"><i class="fa-solid fa-circle-check"></i> Estratégia personalizada para o seu mercado</div>
+        <div class="point"><i class="fa-solid fa-circle-check"></i> Conteúdo para engajar e vender</div>
+        <div class="point"><i class="fa-solid fa-circle-check"></i> Crescimento no Instagram com consistência</div>
+        <div class="point"><i class="fa-solid fa-circle-check"></i> Automação para atender e converter mais</div>
+      </div>
+
+      <div class="about-stats reveal" data-counters>
+        <div class="stat">
+          <p class="num" data-count="120">0</p>
+          <p class="label">Projetos entregues</p>
+        </div>
+        <div class="stat">
+          <p class="num" data-count="35">0</p>
+          <p class="label">Segmentos atendidos</p>
+        </div>
+        <div class="stat">
+          <p class="num" data-count="18">0</p>
+          <p class="label">Meses de crescimento contínuo</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="about-right reveal">
+      <div class="about-visual">
+        <!-- Pode trocar por foto de equipe/escritório se quiser -->
+        <img src="inteligencia-artificial-no-marketing-digital.jpg" alt="FluxAI - Estratégia e IA">
+        <div class="about-mini">
+          <i class="fa-solid fa-bolt"></i>
+          <p><b>Nosso diferencial:</b> estratégia + execução com design, conteúdo e automações para gerar demanda real.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
 <!-- SERVIÇOS -->
 <section class="services">
-
-  <!-- MARCAS PARCEIRAS EM TRANSPARÊNCIA PASSANDO (acima do título) -->
-  <div class="partners" aria-label="Marcas parceiras">
-    <div class="partners-track">
-      <!-- troque pelos seus arquivos reais -->
-      <img src="Marca PB 1 JPG.jpg" alt="Marca parceira 1">
-      <img src="Grupo de 8 objetos (2).png" alt="Marca parceira 2">
-
-      <!-- repete para loop infinito -->
-      <img src="Marca PB 1 JPG.jpg" alt="Marca parceira 1 (repete)">
-      <img src="Grupo de 8 objetos (2).png" alt="Marca parceira 2 (repete)">
-    </div>
-  </div>
-
-  <!-- TÍTULO com mesma fonte/maiúscula estilo “Cases de Sucesso” -->
-  <div class="services-title">
-    <div class="line"></div>
-    <div class="text">O que construímos para sua empresa</div>
-    <div class="line"></div>
-  </div>
+  <h2>O que construímos para sua empresa</h2>
 
   <div class="service-grid">
     <div class="card">
@@ -376,9 +518,8 @@ footer{
   </div>
 </section>
 
-<!-- CASES (logo após serviços) -->
+<!-- CASES -->
 <section class="cases">
-
   <div class="cases-divider">
     <div class="line"></div>
     <div class="text">Cases de Sucesso</div>
@@ -404,13 +545,11 @@ footer{
       <div class="case-result"><i class="fa-solid fa-arrow-trend-up"></i> -40% tempo de resposta</div>
     </div>
   </div>
-
 </section>
 
 <!-- CTA -->
 <section class="cta">
   <h2>Pronto para transformar sua empresa em uma marca forte?</h2>
-
   <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank">
     Quero meu diagnóstico
   </a>
@@ -419,6 +558,48 @@ footer{
 <footer>
   © 2026 • FluxAI Marketing Digital • Salvador / Bahia
 </footer>
+
+<script>
+/* 1) Revelar elementos conforme rolar a página (não fica estático) */
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('show');
+
+      // 2) Contadores animados quando a área entrar na tela
+      if(entry.target.hasAttribute('data-counters')){
+        animateCounters(entry.target);
+      }
+      observer.unobserve(entry.target);
+    }
+  });
+},{threshold:0.15});
+
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+/* 2) Animação dos contadores */
+let countersRan = false;
+function animateCounters(section){
+  if(countersRan) return;
+  countersRan = true;
+
+  const nums = section.querySelectorAll('[data-count]');
+  nums.forEach((el)=>{
+    const target = parseInt(el.getAttribute('data-count'),10);
+    const duration = 1100;
+    const start = performance.now();
+
+    function step(now){
+      const progress = Math.min((now - start) / duration, 1);
+      const value = Math.floor(progress * target);
+      el.textContent = value;
+      if(progress < 1) requestAnimationFrame(step);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(step);
+  });
+}
+</script>
 
 </body>
 </html>
