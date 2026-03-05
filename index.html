@@ -103,7 +103,7 @@ body{
 }
 
 /* =========================================================
-   HERO (RETÂNGULO VERDE MENOR, com parte branca em cima)
+   HERO (RETÂNGULO VERDE MENOR)
    ========================================================= */
 .hero{
   background: var(--bannerBg);
@@ -132,10 +132,16 @@ body{
   white-space: nowrap; /* tudo em uma linha */
 }
 
+/* ===== TEXTO COM TRAÇO VERTICAL À ESQUERDA ===== */
 .hero-sub{
   color: rgba(255,255,255,0.92);
   max-width: 560px;
   font-size: 16px;
+
+  /* traço vertical que "pega" as duas linhas */
+  border-left: 5px solid rgba(255,255,255,0.95);
+  padding-left: 14px;
+  margin-top: 6px;
 }
 
 .hero-actions{
@@ -168,6 +174,11 @@ body{
   .topbar-inner{ justify-content:center; }
   .hero-title{ white-space: normal; } /* no mobile quebra se precisar */
   .hero-actions{ justify-content:center; }
+  .hero-sub{
+    text-align:left;
+    margin-left:auto;
+    margin-right:auto;
+  }
 }
 
 /* ===== SERVIÇOS ===== */
@@ -314,7 +325,7 @@ footer{
       <h1 class="hero-title">SUA EMPRESA, SUA MARCA.</h1>
 
       <p class="hero-sub">
-        Criamos identidade visual estratégica, posicionamento e estrutura digital para médias e pequenas empresas da Bahia atraírem clientes certos.
+        Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.
       </p>
 
       <!-- BOTÕES WHATSAPP + INSTAGRAM LADO A LADO -->
@@ -331,7 +342,7 @@ footer{
 
     <div class="hero-right">
       <figure class="hero-figure">
-        <!-- COLOQUE a imagem anexada na mesma pasta do HTML com esse nome: -->
+        <!-- Coloque a imagem na mesma pasta do HTML com este nome: -->
         <img src="inteligencia-artificial-no-marketing-digital.jpg" alt="Marketing digital com IA">
       </figure>
     </div>
