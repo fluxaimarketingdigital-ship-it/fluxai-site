@@ -20,6 +20,11 @@ gtag('config', 'G-KGJRE4BJYQ');
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
+<!-- Fonte nova para o título -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
+
 <style>
 :root{
   --olive:#556B2F;
@@ -27,7 +32,7 @@ gtag('config', 'G-KGJRE4BJYQ');
   --black:#111111;
   --white:#FFFFFF;
 
-  /* BANNER */
+  /* NOVO VERDE DO BANNER */
   --bannerBg:#727944;
 }
 
@@ -42,221 +47,127 @@ body{
 
 /* ===== BOTÕES (base) ===== */
 .btn{
-  display:inline-block;
-  padding:14px 28px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  padding:14px 22px;
   border-radius:12px;
   text-decoration:none;
-  font-weight:bold;
-  margin:8px;
-  transition:0.3s ease;
+  font-weight:800;
+  margin:0;
+  transition:0.25s ease;
+  white-space:nowrap;
 }
 
 .btn-primary{
   background:var(--orange);
   color:#fff;
 }
-
 .btn-primary:hover{
-  transform:translateY(-3px);
+  transform:translateY(-2px);
   box-shadow:0 8px 20px rgba(255,106,0,0.3);
 }
 
-.btn-secondary{
-  border:2px solid var(--olive);
-  color:var(--olive);
-  background:transparent;
-}
-
-.btn-secondary:hover{
-  background:var(--olive);
-  color:#fff;
-}
-
-/* =========================================================
-   BANNER / HERO (2 colunas)
-   ========================================================= */
-.banner-section{
-  position:relative;
-  min-height: 92vh;
-  display:flex;
-  align-items:center;
-  padding: 72px 20px;
-  overflow:hidden;
-  background: var(--bannerBg);
-}
-
-.banner-bg{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0.18;
-  pointer-events:none;
-}
-
-.banner-container{
-  width:min(1120px, 100%);
-  margin:0 auto;
-  position:relative;
-  z-index:2;
-}
-
-.banner-grid{
-  display:flex;
-  gap: 30px;
-  align-items:center;
-}
-
-.banner-left{
-  position:relative;
-  flex: 1 1 0;
-  padding-top: 90px; /* espaço para logo no topo */
-}
-
-.banner-logo{
-  position:absolute;
-  top: -10px;
-  left: 0;
-  margin: 0;
-}
-
-.banner-logo img{
-  max-width: 260px; /* logo maior */
-  height:auto;
-  filter: drop-shadow(0 10px 18px rgba(0,0,0,0.18));
-}
-
-.banner-title{
-  color:#fff;
-  font-size: 42px;
-  line-height: 1.1;
-  max-width: 560px;
-  letter-spacing: 0.6px;
-  text-transform: uppercase;
-}
-
-.banner-sub{
-  color: rgba(255,255,255,0.9);
-  margin-top: 14px;
-  max-width: 520px;
-  font-size: 16px;
-}
-
-.banner-actions{
-  display:flex;
-  align-items:center;
-  gap: 14px;
-  flex-wrap:wrap;
-  margin-top: 26px;
-}
-
-/* WhatsApp (outline estilo “Instagram”) mantendo link */
-.banner-quote{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:10px;
-  padding: 12px 18px;
-  border-radius: 12px;
-  font-weight: 800;
-  text-decoration:none;
-  color: #fff;
+.btn-outline-white{
   background: transparent;
-  border: 2px solid rgba(255,255,255,0.85);
-  transition: .25s ease;
+  color: #fff;
+  border: 2px solid rgba(255,255,255,0.9);
 }
-.banner-quote:hover{
-  transform: translateY(-2px);
+.btn-outline-white:hover{
+  transform:translateY(-2px);
   background: rgba(255,255,255,0.12);
   box-shadow: 0 10px 24px rgba(0,0,0,0.18);
 }
 
-/* Como trabalhamos */
-.banner-play{
-  display:inline-flex;
-  align-items:center;
-  gap: 10px;
-  color: #fff;
-  text-decoration:none;
-  font-weight: 700;
-  padding: 10px 12px;
-  border-radius: 10px;
-  transition: .25s ease;
-  background: rgba(0,0,0,0.10);
-  border: 1px solid rgba(255,255,255,0.18);
-}
-.banner-play i{ font-size: 24px; }
-.banner-play:hover{
-  transform: translateY(-2px);
-  background: rgba(0,0,0,0.18);
+/* =========================================================
+   TOPO BRANCO (logo em cima)
+   ========================================================= */
+.topbar{
+  background: #fff;
+  border-bottom: 1px solid #eee;
 }
 
-/* Instagram (mantém seu btn-secondary padrão) */
-.banner-right{
-  position:relative;
-  flex: 1 1 0;
-  min-height: 420px;
+.topbar-inner{
+  width:min(1120px, 100%);
+  margin:0 auto;
+  padding:16px 20px;
   display:flex;
   align-items:center;
-  justify-content:center;
+  justify-content:flex-start; /* canto superior esquerdo */
 }
 
-.banner-figure{
-  width: min(420px, 100%);
-  aspect-ratio: 1 / 1;
-  border-radius: 26px;
-  overflow:hidden;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 20px 50px rgba(0,0,0,0.22);
+.topbar-inner img{
+  max-width: 230px; /* logo maior */
+  height:auto;
+}
+
+/* =========================================================
+   HERO (RETÂNGULO VERDE MENOR, com parte branca em cima)
+   ========================================================= */
+.hero{
+  background: var(--bannerBg);
+  padding: 56px 20px; /* retângulo (não full screen) */
+}
+
+.hero-inner{
+  width:min(1120px, 100%);
+  margin:0 auto;
   display:flex;
   align-items:center;
-  justify-content:center;
+  gap: 34px;
 }
 
-.banner-figure img{
-  width: 92%;
-  height: 92%;
-  object-fit: contain;
+.hero-left{ flex: 1 1 0; }
+.hero-right{ flex: 1 1 0; display:flex; justify-content:center; }
+
+.hero-title{
+  font-family: "Montserrat", sans-serif; /* outra fonte */
+  color:#fff;
+  font-size: 44px;
+  line-height: 1.1;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+  white-space: nowrap; /* tudo em uma linha */
 }
 
-.icon-chip{
-  position:absolute;
-  display:inline-flex;
-  align-items:center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 999px;
-  background: rgba(255,255,255,0.94);
-  color: #111;
-  font-weight: 800;
-  font-size: 14px;
-  box-shadow: 0 12px 30px rgba(0,0,0,0.22);
-  border: 1px solid rgba(0,0,0,0.06);
-  user-select:none;
-}
-.icon-chip i{
-  color: var(--orange);
+.hero-sub{
+  color: rgba(255,255,255,0.92);
+  max-width: 560px;
   font-size: 16px;
 }
 
-/* posições dos chips */
-.chip-1{ top: 18px; left: 10px; }
-.chip-2{ top: 90px; right: 6px; }
-.chip-3{ bottom: 88px; left: 0px; }
-.chip-4{ bottom: 18px; right: 18px; }
-.chip-5{ top: 190px; left: 22px; }
-.chip-6{ top: 250px; right: 20px; }
+.hero-actions{
+  margin-top: 22px;
+  display:flex;
+  gap: 12px;
+  flex-wrap:wrap;
+}
+
+/* imagem do banner */
+.hero-figure{
+  width:min(520px, 100%);
+  border-radius: 18px;
+  overflow:hidden;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.25);
+}
+
+.hero-figure img{
+  width:100%;
+  height:auto;
+  display:block;
+  object-fit:cover;
+}
 
 /* responsivo */
-@media (max-width: 900px){
-  .banner-grid{ flex-direction:column; }
-  .banner-title{ font-size: 34px; text-align:center; margin-top: 10px; }
-  .banner-left{ text-align:center; padding-top: 130px; }
-  .banner-logo{ left: 50%; transform: translateX(-50%); }
-  .banner-sub{ margin-left:auto; margin-right:auto; }
-  .banner-actions{ justify-content:center; }
+@media (max-width: 980px){
+  .hero-inner{ flex-direction:column; text-align:center; }
+  .topbar-inner{ justify-content:center; }
+  .hero-title{ white-space: normal; } /* no mobile quebra se precisar */
+  .hero-actions{ justify-content:center; }
 }
 
 /* ===== SERVIÇOS ===== */
@@ -388,69 +299,47 @@ footer{
 
 <body>
 
-<!-- HERO/BANNER NOVO -->
-<section class="banner-section" id="inicio">
-  <img
-    class="banner-bg"
-    src="https://wp-themes.com/wp-content/themes/services-landing-page/inc/block-patterns/images/banner-bg.png"
-    alt=""
-    decoding="async"
-  >
+<!-- PARTE BRANCA EM CIMA + LOGO NO CANTO SUPERIOR ESQUERDO -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <img src="logo.png" alt="FluxAI">
+  </div>
+</header>
 
-  <div class="banner-container">
-    <div class="banner-grid">
+<!-- RETÂNGULO VERDE (MENOR) -->
+<section class="hero" id="inicio">
+  <div class="hero-inner">
 
-      <div class="banner-left">
-        <div class="banner-logo">
-          <img src="logo.png" alt="FluxAI">
-        </div>
+    <div class="hero-left">
+      <h1 class="hero-title">SUA EMPRESA, SUA MARCA.</h1>
 
-        <h1 class="banner-title">SUA EMPRESA, SUA MARCA</h1>
+      <p class="hero-sub">
+        Criamos identidade visual estratégica, posicionamento e estrutura digital para médias e pequenas empresas da Bahia atraírem clientes certos.
+      </p>
 
-        <p class="banner-sub">
-          Criamos identidade visual estratégica, posicionamento e estrutura digital para médias e pequenas empresas da Bahia atraírem clientes certos.
-        </p>
+      <!-- BOTÕES WHATSAPP + INSTAGRAM LADO A LADO -->
+      <div class="hero-actions">
+        <a class="btn btn-outline-white" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
+          <i class="fa-brands fa-whatsapp"></i> WHATSAPP
+        </a>
 
-        <div class="banner-actions">
-          <!-- botão WhatsApp estilo outline, mantendo o link -->
-          <a class="banner-quote" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
-            <i class="fa-brands fa-whatsapp"></i> WHATSAPP
-          </a>
-
-          <a class="banner-play" href="#como-trabalhamos">
-            <i class="fa-solid fa-circle-play"></i>
-            Como trabalhamos
-          </a>
-
-          <a class="btn btn-secondary" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
-            <i class="fa-brands fa-instagram"></i> Instagram
-          </a>
-        </div>
+        <a class="btn btn-outline-white" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
+          <i class="fa-brands fa-instagram"></i> INSTAGRAM
+        </a>
       </div>
-
-      <div class="banner-right">
-        <div class="banner-figure">
-          <img
-            src="https://wp-themes.com/wp-content/themes/services-landing-page/inc/block-patterns/images/cleaner-free.png"
-            alt="Ilustração"
-            decoding="async"
-          >
-        </div>
-
-        <div class="icon-chip chip-1"><i class="fa-solid fa-palette"></i> Identidade</div>
-        <div class="icon-chip chip-2"><i class="fa-solid fa-bullseye"></i> Posicionamento</div>
-        <div class="icon-chip chip-3"><i class="fa-solid fa-chart-line"></i> Tráfego</div>
-        <div class="icon-chip chip-4"><i class="fa-solid fa-robot"></i> Automação IA</div>
-        <div class="icon-chip chip-5"><i class="fa-solid fa-pen-nib"></i> Conteúdo</div>
-        <div class="icon-chip chip-6"><i class="fa-solid fa-globe"></i> Site & Landing</div>
-      </div>
-
     </div>
+
+    <div class="hero-right">
+      <figure class="hero-figure">
+        <!-- COLOQUE a imagem anexada na mesma pasta do HTML com esse nome: -->
+        <img src="inteligencia-artificial-no-marketing-digital.jpg" alt="Marketing digital com IA">
+      </figure>
+    </div>
+
   </div>
 </section>
 
-<!-- âncora do “Como trabalhamos” -->
-<section id="como-trabalhamos" class="services">
+<section class="services" id="como-trabalhamos">
   <h2>O que construímos para sua empresa</h2>
 
   <div class="service-grid">
