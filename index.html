@@ -65,7 +65,6 @@
   .about-left{ flex:1; }
   .about-right{ flex:1; }
 
-  /* ✅ DIMINUIR FONTE do "Sobre a FluxAI" */
   .about-kicker{
     display:inline-flex;
     align-items:center;
@@ -75,7 +74,7 @@
     background:rgba(114,121,68,0.10);
     color:#727944;
     font-weight:800;
-    font-size:11.5px;         /* menor */
+    font-size:11.5px;
     letter-spacing:0.8px;
     text-transform:uppercase;
     margin-bottom:12px;
@@ -84,14 +83,14 @@
 
   .about-title{
     font-family:Montserrat;
-    font-size:28px;           /* menor */
+    font-size:28px;
     margin:0 0 12px;
     line-height:1.15;
     color:#111;
   }
   .about-text{
     color:#333;
-    font-size:15px;           /* menor */
+    font-size:15px;
     line-height:1.85;
     margin:0 0 12px;
     max-width:590px;
@@ -106,7 +105,7 @@
 
   .about-diff-title{
     font-family:Montserrat;
-    font-size:13px;           /* menor */
+    font-size:13px;
     letter-spacing:1px;
     text-transform:uppercase;
     color:#727944;
@@ -122,7 +121,7 @@
     gap:10px;
     align-items:flex-start;
     color:#222;
-    font-size:14px;           /* menor */
+    font-size:14px;
     line-height:1.55;
     padding:12px 12px;
     border:1px solid rgba(0,0,0,0.06);
@@ -166,7 +165,7 @@
   .about-mini p{
     margin:0;
     color:#444;
-    font-size:13.5px;         /* menor */
+    font-size:13.5px;
     line-height:1.6;
   }
 
@@ -183,16 +182,13 @@
     transform:translateY(14px);
     transition:0.7s ease;
   }
-  .stagger.show > *{
-    opacity:1;
-    transform:translateY(0);
-  }
+  .stagger.show > *{ opacity:1; transform:translateY(0); }
   .stagger.show > *:nth-child(1){transition-delay:0.05s}
   .stagger.show > *:nth-child(2){transition-delay:0.12s}
   .stagger.show > *:nth-child(3){transition-delay:0.19s}
   .stagger.show > *:nth-child(4){transition-delay:0.26s}
 
-  /* ===== CONTADOR (abaixo do Sobre a FluxAI) ===== */
+  /* ===== CONTADOR ===== */
   .stats{
     padding:0 20px 70px;
     background:#fff;
@@ -225,10 +221,7 @@
     box-shadow:0 10px 25px rgba(0,0,0,0.06);
     border-color:rgba(114,121,68,0.22);
   }
-  .stat i{
-    font-size:20px;
-    color:#ff6a00;
-  }
+  .stat i{ font-size:20px; color:#ff6a00; }
   .stat .num{
     font-family:Montserrat;
     font-size:22px;
@@ -268,7 +261,7 @@
     color:#111;
   }
 
-  /* ====== MARCAS PARCEIRAS (repetindo e passando) ====== */
+  /* ====== PARCEIROS ====== */
   .partners{
     max-width:1100px;
     margin:10px auto 18px;
@@ -302,7 +295,6 @@
     background:linear-gradient(270deg, rgba(250,250,250,0.98), rgba(250,250,250,0));
   }
 
-  /* ✅ Marquee contínuo (loop de verdade) */
   .marquee{
     display:flex;
     width:100%;
@@ -361,7 +353,7 @@
   .card h3{ margin:0 0 10px; }
   .card p{ margin:0; color:#444; line-height:1.6; }
 
-  /* DIVISÓRIA CASES */
+  /* CASES */
   .cases-divider{
     max-width:1100px;
     margin:55px auto 10px;
@@ -384,7 +376,6 @@
     white-space:nowrap;
   }
 
-  /* CASES */
   .cases{ padding:10px 20px 90px; background:#727944; }
   .cases-grid{
     display:grid;
@@ -501,7 +492,6 @@
   </div>
 </section>
 
-<!-- SOBRE A FLUXAI -->
 <section class="about" id="sobre">
   <div class="about-inner">
 
@@ -550,7 +540,6 @@
   </div>
 </section>
 
-<!-- ✅ CONTADOR (abaixo do Sobre a FluxAI) -->
 <section class="stats">
   <div class="stats-inner reveal" id="stats">
     <div class="stats-grid">
@@ -581,32 +570,33 @@
   </div>
 </section>
 
-<!-- SERVIÇOS -->
 <section class="services">
 
-  <!-- APROVADO POR NOSSOS PARCEIROS -->
   <div class="services-divider">
     <div class="line"></div>
     <div class="text">APROVADO POR NOSSOS PARCEIROS</div>
     <div class="line"></div>
   </div>
 
-  <!-- ✅ Marcas parceiras repetindo e passando (loop infinito) -->
   <div class="partners">
     <div class="partners-track reveal">
       <div class="marquee" aria-label="Marcas parceiras">
         <div class="marquee-content">
           <!-- SET 1 -->
-          <img src="parceiros/parceiro-01.png" alt="Parceiro 1">
-          <img src="parceiros/parceiro-02.png" alt="Parceiro 2">
-          <img src="parceiros/parceiro-01.png" alt="Parceiro 1">
-          <img src="parceiros/parceiro-02.png" alt="Parceiro 2">
+          <img src="parceiro-01.png" alt="Parceiro 01">
+          <img src="parceiro-02.png" alt="Parceiro 02">
+          <img src="parceiro-01.png" alt="Parceiro 01">
+          <img src="parceiro-02.png" alt="Parceiro 02">
+          <img src="parceiro-01.png" alt="Parceiro 01">
+          <img src="parceiro-02.png" alt="Parceiro 02">
 
-          <!-- SET 2 (cópia idêntica para loop contínuo) -->
-          <img src="parceiros/parceiro-01.png" alt="Parceiro 1">
-          <img src="parceiros/parceiro-02.png" alt="Parceiro 2">
-          <img src="parceiros/parceiro-01.png" alt="Parceiro 1">
-          <img src="parceiros/parceiro-02.png" alt="Parceiro 2">
+          <!-- SET 2 (cópia idêntica) -->
+          <img src="parceiro-01.png" alt="Parceiro 01">
+          <img src="parceiro-02.png" alt="Parceiro 02">
+          <img src="parceiro-01.png" alt="Parceiro 01">
+          <img src="parceiro-02.png" alt="Parceiro 02">
+          <img src="parceiro-01.png" alt="Parceiro 01">
+          <img src="parceiro-02.png" alt="Parceiro 02">
         </div>
       </div>
     </div>
@@ -657,7 +647,6 @@
   </div>
 </section>
 
-<!-- CASES -->
 <section class="cases">
   <div class="cases-divider">
     <div class="line"></div>
@@ -686,7 +675,6 @@
   </div>
 </section>
 
-<!-- CTA -->
 <section class="cta">
   <h2>Pronto para transformar sua empresa em uma marca forte?</h2>
   <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
@@ -699,7 +687,7 @@
 </footer>
 
 <script>
-  // Reveal ao rolar (clean e premium)
+  // Reveal ao rolar
   const observer = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       if(entry.isIntersecting){
@@ -711,7 +699,7 @@
   },{threshold:0.14});
   document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
-  // Contador (count-up) quando entrar na tela
+  // Contador
   const counters = document.querySelectorAll('.count');
   let counted = false;
 
@@ -721,7 +709,7 @@
 
     counters.forEach(counter => {
       const target = Number(counter.getAttribute('data-target')) || 0;
-      const duration = 1200; // ms
+      const duration = 1200;
       const startTime = performance.now();
 
       const step = (now) => {
@@ -752,4 +740,3 @@
 
 </body>
 </html>
-
