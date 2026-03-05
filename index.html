@@ -182,7 +182,10 @@
     transform:translateY(14px);
     transition:0.7s ease;
   }
-  .stagger.show > *{ opacity:1; transform:translateY(0); }
+  .stagger.show > *{
+    opacity:1;
+    transform:translateY(0);
+  }
   .stagger.show > *:nth-child(1){transition-delay:0.05s}
   .stagger.show > *:nth-child(2){transition-delay:0.12s}
   .stagger.show > *:nth-child(3){transition-delay:0.19s}
@@ -221,7 +224,10 @@
     box-shadow:0 10px 25px rgba(0,0,0,0.06);
     border-color:rgba(114,121,68,0.22);
   }
-  .stat i{ font-size:20px; color:#ff6a00; }
+  .stat i{
+    font-size:20px;
+    color:#ff6a00;
+  }
   .stat .num{
     font-family:Montserrat;
     font-size:22px;
@@ -235,24 +241,29 @@
     color:#555;
   }
 
-  /* SERVIÇOS */
-  .services{ padding:80px 20px; background:#fafafa; text-align:center; }
-
-  .services-divider{
+  /* ====== MARCAS PARCEIRAS (repetindo e passando) ====== */
+  .partners{
     max-width:1100px;
-    margin:0 auto 8px;
+    margin:0 auto 18px;
+    padding:0 20px;
+  }
+
+  /* título na MESMA formatação do "Cases de Sucesso" (linhas + uppercase) */
+  .partners-title{
+    max-width:1100px;
+    margin:0 auto 10px;
     display:flex;
     align-items:center;
     gap:18px;
-    padding:0 20px;
+    padding:0 0;
   }
-  .services-divider .line{
+  .partners-title .line{
     height:2px;
     flex:1;
     background:rgba(0,0,0,0.10);
     border-radius:999px;
   }
-  .services-divider .text{
+  .partners-title .text{
     font-family:Montserrat;
     font-size:18px;
     letter-spacing:1px;
@@ -261,12 +272,6 @@
     color:#111;
   }
 
-  /* ====== PARCEIROS ====== */
-  .partners{
-    max-width:1100px;
-    margin:10px auto 18px;
-    padding:0 20px;
-  }
   .partners-track{
     position:relative;
     overflow:hidden;
@@ -275,7 +280,7 @@
     background:rgba(255,255,255,0.75);
     backdrop-filter: blur(6px);
     -webkit-backdrop-filter: blur(6px);
-    padding:16px 0;
+    padding:14px 0;
   }
   .partners-track::before,
   .partners-track::after{
@@ -306,24 +311,44 @@
     gap:56px;
     width:max-content;
     animation: marquee 18s linear infinite;
+    opacity:0.65;
+    filter: grayscale(1);
     will-change: transform;
   }
   .marquee-content img{
-    height:36px;
+    height:34px;
     width:auto;
     display:block;
-    opacity:0.65;
-    filter: grayscale(1);
-    transition:0.35s ease;
-  }
-  .marquee-content img:hover{
-    opacity:1;
-    filter:grayscale(0);
-    transform:scale(1.08);
   }
   @keyframes marquee{
     0%{ transform:translateX(0); }
     100%{ transform:translateX(-50%); }
+  }
+
+  /* SERVIÇOS */
+  .services{ padding:80px 20px; background:#fafafa; text-align:center; }
+
+  .services-divider{
+    max-width:1100px;
+    margin:0 auto 8px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:0 20px;
+  }
+  .services-divider .line{
+    height:2px;
+    flex:1;
+    background:rgba(0,0,0,0.10);
+    border-radius:999px;
+  }
+  .services-divider .text{
+    font-family:Montserrat;
+    font-size:18px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    white-space:nowrap;
+    color:#111;
   }
 
   .service-grid{
@@ -353,7 +378,7 @@
   .card h3{ margin:0 0 10px; }
   .card p{ margin:0; color:#444; line-height:1.6; }
 
-  /* CASES */
+  /* DIVISÓRIA CASES */
   .cases-divider{
     max-width:1100px;
     margin:55px auto 10px;
@@ -376,6 +401,7 @@
     white-space:nowrap;
   }
 
+  /* CASES */
   .cases{ padding:10px 20px 90px; background:#727944; }
   .cases-grid{
     display:grid;
@@ -492,6 +518,7 @@
   </div>
 </section>
 
+<!-- SOBRE A FLUXAI -->
 <section class="about" id="sobre">
   <div class="about-inner">
 
@@ -540,6 +567,7 @@
   </div>
 </section>
 
+<!-- CONTADOR -->
 <section class="stats">
   <div class="stats-inner reveal" id="stats">
     <div class="stats-grid">
@@ -570,15 +598,17 @@
   </div>
 </section>
 
+<!-- SERVIÇOS -->
 <section class="services">
 
-  <div class="services-divider">
-    <div class="line"></div>
-    <div class="text">APROVADO POR NOSSOS PARCEIROS</div>
-    <div class="line"></div>
-  </div>
-
+  <!-- MARCAS PARCEIRAS (com título) -->
   <div class="partners">
+    <div class="partners-title reveal">
+      <div class="line"></div>
+      <div class="text">APROVADO POR NOSSOS PARCEIROS</div>
+      <div class="line"></div>
+    </div>
+
     <div class="partners-track reveal">
       <div class="marquee" aria-label="Marcas parceiras">
         <div class="marquee-content">
@@ -587,12 +617,7 @@
           <img src="parceiro-02.png" alt="Parceiro 02">
           <img src="parceiro-01.png" alt="Parceiro 01">
           <img src="parceiro-02.png" alt="Parceiro 02">
-          <img src="parceiro-01.png" alt="Parceiro 01">
-          <img src="parceiro-02.png" alt="Parceiro 02">
-
-          <!-- SET 2 (cópia idêntica) -->
-          <img src="parceiro-01.png" alt="Parceiro 01">
-          <img src="parceiro-02.png" alt="Parceiro 02">
+          <!-- SET 2 (cópia idêntica para loop contínuo) -->
           <img src="parceiro-01.png" alt="Parceiro 01">
           <img src="parceiro-02.png" alt="Parceiro 02">
           <img src="parceiro-01.png" alt="Parceiro 01">
@@ -602,9 +627,9 @@
     </div>
   </div>
 
-  <div class="services-divider" style="margin-top:18px;">
+  <div class="services-divider">
     <div class="line"></div>
-    <div class="text">O QUE CONSTRUÍMOS PARA SUA EMPRESA</div>
+    <div class="text">O que construímos para sua empresa</div>
     <div class="line"></div>
   </div>
 
@@ -647,6 +672,7 @@
   </div>
 </section>
 
+<!-- CASES -->
 <section class="cases">
   <div class="cases-divider">
     <div class="line"></div>
@@ -675,6 +701,7 @@
   </div>
 </section>
 
+<!-- CTA -->
 <section class="cta">
   <h2>Pronto para transformar sua empresa em uma marca forte?</h2>
   <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
@@ -687,7 +714,7 @@
 </footer>
 
 <script>
-  // Reveal ao rolar
+  // Reveal ao rolar (clean e premium)
   const observer = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       if(entry.isIntersecting){
@@ -699,7 +726,7 @@
   },{threshold:0.14});
   document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
-  // Contador
+  // Contador (count-up) quando entrar na tela
   const counters = document.querySelectorAll('.count');
   let counted = false;
 
