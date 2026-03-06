@@ -1,883 +1,577 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>FluxAI | Marketing Digital em Salvador</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-<link rel="preconnect" href="https://fonts.googleapis.com">
+
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800&display=swap" rel="stylesheet">
 
 <style>
-  body{
-    font-family:Arial;
-    margin:0;
-    background:#fff;
-    color:#111;
-  }
 
-  /* TOPO */
-  .topbar{ background:#fff; border-bottom:1px solid #eee; }
-  .topbar-inner{ width:1100px; margin:auto; padding:20px; }
+body{
+font-family:Arial;
+margin:0;
+background:#fff;
+color:#111;
+}
 
-  /* HERO */
-  .hero{
-    background:#727944;
-    padding:60px 20px;
-    position:relative;
-    overflow:hidden;
-  }
+/* TOPO */
 
-  /* Partículas leves (premium) */
-  .hero::before{
-    content:"";
-    position:absolute;
-    inset:-40px;
-    background:
-      radial-gradient(circle at 15% 30%, rgba(255,255,255,0.10) 0 2px, transparent 3px),
-      radial-gradient(circle at 60% 20%, rgba(255,255,255,0.08) 0 2px, transparent 3px),
-      radial-gradient(circle at 85% 55%, rgba(255,255,255,0.07) 0 2px, transparent 3px),
-      radial-gradient(circle at 30% 80%, rgba(255,255,255,0.08) 0 2px, transparent 3px);
-    opacity:.9;
-    filter: blur(0.2px);
-    animation: floatDots 8s ease-in-out infinite alternate;
-    pointer-events:none;
-  }
-  @keyframes floatDots{
-    from{ transform:translateY(0); }
-    to{ transform:translateY(-14px); }
-  }
+.topbar{
+background:#fff;
+border-bottom:1px solid #eee;
+}
 
-  /* brilho suave no fundo */
-  .hero::after{
-    content:"";
-    position:absolute;
-    top:-120px;
-    right:-140px;
-    width:380px;
-    height:380px;
-    background: radial-gradient(circle, rgba(255,106,0,0.28), transparent 60%);
-    filter: blur(10px);
-    pointer-events:none;
-  }
+.topbar-inner{
+width:1100px;
+margin:auto;
+padding:20px;
+}
 
-  .hero-inner{
-    width:1100px;
-    margin:auto;
-    display:flex;
-    align-items:center;
-    gap:40px;
-    position:relative;
-    z-index:1;
-  }
+/* HERO */
 
-  /* Título com efeito premium + entrada */
-  .hero-title{
-    font-family:Montserrat;
-    color:#fff;
-    font-size:44px;
-    margin-bottom:20px;
-    letter-spacing:0.5px;
-    position:relative;
-    animation: heroIn 0.9s ease both;
-  }
-  .hero-title::after{
-    content:"";
-    position:absolute;
-    left:0;
-    bottom:-10px;
-    width:110px;
-    height:4px;
-    border-radius:999px;
-    background: rgba(255,255,255,0.38);
-  }
-  @keyframes heroIn{
-    from{ opacity:0; transform:translateY(10px); }
-    to{ opacity:1; transform:translateY(0); }
-  }
+.hero{
+background:#727944;
+padding:60px 20px;
+position:relative;
+overflow:hidden;
+}
 
-  /* Texto com borda lateral e animação */
-  .hero-sub{
-    color:#fff;
-    font-size:17px;
-    border-left:5px solid rgba(255,255,255,0.95);
-    padding-left:15px;
-    max-width:520px;
-    line-height:1.7;
-    opacity:.95;
-  }
+.hero-inner{
+width:1100px;
+margin:auto;
+display:flex;
+align-items:center;
+gap:40px;
+}
 
-  /* Typewriter (digitação) */
-  .typewrap{
-    min-height:58px;
-  }
-  .typewriter{
-    display:inline;
-  }
-  .cursor{
-    display:inline-block;
-    width:10px;
-    margin-left:4px;
-    background:rgba(255,255,255,0.85);
-    height:18px;
-    transform:translateY(3px);
-    animation: blink 0.8s infinite;
-  }
-  @keyframes blink{
-    0%,49%{ opacity:1; }
-    50%,100%{ opacity:0; }
-  }
+.hero-title{
+font-family:Montserrat;
+color:#fff;
+font-size:44px;
+margin-bottom:20px;
+}
 
-  .hero-actions{
-    margin-top:25px;
-    display:flex;
-    gap:15px;
-  }
+.hero-sub{
+color:#fff;
+font-size:17px;
+border-left:5px solid #fff;
+padding-left:15px;
+max-width:520px;
+line-height:1.7;
+}
 
-  /* BOTÕES */
-  .btn{
-    padding:14px 22px;
-    border-radius:10px;
-    text-decoration:none;
-    font-weight:bold;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    transition:0.3s;
-    font-size:15px;
-    will-change: transform;
-  }
-  .btn-outline{
-    border:2px solid #fff;
-    color:#fff;
-    background:transparent;
-    position:relative;
-    overflow:hidden;
-  }
-  .btn-outline:hover{
-    transform:translateY(-4px);
-    background:#fff;
-    color:#727944;
-    box-shadow:0 10px 25px rgba(0,0,0,0.25);
-  }
+.hero-actions{
+margin-top:25px;
+display:flex;
+gap:15px;
+}
 
-  /* Pulse sutil no WhatsApp */
-  .btn-pulse{
-    animation: pulse 1.8s ease-in-out infinite;
-  }
-  @keyframes pulse{
-    0%,100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
-    50%{ box-shadow: 0 0 0 10px rgba(255,255,255,0.08); }
-  }
+.btn{
+padding:14px 22px;
+border-radius:10px;
+text-decoration:none;
+font-weight:bold;
+display:flex;
+align-items:center;
+gap:10px;
+transition:0.3s;
+font-size:15px;
+}
 
-  /* Glow no hover (Instagram) */
-  .btn-glow:hover{
-    box-shadow:0 10px 25px rgba(0,0,0,0.25), 0 0 0 6px rgba(255,106,0,0.12);
-  }
+.btn-outline{
+border:2px solid #fff;
+color:#fff;
+}
 
-  /* Imagem com tilt */
-  .hero-right{
-    width:100%;
-    max-width:520px;
-    perspective:900px;
-  }
-  .tilt{
-    width:100%;
-    border-radius:12px;
-    transform-style:preserve-3d;
-    transition: transform 0.15s ease;
-    box-shadow:0 18px 40px rgba(0,0,0,0.22);
-  }
+.btn-outline:hover{
+background:#fff;
+color:#727944;
+}
 
-  /* ===== SOBRE A FLUXAI (premium/clean) ===== */
-  .about{ padding:85px 20px 50px; background:#fff; }
-  .about-inner{ width:1100px; margin:auto; display:flex; align-items:center; gap:44px; }
-  .about-left{ flex:1; } .about-right{ flex:1; }
+/* HERO IMAGE */
 
-  .about-kicker{
-    display:inline-flex; align-items:center; gap:10px;
-    padding:7px 11px; border-radius:999px;
-    background:rgba(114,121,68,0.10);
-    color:#727944; font-weight:800; font-size:11.5px;
-    letter-spacing:0.8px; text-transform:uppercase;
-    margin-bottom:12px; font-family:Montserrat;
-  }
-  .about-title{ font-family:Montserrat; font-size:28px; margin:0 0 12px; line-height:1.15; color:#111; }
-  .about-text{ color:#333; font-size:15px; line-height:1.85; margin:0 0 12px; max-width:590px; }
-  .about-sep{ height:1px; background:rgba(0,0,0,0.08); margin:16px 0 18px; border-radius:999px; }
-  .about-diff-title{ font-family:Montserrat; font-size:13px; letter-spacing:1px; text-transform:uppercase; color:#727944; margin:0 0 12px; }
-  .about-points{ display:grid; grid-template-columns:1fr 1fr; gap:12px 18px; }
-  .point{
-    display:flex; gap:10px; align-items:flex-start;
-    color:#222; font-size:14px; line-height:1.55;
-    padding:12px 12px; border:1px solid rgba(0,0,0,0.06);
-    border-radius:14px; background:#fff; transition:0.25s ease;
-  }
-  .point:hover{ transform:translateY(-3px); box-shadow:0 10px 25px rgba(0,0,0,0.06); border-color:rgba(114,121,68,0.22); }
-  .point i{ color:#ff6a00; margin-top:2px; }
+.hero-right img{
+width:100%;
+border-radius:12px;
+box-shadow:0 18px 40px rgba(0,0,0,0.22);
+}
 
-  .about-visual{
-    border-radius:16px; overflow:hidden; border:1px solid #eee;
-    background:linear-gradient(180deg, rgba(114,121,68,0.10), rgba(255,106,0,0.06));
-    padding:16px;
-  }
-  .about-visual img{ width:100%; border-radius:12px; display:block; }
-  .about-mini{
-    margin-top:12px; padding:12px; border-radius:12px;
-    background:#fff; border:1px solid #eee;
-    display:flex; gap:10px; align-items:flex-start;
-  }
-  .about-mini i{ color:#727944; font-size:18px; margin-top:1px; }
-  .about-mini p{ margin:0; color:#444; font-size:13.5px; line-height:1.6; }
+/* SOBRE */
 
-  /* reveal */
-  .reveal{ opacity:0; transform:translateY(16px); transition:0.8s ease; }
-  .reveal.show{ opacity:1; transform:translateY(0); }
+.about{
+padding:85px 20px 50px;
+background:#fff;
+}
 
-  .stagger > *{ opacity:0; transform:translateY(14px); transition:0.7s ease; }
-  .stagger.show > *{ opacity:1; transform:translateY(0); }
-  .stagger.show > *:nth-child(1){transition-delay:0.05s}
-  .stagger.show > *:nth-child(2){transition-delay:0.12s}
-  .stagger.show > *:nth-child(3){transition-delay:0.19s}
-  .stagger.show > *:nth-child(4){transition-delay:0.26s}
+.about-inner{
+width:1100px;
+margin:auto;
+display:flex;
+gap:40px;
+}
 
-  /* ===== CONTADOR ===== */
-  .stats{ padding:0 20px 70px; background:#fff; }
-  .stats-inner{
-    width:1100px; margin:0 auto;
-    border:1px solid rgba(0,0,0,0.06);
-    border-radius:18px;
-    background:linear-gradient(180deg, rgba(114,121,68,0.08), rgba(0,0,0,0.00));
-    padding:18px;
-  }
-  .stats-grid{ display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; }
-  .stat{
-    background:#fff; border:1px solid rgba(0,0,0,0.06);
-    border-radius:16px; padding:16px 16px;
-    display:flex; gap:12px; align-items:center;
-    transition:0.25s ease;
-  }
-  .stat:hover{ transform:translateY(-3px); box-shadow:0 10px 25px rgba(0,0,0,0.06); border-color:rgba(114,121,68,0.22); }
-  .stat i{ font-size:20px; color:#ff6a00; }
-  .stat .num{ font-family:Montserrat; font-size:22px; line-height:1.1; margin:0; color:#111; }
-  .stat .label{ margin:2px 0 0; font-size:13px; color:#555; }
+.about-title{
+font-family:Montserrat;
+font-size:28px;
+margin-bottom:12px;
+}
 
-  /* ====== PARCEIROS (cinza + loop contínuo) ====== */
-  .partners{ max-width:1100px; margin:0 auto 18px; padding:0 20px; }
-  .partners-title{
-    max-width:1100px; margin:0 auto 10px;
-    display:flex; align-items:center; gap:18px;
-  }
-  .partners-title .line{ height:2px; flex:1; background:rgba(0,0,0,0.10); border-radius:999px; }
-  .partners-title .text{
-    font-family:Montserrat; font-size:18px;
-    letter-spacing:1px; text-transform:uppercase;
-    white-space:nowrap; color:#111;
-  }
+.about-text{
+color:#333;
+font-size:15px;
+line-height:1.8;
+}
 
-  .partners-track{
-    position:relative; overflow:hidden;
-    border-radius:14px; border:1px solid rgba(0,0,0,0.06);
-    background:rgba(255,255,255,0.75);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    padding:14px 0;
-  }
-  .partners-track::before,.partners-track::after{
-    content:""; position:absolute; top:0; bottom:0; width:90px; z-index:2; pointer-events:none;
-  }
-  .partners-track::before{ left:0; background:linear-gradient(90deg, rgba(250,250,250,0.98), rgba(250,250,250,0)); }
-  .partners-track::after{ right:0; background:linear-gradient(270deg, rgba(250,250,250,0.98), rgba(250,250,250,0)); }
+/* CONTADOR */
 
-  .partners-marquee{
-    display:flex; width:max-content;
-    align-items:center; gap:56px;
-    animation: partnersMove 18s linear infinite;
-    padding-left:24px;
-  }
-  .partners-set{ display:flex; align-items:center; gap:56px; flex:0 0 auto; }
-  .partners-set img{
-    height:34px; width:auto; display:block;
-    opacity:0.55;
-    filter: grayscale(1) contrast(0.9) brightness(0.85);
-    transition:0.25s ease;
-  }
-  .partners-set img:hover{
-    opacity:0.8;
-    filter: grayscale(1) contrast(1) brightness(0.95);
-    transform:translateY(-1px);
-  }
-  @keyframes partnersMove{
-    0%{ transform:translateX(0); }
-    100%{ transform:translateX(-50%); }
-  }
+.stats{
+padding:70px 20px;
+background:#fff;
+}
 
-  /* SERVIÇOS */
-  .services{ padding:80px 20px; background:#fafafa; text-align:center; }
-  .services-divider{
-    max-width:1100px; margin:0 auto 8px;
-    display:flex; align-items:center; gap:18px; padding:0 20px;
-  }
-  .services-divider .line{ height:2px; flex:1; background:rgba(0,0,0,0.10); border-radius:999px; }
-  .services-divider .text{
-    font-family:Montserrat; font-size:18px; letter-spacing:1px;
-    text-transform:uppercase; white-space:nowrap; color:#111;
-  }
+.stats-inner{
+width:1100px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:20px;
+}
 
-  .service-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:30px;
-    max-width:1100px;
-    margin:28px auto 0;
-  }
-  .card{
-    background:#fff; padding:30px;
-    border-radius:14px; border:1px solid #eee;
-    transition:0.3s; text-align:left;
-  }
-  .card:hover{ transform:translateY(-6px); box-shadow:0 10px 25px rgba(0,0,0,0.08); }
-  .card i{ font-size:30px; color:#ff6a00; margin-bottom:15px; }
-  .card h3{ margin:0 0 10px; }
-  .card p{ margin:0; color:#444; line-height:1.6; }
+.stat{
+background:#fff;
+border:1px solid #eee;
+padding:20px;
+border-radius:14px;
+text-align:center;
+}
 
-  /* CASES */
-  .cases-divider{
-    max-width:1100px; margin:55px auto 10px;
-    display:flex; align-items:center; gap:18px;
-  }
-  .cases-divider .line{ height:2px; flex:1; background:rgba(255,255,255,0.55); border-radius:999px; }
-  .cases-divider .text{
-    font-family:Montserrat; font-size:18px; color:#fff;
-    letter-spacing:1px; text-transform:uppercase; white-space:nowrap;
-  }
-  .cases{ padding:10px 20px 90px; background:#727944; }
-  .cases-grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
-    gap:22px;
-    max-width:1100px;
-    margin:25px auto 0;
-  }
-  .case-card{
-    background:rgba(255,255,255,0.08);
-    border:1px solid rgba(255,255,255,0.18);
-    border-radius:14px;
-    padding:22px;
-    color:#fff;
-    text-align:left;
-    transition:0.3s;
-  }
-  .case-card:hover{ transform:translateY(-6px); box-shadow:0 16px 35px rgba(0,0,0,0.20); }
-  .case-card h3{ margin:0 0 8px; font-family:Montserrat; font-size:18px; }
-  .case-card p{ margin:0 0 12px; opacity:0.95; }
-  .case-result{ font-weight:800; opacity:0.95; display:inline-flex; align-items:center; gap:8px; }
+.stat i{
+font-size:26px;
+color:#ff6a00;
+}
 
-  /* ===== CLIENTES SATISFEITOS (NOVO) ===== */
-  .clients{
-    padding:80px 20px;
-    background:#fff;
-  }
-  .clients-divider{
-    max-width:1100px;
-    margin:0 auto 26px;
-    display:flex;
-    align-items:center;
-    gap:18px;
-    padding:0 20px;
-  }
-  .clients-divider .line{
-    height:2px;
-    flex:1;
-    background:rgba(0,0,0,0.10);
-    border-radius:999px;
-  }
-  .clients-divider .text{
-    font-family:Montserrat;
-    font-size:18px;
-    letter-spacing:1px;
-    text-transform:uppercase;
-    white-space:nowrap;
-    color:#111;
-  }
-  .clients-grid{
-    max-width:1100px;
-    margin:0 auto;
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:22px;
-    padding:0 20px;
-  }
-  .client-card{
-    background:#fff;
-    border:1px solid rgba(0,0,0,0.06);
-    border-radius:16px;
-    padding:18px 16px 18px;
-    transition:0.3s;
-    box-shadow:0 10px 25px rgba(0,0,0,0.04);
-    text-align:center;
-  }
-  .client-card:hover{
-    transform:translateY(-6px);
-    box-shadow:0 16px 35px rgba(0,0,0,0.08);
-    border-color:rgba(114,121,68,0.22);
-  }
-  .client-card img{
-    width:100%;
-    max-width:260px;
-    height:auto;
-    border-radius:14px;
-    display:block;
-    margin:0 auto;
-  }
-  .client-card .mini{
-    margin-top:14px;
-    text-align:left;
-    padding:14px 14px;
-    border-radius:14px;
-    background:linear-gradient(180deg, rgba(114,121,68,0.07), rgba(255,106,0,0.05));
-    border:1px solid rgba(0,0,0,0.06);
-  }
-  .mini .name{
-    font-family:Montserrat;
-    margin:0 0 4px;
-    font-size:16px;
-    color:#111;
-  }
-  .mini .role{
-    margin:0 0 10px;
-    font-size:13px;
-    color:#666;
-  }
-  .mini .stars{
-    color:#ffb400;
-    margin-bottom:10px;
-  }
-  .mini .text{
-    margin:0;
-    font-size:14px;
-    color:#333;
-    line-height:1.65;
-  }
+.stat .num{
+font-family:Montserrat;
+font-size:26px;
+margin-top:10px;
+}
 
-  /* CTA */
-  .cta{
-    padding:100px 20px;
-    background:linear-gradient(90deg,#556B2F,#FF6A00);
-    text-align:center;
-    color:#fff;
-  }
-  .cta h2{ margin-bottom:25px; }
-  .btn-primary{
-    background:#ff6a00;
-    color:#fff;
-    border:2px solid transparent;
-    justify-content:center;
-  }
-  .btn-primary:hover{
-    transform:translateY(-4px);
-    box-shadow:0 10px 25px rgba(0,0,0,0.25);
-  }
+/* SERVIÇOS */
 
-  footer{
-    background:#f5f5f5;
-    text-align:center;
-    padding:25px;
-    font-size:14px;
-    color:#777;
-  }
+.services{
+padding:80px 20px;
+background:#fafafa;
+text-align:center;
+}
 
-  @media (max-width:1150px){
-    .topbar-inner,.hero-inner,.about-inner,.stats-inner{width:92%;}
-  }
-  @media (max-width:900px){
-    .hero-inner{flex-direction:column;}
-    .hero-title{font-size:36px;}
-    .hero-right{max-width:100%;}
-    .hero-actions{flex-wrap:wrap; justify-content:center;}
+.services-divider{
+max-width:1100px;
+margin:auto;
+display:flex;
+align-items:center;
+gap:18px;
+}
 
-    .about-inner{flex-direction:column;}
-    .about-points{grid-template-columns:1fr;}
-    .stats-grid{grid-template-columns:1fr;}
-  }
+.services-divider .line{
+height:2px;
+flex:1;
+background:#ddd;
+}
+
+.services-divider .text{
+font-family:Montserrat;
+font-size:18px;
+}
+
+.service-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:30px;
+max-width:1100px;
+margin:40px auto 0;
+}
+
+.card{
+background:#fff;
+padding:30px;
+border-radius:14px;
+border:1px solid #eee;
+text-align:left;
+}
+
+.card i{
+font-size:30px;
+color:#ff6a00;
+margin-bottom:10px;
+}
+
+/* CASES */
+
+.cases{
+padding:90px 20px;
+background:#727944;
+}
+
+.cases-divider{
+max-width:1100px;
+margin:auto;
+display:flex;
+align-items:center;
+gap:18px;
+}
+
+.cases-divider .line{
+height:2px;
+flex:1;
+background:#fff;
+}
+
+.cases-divider .text{
+font-family:Montserrat;
+color:#fff;
+}
+
+.cases-grid{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+gap:25px;
+max-width:1100px;
+margin:40px auto;
+}
+
+.case-card{
+background:rgba(255,255,255,0.08);
+border:1px solid rgba(255,255,255,0.2);
+padding:25px;
+border-radius:14px;
+color:#fff;
+}
+
+/* CLIENTES SATISFEITOS */
+
+.clients{
+padding:80px 20px;
+background:#fff;
+}
+
+.clients-divider{
+max-width:1100px;
+margin:auto;
+display:flex;
+align-items:center;
+gap:18px;
+margin-bottom:40px;
+}
+
+.clients-divider .line{
+height:2px;
+flex:1;
+background:#ddd;
+}
+
+.clients-divider .text{
+font-family:Montserrat;
+font-size:18px;
+}
+
+.clients-grid{
+max-width:1100px;
+margin:auto;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+gap:30px;
+}
+
+.client-card{
+border:1px solid #eee;
+border-radius:16px;
+padding:14px;
+box-shadow:0 10px 25px rgba(0,0,0,0.04);
+transition:0.3s;
+}
+
+.client-card:hover{
+transform:translateY(-6px);
+box-shadow:0 16px 35px rgba(0,0,0,0.08);
+}
+
+.client-card img{
+width:100%;
+border-radius:12px;
+}
+
+/* CTA */
+
+.cta{
+padding:100px 20px;
+background:linear-gradient(90deg,#556B2F,#FF6A00);
+text-align:center;
+color:#fff;
+}
+
+.btn-primary{
+background:#ff6a00;
+color:#fff;
+padding:16px 30px;
+border-radius:12px;
+text-decoration:none;
+font-weight:bold;
+}
+
+/* FOOTER */
+
+footer{
+background:#f5f5f5;
+text-align:center;
+padding:25px;
+font-size:14px;
+color:#777;
+}
+
+@media (max-width:900px){
+
+.hero-inner{
+flex-direction:column;
+}
+
+.about-inner{
+flex-direction:column;
+}
+
+.stats-inner{
+grid-template-columns:1fr;
+}
+
+}
+
 </style>
 </head>
 
 <body>
 
 <header class="topbar">
-  <div class="topbar-inner">
-    <img src="logo.png" width="220" alt="FluxAI">
-  </div>
+<div class="topbar-inner">
+<img src="logo.png" width="220">
+</div>
 </header>
 
 <section class="hero">
-  <div class="hero-inner">
 
-    <div>
-      <h1 class="hero-title">SUA EMPRESA, SUA MARCA</h1>
+<div class="hero-inner">
 
-      <p class="hero-sub typewrap" aria-live="polite">
-        <span class="typewriter" id="heroType"></span><span class="cursor"></span>
-      </p>
+<div>
 
-      <div class="hero-actions">
-        <a class="btn btn-outline btn-pulse" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
-          <i class="fa-brands fa-whatsapp"></i> WhatsApp
-        </a>
+<h1 class="hero-title">SUA EMPRESA, SUA MARCA</h1>
 
-        <a class="btn btn-outline btn-glow" href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">
-          <i class="fa-brands fa-instagram"></i> Instagram
-        </a>
-      </div>
-    </div>
+<p class="hero-sub">
+Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atrair os clientes certos.
+</p>
 
-    <div class="hero-right" id="tiltWrap">
-      <img class="tilt" src="inteligencia-artificial-no-marketing-digital.jpg" alt="Marketing Digital e IA" id="tiltImg">
-    </div>
+<div class="hero-actions">
 
-  </div>
+<a class="btn btn-outline" href="https://wa.me/5571981114694">
+<i class="fa-brands fa-whatsapp"></i> WhatsApp
+</a>
+
+<a class="btn btn-outline" href="https://instagram.com/fluxai.mark">
+<i class="fa-brands fa-instagram"></i> Instagram
+</a>
+
+</div>
+
+</div>
+
+<div class="hero-right">
+<img src="inteligencia-artificial-no-marketing-digital.jpg">
+</div>
+
+</div>
+
 </section>
 
-<!-- SOBRE A FLUXAI -->
-<section class="about" id="sobre">
-  <div class="about-inner">
+<!-- SOBRE -->
 
-    <div class="about-left">
-      <div class="about-kicker reveal">A agencia FluxAI | Marketing digital</div>
+<section class="about">
 
-      <h2 class="about-title reveal">Sobre a FluxAI</h2>
+<div class="about-inner">
 
-      <p class="about-text reveal">
-        A FluxAI é uma agência especializada em posicionamento digital, estratégia de marketing e automação com inteligência artificial.
-      </p>
+<div>
 
-      <p class="about-text reveal">
-        Nosso foco é ajudar empresas a saírem do anonimato e se tornarem marcas fortes, com presença estratégica nas redes sociais, conteúdo profissional e processos automatizados que geram mais clientes.
-      </p>
+<h2 class="about-title">Sobre a FluxAI</h2>
 
-      <p class="about-text reveal">
-        Unimos criatividade, tecnologia e estratégia para construir negócios sólidos no ambiente digital.
-      </p>
+<p class="about-text">
+A FluxAI é uma agência especializada em posicionamento digital, estratégia de marketing e automação com inteligência artificial.
+</p>
 
-      <div class="about-sep reveal"></div>
+<p class="about-text">
+Nosso foco é ajudar empresas a se tornarem marcas fortes e gerar mais clientes através do marketing digital.
+</p>
 
-      <div style="height:16px;"></div>
-      <div style="height:16px;"></div>
+</div>
 
-      <div class="about-diff-title reveal">Diferenciais</div>
+<div>
 
-      <div class="about-points stagger reveal" data-stagger>
-        <div class="point"><i class="fa-solid fa-circle-check"></i> Estratégia e posicionamento feitos para Salvador</div>
-        <div class="point"><i class="fa-solid fa-circle-check"></i> Conteúdo premium + design que gera percepção de valor</div>
-        <div class="point"><i class="fa-solid fa-circle-check"></i> Tráfego pago com foco em demanda e conversão</div>
-        <div class="point"><i class="fa-solid fa-circle-check"></i> Automação com IA para vender e atender 24/7</div>
-      </div>
-    </div>
+<img src="inteligencia-artificial-no-marketing-digital.jpg" width="100%" style="border-radius:12px">
 
-    <div class="about-right reveal">
-      <div class="about-visual">
-        <img src="inteligencia-artificial-no-marketing-digital.jpg" alt="Equipe / Escritório FluxAI">
-        <div class="about-mini">
-          <i class="fa-solid fa-bolt"></i>
-          <p><b>Premium e direto ao ponto:</b> estratégia, execução e automação para sua marca crescer com consistência.</p>
-        </div>
-      </div>
-    </div>
+</div>
 
-  </div>
+</div>
+
 </section>
 
 <!-- CONTADOR -->
+
 <section class="stats">
-  <div class="stats-inner reveal" id="stats">
-    <div class="stats-grid">
-      <div class="stat">
-        <i class="fa-solid fa-briefcase"></i>
-        <div>
-          <p class="num"><span class="count" data-target="120">0</span>+</p>
-          <p class="label">Projetos e entregas</p>
-        </div>
-      </div>
 
-      <div class="stat">
-        <i class="fa-solid fa-chart-line"></i>
-        <div>
-          <p class="num"><span class="count" data-target="480">0</span>%</p>
-          <p class="label">Crescimento em performance</p>
-        </div>
-      </div>
+<div class="stats-inner">
 
-      <div class="stat">
-        <i class="fa-solid fa-users"></i>
-        <div>
-          <p class="num"><span class="count" data-target="60">0</span>+</p>
-          <p class="label">Marcas atendidas</p>
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="stat">
+<i class="fa-solid fa-briefcase"></i>
+<p class="num">120+</p>
+Projetos
+</div>
+
+<div class="stat">
+<i class="fa-solid fa-chart-line"></i>
+<p class="num">480%</p>
+Performance
+</div>
+
+<div class="stat">
+<i class="fa-solid fa-users"></i>
+<p class="num">60+</p>
+Clientes
+</div>
+
+</div>
+
 </section>
 
 <!-- SERVIÇOS -->
+
 <section class="services">
 
-  <!-- PARCEIROS -->
-  <div class="partners">
-    <div class="partners-title reveal">
-      <div class="line"></div>
-      <div class="text">APROVADO POR NOSSOS PARCEIROS</div>
-      <div class="line"></div>
-    </div>
+<div class="services-divider">
 
-    <div class="partners-track reveal">
-      <div class="partners-marquee" aria-label="Marcas parceiras">
-        <div class="partners-set">
-          <img src="parceiro-01.png" alt="Parceiro 01">
-          <img src="parceiro-02.png" alt="Parceiro 02">
-          <img src="parceiro-01.png" alt="Parceiro 01">
-          <img src="parceiro-02.png" alt="Parceiro 02">
-        </div>
-        <div class="partners-set" aria-hidden="true">
-          <img src="parceiro-01.png" alt="">
-          <img src="parceiro-02.png" alt="">
-          <img src="parceiro-01.png" alt="">
-          <img src="parceiro-02.png" alt="">
-        </div>
-      </div>
-    </div>
-  </div>
+<div class="line"></div>
+<div class="text">O que construímos para sua empresa</div>
+<div class="line"></div>
 
-  <div class="services-divider">
-    <div class="line"></div>
-    <div class="text">O que construímos para sua empresa</div>
-    <div class="line"></div>
-  </div>
+</div>
 
-  <div class="service-grid">
-    <div class="card">
-      <i class="fa-solid fa-palette"></i>
-      <h3>Identidade Visual</h3>
-      <p>Logo, cores e posicionamento estratégico para sua marca se destacar.</p>
-    </div>
+<div class="service-grid">
 
-    <div class="card">
-      <i class="fa-solid fa-mobile-screen"></i>
-      <h3>Gestão de Redes Sociais</h3>
-      <p>Planejamento e crescimento estratégico no Instagram e redes sociais.</p>
-    </div>
+<div class="card">
+<i class="fa-solid fa-palette"></i>
+<h3>Identidade Visual</h3>
+<p>Logo e posicionamento estratégico.</p>
+</div>
 
-    <div class="card">
-      <i class="fa-solid fa-bullhorn"></i>
-      <h3>Social Media</h3>
-      <p>Conteúdo pensado para gerar engajamento e autoridade.</p>
-    </div>
+<div class="card">
+<i class="fa-solid fa-mobile-screen"></i>
+<h3>Gestão de Redes</h3>
+<p>Crescimento estratégico no Instagram.</p>
+</div>
 
-    <div class="card">
-      <i class="fa-solid fa-robot"></i>
-      <h3>Automação com IA</h3>
-      <p>Chatbots e automação inteligente para vender mais.</p>
-    </div>
+<div class="card">
+<i class="fa-solid fa-robot"></i>
+<h3>Automação com IA</h3>
+<p>Chatbots e automação inteligente.</p>
+</div>
 
-    <div class="card">
-      <i class="fa-solid fa-pen-nib"></i>
-      <h3>Criação de Conteúdo</h3>
-      <p>Conteúdos estratégicos que atraem clientes certos.</p>
-    </div>
+</div>
 
-    <div class="card">
-      <i class="fa-solid fa-video"></i>
-      <h3>Produção de Vídeo</h3>
-      <p>Reels, anúncios e vídeos profissionais para sua marca.</p>
-    </div>
-  </div>
 </section>
 
 <!-- CASES -->
+
 <section class="cases">
-  <div class="cases-divider">
-    <div class="line"></div>
-    <div class="text">Cases de Sucesso</div>
-    <div class="line"></div>
-  </div>
 
-  <div class="cases-grid">
-    <div class="case-card">
-      <h3>Clínica Odontológica</h3>
-      <p>Reposicionamento da marca + tráfego pago + conteúdo estratégico.</p>
-      <div class="case-result"><i class="fa-solid fa-arrow-trend-up"></i> +180% leads</div>
-    </div>
+<div class="cases-divider">
 
-    <div class="case-card">
-      <h3>Empresa de Serviços</h3>
-      <p>Gestão de redes sociais + identidade visual + campanhas locais.</p>
-      <div class="case-result"><i class="fa-solid fa-arrow-trend-up"></i> +65% conversões</div>
-    </div>
+<div class="line"></div>
+<div class="text">Cases de Sucesso</div>
+<div class="line"></div>
 
-    <div class="case-card">
-      <h3>Automação com IA</h3>
-      <p>Chatbot inteligente + funil de atendimento + qualificação automática.</p>
-      <div class="case-result"><i class="fa-solid fa-arrow-trend-up"></i> -40% tempo de resposta</div>
-    </div>
-  </div>
+</div>
+
+<div class="cases-grid">
+
+<div class="case-card">
+<h3>Clínica</h3>
+<p>Reposicionamento e tráfego pago.</p>
+</div>
+
+<div class="case-card">
+<h3>Empresa</h3>
+<p>Gestão de redes e campanhas.</p>
+</div>
+
+<div class="case-card">
+<h3>Automação</h3>
+<p>Chatbot inteligente.</p>
+</div>
+
+</div>
+
 </section>
 
-<!-- ✅ CLIENTES SATISFEITOS (NOVO) -->
+<!-- CLIENTES -->
+
 <section class="clients">
-  <div class="clients-divider reveal">
-    <div class="line"></div>
-    <div class="text">CLIENTES SATISFEITOS</div>
-    <div class="line"></div>
-  </div>
 
-  <div class="clients-grid">
+<div class="clients-divider">
 
-    <div class="client-card reveal">
-      <img src="cliente-joao.png" alt="Depoimento João Santos">
-      <div class="mini">
-        <p class="name">João Santos</p>
-        <p class="role">Gestor Comercial – Grupo NovaMidia</p>
-        <div class="stars" aria-label="5 estrelas">
-          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-        </div>
-        <p class="text">A implementação da automação e dos processos digitais pela FluxAI trouxe muita produtividade para nossa equipe.</p>
-      </div>
-    </div>
+<div class="line"></div>
+<div class="text">#CLIENTES SATISFEITOS</div>
+<div class="line"></div>
 
-    <div class="client-card reveal">
-      <img src="cliente-camila.png" alt="Depoimento Dr. Camila Oliveira">
-      <div class="mini">
-        <p class="name">Dr. Camila Oliveira</p>
-        <p class="role">CEO da Clínica Sorriso Prime</p>
-        <div class="stars" aria-label="5 estrelas">
-          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-        </div>
-        <p class="text">A FluxAI organizou toda a estrutura de marketing e processos da clínica. Tivemos mais controle, mais previsibilidade e crescimento nas agendas.</p>
-      </div>
-    </div>
+</div>
 
-    <div class="client-card reveal">
-      <img src="cliente-lucas.png" alt="Depoimento Lucas Almeida">
-      <div class="mini">
-        <p class="name">Lucas Almeida</p>
-        <p class="role">Diretor da Viree</p>
-        <div class="stars" aria-label="5 estrelas">
-          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-        </div>
-        <p class="text">Fizemos todo nosso fluxograma de processos e padronização com a FluxAI. Hoje nossa operação é muito mais organizada e eficiente. Estou extremamente satisfeito com o resultado.</p>
-      </div>
-    </div>
+<div class="clients-grid">
 
-    <div class="client-card reveal">
-      <img src="cliente-silvana.png" alt="Depoimento Silvana Patricia">
-      <div class="mini">
-        <p class="name">Silvana Patricia</p>
-        <p class="role">CEO da Sil Sabores</p>
-        <div class="stars" aria-label="5 estrelas">
-          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
-        </div>
-        <p class="text">A FluxAI fez todo o rebranding da minha marca. Estudou profundamente o posicionamento e trouxe sugestões estratégicas que aplico todos os dias. Hoje tenho uma identidade visual mais forte e alinhada com o posicionamento que minha marca merece.</p>
-      </div>
-    </div>
+<div class="client-card">
+<img src="cliente-joao.png">
+</div>
 
-  </div>
+<div class="client-card">
+<img src="cliente-camila.png">
+</div>
+
+<div class="client-card">
+<img src="cliente-lucas.png">
+</div>
+
+<div class="client-card">
+<img src="cliente-silvana.png">
+</div>
+
+</div>
+
 </section>
 
 <!-- CTA -->
+
 <section class="cta">
-  <h2>Pronto para transformar sua empresa em uma marca forte?</h2>
-  <a class="btn btn-primary" href="https://wa.me/5571981114694" target="_blank" rel="noopener">
-    Quero meu diagnóstico
-  </a>
+
+<h2>Pronto para transformar sua empresa?</h2>
+
+<a class="btn-primary" href="https://wa.me/5571981114694">
+Quero meu diagnóstico
+</a>
+
 </section>
 
 <footer>
-  © 2026 • FluxAI Marketing Digital • Salvador / Bahia
+
+© 2026 • FluxAI Marketing Digital • Salvador / Bahia
+
 </footer>
-
-<script>
-  // ===== HERO: Typewriter =====
-  const text = "Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.";
-  const el = document.getElementById("heroType");
-  let i = 0;
-
-  function type(){
-    if(!el) return;
-    el.textContent = text.slice(0, i);
-    i++;
-    if(i <= text.length) setTimeout(type, 18);
-  }
-  window.addEventListener("load", () => setTimeout(type, 350));
-
-  // ===== HERO: Tilt na imagem =====
-  const wrap = document.getElementById("tiltWrap");
-  const img = document.getElementById("tiltImg");
-
-  if(wrap && img){
-    wrap.addEventListener("mousemove", (e)=>{
-      const rect = wrap.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      const rotY = x * 10;
-      const rotX = -y * 10;
-      img.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(0)`;
-    });
-    wrap.addEventListener("mouseleave", ()=>{
-      img.style.transform = "rotateX(0deg) rotateY(0deg) translateZ(0)";
-    });
-  }
-
-  // ===== Reveal ao rolar =====
-  const observer = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        entry.target.classList.add('show');
-        if(entry.target.hasAttribute('data-stagger')) entry.target.classList.add('show');
-        observer.unobserve(entry.target);
-      }
-    });
-  },{threshold:0.14});
-  document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
-
-  // ===== Contador =====
-  const counters = document.querySelectorAll('.count');
-  let counted = false;
-
-  const runCounters = () => {
-    if(counted) return;
-    counted = true;
-
-    counters.forEach(counter => {
-      const target = Number(counter.getAttribute('data-target')) || 0;
-      const duration = 1200;
-      const startTime = performance.now();
-
-      const step = (now) => {
-        const progress = Math.min((now - startTime) / duration, 1);
-        const value = Math.floor(progress * target);
-        counter.textContent = value.toString();
-
-        if(progress < 1) requestAnimationFrame(step);
-        else counter.textContent = target.toString();
-      };
-
-      requestAnimationFrame(step);
-    });
-  };
-
-  const statsEl = document.getElementById('stats');
-  const statsObserver = new IntersectionObserver((entries)=>{
-    entries.forEach(entry=>{
-      if(entry.isIntersecting){
-        runCounters();
-        statsObserver.unobserve(entry.target);
-      }
-    });
-  },{threshold:0.25});
-
-  if(statsEl) statsObserver.observe(statsEl);
-</script>
 
 </body>
 </html>
