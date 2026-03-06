@@ -374,6 +374,93 @@
   .case-card p{ margin:0 0 12px; opacity:0.95; }
   .case-result{ font-weight:800; opacity:0.95; display:inline-flex; align-items:center; gap:8px; }
 
+  /* ===== CLIENTES SATISFEITOS (NOVO) ===== */
+  .clients{
+    padding:80px 20px;
+    background:#fff;
+  }
+  .clients-divider{
+    max-width:1100px;
+    margin:0 auto 26px;
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:0 20px;
+  }
+  .clients-divider .line{
+    height:2px;
+    flex:1;
+    background:rgba(0,0,0,0.10);
+    border-radius:999px;
+  }
+  .clients-divider .text{
+    font-family:Montserrat;
+    font-size:18px;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    white-space:nowrap;
+    color:#111;
+  }
+  .clients-grid{
+    max-width:1100px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    gap:22px;
+    padding:0 20px;
+  }
+  .client-card{
+    background:#fff;
+    border:1px solid rgba(0,0,0,0.06);
+    border-radius:16px;
+    padding:18px 16px 18px;
+    transition:0.3s;
+    box-shadow:0 10px 25px rgba(0,0,0,0.04);
+    text-align:center;
+  }
+  .client-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 16px 35px rgba(0,0,0,0.08);
+    border-color:rgba(114,121,68,0.22);
+  }
+  .client-card img{
+    width:100%;
+    max-width:260px;
+    height:auto;
+    border-radius:14px;
+    display:block;
+    margin:0 auto;
+  }
+  .client-card .mini{
+    margin-top:14px;
+    text-align:left;
+    padding:14px 14px;
+    border-radius:14px;
+    background:linear-gradient(180deg, rgba(114,121,68,0.07), rgba(255,106,0,0.05));
+    border:1px solid rgba(0,0,0,0.06);
+  }
+  .mini .name{
+    font-family:Montserrat;
+    margin:0 0 4px;
+    font-size:16px;
+    color:#111;
+  }
+  .mini .role{
+    margin:0 0 10px;
+    font-size:13px;
+    color:#666;
+  }
+  .mini .stars{
+    color:#ffb400;
+    margin-bottom:10px;
+  }
+  .mini .text{
+    margin:0;
+    font-size:14px;
+    color:#333;
+    line-height:1.65;
+  }
+
   /* CTA */
   .cta{
     padding:100px 20px;
@@ -633,6 +720,67 @@
       <p>Chatbot inteligente + funil de atendimento + qualificação automática.</p>
       <div class="case-result"><i class="fa-solid fa-arrow-trend-up"></i> -40% tempo de resposta</div>
     </div>
+  </div>
+</section>
+
+<!-- ✅ CLIENTES SATISFEITOS (NOVO) -->
+<section class="clients">
+  <div class="clients-divider reveal">
+    <div class="line"></div>
+    <div class="text">CLIENTES SATISFEITOS</div>
+    <div class="line"></div>
+  </div>
+
+  <div class="clients-grid">
+
+    <div class="client-card reveal">
+      <img src="cliente-joao.png" alt="Depoimento João Santos">
+      <div class="mini">
+        <p class="name">João Santos</p>
+        <p class="role">Gestor Comercial – Grupo NovaMidia</p>
+        <div class="stars" aria-label="5 estrelas">
+          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+        </div>
+        <p class="text">A implementação da automação e dos processos digitais pela FluxAI trouxe muita produtividade para nossa equipe.</p>
+      </div>
+    </div>
+
+    <div class="client-card reveal">
+      <img src="cliente-camila.png" alt="Depoimento Dr. Camila Oliveira">
+      <div class="mini">
+        <p class="name">Dr. Camila Oliveira</p>
+        <p class="role">CEO da Clínica Sorriso Prime</p>
+        <div class="stars" aria-label="5 estrelas">
+          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+        </div>
+        <p class="text">A FluxAI organizou toda a estrutura de marketing e processos da clínica. Tivemos mais controle, mais previsibilidade e crescimento nas agendas.</p>
+      </div>
+    </div>
+
+    <div class="client-card reveal">
+      <img src="cliente-lucas.png" alt="Depoimento Lucas Almeida">
+      <div class="mini">
+        <p class="name">Lucas Almeida</p>
+        <p class="role">Diretor da Viree</p>
+        <div class="stars" aria-label="5 estrelas">
+          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+        </div>
+        <p class="text">Fizemos todo nosso fluxograma de processos e padronização com a FluxAI. Hoje nossa operação é muito mais organizada e eficiente. Estou extremamente satisfeito com o resultado.</p>
+      </div>
+    </div>
+
+    <div class="client-card reveal">
+      <img src="cliente-silvana.png" alt="Depoimento Silvana Patricia">
+      <div class="mini">
+        <p class="name">Silvana Patricia</p>
+        <p class="role">CEO da Sil Sabores</p>
+        <div class="stars" aria-label="5 estrelas">
+          <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i>
+        </div>
+        <p class="text">A FluxAI fez todo o rebranding da minha marca. Estudou profundamente o posicionamento e trouxe sugestões estratégicas que aplico todos os dias. Hoje tenho uma identidade visual mais forte e alinhada com o posicionamento que minha marca merece.</p>
+      </div>
+    </div>
+
   </div>
 </section>
 
