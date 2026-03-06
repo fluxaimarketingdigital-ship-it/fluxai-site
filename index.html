@@ -42,7 +42,7 @@ gtag('config', 'G-KGJRE4BJYQ');
 
   .hero{
     background:#727944;
-    padding:60px 20px 40px;
+    padding:60px 20px 0;
     position:relative;
     overflow:hidden;
   }
@@ -79,17 +79,23 @@ gtag('config', 'G-KGJRE4BJYQ');
   }
 
   .hero-inner{
-  width:1100px;
-  margin:auto;
-  display:flex;
-  align-items:flex-end;
-  gap:40px;
-  position:relative;
-  z-index:1;
-}
+    width:1100px;
+    margin:auto;
+    display:flex;
+    align-items:flex-end;
+    gap:40px;
+    position:relative;
+    z-index:1;
+  }
+
+  /* sobe apenas texto/botoes, mantendo a mulher no mesmo lugar */
+  .hero-content{
+    margin-bottom:170px;
+  }
+
   .hero-title{
     font-family:Montserrat;
-    color:#fff;
+    color:#ffffff;
     font-size:44px;
     margin:0;
     letter-spacing:0.5px;
@@ -152,7 +158,7 @@ gtag('config', 'G-KGJRE4BJYQ');
     display:flex;
     gap:15px;
     flex-wrap:wrap;
-    padding-bottom:60px;
+    padding-bottom:0;
   }
 
   .btn{
@@ -202,7 +208,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     box-shadow:0 10px 25px rgba(0,0,0,0.25);
   }
 
-  /* botão superior */
   .topbar-whatsapp{
     background:#727944;
     color:#fff;
@@ -226,7 +231,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     overflow:visible;
   }
 
-  /* imagem mais baixa até a barra verde */
   .hero-woman{
     width:100%;
     max-width:620px;
@@ -240,17 +244,16 @@ gtag('config', 'G-KGJRE4BJYQ');
     z-index:2;
     object-fit:contain;
     object-position:center bottom;
-    margin-bottom:-70px;
+    margin-bottom:-26px;
     margin-top:20px;
   }
 
-  /* cérebro descido até as mãos */
   .hero-brain{
     position:absolute;
-    width:230px;
+    width:195px;
     max-width:38%;
     right:118px;
-    top:380px;
+    top:305px;
     z-index:3;
     filter: drop-shadow(0 16px 30px rgba(0,0,0,0.22));
     animation: brainFlow 3.2s ease-in-out infinite;
@@ -752,6 +755,11 @@ gtag('config', 'G-KGJRE4BJYQ');
       font-size:36px;
       white-space:normal;
     }
+
+    .hero-content{
+      margin-bottom:20px;
+    }
+
     .hero-right{max-width:100%; min-height:auto;}
     .hero-actions{justify-content:center; padding-bottom:25px;}
     .about-inner{flex-direction:column;}
@@ -794,7 +802,7 @@ gtag('config', 'G-KGJRE4BJYQ');
 <section class="hero">
   <div class="hero-inner">
 
-    <div>
+    <div class="hero-content">
       <div class="hero-head">
         <h1 class="hero-title">SUA EMPRESA, SUA MARCA.</h1>
       </div>
@@ -1229,13 +1237,3 @@ gtag('config', 'G-KGJRE4BJYQ');
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
