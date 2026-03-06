@@ -215,7 +215,7 @@ gtag('config', 'G-KGJRE4BJYQ');
     box-shadow:0 10px 25px rgba(0,0,0,0.25);
   }
 
-  /* ✅ HERO VISUAL (mulher + fundo dinâmico) */
+  /* ✅ HERO VISUAL (mulher integrada ao site) */
   .hero-right{
     width:100%;
     max-width:520px;
@@ -223,50 +223,23 @@ gtag('config', 'G-KGJRE4BJYQ');
     display:flex;
     align-items:center;
     justify-content:center;
-    perspective:900px;
   }
   .hero-shape{
-    position:absolute;
-    width:520px;
-    height:520px;
-    border-radius:50%;
-    background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
-    top:-70px;
-    right:-120px;
-    z-index:0;
-    pointer-events:none;
+    display:none;
   }
   .hero-glow{
-    position:absolute;
-    width:380px;
-    height:380px;
-    background: radial-gradient(circle, rgba(255,106,0,0.35), transparent 70%);
-    border-radius:50%;
-    filter:blur(25px);
-    z-index:1;
-    pointer-events:none;
-    animation: glowPulse 3.8s ease-in-out infinite;
-  }
-  @keyframes glowPulse{
-    0%,100%{ transform:scale(1); opacity:0.95; }
-    50%{ transform:scale(1.06); opacity:1; }
+    display:none;
   }
 
   .hero-woman{
     width:100%;
     max-width:520px;
-    border-radius:18px;
-    transform-style:preserve-3d;
-    transition: transform 0.15s ease;
-    box-shadow:0 18px 40px rgba(0,0,0,0.22);
-    z-index:2;
-    animation: floatHero 4s ease-in-out infinite;
-    will-change: transform;
-  }
-  @keyframes floatHero{
-    0%{ transform:translateY(0px); }
-    50%{ transform:translateY(-12px); }
-    100%{ transform:translateY(0px); }
+    display:block;
+    box-shadow:none;
+    border-radius:0;
+    background:none;
+    animation:none;
+    transform:none !important;
   }
 
   /* ===== SOBRE A FLUXAI (premium/clean) ===== */
@@ -798,7 +771,7 @@ gtag('config', 'G-KGJRE4BJYQ');
       </div>
     </div>
 
-    <!-- ✅ IMAGEM PRINCIPAL NO HERO (mulher + fundo dinâmico) -->
+    <!-- ✅ IMAGEM PRINCIPAL NO HERO -->
     <div class="hero-right" id="tiltWrap" aria-label="Imagem FluxAI">
       <div class="hero-shape"></div>
       <div class="hero-glow"></div>
@@ -1165,24 +1138,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     if(i <= text.length) setTimeout(type, 18);
   }
   window.addEventListener("load", () => setTimeout(type, 350));
-
-  // ===== HERO: Tilt na imagem (mantido) =====
-  const wrap = document.getElementById("tiltWrap");
-  const img = document.getElementById("tiltImg");
-
-  if(wrap && img){
-    wrap.addEventListener("mousemove", (e)=>{
-      const rect = wrap.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width - 0.5;
-      const y = (e.clientY - rect.top) / rect.height - 0.5;
-      const rotY = x * 9;
-      const rotX = -y * 9;
-      img.style.transform = `translateY(-6px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-    });
-    wrap.addEventListener("mouseleave", ()=>{
-      img.style.transform = "";
-    });
-  }
 
   // ===== Reveal ao rolar =====
   const observer = new IntersectionObserver((entries)=>{
