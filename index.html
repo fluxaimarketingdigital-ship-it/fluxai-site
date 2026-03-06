@@ -29,6 +29,7 @@
     overflow:hidden;
   }
 
+  /* Partículas leves (premium) */
   .hero::before{
     content:"";
     position:absolute;
@@ -43,8 +44,12 @@
     animation: floatDots 8s ease-in-out infinite alternate;
     pointer-events:none;
   }
-  @keyframes floatDots{ from{ transform:translateY(0); } to{ transform:translateY(-14px); } }
+  @keyframes floatDots{
+    from{ transform:translateY(0); }
+    to{ transform:translateY(-14px); }
+  }
 
+  /* brilho suave no fundo */
   .hero::after{
     content:"";
     position:absolute;
@@ -67,14 +72,16 @@
     z-index:1;
   }
 
+  /* Título com efeito premium + entrada */
   .hero-title{
     font-family:Montserrat;
     color:#fff;
     font-size:44px;
-    margin-bottom:20px;
+    margin:0;
     letter-spacing:0.5px;
     position:relative;
     animation: heroIn 0.9s ease both;
+    line-height:1.05;
   }
   .hero-title::after{
     content:"";
@@ -86,8 +93,35 @@
     border-radius:999px;
     background: rgba(255,255,255,0.38);
   }
-  @keyframes heroIn{ from{ opacity:0; transform:translateY(10px); } to{ opacity:1; transform:translateY(0); } }
+  @keyframes heroIn{
+    from{ opacity:0; transform:translateY(10px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
 
+  /* ✅ TÍTULO + IMAGEM AO LADO */
+  .hero-head{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+  }
+  .hero-sideimg{
+    width:92px;
+    height:92px;
+    object-fit:cover;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,0.35);
+    box-shadow:0 14px 28px rgba(0,0,0,0.18);
+    background:rgba(255,255,255,0.10);
+    transition:0.25s ease;
+  }
+  .hero-sideimg:hover{
+    transform:translateY(-3px);
+    box-shadow:0 18px 40px rgba(0,0,0,0.26);
+  }
+
+  /* Texto com borda lateral e animação */
   .hero-sub{
     color:#fff;
     font-size:17px;
@@ -98,6 +132,7 @@
     opacity:.95;
   }
 
+  /* Typewriter (digitação) */
   .typewrap{ min-height:58px; }
   .typewriter{ display:inline; }
   .cursor{
@@ -109,7 +144,10 @@
     transform:translateY(3px);
     animation: blink 0.8s infinite;
   }
-  @keyframes blink{ 0%,49%{ opacity:1; } 50%,100%{ opacity:0; } }
+  @keyframes blink{
+    0%,49%{ opacity:1; }
+    50%,100%{ opacity:0; }
+  }
 
   .hero-actions{
     margin-top:25px;
@@ -118,6 +156,7 @@
     flex-wrap:wrap;
   }
 
+  /* BOTÕES */
   .btn{
     padding:14px 22px;
     border-radius:10px;
@@ -145,12 +184,14 @@
     box-shadow:0 10px 25px rgba(0,0,0,0.25);
   }
 
+  /* Pulse sutil no WhatsApp */
   .btn-pulse{ animation: pulse 1.8s ease-in-out infinite; }
   @keyframes pulse{
     0%,100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
     50%{ box-shadow: 0 0 0 10px rgba(255,255,255,0.08); }
   }
 
+  /* Glow no hover (Instagram) */
   .btn-glow:hover{
     box-shadow:0 10px 25px rgba(0,0,0,0.25), 0 0 0 6px rgba(255,106,0,0.12);
   }
@@ -165,20 +206,61 @@
     box-shadow:0 10px 25px rgba(0,0,0,0.25);
   }
 
+  /* ✅ HERO VISUAL (mulher + fundo dinâmico) */
   .hero-right{
     width:100%;
     max-width:520px;
+    position:relative;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     perspective:900px;
   }
-  .tilt{
+  .hero-shape{
+    position:absolute;
+    width:520px;
+    height:520px;
+    border-radius:50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.14), transparent 70%);
+    top:-70px;
+    right:-120px;
+    z-index:0;
+    pointer-events:none;
+  }
+  .hero-glow{
+    position:absolute;
+    width:380px;
+    height:380px;
+    background: radial-gradient(circle, rgba(255,106,0,0.35), transparent 70%);
+    border-radius:50%;
+    filter:blur(25px);
+    z-index:1;
+    pointer-events:none;
+    animation: glowPulse 3.8s ease-in-out infinite;
+  }
+  @keyframes glowPulse{
+    0%,100%{ transform:scale(1); opacity:0.95; }
+    50%{ transform:scale(1.06); opacity:1; }
+  }
+
+  .hero-woman{
     width:100%;
-    border-radius:12px;
+    max-width:520px;
+    border-radius:18px;
     transform-style:preserve-3d;
     transition: transform 0.15s ease;
     box-shadow:0 18px 40px rgba(0,0,0,0.22);
+    z-index:2;
+    animation: floatHero 4s ease-in-out infinite;
+    will-change: transform;
+  }
+  @keyframes floatHero{
+    0%{ transform:translateY(0px); }
+    50%{ transform:translateY(-12px); }
+    100%{ transform:translateY(0px); }
   }
 
-  /* ===== SOBRE A FLUXAI ===== */
+  /* ===== SOBRE A FLUXAI (premium/clean) ===== */
   .about{ padding:85px 20px 50px; background:#fff; }
   .about-inner{ width:1100px; margin:auto; display:flex; align-items:center; gap:44px; }
   .about-left{ flex:1; } .about-right{ flex:1; }
@@ -251,7 +333,7 @@
   .stat .num{ font-family:Montserrat; font-size:22px; line-height:1.1; margin:0; color:#111; }
   .stat .label{ margin:2px 0 0; font-size:13px; color:#555; }
 
-  /* ====== PARCEIROS ====== */
+  /* ====== PARCEIROS (cinza + loop contínuo) ====== */
   .partners{ max-width:1100px; margin:0 auto 18px; padding:0 20px; }
   .partners-title{
     max-width:1100px; margin:0 auto 10px;
@@ -296,7 +378,10 @@
     filter: grayscale(1) contrast(1) brightness(0.95);
     transform:translateY(-1px);
   }
-  @keyframes partnersMove{ 0%{ transform:translateX(0); } 100%{ transform:translateX(-50%); } }
+  @keyframes partnersMove{
+    0%{ transform:translateX(0); }
+    100%{ transform:translateX(-50%); }
+  }
 
   /* SERVIÇOS */
   .services{ padding:80px 20px; background:#fafafa; text-align:center; }
@@ -480,7 +565,7 @@
   .case-card p{ margin:0 0 12px; opacity:0.95; }
   .case-result{ font-weight:800; opacity:0.95; display:inline-flex; align-items:center; gap:8px; }
 
-  /* CLIENTES SATISFEITOS */
+  /* CLIENTES SATISFEITOS (apenas imagens) */
   .clients{
     padding:80px 20px;
     background:#fff;
@@ -582,7 +667,7 @@
     font-size:14px;
   }
 
-  /* CTA final */
+  /* CTA */
   .cta{
     padding:100px 20px;
     background:linear-gradient(90deg,#556B2F,#FF6A00);
@@ -662,6 +747,7 @@
     .stats-grid{grid-template-columns:1fr;}
     .mid-cta-inner{flex-direction:column; align-items:flex-start;}
     .faq-grid{ grid-template-columns:1fr; }
+    .hero-sideimg{ width:78px; height:78px; }
   }
 </style>
 </head>
@@ -678,7 +764,11 @@
   <div class="hero-inner">
 
     <div>
-      <h1 class="hero-title">SUA EMPRESA, SUA MARCA</h1>
+      <!-- ✅ TÍTULO + IMAGEM AO LADO -->
+      <div class="hero-head">
+        <h1 class="hero-title">SUA EMPRESA, SUA MARCA</h1>
+        <img class="hero-sideimg" src="mulher.png" alt="FluxAI - Estratégia e Performance">
+      </div>
 
       <p class="hero-sub typewrap" aria-live="polite">
         <span class="typewriter" id="heroType"></span><span class="cursor"></span>
@@ -699,8 +789,11 @@
       </div>
     </div>
 
-    <div class="hero-right" id="tiltWrap">
-      <img class="tilt" src="inteligencia-artificial-no-marketing-digital.jpg" alt="Marketing Digital e IA" id="tiltImg">
+    <!-- ✅ IMAGEM PRINCIPAL NO HERO (mulher + fundo dinâmico) -->
+    <div class="hero-right" id="tiltWrap" aria-label="Imagem FluxAI">
+      <div class="hero-shape"></div>
+      <div class="hero-glow"></div>
+      <img class="hero-woman" src="mulher.png" alt="Estratégia de marketing FluxAI" id="tiltImg">
     </div>
 
   </div>
@@ -967,7 +1060,7 @@
   </div>
 </section>
 
-<!-- CLIENTES SATISFEITOS -->
+<!-- ✅ CLIENTES SATISFEITOS (apenas imagem) -->
 <section class="clients">
   <div class="clients-divider reveal">
     <div class="line"></div>
@@ -1064,7 +1157,7 @@
   }
   window.addEventListener("load", () => setTimeout(type, 350));
 
-  // ===== HERO: Tilt na imagem =====
+  // ===== HERO: Tilt na imagem (mantido) =====
   const wrap = document.getElementById("tiltWrap");
   const img = document.getElementById("tiltImg");
 
@@ -1073,12 +1166,13 @@
       const rect = wrap.getBoundingClientRect();
       const x = (e.clientX - rect.left) / rect.width - 0.5;
       const y = (e.clientY - rect.top) / rect.height - 0.5;
-      const rotY = x * 10;
-      const rotX = -y * 10;
-      img.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(0)`;
+      const rotY = x * 9;
+      const rotX = -y * 9;
+      // mantém o "float" + adiciona tilt por cima (leve)
+      img.style.transform = `translateY(-6px) rotateX(${rotX}deg) rotateY(${rotY}deg)`;
     });
     wrap.addEventListener("mouseleave", ()=>{
-      img.style.transform = "rotateX(0deg) rotateY(0deg) translateZ(0)";
+      img.style.transform = "";
     });
   }
 
@@ -1132,7 +1226,7 @@
 
   if(statsEl) statsObserver.observe(statsEl);
 
-  // ===== FAQ: trocar + por - quando abre (visual)
+  // ===== FAQ: trocar + por - quando abre =====
   document.querySelectorAll('details').forEach(d => {
     d.addEventListener('toggle', () => {
       const icon = d.querySelector('summary i');
