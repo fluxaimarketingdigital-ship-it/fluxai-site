@@ -26,19 +26,16 @@ gtag('config', 'G-KGJRE4BJYQ');
     color:#111;
   }
 
-  /* TOPO */
   .topbar{ background:#fff; border-bottom:1px solid #eee; }
   .topbar-inner{ width:1100px; margin:auto; padding:20px; }
 
-  /* HERO */
   .hero{
     background:#727944;
-    padding:60px 20px;
+    padding:60px 20px 0;
     position:relative;
     overflow:hidden;
   }
 
-  /* Partículas leves (premium) */
   .hero::before{
     content:"";
     position:absolute;
@@ -58,7 +55,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     to{ transform:translateY(-14px); }
   }
 
-  /* brilho suave no fundo */
   .hero::after{
     content:"";
     position:absolute;
@@ -75,13 +71,12 @@ gtag('config', 'G-KGJRE4BJYQ');
     width:1100px;
     margin:auto;
     display:flex;
-    align-items:center;
+    align-items:flex-end;
     gap:40px;
     position:relative;
     z-index:1;
   }
 
-  /* Título com efeito premium + entrada */
   .hero-title{
     font-family:Montserrat;
     color:#fff;
@@ -107,7 +102,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     to{ opacity:1; transform:translateY(0); }
   }
 
-  /* ✅ TÍTULO + IMAGEM AO LADO */
   .hero-head{
     display:flex;
     align-items:center;
@@ -130,7 +124,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     box-shadow:0 18px 40px rgba(0,0,0,0.26);
   }
 
-  /* Texto com borda lateral e animação */
   .hero-sub{
     color:#fff;
     font-size:17px;
@@ -141,7 +134,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     opacity:.95;
   }
 
-  /* Typewriter (digitação) */
   .typewrap{ min-height:58px; }
   .typewriter{ display:inline; }
   .cursor{
@@ -163,9 +155,9 @@ gtag('config', 'G-KGJRE4BJYQ');
     display:flex;
     gap:15px;
     flex-wrap:wrap;
+    padding-bottom:60px;
   }
 
-  /* BOTÕES */
   .btn{
     padding:14px 22px;
     border-radius:10px;
@@ -193,14 +185,12 @@ gtag('config', 'G-KGJRE4BJYQ');
     box-shadow:0 10px 25px rgba(0,0,0,0.25);
   }
 
-  /* Pulse sutil no WhatsApp */
   .btn-pulse{ animation: pulse 1.8s ease-in-out infinite; }
   @keyframes pulse{
     0%,100%{ box-shadow: 0 0 0 0 rgba(255,255,255,0.0); }
     50%{ box-shadow: 0 0 0 10px rgba(255,255,255,0.08); }
   }
 
-  /* Glow no hover (Instagram) */
   .btn-glow:hover{
     box-shadow:0 10px 25px rgba(0,0,0,0.25), 0 0 0 6px rgba(255,106,0,0.12);
   }
@@ -215,34 +205,70 @@ gtag('config', 'G-KGJRE4BJYQ');
     box-shadow:0 10px 25px rgba(0,0,0,0.25);
   }
 
-  /* ✅ HERO VISUAL (mulher integrada ao site) */
+  /* HERO VISUAL */
   .hero-right{
     width:100%;
     max-width:520px;
     position:relative;
     display:flex;
-    align-items:center;
+    align-items:flex-end;
     justify-content:center;
-  }
-  .hero-shape{
-    display:none;
-  }
-  .hero-glow{
-    display:none;
+    min-height:560px;
   }
 
   .hero-woman{
     width:100%;
-    max-width:520px;
+    max-width:540px;
     display:block;
     box-shadow:none;
     border-radius:0;
     background:none;
     animation:none;
     transform:none !important;
+    position:relative;
+    z-index:2;
+    object-fit:contain;
+    object-position:center bottom;
+    margin-bottom:-6px;
   }
 
-  /* ===== SOBRE A FLUXAI (premium/clean) ===== */
+  /* cérebro IA */
+  .hero-brain{
+    position:absolute;
+    width:150px;
+    max-width:32%;
+    right:38px;
+    top:110px;
+    z-index:3;
+    filter: drop-shadow(0 16px 30px rgba(0,0,0,0.22));
+    animation: brainFlow 3.2s ease-in-out infinite;
+    transform-origin:center;
+    pointer-events:none;
+  }
+
+  @keyframes brainFlow{
+    0%{
+      transform:translate3d(0,0,0) scale(0.9) rotate(-4deg);
+      opacity:0.15;
+    }
+    20%{
+      transform:translate3d(-18px,10px,40px) scale(1.02) rotate(0deg);
+      opacity:0.85;
+    }
+    50%{
+      transform:translate3d(-55px,30px,100px) scale(1.18) rotate(3deg);
+      opacity:1;
+    }
+    75%{
+      transform:translate3d(-20px,12px,40px) scale(1.02) rotate(0deg);
+      opacity:0.85;
+    }
+    100%{
+      transform:translate3d(0,0,0) scale(0.9) rotate(-4deg);
+      opacity:0.15;
+    }
+  }
+
   .about{ padding:85px 20px 50px; background:#fff; }
   .about-inner{ width:1100px; margin:auto; display:flex; align-items:center; gap:44px; }
   .about-left{ flex:1; } .about-right{ flex:1; }
@@ -283,7 +309,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   .about-mini i{ color:#727944; font-size:18px; margin-top:1px; }
   .about-mini p{ margin:0; color:#444; font-size:13.5px; line-height:1.6; }
 
-  /* reveal */
   .reveal{ opacity:0; transform:translateY(16px); transition:0.8s ease; }
   .reveal.show{ opacity:1; transform:translateY(0); }
 
@@ -294,7 +319,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   .stagger.show > *:nth-child(3){transition-delay:0.19s}
   .stagger.show > *:nth-child(4){transition-delay:0.26s}
 
-  /* ===== CONTADOR ===== */
   .stats{ padding:0 20px 70px; background:#fff; }
   .stats-inner{
     width:1100px; margin:0 auto;
@@ -315,7 +339,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   .stat .num{ font-family:Montserrat; font-size:22px; line-height:1.1; margin:0; color:#111; }
   .stat .label{ margin:2px 0 0; font-size:13px; color:#555; }
 
-  /* ====== PARCEIROS (cinza + loop contínuo) ====== */
   .partners{ max-width:1100px; margin:0 auto 18px; padding:0 20px; }
   .partners-title{
     max-width:1100px; margin:0 auto 10px;
@@ -365,7 +388,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     100%{ transform:translateX(-50%); }
   }
 
-  /* SERVIÇOS */
   .services{ padding:80px 20px; background:#fafafa; text-align:center; }
   .services-divider{
     max-width:1100px; margin:0 auto 8px;
@@ -394,7 +416,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   .card h3{ margin:0 0 10px; }
   .card p{ margin:0; color:#444; line-height:1.6; }
 
-  /* CTA intermediário */
   .mid-cta{
     padding:55px 20px;
     background:#fff;
@@ -425,7 +446,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     max-width:680px;
   }
 
-  /* POR QUE ESCOLHER */
   .why{
     padding:70px 20px;
     background:#fff;
@@ -465,7 +485,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     font-size:14px;
   }
 
-  /* PROCESSO */
   .process{
     padding:70px 20px;
     background:#fafafa;
@@ -515,7 +534,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     font-size:14px;
   }
 
-  /* CASES */
   .cases-divider{
     max-width:1100px; margin:55px auto 10px;
     display:flex; align-items:center; gap:18px;
@@ -547,7 +565,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   .case-card p{ margin:0 0 12px; opacity:0.95; }
   .case-result{ font-weight:800; opacity:0.95; display:inline-flex; align-items:center; gap:8px; }
 
-  /* CLIENTES SATISFEITOS (apenas imagens) */
   .clients{
     padding:80px 20px;
     background:#fff;
@@ -605,7 +622,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     margin:0 auto;
   }
 
-  /* FAQ */
   .faq{
     padding:75px 20px;
     background:#fafafa;
@@ -649,7 +665,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     font-size:14px;
   }
 
-  /* CTA */
   .cta{
     padding:100px 20px;
     background:linear-gradient(90deg,#556B2F,#FF6A00);
@@ -691,7 +706,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   }
   .footer-links a:hover{ color:#111; }
 
-  /* WhatsApp flutuante */
   .wa-float{
     position:fixed;
     right:18px;
@@ -720,16 +734,25 @@ gtag('config', 'G-KGJRE4BJYQ');
     .steps{ grid-template-columns:1fr 1fr; }
   }
   @media (max-width:900px){
-    .hero-inner{flex-direction:column;}
+    .hero{ padding:50px 20px 0; }
+    .hero-inner{flex-direction:column; align-items:center;}
     .hero-title{font-size:36px;}
-    .hero-right{max-width:100%;}
-    .hero-actions{justify-content:center;}
+    .hero-right{max-width:100%; min-height:auto;}
+    .hero-actions{justify-content:center; padding-bottom:25px;}
     .about-inner{flex-direction:column;}
     .about-points{grid-template-columns:1fr;}
     .stats-grid{grid-template-columns:1fr;}
     .mid-cta-inner{flex-direction:column; align-items:flex-start;}
     .faq-grid{ grid-template-columns:1fr; }
     .hero-sideimg{ width:78px; height:78px; }
+    .hero-brain{
+      width:120px;
+      right:16px;
+      top:60px;
+    }
+    .hero-woman{
+      max-width:420px;
+    }
   }
 </style>
 </head>
@@ -746,7 +769,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   <div class="hero-inner">
 
     <div>
-      <!-- ✅ TÍTULO + IMAGEM AO LADO -->
       <div class="hero-head">
         <h1 class="hero-title">SUA EMPRESA, SUA MARCA</h1>
         <img class="hero-sideimg" src="mulher.png" alt="FluxAI - Estratégia e Performance">
@@ -771,17 +793,14 @@ gtag('config', 'G-KGJRE4BJYQ');
       </div>
     </div>
 
-    <!-- ✅ IMAGEM PRINCIPAL NO HERO -->
-    <div class="hero-right" id="tiltWrap" aria-label="Imagem FluxAI">
-      <div class="hero-shape"></div>
-      <div class="hero-glow"></div>
-      <img class="hero-woman" src="mulher.png" alt="Estratégia de marketing FluxAI" id="tiltImg">
+    <div class="hero-right" aria-label="Imagem FluxAI">
+      <img class="hero-brain" src="cerebro-ia.png" alt="Cérebro de inteligência artificial">
+      <img class="hero-woman" src="mulher.png" alt="Estratégia de marketing FluxAI">
     </div>
 
   </div>
 </section>
 
-<!-- SOBRE A FLUXAI -->
 <section class="about" id="sobre">
   <div class="about-inner">
 
@@ -827,7 +846,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- CONTADOR -->
 <section class="stats">
   <div class="stats-inner reveal" id="stats">
     <div class="stats-grid">
@@ -858,7 +876,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- POR QUE ESCOLHER -->
 <section class="why">
   <div class="services-divider">
     <div class="line"></div>
@@ -889,7 +906,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- PROCESSO -->
 <section class="process">
   <div class="services-divider">
     <div class="line"></div>
@@ -926,7 +942,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- CTA intermediário -->
 <section class="mid-cta">
   <div class="mid-cta-inner reveal">
     <div>
@@ -939,10 +954,7 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- SERVIÇOS -->
 <section class="services">
-
-  <!-- PARCEIROS -->
   <div class="partners">
     <div class="partners-title reveal">
       <div class="line"></div>
@@ -1013,7 +1025,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- CASES -->
 <section class="cases">
   <div class="cases-divider">
     <div class="line"></div>
@@ -1042,7 +1053,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- ✅ CLIENTES SATISFEITOS (apenas imagem) -->
 <section class="clients">
   <div class="clients-divider reveal">
     <div class="line"></div>
@@ -1058,7 +1068,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- FAQ -->
 <section class="faq">
   <div class="services-divider">
     <div class="line"></div>
@@ -1101,7 +1110,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </section>
 
-<!-- CTA FINAL -->
 <section class="cta">
   <h2>Pronto para transformar sua empresa em uma marca forte?</h2>
   <p>Se você quer parar de depender de indicação e começar a gerar clientes no digital com consistência, a FluxAI te mostra o caminho.</p>
@@ -1120,13 +1128,11 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 </footer>
 
-<!-- WhatsApp Flutuante -->
 <a class="wa-float" href="https://wa.me/5571981114694?text=Quero%20um%20diagn%C3%B3stico%20da%20minha%20marca%20com%20a%20FluxAI" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
   <i class="fa-brands fa-whatsapp"></i>
 </a>
 
 <script>
-  // ===== HERO: Typewriter =====
   const text = "Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.";
   const el = document.getElementById("heroType");
   let i = 0;
@@ -1139,7 +1145,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   }
   window.addEventListener("load", () => setTimeout(type, 350));
 
-  // ===== Reveal ao rolar =====
   const observer = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       if(entry.isIntersecting){
@@ -1151,7 +1156,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   },{threshold:0.14});
   document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
 
-  // ===== Contador =====
   const counters = document.querySelectorAll('.count');
   let counted = false;
 
@@ -1189,7 +1193,6 @@ gtag('config', 'G-KGJRE4BJYQ');
 
   if(statsEl) statsObserver.observe(statsEl);
 
-  // ===== FAQ: trocar + por - quando abre =====
   document.querySelectorAll('details').forEach(d => {
     d.addEventListener('toggle', () => {
       const icon = d.querySelector('summary i');
