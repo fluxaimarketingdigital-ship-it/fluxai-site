@@ -86,22 +86,6 @@
       color:#111;
     }
 
-    .section-kicker{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:7px 12px;
-      border-radius:999px;
-      background:rgba(114,121,68,0.10);
-      color:#727944;
-      font-family:Montserrat, sans-serif;
-      font-size:11px;
-      font-weight:800;
-      letter-spacing:0.9px;
-      text-transform:uppercase;
-      margin-bottom:12px;
-    }
-
     .hover-lift{
       transition:transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
     }
@@ -184,7 +168,7 @@
     }
 
     .hero-inner{
-      width:1500px;
+      width:1750px;
       margin:auto;
       display:flex;
       align-items:flex-end;
@@ -223,7 +207,7 @@
       position:relative;
       animation:heroIn 0.9s ease both;
       line-height:1.05;
-      white-space:nowrap;
+      white-space:normal;
       text-shadow:0 10px 30px rgba(0,0,0,0.10);
     }
 
@@ -400,7 +384,7 @@
       display:flex;
       align-items:flex-end;
       justify-content:center;
-      min-height:1100px;
+      min-height:980px;
       overflow:visible;
       flex:1;
       will-change:transform;
@@ -419,7 +403,7 @@
       z-index:2;
       object-fit:contain;
       object-position:center bottom;
-      margin-bottom:-55px;
+      margin-bottom:-85px;
       margin-top:0;
       animation:heroFloat 6s ease-in-out infinite;
     }
@@ -1370,27 +1354,6 @@
       font-weight:700;
     }
 
-    .wa-float{
-      position:fixed;
-      right:18px;
-      bottom:18px;
-      width:56px;
-      height:56px;
-      border-radius:999px;
-      background:#25D366;
-      color:#fff;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      text-decoration:none;
-      box-shadow:0 14px 28px rgba(0,0,0,0.22);
-      z-index:99;
-      transition:0.25s ease;
-    }
-
-    .wa-float:hover{ transform:translateY(-3px) scale(1.02); }
-    .wa-float i{ font-size:26px; }
-
     .flux-fixed{
       position:fixed;
       right:18px;
@@ -1693,6 +1656,7 @@
     @media (max-width:900px){
       .hero{ padding:50px 20px 0; }
       .hero-inner{ flex-direction:column; align-items:center; }
+
       .hero-title{
         font-size:36px;
         white-space:normal;
@@ -1730,8 +1694,8 @@
 
       .hero-woman{
         width:100%;
-        max-width:430px;
-        margin-bottom:-10px;
+        max-width:400px;
+        margin-bottom:-55px;
       }
 
       .flux-hero-box{
@@ -1744,16 +1708,32 @@
 
       .flux-fixed{
         right:6px;
-        bottom:72px;
+        bottom:68px;
         z-index:70;
       }
 
       .flux-fixed-bubble{
-        display:none;
+        display:flex;
+        max-width:120px;
+        min-height:auto;
+        padding:8px 10px;
+        font-size:10px;
+        line-height:1.3;
+      }
+
+      .flux-fixed-bubble strong{
+        font-size:10px;
+        margin-bottom:2px;
+      }
+
+      .flux-fixed-bubble::after{
+        width:10px;
+        height:10px;
+        bottom:-5px;
       }
 
       .flux-fixed-avatar img{
-        width:92px;
+        width:108px;
       }
     }
 
@@ -1807,7 +1787,7 @@
 
       <div class="hero-content hero-fade-scroll" id="heroContent">
         <div class="hero-head">
-          <h1 class="hero-title">Transformamos sua empresa em uma marca forte.</h1>
+          <h1 class="hero-title">Transformamos sua empresa<br>em uma marca forte.</h1>
         </div>
 
         <p class="hero-sub typewrap" aria-live="polite">
@@ -2331,10 +2311,6 @@
       Agência de Marketing Digital em Salvador • Social Media • Tráfego Pago • Automação com IA
     </div>
   </footer>
-
-  <a class="wa-float" href="https://wa.me/5571981114694?text=Quero%20um%20diagn%C3%B3stico%20da%20minha%20marca%20com%20a%20FluxAI" target="_blank" rel="noopener" aria-label="Falar no WhatsApp">
-    <i class="fa-brands fa-whatsapp"></i>
-  </a>
 
   <div class="flux-fixed">
     <div class="flux-fixed-bubble" id="fluxDynamicBubble">
