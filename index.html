@@ -88,7 +88,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     z-index:1;
   }
 
-  /* sobe apenas texto/botoes, mantendo a mulher no mesmo lugar */
   .hero-content{
     margin-bottom:170px;
   }
@@ -284,6 +283,40 @@ gtag('config', 'G-KGJRE4BJYQ');
     }
   }
 
+  /* FLUX HERO CARD */
+  .flux-hero-box{
+    margin-top:24px;
+    max-width:540px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    background:rgba(255,255,255,0.12);
+    border:1px solid rgba(255,255,255,0.20);
+    border-radius:18px;
+    padding:16px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow:0 16px 35px rgba(0,0,0,0.12);
+  }
+  .flux-hero-box img{
+    width:95px;
+    height:auto;
+    display:block;
+    flex-shrink:0;
+  }
+  .flux-hero-text h3{
+    margin:0 0 6px;
+    font-family:Montserrat;
+    font-size:18px;
+    color:#fff;
+  }
+  .flux-hero-text p{
+    margin:0;
+    color:rgba(255,255,255,0.92);
+    line-height:1.6;
+    font-size:14px;
+  }
+
   .about{ padding:85px 20px 50px; background:#fff; }
   .about-inner{ width:1100px; margin:auto; display:flex; align-items:center; gap:44px; }
   .about-left{ flex:1; } .about-right{ flex:1; }
@@ -430,6 +463,123 @@ gtag('config', 'G-KGJRE4BJYQ');
   .card i{ font-size:30px; color:#ff6a00; margin-bottom:15px; }
   .card h3{ margin:0 0 10px; }
   .card p{ margin:0; color:#444; line-height:1.6; }
+
+  /* PERGUNTE AO FLUX */
+  .flux-section{
+    padding:80px 20px;
+    background:#fff;
+  }
+  .flux-inner{
+    width:1100px;
+    margin:0 auto;
+  }
+  .flux-grid{
+    display:grid;
+    grid-template-columns:360px 1fr;
+    gap:24px;
+    align-items:start;
+    margin-top:24px;
+  }
+  .flux-side{
+    background:linear-gradient(180deg, #727944, #5c6235);
+    border-radius:20px;
+    padding:26px;
+    color:#fff;
+    position:sticky;
+    top:20px;
+    overflow:hidden;
+  }
+  .flux-side::after{
+    content:"";
+    position:absolute;
+    right:-60px;
+    bottom:-60px;
+    width:180px;
+    height:180px;
+    background:radial-gradient(circle, rgba(255,106,0,0.25), transparent 65%);
+    filter:blur(6px);
+  }
+  .flux-side img{
+    width:150px;
+    max-width:100%;
+    display:block;
+    margin:0 auto 14px;
+    position:relative;
+    z-index:1;
+  }
+  .flux-side h3{
+    margin:0 0 10px;
+    font-family:Montserrat;
+    font-size:22px;
+    text-align:center;
+    position:relative;
+    z-index:1;
+  }
+  .flux-side p{
+    margin:0 0 18px;
+    line-height:1.7;
+    font-size:14px;
+    text-align:center;
+    color:rgba(255,255,255,0.95);
+    position:relative;
+    z-index:1;
+  }
+  .flux-mini-btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    padding:13px 16px;
+    border-radius:12px;
+    background:#ff6a00;
+    color:#fff;
+    text-decoration:none;
+    font-weight:700;
+    position:relative;
+    z-index:1;
+    transition:0.25s ease;
+  }
+  .flux-mini-btn:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 25px rgba(0,0,0,0.18);
+  }
+  .flux-qa{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  .flux-card{
+    background:#fff;
+    border:1px solid rgba(0,0,0,0.06);
+    border-radius:18px;
+    padding:20px;
+    transition:0.25s ease;
+    box-shadow:0 8px 22px rgba(0,0,0,0.03);
+  }
+  .flux-card:hover{
+    transform:translateY(-4px);
+    box-shadow:0 16px 35px rgba(0,0,0,0.07);
+    border-color:rgba(114,121,68,0.22);
+  }
+  .flux-question{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:12px;
+    font-family:Montserrat;
+    font-size:14px;
+    color:#111;
+  }
+  .flux-question i{
+    color:#ff6a00;
+    font-size:18px;
+  }
+  .flux-answer{
+    color:#444;
+    line-height:1.75;
+    font-size:14px;
+    margin:0;
+  }
 
   .mid-cta{
     padding:55px 20px;
@@ -742,11 +892,14 @@ gtag('config', 'G-KGJRE4BJYQ');
   .wa-float i{ font-size:26px; }
 
   @media (max-width:1150px){
-    .topbar-inner,.hero-inner,.about-inner,.stats-inner,.mid-cta-inner,.why-inner,.process-inner,.faq-inner{width:92%;}
+    .topbar-inner,.hero-inner,.about-inner,.stats-inner,.mid-cta-inner,.why-inner,.process-inner,.faq-inner,.flux-inner{width:92%;}
   }
   @media (max-width:980px){
     .why-grid{ grid-template-columns:1fr; }
     .steps{ grid-template-columns:1fr 1fr; }
+    .flux-grid{ grid-template-columns:1fr; }
+    .flux-qa{ grid-template-columns:1fr; }
+    .flux-side{ position:relative; top:auto; }
   }
   @media (max-width:900px){
     .hero{ padding:50px 20px 0; }
@@ -782,6 +935,12 @@ gtag('config', 'G-KGJRE4BJYQ');
     .hero-woman{
       max-width:460px;
       margin-bottom:-24px;
+    }
+
+    .flux-hero-box{
+      flex-direction:column;
+      text-align:center;
+      align-items:center;
     }
   }
 </style>
@@ -823,6 +982,14 @@ gtag('config', 'G-KGJRE4BJYQ');
         <a class="btn btn-solid" href="https://wa.me/5571981114694?text=Quero%20um%20diagn%C3%B3stico%20da%20minha%20marca%20com%20a%20FluxAI" target="_blank" rel="noopener">
           <i class="fa-solid fa-magnifying-glass"></i> Quero um diagnóstico
         </a>
+      </div>
+
+      <div class="flux-hero-box reveal">
+        <img src="flux.png" alt="Flux, assistente da FluxAI">
+        <div class="flux-hero-text">
+          <h3>Olá, eu sou o Flux.</h3>
+          <p>A inteligência por trás das estratégias da FluxAI. Posso te ajudar a entender como sua marca pode crescer com criação, automação e posicionamento digital.</p>
+        </div>
       </div>
     </div>
 
@@ -970,6 +1137,61 @@ gtag('config', 'G-KGJRE4BJYQ');
         <div class="badge"><i class="fa-solid fa-chart-line"></i> 4 • Crescimento</div>
         <h4>Otimização contínua</h4>
         <p>Mensuramos e ajustamos para manter a marca subindo mês após mês.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="flux-section">
+  <div class="services-divider">
+    <div class="line"></div>
+    <div class="text">Pergunte ao Flux</div>
+    <div class="line"></div>
+  </div>
+
+  <div class="flux-inner">
+    <div class="flux-grid">
+      <div class="flux-side reveal">
+        <img src="flux.png" alt="Flux, mascote da FluxAI">
+        <h3>Olá, eu sou o Flux.</h3>
+        <p>Seu assistente digital da FluxAI. Abaixo estão algumas das dúvidas mais comuns de empresas que querem crescer no digital com mais inteligência.</p>
+        <a class="flux-mini-btn" href="https://wa.me/5571981114694?text=Ol%C3%A1%20Flux%2C%20quero%20entender%20como%20a%20FluxAI%20pode%20ajudar%20minha%20empresa" target="_blank" rel="noopener">
+          <i class="fa-brands fa-whatsapp"></i> Falar com o Flux
+        </a>
+      </div>
+
+      <div class="flux-qa">
+        <div class="flux-card reveal">
+          <div class="flux-question">
+            <i class="fa-solid fa-circle-question"></i>
+            <span>Meu Instagram não gera clientes. O que fazer?</span>
+          </div>
+          <p class="flux-answer">Provavelmente sua marca está postando sem uma estrutura clara de posicionamento, oferta e conversão. Curtida sozinha não paga boleto. O conteúdo precisa direcionar o cliente para ação.</p>
+        </div>
+
+        <div class="flux-card reveal">
+          <div class="flux-question">
+            <i class="fa-solid fa-circle-question"></i>
+            <span>Preciso mesmo de um site profissional?</span>
+          </div>
+          <p class="flux-answer">Sim. Seu site é a base da sua autoridade digital. Ele precisa ser bonito, rápido, estratégico e pensado para transformar visitas em oportunidades reais de venda.</p>
+        </div>
+
+        <div class="flux-card reveal">
+          <div class="flux-question">
+            <i class="fa-solid fa-circle-question"></i>
+            <span>Automação com IA funciona para meu negócio?</span>
+          </div>
+          <p class="flux-answer">Na maioria dos casos, sim. A IA pode acelerar atendimento, organizar contatos, responder mais rápido e ajudar sua empresa a vender melhor sem depender de processos manuais o tempo todo.</p>
+        </div>
+
+        <div class="flux-card reveal">
+          <div class="flux-question">
+            <i class="fa-solid fa-circle-question"></i>
+            <span>Postar todo dia resolve?</span>
+          </div>
+          <p class="flux-answer">Não sozinho. Frequência ajuda, mas o que converte é estratégia. Sua marca precisa de mensagem certa, identidade forte, provas e uma chamada clara para o próximo passo.</p>
+        </div>
       </div>
     </div>
   </div>
@@ -1237,7 +1459,3 @@ gtag('config', 'G-KGJRE4BJYQ');
 
 </body>
 </html>
-
-
-
-
