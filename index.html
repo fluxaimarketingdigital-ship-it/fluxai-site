@@ -218,7 +218,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     box-shadow:0 10px 25px rgba(0,0,0,0.12);
   }
 
-  /* HERO VISUAL */
   .hero-right{
     width:100%;
     max-width:520px;
@@ -283,7 +282,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     }
   }
 
-  /* FLUX HERO CARD */
   .flux-hero-box{
     margin-top:24px;
     max-width:540px;
@@ -557,7 +555,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   .card h3{ margin:0 0 10px; }
   .card p{ margin:0; color:#444; line-height:1.6; }
 
-  /* PERGUNTE AO FLUX */
   .flux-section{
     padding:80px 20px;
     background:#fff;
@@ -984,7 +981,6 @@ gtag('config', 'G-KGJRE4BJYQ');
   .wa-float:hover{ transform:translateY(-3px) scale(1.02); }
   .wa-float i{ font-size:26px; }
 
-  /* FLUX FIXO */
   .flux-fixed{
     position:fixed;
     right:90px;
@@ -1004,6 +1000,17 @@ gtag('config', 'G-KGJRE4BJYQ');
     font-size:13px;
     line-height:1.45;
     animation: fluxBubbleFloat 3s ease-in-out infinite;
+    position:relative;
+  }
+  .flux-fixed-bubble::after{
+    content:"";
+    position:absolute;
+    right:18px;
+    bottom:-8px;
+    width:16px;
+    height:16px;
+    background:#fff;
+    transform:rotate(45deg);
   }
   .flux-fixed-bubble strong{
     display:block;
@@ -1032,7 +1039,31 @@ gtag('config', 'G-KGJRE4BJYQ');
   .flux-fixed-avatar img{
     width:58px;
     height:auto;
-    animation: fluxFloat 3s ease-in-out infinite;
+    animation: fluxSpinPause 4.8s ease-in-out infinite;
+    transform-origin:center center;
+  }
+  @keyframes fluxSpinPause{
+    0%{
+      transform:rotate(0deg) scale(1);
+    }
+    12%{
+      transform:rotate(0deg) scale(1);
+    }
+    32%{
+      transform:rotate(360deg) scale(1.06);
+    }
+    42%{
+      transform:rotate(360deg) scale(1);
+    }
+    72%{
+      transform:rotate(360deg) scale(1);
+    }
+    86%{
+      transform:rotate(360deg) translateY(-4px);
+    }
+    100%{
+      transform:rotate(360deg) translateY(0);
+    }
   }
 
   @media (max-width:1150px){
@@ -1164,7 +1195,7 @@ gtag('config', 'G-KGJRE4BJYQ');
       <div class="flux-hero-box reveal">
         <div class="flux-speech">Posso te mostrar como sua marca pode vender mais com IA.</div>
 
-        <img src="fluxo-apontando.png" alt="Flux apontando para diagnóstico">
+        <img src="fluxo.png" alt="Flux, assistente da FluxAI">
 
         <div class="flux-hero-text">
           <div class="flux-badge">
@@ -1581,7 +1612,7 @@ gtag('config', 'G-KGJRE4BJYQ');
   </div>
 
   <a href="https://wa.me/5571981114694?text=Ol%C3%A1%20Flux%2C%20quero%20um%20diagn%C3%B3stico%20da%20minha%20marca" target="_blank" rel="noopener" class="flux-fixed-avatar" aria-label="Falar com o Flux">
-    <img src="fluxo.png" alt="Flux">
+    <img src="fluxo-apontando.png" alt="Flux apontando">
   </a>
 </div>
 
