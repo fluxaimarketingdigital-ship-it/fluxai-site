@@ -1,9 +1,24 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>FluxAI | Marketing Digital em Salvador</title>
+
+  <!-- SEO -->
+  <meta name="description" content="Agência de marketing digital em Salvador especializada em estratégia, redes sociais, automação com IA e posicionamento de marca.">
+  <meta name="keywords" content="marketing digital salvador, social media salvador, agencia de marketing salvador, tráfego pago salvador, criação de site salvador, automação com ia salvador">
+  <meta name="author" content="FluxAI Marketing Digital">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="FluxAI | Marketing Digital em Salvador">
+  <meta property="og:description" content="Transformamos empresas em marcas fortes com estratégia, conteúdo e automação.">
+  <meta property="og:image" content="https://seudominio.com/preview.jpg">
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
 
   <!-- Google Analytics GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KGJRE4BJYQ"></script>
@@ -158,6 +173,16 @@
       text-shadow:0 2px 10px rgba(0,0,0,0.08);
     }
 
+    .hero-authority{
+      color:#fff;
+      opacity:0.92;
+      font-size:14px;
+      margin-top:14px;
+      margin-bottom:0;
+      font-weight:700;
+      letter-spacing:0.4px;
+    }
+
     .typewrap{ min-height:58px; }
     .typewriter{ display:inline; }
 
@@ -288,6 +313,13 @@
       object-position:center bottom;
       margin-bottom:-40px;
       margin-top:0;
+      animation:heroFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes heroFloat{
+      0%{ transform:translateY(0px); }
+      50%{ transform:translateY(-10px); }
+      100%{ transform:translateY(0px); }
     }
 
     .flux-hero-box{
@@ -446,7 +478,8 @@
     .card:hover,
     .flux-card:hover,
     .client-card:hover,
-    .case-card:hover{
+    .case-card:hover,
+    .diagnostic-step:hover{
       transform:translateY(-4px);
       box-shadow:0 12px 25px rgba(0,0,0,0.06);
     }
@@ -534,14 +567,16 @@
     .services-divider,
     .clients-divider,
     .partners-title,
-    .cases-divider{
+    .cases-divider,
+    .diagnostic-divider{
       display:flex;
       align-items:center;
       gap:18px;
     }
 
     .services-divider,
-    .clients-divider{
+    .clients-divider,
+    .diagnostic-divider{
       max-width:1100px;
       margin:0 auto 8px;
       padding:0 20px;
@@ -559,7 +594,8 @@
 
     .services-divider .line,
     .clients-divider .line,
-    .partners-title .line{
+    .partners-title .line,
+    .diagnostic-divider .line{
       height:2px;
       flex:1;
       background:rgba(0,0,0,0.10);
@@ -576,7 +612,8 @@
     .services-divider .text,
     .clients-divider .text,
     .partners-title .text,
-    .cases-divider .text{
+    .cases-divider .text,
+    .diagnostic-divider .text{
       font-family:Montserrat, sans-serif;
       font-size:18px;
       letter-spacing:1px;
@@ -586,7 +623,8 @@
 
     .services-divider .text,
     .clients-divider .text,
-    .partners-title .text{ color:#111; }
+    .partners-title .text,
+    .diagnostic-divider .text{ color:#111; }
     .cases-divider .text{ color:#fff; }
 
     .why{
@@ -597,7 +635,8 @@
     .why-inner,
     .process-inner,
     .faq-inner,
-    .flux-inner{
+    .flux-inner,
+    .diagnostic-inner{
       width:1100px;
       margin:0 auto;
     }
@@ -630,7 +669,8 @@
     .card p,
     .flux-answer,
     .faq-answer,
-    .mid-cta p{
+    .mid-cta p,
+    .diagnostic-step p{
       margin:0;
       color:#444;
       line-height:1.65;
@@ -676,6 +716,49 @@
       margin:10px 0 6px;
       font-family:Montserrat, sans-serif;
       font-size:15px;
+    }
+
+    .diagnostic{
+      padding:75px 20px;
+      background:#fff;
+    }
+
+    .diagnostic-grid{
+      margin-top:24px;
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:16px;
+    }
+
+    .diagnostic-step{
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.06);
+      border-radius:18px;
+      padding:22px;
+      text-align:left;
+      transition:0.25s ease;
+      box-shadow:0 8px 22px rgba(0,0,0,0.03);
+    }
+
+    .diagnostic-number{
+      width:42px;
+      height:42px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#727944;
+      color:#fff;
+      font-family:Montserrat, sans-serif;
+      font-size:16px;
+      margin-bottom:14px;
+    }
+
+    .diagnostic-step h4{
+      margin:0 0 8px;
+      font-family:Montserrat, sans-serif;
+      font-size:17px;
+      color:#111;
     }
 
     .flux-section{
@@ -1059,6 +1142,13 @@
       background:#ff6a00;
       color:#fff;
       border:2px solid transparent;
+      animation:ctaPulse 2s infinite;
+    }
+
+    @keyframes ctaPulse{
+      0%{ box-shadow:0 0 0 0 rgba(255,106,0,0.4); }
+      70%{ box-shadow:0 0 0 12px rgba(255,106,0,0); }
+      100%{ box-shadow:0 0 0 0 rgba(255,106,0,0); }
     }
 
     .cta .btn{
@@ -1089,6 +1179,14 @@
     }
 
     .footer-links a:hover{ color:#111; }
+
+    .footer-seo{
+      margin-top:14px;
+      color:#666;
+      font-size:13px;
+      line-height:1.7;
+      font-weight:700;
+    }
 
     .wa-float{
       position:fixed;
@@ -1363,7 +1461,8 @@
       .why-inner,
       .process-inner,
       .faq-inner,
-      .flux-inner{
+      .flux-inner,
+      .diagnostic-inner{
         width:92%;
       }
     }
@@ -1374,6 +1473,7 @@
       .flux-grid{ grid-template-columns:1fr; }
       .flux-qa{ grid-template-columns:1fr; }
       .flux-side{ position:relative; top:auto; }
+      .diagnostic-grid{ grid-template-columns:1fr; }
     }
 
     @media (max-width:900px){
@@ -1456,7 +1556,8 @@
       .services-divider .text,
       .clients-divider .text,
       .partners-title .text,
-      .cases-divider .text{
+      .cases-divider .text,
+      .diagnostic-divider .text{
         font-size:15px;
         white-space:normal;
         text-align:center;
@@ -1496,6 +1597,10 @@
 
         <p class="hero-sub typewrap" aria-live="polite">
           <span class="typewriter" id="heroType"></span><span class="cursor"></span>
+        </p>
+
+        <p class="hero-authority">
+          Estratégia • Conteúdo • Automação • Inteligência Artificial
         </p>
 
         <div class="hero-actions">
@@ -1666,6 +1771,36 @@
           <div class="badge"><i class="fa-solid fa-chart-line"></i> 4 • Crescimento</div>
           <h4>Otimização contínua</h4>
           <p>Mensuramos e ajustamos para manter a marca subindo mês após mês.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="diagnostic">
+    <div class="diagnostic-divider">
+      <div class="line"></div>
+      <div class="text">Como funciona o diagnóstico</div>
+      <div class="line"></div>
+    </div>
+
+    <div class="diagnostic-inner">
+      <div class="diagnostic-grid">
+        <div class="diagnostic-step reveal">
+          <div class="diagnostic-number">1</div>
+          <h4>Analisamos sua marca</h4>
+          <p>Entendemos seu posicionamento atual, sua comunicação, seu Instagram e o cenário do seu negócio.</p>
+        </div>
+
+        <div class="diagnostic-step reveal">
+          <div class="diagnostic-number">2</div>
+          <h4>Identificamos o que trava suas vendas</h4>
+          <p>Mostramos os pontos que estão impedindo sua empresa de atrair mais clientes e gerar mais percepção de valor.</p>
+        </div>
+
+        <div class="diagnostic-step reveal">
+          <div class="diagnostic-number">3</div>
+          <h4>Indicamos o melhor caminho</h4>
+          <p>Você recebe uma direção clara sobre estratégia, conteúdo, tráfego e automação para crescer com mais consistência.</p>
         </div>
       </div>
     </div>
@@ -1911,6 +2046,9 @@
       <a href="https://instagram.com/fluxai.mark" target="_blank" rel="noopener">Instagram</a>
       <a href="https://wa.me/5571981114694" target="_blank" rel="noopener">WhatsApp</a>
       <a href="#sobre">Sobre</a>
+    </div>
+    <div class="footer-seo">
+      Agência de Marketing Digital em Salvador • Social Media • Tráfego Pago • Automação com IA
     </div>
   </footer>
 
@@ -2192,8 +2330,3 @@
 
 </body>
 </html>
-
-
-
-
-
