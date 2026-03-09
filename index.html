@@ -356,56 +356,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     text-transform:uppercase;
     margin-bottom:8px;
   }
-  .flux-speech{
-    position:absolute;
-    top:-22px;
-    right:-12px;
-    background:#fff;
-    color:#111;
-    padding:10px 14px;
-    border-radius:14px;
-    font-size:13px;
-    font-weight:700;
-    line-height:1.4;
-    box-shadow:0 12px 28px rgba(0,0,0,0.14);
-    max-width:220px;
-    animation: fluxTalk 2.8s ease-in-out infinite;
-    z-index:3;
-  }
-  .flux-speech::after{
-    content:"";
-    position:absolute;
-    left:18px;
-    bottom:-8px;
-    width:16px;
-    height:16px;
-    background:#fff;
-    transform:rotate(45deg);
-  }
-  @keyframes fluxTalk{
-    0%{ transform:translateY(0px); }
-    50%{ transform:translateY(-4px); }
-    100%{ transform:translateY(0px); }
-  }
-  .flux-pointer{
-    position:absolute;
-    right:-18px;
-    bottom:12px;
-    background:#ff6a00;
-    color:#fff;
-    width:44px;
-    height:44px;
-    border-radius:999px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 10px 22px rgba(0,0,0,0.18);
-    animation: fluxPointer 1.3s ease-in-out infinite;
-    z-index:3;
-  }
-  @keyframes fluxPointer{
-    0%,100%{ transform:translateX(0); }
-    50%{ transform:translateX(7px); }
   }
 
   .about{ padding:85px 20px 50px; background:#fff; }
@@ -990,18 +940,26 @@ gtag('config', 'G-KGJRE4BJYQ');
     align-items:flex-end;
     gap:10px;
   }
-  .flux-fixed-bubble{
-    background:#fff;
-    color:#111;
-    padding:12px 14px;
-    border-radius:16px 16px 4px 16px;
-    box-shadow:0 14px 30px rgba(0,0,0,0.16);
-    max-width:220px;
-    font-size:13px;
-    line-height:1.45;
-    animation: fluxBubbleFloat 3s ease-in-out infinite;
-    position:relative;
-  }
+.flux-fixed-bubble{
+  background:#fff;
+  color:#111;
+  padding:12px 14px;
+  border-radius:16px 16px 4px 16px;
+  box-shadow:0 14px 30px rgba(0,0,0,0.16);
+  max-width:240px;
+  font-size:13px;
+  line-height:1.45;
+  position:relative;
+  opacity:0;
+  transform:translateY(12px) scale(0.96);
+  pointer-events:none;
+  transition:opacity 0.35s ease, transform 0.35s ease;
+}
+
+.flux-fixed-bubble.show{
+  opacity:1;
+  transform:translateY(0) scale(1);
+}  }
   .flux-fixed-bubble::after{
     content:"";
     position:absolute;
@@ -1023,25 +981,26 @@ gtag('config', 'G-KGJRE4BJYQ');
     50%{ transform:translateY(-5px); }
     100%{ transform:translateY(0); }
   }
-  .flux-fixed-avatar{
-    width:74px;
-    height:74px;
-    border-radius:999px;
-    background:linear-gradient(180deg,#727944,#5c6235);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 14px 30px rgba(0,0,0,0.18);
-    overflow:hidden;
-    border:2px solid rgba(255,255,255,0.75);
-    text-decoration:none;
-  }
-  .flux-fixed-avatar img{
-    width:58px;
-    height:auto;
-    animation: fluxSpinPause 4.8s ease-in-out infinite;
-    transform-origin:center center;
-  }
+.flux-fixed-avatar{
+  width:92px;
+  height:92px;
+  border-radius:999px;
+  background:linear-gradient(180deg,#727944,#5c6235);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  box-shadow:0 14px 30px rgba(0,0,0,0.18);
+  overflow:hidden;
+  border:2px solid rgba(255,255,255,0.75);
+  text-decoration:none;
+}
+
+.flux-fixed-avatar img{
+  width:76px;
+  height:auto;
+  animation: fluxSpinPause 4.8s ease-in-out infinite;
+  transform-origin:center center;
+}
   @keyframes fluxSpinPause{
     0%{
       transform:rotate(0deg) scale(1);
@@ -1193,7 +1152,6 @@ gtag('config', 'G-KGJRE4BJYQ');
       </div>
 
       <div class="flux-hero-box reveal">
-        <div class="flux-speech">Posso te mostrar como sua marca pode vender mais com IA.</div>
 
         <img src="fluxo.png" alt="Flux, assistente da FluxAI">
 
@@ -1205,9 +1163,6 @@ gtag('config', 'G-KGJRE4BJYQ');
           <p>A inteligência por trás das estratégias da FluxAI. Posso te ajudar a entender como sua marca pode crescer com criação, automação e posicionamento digital.</p>
         </div>
 
-        <div class="flux-pointer">
-          <i class="fa-solid fa-arrow-right"></i>
-        </div>
       </div>
     </div>
 
@@ -1606,16 +1561,6 @@ gtag('config', 'G-KGJRE4BJYQ');
 </a>
 
 <div class="flux-fixed">
-  <div class="flux-fixed-bubble">
-    <strong>Flux</strong>
-    Quer um diagnóstico rápido da sua marca?
-  </div>
-
-  <a href="https://wa.me/5571981114694?text=Ol%C3%A1%20Flux%2C%20quero%20um%20diagn%C3%B3stico%20da%20minha%20marca" target="_blank" rel="noopener" class="flux-fixed-avatar" aria-label="Falar com o Flux">
-    <img src="fluxo-apontando.png" alt="Flux apontando">
-  </a>
-</div>
-
 <script>
   const text = "Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.";
   const el = document.getElementById("heroType");
@@ -1684,7 +1629,62 @@ gtag('config', 'G-KGJRE4BJYQ');
       icon.className = d.open ? 'fa-solid fa-minus' : 'fa-solid fa-plus';
     });
   });
-</script>
+
+  const fluxBubble = document.getElementById("fluxBubble");
+  const fluxBubbleText = document.getElementById("fluxBubbleText");
+
+  function showFluxBubble(message, hideAfter = 5000){
+    if(!fluxBubble || !fluxBubbleText) return;
+
+    fluxBubbleText.textContent = message;
+    fluxBubble.classList.add("show");
+
+    clearTimeout(window._fluxHideTimer);
+    window._fluxHideTimer = setTimeout(() => {
+      fluxBubble.classList.remove("show");
+    }, hideAfter);
+  }
+
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      showFluxBubble("Olá! Posso te mostrar como sua marca pode vender mais com IA.", 5500);
+    }, 1200);
+
+    setTimeout(() => {
+      showFluxBubble("Quer um diagnóstico rápido da sua marca?", 5000);
+    }, 11000);
+  });
+const fluxBubble = document.getElementById("fluxBubble");
+const fluxBubbleText = document.getElementById("fluxBubbleText");
+
+function showFluxBubble(message, hideAfter = 5000){
+
+  if(!fluxBubble || !fluxBubbleText) return;
+
+  fluxBubbleText.textContent = message;
+
+  fluxBubble.classList.add("show");
+
+  clearTimeout(window._fluxHideTimer);
+
+  window._fluxHideTimer = setTimeout(() => {
+    fluxBubble.classList.remove("show");
+  }, hideAfter);
+}
+
+window.addEventListener("load", () => {
+
+  setTimeout(() => {
+    showFluxBubble("Olá! Posso te mostrar como sua marca pode vender mais com IA.", 5500);
+  }, 1200);
+
+  setTimeout(() => {
+    showFluxBubble("Quer um diagnóstico rápido da sua marca?", 5000);
+  }, 11000);
+
+});
+</script></script>
 
 </body>
 </html>
+
