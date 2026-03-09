@@ -387,26 +387,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     50%{ transform:translateY(-4px); }
     100%{ transform:translateY(0px); }
   }
-  .flux-pointer{
-    position:absolute;
-    right:-18px;
-    bottom:12px;
-    background:#ff6a00;
-    color:#fff;
-    width:44px;
-    height:44px;
-    border-radius:999px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    box-shadow:0 10px 22px rgba(0,0,0,0.18);
-    animation: fluxPointer 1.3s ease-in-out infinite;
-    z-index:3;
-  }
-  @keyframes fluxPointer{
-    0%,100%{ transform:translateX(0); }
-    50%{ transform:translateX(7px); }
-  }
 
   .about{ padding:85px 20px 50px; background:#fff; }
   .about-inner{ width:1100px; margin:auto; display:flex; align-items:center; gap:44px; }
@@ -996,11 +976,19 @@ gtag('config', 'G-KGJRE4BJYQ');
     padding:12px 14px;
     border-radius:16px 16px 4px 16px;
     box-shadow:0 14px 30px rgba(0,0,0,0.16);
-    max-width:220px;
+    max-width:250px;
+    min-width:210px;
     font-size:13px;
     line-height:1.45;
-    animation: fluxBubbleFloat 3s ease-in-out infinite;
     position:relative;
+    opacity:0;
+    transform:translateY(12px) scale(0.96);
+    pointer-events:none;
+    transition:opacity 0.35s ease, transform 0.35s ease;
+  }
+  .flux-fixed-bubble.show{
+    opacity:1;
+    transform:translateY(0) scale(1);
   }
   .flux-fixed-bubble::after{
     content:"";
@@ -1018,14 +1006,27 @@ gtag('config', 'G-KGJRE4BJYQ');
     margin-bottom:4px;
     font-size:13px;
   }
-  @keyframes fluxBubbleFloat{
-    0%{ transform:translateY(0); }
-    50%{ transform:translateY(-5px); }
-    100%{ transform:translateY(0); }
+  .flux-fixed-text{
+    display:inline;
   }
+  .flux-fixed-text.typing::after{
+    content:"";
+    display:inline-block;
+    width:2px;
+    height:14px;
+    margin-left:4px;
+    background:#111;
+    vertical-align:-2px;
+    animation: fluxCaretBlink 0.8s infinite;
+  }
+  @keyframes fluxCaretBlink{
+    0%,49%{ opacity:1; }
+    50%,100%{ opacity:0; }
+  }
+
   .flux-fixed-avatar{
-    width:74px;
-    height:74px;
+    width:92px;
+    height:92px;
     border-radius:999px;
     background:linear-gradient(180deg,#727944,#5c6235);
     display:flex;
@@ -1037,7 +1038,7 @@ gtag('config', 'G-KGJRE4BJYQ');
     text-decoration:none;
   }
   .flux-fixed-avatar img{
-    width:58px;
+    width:76px;
     height:auto;
     animation: fluxSpinPause 4.8s ease-in-out infinite;
     transform-origin:center center;
@@ -1128,27 +1129,24 @@ gtag('config', 'G-KGJRE4BJYQ');
       display:none;
     }
 
-    .flux-pointer{
-      display:none;
-    }
-
     .flux-fixed{
       right:14px;
       bottom:86px;
     }
 
     .flux-fixed-bubble{
-      max-width:170px;
+      max-width:185px;
+      min-width:auto;
       font-size:12px;
     }
 
     .flux-fixed-avatar{
-      width:62px;
-      height:62px;
+      width:70px;
+      height:70px;
     }
 
     .flux-fixed-avatar img{
-      width:48px;
+      width:56px;
     }
   }
 </style>
@@ -1203,10 +1201,6 @@ gtag('config', 'G-KGJRE4BJYQ');
           </div>
           <h3>Olá, eu sou o Flux.</h3>
           <p>A inteligência por trás das estratégias da FluxAI. Posso te ajudar a entender como sua marca pode crescer com criação, automação e posicionamento digital.</p>
-        </div>
-
-        <div class="flux-pointer">
-          <i class="fa-solid fa-arrow-right"></i>
         </div>
       </div>
     </div>
@@ -1606,9 +1600,9 @@ gtag('config', 'G-KGJRE4BJYQ');
 </a>
 
 <div class="flux-fixed">
-  <div class="flux-fixed-bubble">
+  <div class="flux-fixed-bubble" id="fluxBubble">
     <strong>Flux</strong>
-    Quer um diagnóstico rápido da sua marca?
+    <span class="flux-fixed-text" id="fluxBubbleText"></span>
   </div>
 
   <a href="https://wa.me/5571981114694?text=Ol%C3%A1%20Flux%2C%20quero%20um%20diagn%C3%B3stico%20da%20minha%20marca" target="_blank" rel="noopener" class="flux-fixed-avatar" aria-label="Falar com o Flux">
@@ -1684,8 +1678,67 @@ gtag('config', 'G-KGJRE4BJYQ');
       icon.className = d.open ? 'fa-solid fa-minus' : 'fa-solid fa-plus';
     });
   });
+
+  const fluxBubble = document.getElementById("fluxBubble");
+  const fluxBubbleText = document.getElementById("fluxBubbleText");
+
+  const fluxMessages = [
+    "Olá! Posso te mostrar como sua marca pode vender mais com IA.",
+    "Quer um diagnóstico rápido da sua marca?",
+    "Clique aqui e fale comigo no WhatsApp da FluxAI."
+  ];
+
+  let fluxMessageIndex = 0;
+  let fluxTypingTimer = null;
+  let fluxHideTimer = null;
+  let fluxLoopTimer = null;
+
+  function typeFluxMessage(message, speed = 32){
+    if(!fluxBubble || !fluxBubbleText) return;
+
+    clearTimeout(fluxTypingTimer);
+    fluxBubbleText.textContent = "";
+    fluxBubbleText.classList.add("typing");
+    fluxBubble.classList.add("show");
+
+    let charIndex = 0;
+
+    function write(){
+      if(charIndex <= message.length){
+        fluxBubbleText.textContent = message.slice(0, charIndex);
+        charIndex++;
+        fluxTypingTimer = setTimeout(write, speed);
+      } else {
+        fluxBubbleText.classList.remove("typing");
+      }
+    }
+
+    write();
+  }
+
+  function showFluxSequence(){
+    const currentMessage = fluxMessages[fluxMessageIndex];
+    typeFluxMessage(currentMessage, 26);
+
+    clearTimeout(fluxHideTimer);
+    clearTimeout(fluxLoopTimer);
+
+    fluxHideTimer = setTimeout(() => {
+      if(fluxBubble) fluxBubble.classList.remove("show");
+    }, 6000);
+
+    fluxLoopTimer = setTimeout(() => {
+      fluxMessageIndex = (fluxMessageIndex + 1) % fluxMessages.length;
+      showFluxSequence();
+    }, 9000);
+  }
+
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      showFluxSequence();
+    }, 1200);
+  });
 </script>
 
 </body>
 </html>
-
