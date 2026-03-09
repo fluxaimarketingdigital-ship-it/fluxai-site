@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
@@ -9,6 +9,13 @@
   <meta name="description" content="Agência de marketing digital em Salvador especializada em estratégia, redes sociais, automação com IA e posicionamento de marca.">
   <meta name="keywords" content="marketing digital salvador, social media salvador, agencia de marketing salvador, tráfego pago salvador, criação de site salvador, automação com ia salvador">
   <meta name="author" content="FluxAI Marketing Digital">
+  <meta name="robots" content="index, follow">
+  <meta name="theme-color" content="#727944">
+  <meta name="geo.region" content="BR-BA">
+  <meta name="geo.placename" content="Salvador">
+  <meta name="geo.position" content="-12.9714;-38.5014">
+  <meta name="ICBM" content="-12.9714, -38.5014">
+  <link rel="canonical" href="https://fluxai-site-zeta.vercel.app/">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png">
@@ -16,9 +23,44 @@
   <!-- Open Graph -->
   <meta property="og:title" content="FluxAI | Marketing Digital em Salvador">
   <meta property="og:description" content="Transformamos empresas em marcas fortes com estratégia, conteúdo e automação.">
-  <meta property="og:image" content="https://seudominio.com/preview.jpg">
+  <meta property="og:image" content="https://fluxai-site-zeta.vercel.app/preview.jpg">
   <meta property="og:type" content="website">
   <meta property="og:locale" content="pt_BR">
+  <meta property="og:url" content="https://fluxai-site-zeta.vercel.app/">
+  <meta property="og:site_name" content="FluxAI">
+  <meta property="og:image:alt" content="FluxAI Marketing Digital em Salvador">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="FluxAI | Marketing Digital em Salvador">
+  <meta name="twitter:description" content="Transformamos empresas em marcas fortes com estratégia, conteúdo, tráfego e automação com IA.">
+  <meta name="twitter:image" content="https://fluxai-site-zeta.vercel.app/preview.jpg">
+
+  <!-- Schema -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "ProfessionalService",
+    "name": "FluxAI Marketing Digital",
+    "image": "https://fluxai-site-zeta.vercel.app/preview.jpg",
+    "url": "https://fluxai-site-zeta.vercel.app/",
+    "telephone": "+55-71-98111-4694",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Salvador",
+      "addressRegion": "BA",
+      "addressCountry": "BR"
+    },
+    "areaServed": {
+      "@type": "City",
+      "name": "Salvador"
+    },
+    "sameAs": [
+      "https://instagram.com/fluxai.mark"
+    ],
+    "description": "Agência de marketing digital em Salvador especializada em posicionamento, social media, tráfego pago, criação de conteúdo e automação com IA."
+  }
+  </script>
 
   <!-- Google Analytics GA4 -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-KGJRE4BJYQ"></script>
@@ -35,7 +77,6 @@
 
   <style>
     *{box-sizing:border-box}
-
     html{scroll-behavior:smooth}
 
     body{
@@ -45,12 +86,57 @@
       color:#111;
     }
 
+    .section-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:7px 12px;
+      border-radius:999px;
+      background:rgba(114,121,68,0.10);
+      color:#727944;
+      font-family:Montserrat, sans-serif;
+      font-size:11px;
+      font-weight:800;
+      letter-spacing:0.9px;
+      text-transform:uppercase;
+      margin-bottom:12px;
+    }
+
+    .glass-card{
+      background:rgba(255,255,255,0.72);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+      border:1px solid rgba(255,255,255,0.35);
+    }
+
+    .hover-lift{
+      transition:transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
+    }
+
+    .hover-lift:hover{
+      transform:translateY(-6px);
+      box-shadow:0 18px 35px rgba(0,0,0,0.08);
+    }
+
+    .fade-up{
+      opacity:0;
+      transform:translateY(24px);
+      transition:opacity 0.9s ease, transform 0.9s ease;
+    }
+
+    .fade-up.show{
+      opacity:1;
+      transform:translateY(0);
+    }
+
     .topbar{
       background:#fff;
       border-bottom:1px solid #eee;
       position:sticky;
       top:0;
       z-index:80;
+      backdrop-filter:blur(8px);
+      -webkit-backdrop-filter:blur(8px);
     }
 
     .topbar-inner{
@@ -87,8 +173,8 @@
         radial-gradient(circle at 60% 20%, rgba(255,255,255,0.08) 0 2px, transparent 3px),
         radial-gradient(circle at 85% 55%, rgba(255,255,255,0.07) 0 2px, transparent 3px),
         radial-gradient(circle at 30% 80%, rgba(255,255,255,0.08) 0 2px, transparent 3px);
-      opacity:.9;
-      animation: floatDots 8s ease-in-out infinite alternate;
+      opacity:.8;
+      animation:floatDots 8s ease-in-out infinite alternate;
       pointer-events:none;
     }
 
@@ -107,6 +193,12 @@
       background:radial-gradient(circle, rgba(255,106,0,0.28), transparent 60%);
       filter:blur(10px);
       pointer-events:none;
+      animation:heroGlow 5s ease-in-out infinite alternate;
+    }
+
+    @keyframes heroGlow{
+      from{ transform:scale(1) translateY(0); opacity:.75; }
+      to{ transform:scale(1.08) translateY(10px); opacity:1; }
     }
 
     .hero-inner{
@@ -124,6 +216,12 @@
       margin-bottom:160px;
       position:relative;
       z-index:2;
+      will-change:transform;
+    }
+
+    .hero-fade-scroll{
+      transition:transform 0.08s linear, opacity 0.08s linear;
+      will-change:transform, opacity;
     }
 
     .hero-head{
@@ -144,6 +242,7 @@
       animation:heroIn 0.9s ease both;
       line-height:1.05;
       white-space:nowrap;
+      text-shadow:0 10px 30px rgba(0,0,0,0.10);
     }
 
     .hero-title::after{
@@ -171,6 +270,7 @@
       line-height:1.7;
       opacity:.95;
       text-shadow:0 2px 10px rgba(0,0,0,0.08);
+      backdrop-filter:blur(1px);
     }
 
     .hero-authority{
@@ -224,7 +324,27 @@
       font-family:inherit;
     }
 
-    .hero-actions .btn{ min-width:190px; }
+    .hero-actions .btn{
+      min-width:190px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero-actions .btn::after{
+      content:"";
+      position:absolute;
+      top:0;
+      left:-120%;
+      width:60%;
+      height:100%;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+      transform:skewX(-20deg);
+      transition:left 0.7s ease;
+    }
+
+    .hero-actions .btn:hover::after{
+      left:130%;
+    }
 
     .btn-outline{
       border:2px solid #fff;
@@ -290,7 +410,7 @@
       background:#727944;
       color:#fff;
     }
- 
+
     .hero-right{
       width:100%;
       max-width:none;
@@ -301,6 +421,12 @@
       min-height:620px;
       overflow:visible;
       flex:1;
+      will-change:transform;
+    }
+
+    .hero-parallax{
+      transition:transform 0.08s linear;
+      will-change:transform;
     }
 
     .hero-woman{
@@ -625,6 +751,7 @@
     .clients-divider .text,
     .partners-title .text,
     .diagnostic-divider .text{ color:#111; }
+
     .cases-divider .text{ color:#fff; }
 
     .why{
@@ -636,7 +763,8 @@
     .process-inner,
     .faq-inner,
     .flux-inner,
-    .diagnostic-inner{
+    .diagnostic-inner,
+    .social-proof-inner{
       width:1100px;
       margin:0 auto;
     }
@@ -995,12 +1123,13 @@
     }
 
     .card{
-      background:#fff;
+      background:linear-gradient(180deg, rgba(255,255,255,1), rgba(249,249,249,1));
       padding:30px;
-      border-radius:14px;
-      border:1px solid #eee;
-      transition:0.3s;
+      border-radius:18px;
+      border:1px solid rgba(0,0,0,0.06);
+      transition:0.35s ease;
       text-align:left;
+      box-shadow:0 10px 25px rgba(0,0,0,0.03);
     }
 
     .card i{ font-size:30px; color:#ff6a00; margin-bottom:15px; }
@@ -1020,7 +1149,7 @@
     }
 
     .case-card{
-      background:rgba(255,255,255,0.08);
+      background:rgba(255,255,255,0.10);
       border:1px solid rgba(255,255,255,0.18);
       border-radius:14px;
       padding:22px;
@@ -1081,6 +1210,46 @@
       margin:0 auto;
     }
 
+    .social-proof{
+      padding:80px 20px;
+      background:#fff;
+    }
+
+    .proof-grid{
+      margin-top:24px;
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:16px;
+    }
+
+    .proof-card{
+      background:#fff;
+      border:1px solid rgba(0,0,0,0.06);
+      border-radius:18px;
+      padding:22px;
+      box-shadow:0 8px 22px rgba(0,0,0,0.03);
+    }
+
+    .proof-stars{
+      display:flex;
+      gap:6px;
+      color:#ff6a00;
+      margin-bottom:12px;
+    }
+
+    .proof-card p{
+      margin:0 0 14px;
+      color:#444;
+      line-height:1.75;
+      font-size:14px;
+    }
+
+    .proof-card strong{
+      font-size:13px;
+      color:#727944;
+      font-family:Montserrat, sans-serif;
+    }
+
     .faq{
       padding:75px 20px;
       background:#fafafa;
@@ -1118,6 +1287,37 @@
     }
 
     summary::-webkit-details-marker{ display:none; }
+
+    .conversion-bar{
+      padding:34px 20px;
+      background:#fff;
+    }
+
+    .conversion-bar-inner{
+      width:1100px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:repeat(3, 1fr);
+      gap:14px;
+    }
+
+    .conversion-item{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:16px;
+      border-radius:14px;
+      border:1px solid rgba(0,0,0,0.06);
+      background:linear-gradient(180deg, rgba(114,121,68,0.06), rgba(255,255,255,1));
+      font-weight:700;
+      color:#333;
+      text-align:center;
+    }
+
+    .conversion-item i{
+      color:#ff6a00;
+    }
 
     .cta{
       padding:100px 20px;
@@ -1231,6 +1431,10 @@
       line-height:1.45;
       position:relative;
       text-align:center;
+      min-height:82px;
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
     }
 
     .flux-fixed-bubble::after{
@@ -1250,6 +1454,19 @@
       margin-bottom:4px;
       font-size:13px;
       color:#727944;
+    }
+
+    #fluxDynamicText{
+      display:block;
+    }
+
+    .flux-fixed-bubble.active{
+      animation:fluxBubblePop 0.35s ease;
+    }
+
+    @keyframes fluxBubblePop{
+      0%{ transform:scale(0.96); opacity:0.7; }
+      100%{ transform:scale(1); opacity:1; }
     }
 
     .flux-fixed-avatar{
@@ -1282,6 +1499,17 @@
       50%{ transform:translateY(0) scale(0.98); }
       60%{ transform:translateY(-10px) scale(1.02); }
       100%{ transform:translateY(0) scale(1); }
+    }
+
+    .case-card,
+    .flux-card,
+    .client-card,
+    .proof-card,
+    .diagnostic-step,
+    .card,
+    .why-card,
+    .step{
+      backdrop-filter:blur(2px);
     }
 
     .modal-overlay{
@@ -1462,7 +1690,9 @@
       .process-inner,
       .faq-inner,
       .flux-inner,
-      .diagnostic-inner{
+      .diagnostic-inner,
+      .social-proof-inner,
+      .conversion-bar-inner{
         width:92%;
       }
     }
@@ -1474,6 +1704,8 @@
       .flux-qa{ grid-template-columns:1fr; }
       .flux-side{ position:relative; top:auto; }
       .diagnostic-grid{ grid-template-columns:1fr; }
+      .proof-grid{ grid-template-columns:1fr; }
+      .conversion-bar-inner{ grid-template-columns:1fr; }
     }
 
     @media (max-width:900px){
@@ -1590,9 +1822,9 @@
   <section class="hero">
     <div class="hero-inner">
 
-      <div class="hero-content">
+      <div class="hero-content hero-fade-scroll" id="heroContent">
         <div class="hero-head">
-          <h1 class="hero-title">SUA EMPRESA, SUA MARCA.</h1>
+          <h1 class="hero-title">Transformamos sua empresa em uma marca forte.</h1>
         </div>
 
         <p class="hero-sub typewrap" aria-live="polite">
@@ -1630,7 +1862,7 @@
         </div>
       </div>
 
-      <div class="hero-right" aria-label="Imagem FluxAI">
+      <div class="hero-right hero-parallax" id="heroVisual" aria-label="Imagem FluxAI">
         <img class="hero-woman" src="mulher.png" alt="Estratégia de marketing FluxAI">
       </div>
 
@@ -1987,6 +2219,54 @@
     </div>
   </section>
 
+  <section class="social-proof">
+    <div class="services-divider">
+      <div class="line"></div>
+      <div class="text">Resultados e confiança</div>
+      <div class="line"></div>
+    </div>
+
+    <div class="social-proof-inner">
+      <div class="proof-grid">
+        <div class="proof-card reveal hover-lift">
+          <div class="proof-stars">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <p>“A FluxAI trouxe mais clareza para nossa marca e nosso Instagram começou a parecer realmente profissional.”</p>
+          <strong>Cliente atendido em Salvador</strong>
+        </div>
+
+        <div class="proof-card reveal hover-lift">
+          <div class="proof-stars">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <p>“O que mais gostamos foi a estratégia. Não foi só design bonito, foi direção para vender melhor.”</p>
+          <strong>Empresa de serviços</strong>
+        </div>
+
+        <div class="proof-card reveal hover-lift">
+          <div class="proof-stars">
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <p>“A sensação é de ter uma equipe de marketing inteira pensando no negócio.”</p>
+          <strong>Marca local</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="faq">
     <div class="services-divider">
       <div class="line"></div>
@@ -2029,6 +2309,23 @@
     </div>
   </section>
 
+  <section class="conversion-bar">
+    <div class="conversion-bar-inner">
+      <div class="conversion-item reveal">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>Diagnóstico inicial estratégico</span>
+      </div>
+      <div class="conversion-item reveal">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>Contato rápido pelo seu canal</span>
+      </div>
+      <div class="conversion-item reveal">
+        <i class="fa-solid fa-check-circle"></i>
+        <span>Atendimento para Salvador e online</span>
+      </div>
+    </div>
+  </section>
+
   <section class="cta">
     <h2>Pronto para transformar sua empresa em uma marca forte?</h2>
     <p>Se você quer parar de depender de indicação e começar a gerar clientes no digital com consistência, a FluxAI te mostra o caminho.</p>
@@ -2057,9 +2354,9 @@
   </a>
 
   <div class="flux-fixed">
-    <div class="flux-fixed-bubble">
+    <div class="flux-fixed-bubble" id="fluxDynamicBubble">
       <strong>Flux</strong>
-      Quer que a FluxAI analise sua marca? Clique aqui.
+      <span id="fluxDynamicText">Quer que a FluxAI analise sua marca? Clique aqui.</span>
     </div>
 
     <button type="button" class="flux-fixed-avatar open-lead-form" aria-label="Abrir formulário de diagnóstico">
@@ -2326,6 +2623,49 @@
         }
       });
     }
+
+    const heroContent = document.getElementById('heroContent');
+    const heroVisual = document.getElementById('heroVisual');
+
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      const heroLimit = 500;
+      const clamped = Math.min(scrollY, heroLimit);
+
+      if(heroContent){
+        heroContent.style.transform = `translateY(${clamped * 0.10}px)`;
+        heroContent.style.opacity = `${1 - clamped / 900}`;
+      }
+
+      if(heroVisual){
+        heroVisual.style.transform = `translateY(${clamped * -0.06}px)`;
+      }
+    });
+
+    const fluxDynamicText = document.getElementById('fluxDynamicText');
+    const fluxDynamicBubble = document.getElementById('fluxDynamicBubble');
+
+    const fluxMessages = [
+      'Quer que a FluxAI analise sua marca? Clique aqui.',
+      'Posso te mostrar o que está travando suas vendas.',
+      'Seu Instagram pode parecer muito mais premium.',
+      'A FluxAI une estratégia, conteúdo e automação com IA.'
+    ];
+
+    let fluxIndex = 0;
+
+    function rotateFluxMessage(){
+      if(!fluxDynamicText || !fluxDynamicBubble) return;
+
+      fluxDynamicBubble.classList.remove('active');
+      setTimeout(() => {
+        fluxIndex = (fluxIndex + 1) % fluxMessages.length;
+        fluxDynamicText.textContent = fluxMessages[fluxIndex];
+        fluxDynamicBubble.classList.add('active');
+      }, 120);
+    }
+
+    setInterval(rotateFluxMessage, 4200);
   </script>
 
 </body>
