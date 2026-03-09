@@ -90,6 +90,8 @@ gtag('config', 'G-KGJRE4BJYQ');
 
   .hero-content{
     margin-bottom:170px;
+    position:relative;
+    z-index:2;
   }
 
   .hero-title{
@@ -134,6 +136,7 @@ gtag('config', 'G-KGJRE4BJYQ');
     max-width:520px;
     line-height:1.7;
     opacity:.95;
+    text-shadow:0 2px 10px rgba(0,0,0,0.08);
   }
 
   .typewrap{ min-height:58px; }
@@ -173,6 +176,10 @@ gtag('config', 'G-KGJRE4BJYQ');
     will-change: transform;
     justify-content:center;
   }
+  .hero-actions .btn{
+    min-width:190px;
+  }
+
   .btn-outline{
     border:2px solid #fff;
     color:#fff;
@@ -201,6 +208,7 @@ gtag('config', 'G-KGJRE4BJYQ');
     background:#ff6a00;
     color:#fff;
     border:2px solid transparent;
+    cursor:pointer;
   }
   .btn-solid:hover{
     transform:translateY(-4px);
@@ -244,42 +252,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     object-position:center bottom;
     margin-bottom:-70px;
     margin-top:20px;
-  }
-
-  .hero-brain{
-    position:absolute;
-    width:195px;
-    max-width:38%;
-    right:118px;
-    top:380px;
-    z-index:3;
-    filter: drop-shadow(0 16px 30px rgba(0,0,0,0.22));
-    animation: brainFlow 3.2s ease-in-out infinite;
-    transform-origin:center;
-    pointer-events:none;
-  }
-
-  @keyframes brainFlow{
-    0%{
-      transform:translate3d(0,0,0) scale(0.9) rotate(-4deg);
-      opacity:0.15;
-    }
-    20%{
-      transform:translate3d(-18px,10px,40px) scale(1.02) rotate(0deg);
-      opacity:0.85;
-    }
-    50%{
-      transform:translate3d(-55px,30px,100px) scale(1.18) rotate(3deg);
-      opacity:1;
-    }
-    75%{
-      transform:translate3d(-20px,12px,40px) scale(1.02) rotate(0deg);
-      opacity:0.85;
-    }
-    100%{
-      transform:translate3d(0,0,0) scale(0.9) rotate(-4deg);
-      opacity:0.15;
-    }
   }
 
   .flux-hero-box{
@@ -355,37 +327,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     letter-spacing:0.8px;
     text-transform:uppercase;
     margin-bottom:8px;
-  }
-  .flux-speech{
-    position:absolute;
-    top:-22px;
-    right:-12px;
-    background:#fff;
-    color:#111;
-    padding:10px 14px;
-    border-radius:14px;
-    font-size:13px;
-    font-weight:700;
-    line-height:1.4;
-    box-shadow:0 12px 28px rgba(0,0,0,0.14);
-    max-width:220px;
-    animation: fluxTalk 2.8s ease-in-out infinite;
-    z-index:3;
-  }
-  .flux-speech::after{
-    content:"";
-    position:absolute;
-    left:18px;
-    bottom:-8px;
-    width:16px;
-    height:16px;
-    background:#fff;
-    transform:rotate(45deg);
-  }
-  @keyframes fluxTalk{
-    0%{ transform:translateY(0px); }
-    50%{ transform:translateY(-4px); }
-    100%{ transform:translateY(0px); }
   }
 
   .about{ padding:85px 20px 50px; background:#fff; }
@@ -913,6 +854,7 @@ gtag('config', 'G-KGJRE4BJYQ');
     color:#fff;
     border:2px solid transparent;
     justify-content:center;
+    cursor:pointer;
   }
   .btn-primary:hover{
     transform:translateY(-4px);
@@ -963,108 +905,259 @@ gtag('config', 'G-KGJRE4BJYQ');
 
   .flux-fixed{
     position:fixed;
-    right:90px;
-    bottom:18px;
+    right:22px;
+    bottom:88px;
     z-index:98;
     display:flex;
-    align-items:flex-end;
-    gap:10px;
+    flex-direction:column;
+    align-items:center;
+    gap:12px;
   }
+
   .flux-fixed-bubble{
     background:#fff;
     color:#111;
-    padding:12px 14px;
-    border-radius:16px 16px 4px 16px;
+    padding:12px 16px;
+    border-radius:16px;
     box-shadow:0 14px 30px rgba(0,0,0,0.16);
-    max-width:250px;
-    min-width:210px;
+    max-width:240px;
     font-size:13px;
     line-height:1.45;
     position:relative;
-    opacity:0;
-    transform:translateY(12px) scale(0.96);
-    pointer-events:none;
-    transition:opacity 0.35s ease, transform 0.35s ease;
+    text-align:center;
+    animation: fluxTalk 2.8s ease-in-out infinite;
   }
-  .flux-fixed-bubble.show{
-    opacity:1;
-    transform:translateY(0) scale(1);
-  }
+
   .flux-fixed-bubble::after{
     content:"";
     position:absolute;
-    right:18px;
+    left:50%;
     bottom:-8px;
     width:16px;
     height:16px;
     background:#fff;
-    transform:rotate(45deg);
+    transform:translateX(-50%) rotate(45deg);
   }
+
   .flux-fixed-bubble strong{
     display:block;
     font-family:Montserrat;
     margin-bottom:4px;
     font-size:13px;
+    color:#727944;
   }
-  .flux-fixed-text{
-    display:inline;
-  }
-  .flux-fixed-text.typing::after{
-    content:"";
-    display:inline-block;
-    width:2px;
-    height:14px;
-    margin-left:4px;
-    background:#111;
-    vertical-align:-2px;
-    animation: fluxCaretBlink 0.8s infinite;
-  }
-  @keyframes fluxCaretBlink{
-    0%,49%{ opacity:1; }
-    50%,100%{ opacity:0; }
+
+  @keyframes fluxTalk{
+    0%{ transform:translateY(0px); }
+    50%{ transform:translateY(-4px); }
+    100%{ transform:translateY(0px); }
   }
 
   .flux-fixed-avatar{
-    width:92px;
-    height:92px;
-    border-radius:999px;
-    background:linear-gradient(180deg,#727944,#5c6235);
-    display:flex;
+    background:none;
+    box-shadow:none;
+    border:none;
+    text-decoration:none;
+    display:block;
+    cursor:pointer;
+  }
+
+  .flux-fixed-avatar img{
+    width:155px;
+    height:auto;
+    display:block;
+    filter:drop-shadow(0 18px 28px rgba(0,0,0,0.25));
+    animation: fluxFloatBig 3s ease-in-out infinite;
+    transition:transform 0.25s ease;
+  }
+
+  .flux-fixed-avatar:hover img{
+    transform:scale(1.04);
+  }
+
+  @keyframes fluxFloatBig{
+    0%{ transform:translateY(0px); }
+    50%{ transform:translateY(-8px); }
+    100%{ transform:translateY(0px); }
+  }
+
+  .modal-overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.55);
+    display:none;
     align-items:center;
     justify-content:center;
-    box-shadow:0 14px 30px rgba(0,0,0,0.18);
+    z-index:200;
+    padding:20px;
+  }
+
+  .modal-overlay.show{
+    display:flex;
+  }
+
+  .modal{
+    width:100%;
+    max-width:760px;
+    background:#fff;
+    border-radius:22px;
     overflow:hidden;
-    border:2px solid rgba(255,255,255,0.75);
-    text-decoration:none;
+    box-shadow:0 30px 70px rgba(0,0,0,0.30);
+    animation: modalIn 0.25s ease;
   }
-  .flux-fixed-avatar img{
-    width:76px;
-    height:auto;
-    animation: fluxSpinPause 4.8s ease-in-out infinite;
-    transform-origin:center center;
+
+  @keyframes modalIn{
+    from{ opacity:0; transform:translateY(14px) scale(0.98); }
+    to{ opacity:1; transform:translateY(0) scale(1); }
   }
-  @keyframes fluxSpinPause{
-    0%{
-      transform:rotate(0deg) scale(1);
-    }
-    12%{
-      transform:rotate(0deg) scale(1);
-    }
-    32%{
-      transform:rotate(360deg) scale(1.06);
-    }
-    42%{
-      transform:rotate(360deg) scale(1);
-    }
-    72%{
-      transform:rotate(360deg) scale(1);
-    }
-    86%{
-      transform:rotate(360deg) translateY(-4px);
-    }
-    100%{
-      transform:rotate(360deg) translateY(0);
-    }
+
+  .modal-header{
+    background:linear-gradient(135deg,#727944,#5c6235);
+    color:#fff;
+    padding:24px 24px 20px;
+    position:relative;
+  }
+
+  .modal-header h3{
+    margin:0 0 8px;
+    font-family:Montserrat;
+    font-size:24px;
+  }
+
+  .modal-header p{
+    margin:0;
+    line-height:1.65;
+    max-width:580px;
+    opacity:.95;
+    font-size:14px;
+  }
+
+  .modal-close{
+    position:absolute;
+    top:16px;
+    right:16px;
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:999px;
+    background:rgba(255,255,255,0.14);
+    color:#fff;
+    font-size:18px;
+    cursor:pointer;
+    transition:0.2s;
+  }
+
+  .modal-close:hover{
+    background:rgba(255,255,255,0.24);
+    transform:scale(1.04);
+  }
+
+  .lead-form{
+    padding:24px;
+  }
+
+  .lead-grid{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+
+  .field{
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+  }
+
+  .field.full{
+    grid-column:1 / -1;
+  }
+
+  .field label{
+    font-weight:700;
+    font-size:13px;
+    color:#222;
+  }
+
+  .field input,
+  .field select,
+  .field textarea{
+    width:100%;
+    box-sizing:border-box;
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:14px 14px;
+    font-size:14px;
+    outline:none;
+    transition:0.2s ease;
+    font-family:Arial, sans-serif;
+    background:#fff;
+  }
+
+  .field input:focus,
+  .field select:focus,
+  .field textarea:focus{
+    border-color:#727944;
+    box-shadow:0 0 0 4px rgba(114,121,68,0.12);
+  }
+
+  .field textarea{
+    min-height:110px;
+    resize:vertical;
+  }
+
+  .form-note{
+    margin:16px 0 0;
+    color:#666;
+    font-size:12.5px;
+    line-height:1.6;
+  }
+
+  .form-actions{
+    margin-top:20px;
+    display:flex;
+    justify-content:flex-end;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+
+  .btn-light{
+    background:#f4f4f4;
+    color:#222;
+    border:none;
+    cursor:pointer;
+  }
+
+  .btn-light:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 18px rgba(0,0,0,0.08);
+  }
+
+  .btn-submit{
+    background:#ff6a00;
+    color:#fff;
+    border:none;
+    cursor:pointer;
+  }
+
+  .btn-submit:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 24px rgba(0,0,0,0.18);
+  }
+
+  .form-success{
+    display:none;
+    padding:18px 20px;
+    margin-top:18px;
+    border-radius:14px;
+    background:rgba(114,121,68,0.10);
+    border:1px solid rgba(114,121,68,0.20);
+    color:#2f3b19;
+    font-size:14px;
+    line-height:1.6;
+  }
+
+  .form-success.show{
+    display:block;
   }
 
   @media (max-width:1150px){
@@ -1102,12 +1195,6 @@ gtag('config', 'G-KGJRE4BJYQ');
       align-items:flex-start;
     }
 
-    .hero-brain{
-      width:145px;
-      right:92px;
-      top:245px;
-    }
-
     .hero-woman{
       max-width:460px;
       margin-bottom:-24px;
@@ -1119,34 +1206,22 @@ gtag('config', 'G-KGJRE4BJYQ');
       align-items:center;
     }
 
-    .flux-speech{
-      position:static;
-      margin-bottom:12px;
-      max-width:100%;
-    }
-
-    .flux-speech::after{
-      display:none;
-    }
-
     .flux-fixed{
-      right:14px;
+      right:10px;
       bottom:86px;
     }
 
     .flux-fixed-bubble{
-      max-width:185px;
-      min-width:auto;
+      max-width:190px;
       font-size:12px;
     }
 
-    .flux-fixed-avatar{
-      width:70px;
-      height:70px;
+    .flux-fixed-avatar img{
+      width:120px;
     }
 
-    .flux-fixed-avatar img{
-      width:56px;
+    .lead-grid{
+      grid-template-columns:1fr;
     }
   }
 </style>
@@ -1185,14 +1260,12 @@ gtag('config', 'G-KGJRE4BJYQ');
           <i class="fa-brands fa-instagram"></i> Instagram
         </a>
 
-        <a class="btn btn-solid" href="https://wa.me/5571981114694?text=Quero%20um%20diagn%C3%B3stico%20da%20minha%20marca%20com%20a%20FluxAI" target="_blank" rel="noopener">
+        <button class="btn btn-solid open-lead-form" type="button">
           <i class="fa-solid fa-magnifying-glass"></i> Quero um diagnóstico
-        </a>
+        </button>
       </div>
 
       <div class="flux-hero-box reveal">
-        <div class="flux-speech">Posso te mostrar como sua marca pode vender mais com IA.</div>
-
         <img src="fluxo.png" alt="Flux, assistente da FluxAI">
 
         <div class="flux-hero-text">
@@ -1206,7 +1279,6 @@ gtag('config', 'G-KGJRE4BJYQ');
     </div>
 
     <div class="hero-right" aria-label="Imagem FluxAI">
-      <img class="hero-brain" src="cerebro-ia.png" alt="Cérebro de inteligência artificial">
       <img class="hero-woman" src="mulher.png" alt="Estratégia de marketing FluxAI">
     </div>
 
@@ -1367,9 +1439,9 @@ gtag('config', 'G-KGJRE4BJYQ');
         <img src="fluxo.png" alt="Flux, mascote da FluxAI">
         <h3>Olá, eu sou o Flux.</h3>
         <p>Seu assistente digital da FluxAI. Abaixo estão algumas das dúvidas mais comuns de empresas que querem crescer no digital com mais inteligência.</p>
-        <a class="flux-mini-btn" href="https://wa.me/5571981114694?text=Ol%C3%A1%20Flux%2C%20quero%20entender%20como%20a%20FluxAI%20pode%20ajudar%20minha%20empresa" target="_blank" rel="noopener">
-          <i class="fa-brands fa-whatsapp"></i> Falar com o Flux
-        </a>
+        <button class="flux-mini-btn open-lead-form" type="button">
+          <i class="fa-solid fa-file-lines"></i> Solicitar diagnóstico
+        </button>
       </div>
 
       <div class="flux-qa">
@@ -1415,9 +1487,9 @@ gtag('config', 'G-KGJRE4BJYQ');
       <h3>Quer saber o que está travando suas vendas no digital?</h3>
       <p>A FluxAI analisa sua marca e te mostra, com clareza, o que ajustar para atrair clientes certos e vender mais.</p>
     </div>
-    <a class="btn btn-solid" href="https://wa.me/5571981114694?text=Quero%20uma%20an%C3%A1lise%20da%20minha%20marca%20com%20a%20FluxAI" target="_blank" rel="noopener">
-      <i class="fa-brands fa-whatsapp"></i> Falar agora
-    </a>
+    <button class="btn btn-solid open-lead-form" type="button">
+      <i class="fa-solid fa-file-signature"></i> Solicitar análise
+    </button>
   </div>
 </section>
 
@@ -1571,7 +1643,7 @@ gtag('config', 'G-KGJRE4BJYQ');
 
       <details class="reveal">
         <summary>Como faço para começar? <i class="fa-solid fa-plus"></i></summary>
-        <div class="faq-answer">Clique em “Quero um diagnóstico” e envie seu Instagram. A FluxAI faz uma análise rápida e te direciona com clareza.</div>
+        <div class="faq-answer">Clique em “Quero um diagnóstico” e envie suas informações. A FluxAI analisa seu momento e entra em contato com clareza sobre o melhor caminho.</div>
       </details>
     </div>
   </div>
@@ -1581,9 +1653,9 @@ gtag('config', 'G-KGJRE4BJYQ');
   <h2>Pronto para transformar sua empresa em uma marca forte?</h2>
   <p>Se você quer parar de depender de indicação e começar a gerar clientes no digital com consistência, a FluxAI te mostra o caminho.</p>
 
-  <a class="btn btn-primary" href="https://wa.me/5571981114694?text=Quero%20meu%20diagn%C3%B3stico%20com%20a%20FluxAI" target="_blank" rel="noopener">
+  <button class="btn btn-primary open-lead-form" type="button">
     Quero meu diagnóstico
-  </a>
+  </button>
 </section>
 
 <footer>
@@ -1600,18 +1672,116 @@ gtag('config', 'G-KGJRE4BJYQ');
 </a>
 
 <div class="flux-fixed">
-  <div class="flux-fixed-bubble" id="fluxBubble">
+  <div class="flux-fixed-bubble">
     <strong>Flux</strong>
-    <span class="flux-fixed-text" id="fluxBubbleText"></span>
+    Quer um diagnóstico da sua marca? Me chama aqui.
   </div>
 
-  <a href="https://wa.me/5571981114694?text=Ol%C3%A1%20Flux%2C%20quero%20um%20diagn%C3%B3stico%20da%20minha%20marca" target="_blank" rel="noopener" class="flux-fixed-avatar" aria-label="Falar com o Flux">
+  <button type="button" class="flux-fixed-avatar open-lead-form" aria-label="Abrir formulário de diagnóstico">
     <img src="fluxo-apontando.png" alt="Flux apontando">
-  </a>
+  </button>
+</div>
+
+<div class="modal-overlay" id="leadModal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-header">
+      <button class="modal-close" id="closeLeadModal" aria-label="Fechar formulário">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+      <h3 id="modalTitle">Solicite seu diagnóstico</h3>
+      <p>Preencha as informações abaixo para a FluxAI entender melhor sua empresa, seu momento e o que está travando seu crescimento digital.</p>
+    </div>
+
+    <form class="lead-form" id="leadForm">
+      <div class="lead-grid">
+        <div class="field">
+          <label for="nome">Nome completo *</label>
+          <input type="text" id="nome" name="nome" required>
+        </div>
+
+        <div class="field">
+          <label for="empresa">Nome da empresa *</label>
+          <input type="text" id="empresa" name="empresa" required>
+        </div>
+
+        <div class="field">
+          <label for="whatsapp">WhatsApp *</label>
+          <input type="tel" id="whatsapp" name="whatsapp" placeholder="(71) 99999-9999" required>
+        </div>
+
+        <div class="field">
+          <label for="instagram">Instagram da empresa</label>
+          <input type="text" id="instagram" name="instagram" placeholder="@suaempresa">
+        </div>
+
+        <div class="field">
+          <label for="segmento">Segmento *</label>
+          <select id="segmento" name="segmento" required>
+            <option value="">Selecione</option>
+            <option>Clínica / Saúde</option>
+            <option>Odontologia</option>
+            <option>Estética / Beleza</option>
+            <option>Restaurante / Alimentação</option>
+            <option>Serviços</option>
+            <option>Advocacia</option>
+            <option>Imobiliário</option>
+            <option>Moda / Loja</option>
+            <option>Educação</option>
+            <option>Outro</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="objetivo">Objetivo principal *</label>
+          <select id="objetivo" name="objetivo" required>
+            <option value="">Selecione</option>
+            <option>Gerar mais leads</option>
+            <option>Vender mais</option>
+            <option>Melhorar posicionamento</option>
+            <option>Melhorar o Instagram</option>
+            <option>Criar site / landing page</option>
+            <option>Automatizar atendimento</option>
+            <option>Rodar tráfego pago</option>
+          </select>
+        </div>
+
+        <div class="field full">
+          <label for="desafio">Qual é o maior desafio da sua marca hoje? *</label>
+          <textarea id="desafio" name="desafio" required placeholder="Ex.: meu Instagram não gera clientes, não tenho posicionamento claro, preciso de uma landing page, quero melhorar minhas vendas..."></textarea>
+        </div>
+
+        <div class="field full">
+          <label for="investimento">Você já investe em marketing?</label>
+          <select id="investimento" name="investimento">
+            <option value="">Selecione</option>
+            <option>Ainda não</option>
+            <option>Sim, pouco</option>
+            <option>Sim, de forma recorrente</option>
+            <option>Já investi, mas não tive resultado</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="form-note">
+        Ao enviar, suas informações poderão ser usadas pela FluxAI para entrar em contato e apresentar a melhor estratégia para o seu negócio.
+      </p>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-light" id="cancelLeadModal">Cancelar</button>
+        <button type="submit" class="btn btn-submit">
+          <i class="fa-solid fa-paper-plane"></i> Enviar diagnóstico
+        </button>
+      </div>
+
+      <div class="form-success" id="formSuccess">
+        Recebemos suas informações com sucesso. Agora você pode integrar este formulário ao seu e-mail, WhatsApp, Google Sheets ou CRM.
+      </div>
+    </form>
+  </div>
 </div>
 
 <script>
-  const text = "Criamos toda estratégia de marketing, posicionamento e estrutura digital para sua empresa atraírem clientes certos.";
+  const text = "Criamos toda a estratégia de marketing, posicionamento e estrutura digital para sua empresa atrair os clientes certos.";
   const el = document.getElementById("heroType");
   let i = 0;
 
@@ -1679,65 +1849,76 @@ gtag('config', 'G-KGJRE4BJYQ');
     });
   });
 
-  const fluxBubble = document.getElementById("fluxBubble");
-  const fluxBubbleText = document.getElementById("fluxBubbleText");
+  const leadModal = document.getElementById('leadModal');
+  const openLeadButtons = document.querySelectorAll('.open-lead-form');
+  const closeLeadModal = document.getElementById('closeLeadModal');
+  const cancelLeadModal = document.getElementById('cancelLeadModal');
+  const leadForm = document.getElementById('leadForm');
+  const formSuccess = document.getElementById('formSuccess');
 
-  const fluxMessages = [
-    "Olá! Posso te mostrar como sua marca pode vender mais com IA.",
-    "Quer um diagnóstico rápido da sua marca?",
-    "Clique aqui e fale comigo no WhatsApp da FluxAI."
-  ];
-
-  let fluxMessageIndex = 0;
-  let fluxTypingTimer = null;
-  let fluxHideTimer = null;
-  let fluxLoopTimer = null;
-
-  function typeFluxMessage(message, speed = 32){
-    if(!fluxBubble || !fluxBubbleText) return;
-
-    clearTimeout(fluxTypingTimer);
-    fluxBubbleText.textContent = "";
-    fluxBubbleText.classList.add("typing");
-    fluxBubble.classList.add("show");
-
-    let charIndex = 0;
-
-    function write(){
-      if(charIndex <= message.length){
-        fluxBubbleText.textContent = message.slice(0, charIndex);
-        charIndex++;
-        fluxTypingTimer = setTimeout(write, speed);
-      } else {
-        fluxBubbleText.classList.remove("typing");
-      }
-    }
-
-    write();
+  function openModal(){
+    if(leadModal) leadModal.classList.add('show');
+    document.body.style.overflow = 'hidden';
   }
 
-  function showFluxSequence(){
-    const currentMessage = fluxMessages[fluxMessageIndex];
-    typeFluxMessage(currentMessage, 26);
-
-    clearTimeout(fluxHideTimer);
-    clearTimeout(fluxLoopTimer);
-
-    fluxHideTimer = setTimeout(() => {
-      if(fluxBubble) fluxBubble.classList.remove("show");
-    }, 6000);
-
-    fluxLoopTimer = setTimeout(() => {
-      fluxMessageIndex = (fluxMessageIndex + 1) % fluxMessages.length;
-      showFluxSequence();
-    }, 9000);
+  function closeModal(){
+    if(leadModal) leadModal.classList.remove('show');
+    document.body.style.overflow = '';
   }
 
-  window.addEventListener("load", () => {
-    setTimeout(() => {
-      showFluxSequence();
-    }, 1200);
+  openLeadButtons.forEach(btn => {
+    btn.addEventListener('click', openModal);
   });
+
+  if(closeLeadModal) closeLeadModal.addEventListener('click', closeModal);
+  if(cancelLeadModal) cancelLeadModal.addEventListener('click', closeModal);
+
+  if(leadModal){
+    leadModal.addEventListener('click', (e) => {
+      if(e.target === leadModal) closeModal();
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if(e.key === 'Escape' && leadModal.classList.contains('show')){
+      closeModal();
+    }
+  });
+
+  if(leadForm){
+    leadForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      const dados = new FormData(leadForm);
+      const nome = dados.get('nome') || '';
+      const empresa = dados.get('empresa') || '';
+      const whatsapp = dados.get('whatsapp') || '';
+      const instagram = dados.get('instagram') || '';
+      const segmento = dados.get('segmento') || '';
+      const objetivo = dados.get('objetivo') || '';
+      const desafio = dados.get('desafio') || '';
+      const investimento = dados.get('investimento') || '';
+
+      console.log({
+        nome,
+        empresa,
+        whatsapp,
+        instagram,
+        segmento,
+        objetivo,
+        desafio,
+        investimento
+      });
+
+      formSuccess.classList.add('show');
+      leadForm.reset();
+
+      setTimeout(() => {
+        formSuccess.classList.remove('show');
+        closeModal();
+      }, 2200);
+    });
+  }
 </script>
 
 </body>
