@@ -1088,28 +1088,17 @@ a {
     font-size: 1.4rem;
   }
   .hero {
-    padding: 120px 0 60px; /* Reduzido de 240px */
-  }
-  .hero-content h1 {
-    font-size: 2.2rem;
-    margin-bottom: 20px;
-  }
-  .hero-text {
-    font-size: 1rem;
-    margin-bottom: 24px;
+    background: linear-gradient(180deg, var(--secondary) 0%, var(--secondary) 40%, var(--bg-slate) 80%);
   }
   .hero-grid, .features-grid {
     grid-template-columns: 1fr;
     text-align: center;
   }
-  .hero-main-img { 
-    width: 100%;
-    max-width: 320px;
-    max-height: 280px; 
+  .hero-img { 
+    max-width: 80%; /* Reduzindo a imagem no mobile conforme pedido */
+    max-height: 380px;
     margin: 0 auto;
-    display: block;
-    transform: none; /* Resetando o translate agressivo do desktop */
-    animation: floatWoman 10s ease-in-out infinite;
+    object-fit: contain;
   }
   .hero-actions, .hero-stats { justify-content: center; }
   .hero-stats { flex-wrap: wrap; }
