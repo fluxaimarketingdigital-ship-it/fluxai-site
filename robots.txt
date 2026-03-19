@@ -1,2 +1,3 @@
 User-agent: *
 Allow: /
+Sitemap: https://www.fluxaidigital.com.br/sitemap.xml
