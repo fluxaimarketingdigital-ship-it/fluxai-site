@@ -1,0 +1,48 @@
+:\Users\BRENDA\Desktop\Identidade Visual FluxAI\Fluxai-site>
+C:\Users\BRENDA\Desktop\Identidade Visual FluxAI\Fluxai-site>dir
+ O volume na unidade C é Sistema
+ O Número de Série do Volume é 58E2-4D62
+
+ Pasta de C:\Users\BRENDA\Desktop\Identidade Visual FluxAI\Fluxai-site
+
+04/03/2026  22:56    <DIR>          .
+04/03/2026  22:56    <DIR>          ..
+26/02/2026  17:15                61 francisco.txt
+23/02/2026  09:46             2.512 index.html
+03/02/2026  13:22            30.202 logo.png
+05/03/2026  09:01    <DIR>          Marca Parceiras
+23/02/2026  22:35    <DIR>          Public
+21/02/2026  21:36                23 robots.txt
+               4 arquivo(s)         32.798 bytes
+               4 pasta(s)   19.120.914.432 bytes disponíveis
+
+C:\Users\BRENDA\Desktop\Identidade Visual FluxAI\Fluxai-site>surge
+
+        project: C:\Users\BRENDA\Desktop\Identidade Visual FluxAI\Fluxai-site\
+         domain: fluxai.suge.sd
+           size: 11 files, 21.1 MB
+         upload: [=========================] 100%
+            CDN: [=========================] 100%
+
+  ┌──────────┬──────────────────────────────────────────────────────────────────────────────┬─────────┐
+  │          │   ns1.surge.world   ns2.surge.world     or CNAME…                            │         │
+  │    NS    │   ns3.surge.world   ns4.surge.world     geo.surge.world                      │         │
+  ├──────────┼──────────────────┬───────────────────────┬─────────────────────┬─────────────┼─────────┤
+  │   HTTP   │   sfo.surge.sh   │   US, San Francisco   │   138.197.235.123   │   D.Ocean   │   ✔ ◍   │
+  │   HTTP   │   lhr.surge.sh   │   GB, London          │   46.101.67.123     │   D.Ocean   │   ✔ ◍   │
+  │   HTTP   │   yyz.surge.sh   │   CA, Toronto         │   159.203.50.177    │   D.Ocean   │   ✔ ◍   │
+  │   HTTP   │   jfk.surge.sh   │   US, New York        │   159.203.159.100   │   D.Ocean   │   ✔ ◍   │
+  │   HTTP   │   ams.surge.sh   │   NL, Amsterdam       │   188.166.132.94    │   D.Ocean   │   ✔ ◍   │
+  │   HTTP   │   fra.surge.sh   │   DE, Frankfurt       │   138.68.112.220    │   D.Ocean   │   ✔ ◍   │
+  │   HTTP   │   sgp.surge.sh   │   SG, Singapore       │   139.59.195.30     │   D.Ocean   │   ✔ ◍   │
+  │   HTTP   │   blr.surge.sh   │   IN, Bangalore       │   139.59.50.135     │   D.Ocean   │   ✔ ◍   │
+  │   HTTP   │   syd.surge.sh   │   AU, Sydney          │   45.76.126.95      │   Vultr     │   ✔ ◍   │
+  │   HTTP   │   nrt.surge.sh   │   JP, Tokyo           │   172.104.96.133    │   Linode    │   ✔ ◍   │
+  └──────────┴──────────────────┴───────────────────────┴─────────────────────┴─────────────┴─────────┘
+   Live preview ......................................................... 1772712651699-fluxai.suge.sd
+   Production ......................................................................... fluxai.suge.sd
+
+   Success! - Published to fluxai.suge.sd
+
+
+C:\Users\BRENDA\Desktop\Identidade Visual FluxAI\Fluxai-site>

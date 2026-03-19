@@ -1,117 +1,511 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>FluxAI | Marketing Digital</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-KGJRE4BJYQ"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-KGJRE4BJYQ');
+    </script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI | Posicionamento Digital & High-Ticket</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="logo.png" />
+    
+    <!-- Meta Tags para Redes Sociais (Open Graph) -->
+    <meta property="og:title" content="FluxAI | Posicionamento Digital & High-Ticket" />
+    <meta property="og:description" content="Acelere seus resultados com IA, Design Premium e Tráfego Pago de alta performance." />
+    <meta property="og:image" content="logo.png" />
+    <meta property="og:url" content="http://www.fluxaidigital.com.br" />
+    <meta property="og:type" content="website" />
+    
+    <meta name="description" content="FluxAI: Agência de marketing digital especializada em branding high-ticket, tráfego pago com remarketing e inteligência artificial aplicada." />
+  <meta name="keywords" content="marketing digital, posicionamento, agência, conteúdo" />
+  
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-  <!-- 🔹 GOOGLE ANALYTICS (GA4) -->
-  <!-- SUBSTITUA G-xxxxxxxxxx PELO SEU ID -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-KGJRE4BJYQ');
-  </script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #ffffff;
-      color: #000000;
-    }
-
-    .container {
-      max-width: 420px;
-      margin: auto;
-      padding: 40px 20px;
-      text-align: center;
-    }
-
-    .logo img {
-      max-width: 160px;
-      margin-bottom: 25px;
-    }
-
-    h1 {
-      font-size: 22px;
-      margin-bottom: 12px;
-      font-weight: bold;
-    }
-
-    .subtitle {
-      font-size: 14px;
-      line-height: 1.6;
-      margin-bottom: 35px;
-      color: #000000;
-    }
-
-    .btn {
-      display: block;
-      background: linear-gradient(90deg, #8a2be2, #ff6a00);
-      color: #ffffff;
-      text-decoration: none;
-      padding: 16px;
-      border-radius: 12px;
-      margin-bottom: 15px;
-      font-weight: bold;
-      transition: transform 0.2s ease, opacity 0.2s ease;
-    }
-
-    .btn:hover {
-      transform: scale(1.03);
-      opacity: 0.9;
-    }
-
-    footer {
-      margin-top: 40px;
-      font-size: 12px;
-      color: #000000;
-      opacity: 0.6;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-  <div class="container">
+  <!-- Menu de Navegação -->
+  <header class="header" id="topo">
+    <div class="container nav-wrapper">
+      <a href="#topo" class="logo">
+        <img src="logo.png" alt="FluxAI" class="logo-img" />
+      </a>
 
-    <!-- LOGO -->
-    <div class="logo">
-      <img src="logo.png" alt="FluxAI">
+      <nav class="menu" id="menu">
+        <a href="#servicos">Serviços</a>
+        <a href="#diferenciais">Diferenciais</a>
+        <a href="#parceiros">Parceiros</a>
+        <a href="#depoimentos">Depoimentos</a>
+      </nav>
+
+      <div class="nav-right">
+        <a href="https://instagram.com/fluxai.mark" target="_blank" class="nav-icon" aria-label="Instagram FluxAI">
+          <i class="fa-brands fa-instagram"></i>
+        </a>
+        <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline" rel="noopener noreferrer">
+          Falar no WhatsApp
+        </a>
+        <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
     </div>
+  </header>
 
-    <!-- TEXTO PRINCIPAL -->
-    <h1>FluxAI Marketing Digital</h1>
+  <main>
+    <!-- Seção Principal -->
+    <section class="hero" id="inicio">
+      <!-- Glow Accents -->
+      <div class="bg-aura aura-primary"></div>
+      <div class="container hero-grid">
+        <div class="hero-content reveal">
+          <div class="hero-badge">
+            <i class="fa-solid fa-star"></i> Excelência em Marketing
+          </div>
+          <h1>Posicionamento digital para <br /><span>marcas que lideram.</span></h1>
+          <p class="hero-text">Uma agência focada em resultados reais. Combinamos design sofisticado, estratégia e tecnologia para fazer seu negócio crescer no meio digital.</p>
+          
+          <div class="hero-actions">
+            <a href="#diagnostico" class="btn btn-primary">
+              Começar Agora <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <a href="#servicos" class="btn btn-secondary">
+              Conhecer Nossas Soluções
+            </a>
+          </div>
 
-    <div class="subtitle">
-      Posicionamento digital para grandes negócios.<br><br>
-      <strong>Autoridade • Estratégia • Crescimento</strong><br><br>
-      Gestão profissional de redes sociais.
+          <div class="hero-stats">
+            <div><strong>+Autoridade</strong><span>Posicionamento online</span></div>
+            <div><strong>+Presença</strong><span>Mais visibilidade</span></div>
+            <div><strong>+Crescimento</strong><span>Estratégia focada</span></div>
+          </div>
+        </div>
+
+        <div class="hero-visual reveal">
+          <!-- Detalhe de fundo visual limpo -->
+          <div class="visual-blob"></div>
+          
+          <!-- Imagem Principal -->
+          <img src="mulher.png" alt="Profissional de Marketing FluxAI" class="hero-main-img" />
+
+          <!-- Card Flutuante 1 -->
+          <div class="floating-card float-1">
+            <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="card-info">
+              <strong>Alta Performance</strong>
+              <span>Resultados focados em conversão</span>
+            </div>
+          </div>
+
+          <!-- Card Flutuante 2 -->
+          <div class="floating-card float-2">
+            <div class="icon-box"><i class="fa-solid fa-rocket"></i></div>
+            <div class="card-info">
+              <strong>Soluções com IA</strong>
+              <span>Mais velocidade e escala</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Barra de Parceiros -->
+    <section class="partners section-light" id="parceiros">
+      <div class="container">
+        <p class="section-top-label text-center">Grandes empresas confiam na FluxAI</p>
+        <div class="marquee-wrapper reveal">
+          <div class="marquee-content">
+            <!-- Grupo 1 -->
+            <div class="marquee-group">
+              <img src="parceiro-01.png" alt="Parceiro 1" />
+              <img src="parceiro-02.png" alt="Parceiro 2" />
+              <img src="parceiro-03.png" alt="Parceiro 3" />
+              <img src="parceiro-04.png" alt="Parceiro 4" />
+              <img src="parceiro-05.png" alt="Parceiro 5" />
+            </div>
+            <!-- Grupo 2 copia idêntica para o loop perfeito -->
+            <div class="marquee-group">
+              <img src="parceiro-01.png" alt="Parceiro 1" />
+              <img src="parceiro-02.png" alt="Parceiro 2" />
+              <img src="parceiro-03.png" alt="Parceiro 3" />
+              <img src="parceiro-04.png" alt="Parceiro 4" />
+              <img src="parceiro-05.png" alt="Parceiro 5" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Números / Resultados -->
+    <section class="results section-light">
+      <div class="container results-grid reveal">
+        <div class="result-item">
+          <span class="result-number">+ R$ 2MM</span>
+          <span class="result-label">Gerados para Clientes</span>
+        </div>
+        <div class="result-item">
+          <span class="result-number">+50</span>
+          <span class="result-label">Marcas Escaladas</span>
+        </div>
+        <div class="result-item">
+          <span class="result-number">100%</span>
+          <span class="result-label">Foco em Performance</span>
+        </div>
+        <div class="result-item">
+          <span class="result-number">+10k</span>
+          <span class="result-label">Leads Qualificados</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sobre Nós -->
+    <section class="sobre section-white" id="sobre">
+      <div class="container">
+        <div class="sobre-grid reveal">
+          <div class="sobre-img-wrapper">
+            <img src="sobre-valor.png" alt="Estrategistas FluxAI" class="sobre-img" />
+            <div class="sobre-floating-box">
+              <h3>+ R$ 2M</h3>
+              <span>Em resultados documentados</span>
+            </div>
+          </div>
+          <div class="sobre-text">
+            <h2 class="section-title">Não somos apenas uma agência. Somos a sua máquina de crescimento.</h2>
+            <p class="section-desc" style="margin-bottom: 16px;">
+              Na <strong>FluxAI</strong>, unimos branding, design estratégico e estratégias focadas em conversão para marcas visionárias. Nossas soluções vão desde a criação de uma <strong>Identidade Visual</strong> memorável até a <strong>Capacitação de Imagens</strong> para redes sociais potencializadas com <strong>Inteligência Artificial</strong>.
+            </p>
+            <p class="section-desc" style="margin-bottom: 32px;">
+              Somos especialistas em <strong>Gerenciamento de Redes Sociais</strong> e <strong>Social Media</strong> de alto impacto. Trabalhamos ativamente com fluxo contínuo de <strong>IA</strong> para transformar seus canais digitais em ferramentas de vendas reais de alto padrão.
+            </p>
+            <div class="sobre-stats">
+              <div>
+                <strong>+50</strong>
+                <span>Projetos Lançados</span>
+              </div>
+              <div>
+                <strong>100%</strong>
+                <span>Foco em Crescimento</span>
+              </div>
+              <div>
+                <strong>IA</strong>
+                <span>Estratégias Avançadas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Serviços -->
+    <section class="services section-white" id="servicos">
+      <div class="container">
+        <div class="section-title text-center reveal">
+          <span class="section-top-label">Soluções</span>
+          <h2>Nossa Expertise.</h2>
+        </div>
+
+        <div class="services-grid">
+          <div class="service-card reveal" data-service="branding">
+            <div class="service-icon"><i class="fa-solid fa-palette"></i></div>
+            <h3>Identidade Visual & Branding</h3>
+            <p>Criamos a face da sua marca. Design sofisticado e coerente que transmite autoridade.</p>
+            <span class="service-link">Ver Detalhes <i class="fa-solid fa-plus"></i></span>
+          </div>
+          <div class="service-card reveal" data-service="social" style="transition-delay: 100ms;">
+            <div class="service-icon"><i class="fa-solid fa-users-gear"></i></div>
+            <h3>Social Media & Gestão</h3>
+            <p>Estratégia de conteúdo e gerenciamento ativo para criar uma comunidade engajada.</p>
+            <span class="service-link">Ver Detalhes <i class="fa-solid fa-plus"></i></span>
+          </div>
+          <div class="service-card reveal" data-service="sites" style="transition-delay: 200ms;">
+            <div class="service-icon"><i class="fa-solid fa-code"></i></div>
+            <h3>Sites & SEO</h3>
+            <p>SEO, Entrega Orgânica e Funis de Captura de Leads de alta performance.</p>
+            <span class="service-link">Ver Detalhes <i class="fa-solid fa-plus"></i></span>
+          </div>
+          <div class="service-card reveal" data-service="ads" style="transition-delay: 300ms;">
+            <div class="service-icon"><i class="fa-solid fa-bullseye"></i></div>
+            <h3>Tráfego & Performance</h3>
+            <p>Meta Pixel, Remarketing Estratégico e escala acelerada de faturamento.</p>
+            <span class="service-link">Ver Detalhes <i class="fa-solid fa-plus"></i></span>
+          </div>
+          <div class="service-card reveal" data-service="ia" style="transition-delay: 400ms;">
+            <div class="service-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+            <h3>Capacitação de Imagens (IA)</h3>
+            <p>Treinamentos e fluxos de criação de imagens via IA para elevar seu padrão visual.</p>
+            <span class="service-link">Ver Detalhes <i class="fa-solid fa-plus"></i></span>
+          </div>
+          <div class="service-card reveal" data-service="strategy" style="transition-delay: 500ms;">
+            <div class="service-icon"><i class="fa-solid fa-handshake-angle"></i></div>
+            <h3>Estratégia & Dados</h3>
+            <p>Google Analytics e inteligência de dados para escalar com segurança.</p>
+            <span class="service-link">Ver Detalhes <i class="fa-solid fa-plus"></i></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Nosso Portfólio / Entregas -->
+    <section class="portfolio section-light" id="portfolio">
+      <div class="bg-aura aura-secondary"></div>
+      <div class="container">
+        <div class="section-title text-center reveal">
+          <span class="section-top-label">Excelência</span>
+          <h2>Nossas Entregas.</h2>
+        </div>
+        <div class="portfolio-grid">
+          <div class="portfolio-item reveal">
+            <img src="portfolio-web.png" alt="Web Design FluxAI" />
+            <div class="portfolio-overlay">
+              <div class="overlay-content">
+                <span>Landing Pages</span>
+                <p>Estruturas High-Ticket.</p>
+              </div>
+            </div>
+          </div>
+          <div class="portfolio-item reveal" style="transition-delay: 100ms;">
+            <img src="portfolio-brand.png" alt="Branding FluxAI" />
+            <div class="portfolio-overlay">
+              <div class="overlay-content">
+                <span>Identidade Visual</span>
+                <p>Padrão Corporativo.</p>
+              </div>
+            </div>
+          </div>
+          <div class="portfolio-item reveal" style="transition-delay: 200ms;">
+            <img src="portfolio-social.png" alt="Social Media FluxAI" />
+            <div class="portfolio-overlay">
+              <div class="overlay-content">
+                <span>Social Media</span>
+                <p>Estratégia & Ads.</p>
+              </div>
+            </div>
+          </div>
+          <div class="portfolio-item reveal" style="transition-delay: 300ms;">
+            <img src="sobre-valor.png" alt="IA FluxAI" />
+            <div class="portfolio-overlay">
+              <div class="overlay-content">
+                <span>Inteligência Artificial</span>
+                <p>Criação & Fluxos IA.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Diferenciais -->
+    <!-- Diferenciais -->
+    <section class="section-light" id="diferenciais">
+      <div class="container">
+        <div class="section-title text-center reveal">
+          <span class="section-top-label">Metodologia</span>
+          <h2>A Diferença.</h2>
+        </div>
+
+        <div class="diff-split-wrapper reveal">
+          <div class="diff-grid">
+            <div class="diff-card">
+              <div class="diff-icon"><i class="fa-solid fa-microchip"></i></div>
+              <h3>Inteligência Artificial</h3>
+              <p>Produção de conteúdo estratégica utilizando ferramentas de IA para agilidade e escala.</p>
+            </div>
+            <div class="diff-card">
+              <div class="diff-icon"><i class="fa-solid fa-gem"></i></div>
+              <h3>Padrão High-Ticket</h3>
+              <p>Design que valoriza o seu preço e eleva imediatamente a percepção de valor da marca.</p>
+            </div>
+            <div class="diff-card">
+              <div class="diff-icon"><i class="fa-solid fa-chart-line"></i></div>
+              <h3>Foco em ROI</h3>
+              <p>Estratégias validadas de captação de clientes focadas em retorno sobre o investimento.</p>
+            </div>
+            <div class="diff-card">
+              <div class="diff-icon"><i class="fa-solid fa-shield-halved"></i></div>
+              <h3>Exclusividade</h3>
+              <p>Atendimento consultivo e próximo, focado em entender os desafios únicos do seu setor.</p>
+            </div>
+          </div>
+          <div class="diff-img-side">
+            <img src="fluxo-apontando.png" alt="Fluxo Boneco" class="diff-mascot" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Depoimentos Reais -->
+    <section class="testimonials section-white" id="depoimentos">
+      <div class="container">
+        <div class="section-title text-center reveal">
+          <h2>Quem experimentou, aprovou</h2>
+          <p>Resultados que falam diretamente com quem quer investir com segurança.</p>
+        </div>
+
+        <div class="testim-grid">
+          <div class="testim-card reveal">
+            <div class="testim-quote">
+              <i class="fa-solid fa-quote-left"></i>
+              <p>O trabalho da FluxAI revolucionou nosso posicionamento digital de uma forma que nós não esperávamos conseguir nas redes sociais.</p>
+            </div>
+            <div class="testim-author">
+              <img src="cliente-camila.png" alt="Camila" />
+              <div>
+                <strong>Camila</strong>
+                <span>Empreendedora</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testim-card reveal" style="transition-delay: 100ms;">
+            <div class="testim-quote">
+              <i class="fa-solid fa-quote-left"></i>
+              <p>O visual, a organização e o tráfego gerado dobraram a percepção de valor dos nossos produtos e serviços.</p>
+            </div>
+            <div class="testim-author">
+              <img src="cliente-joao.png" alt="João" />
+              <div>
+                <strong>João</strong>
+                <span>CEO</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="testim-card reveal" style="transition-delay: 200ms;">
+            <div class="testim-quote">
+              <i class="fa-solid fa-quote-left"></i>
+              <p>Agilidade, profissionalismo e inteligência. É o parceiro ideal para delegar o marketing da empresa e focar apenas na gestão.</p>
+            </div>
+            <div class="testim-author">
+              <img src="cliente-silvana.png" alt="Silvana" />
+              <div>
+                <strong>Silvana</strong>
+                <span>Especialista</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Impact CTA -->
+    <section class="impact-cta">
+      <div class="container text-center reveal">
+        <h2 class="impact-title">O mercado não perdoa o amadorismo. <br><span>Domine o seu setor com a FluxAI.</span></h2>
+        <p class="impact-desc">Chega de tentar a sorte. Implementamos a estrutura que as marcas líderes usam para faturar múltiplos dígitos mensalmente.</p>
+        <a href="#diagnostico" class="btn btn-primary btn-large pulse">
+          Garantir Meu Diagnóstico de Alto Valor <i class="fa-solid fa-fire"></i>
+        </a>
+      </div>
+    </section>
+
+    <!-- Diagnóstico CTA Final -->
+    <section class="cta section-light" id="diagnostico">
+      <div class="container">
+        <div class="cta-banner reveal cta-split">
+          <div class="cta-text-side">
+            <h2>Pronto para elevar o padrão corporativo da sua marca?</h2>
+            <p>Preencha os dados abaixo para uma aplicação rápida. Nossa equipe analisará o seu perfil atual e entraremos em contato com um diagnóstico estratégico de alto valor.</p>
+          </div>
+          <div class="cta-form-side">
+            <form id="diagnosticoForm" class="contact-form">
+              <input type="text" id="nome" placeholder="Seu Nome / Nome da Empresa" required />
+              <input type="text" id="whatsapp" placeholder="Seu WhatsApp (ex: 71 9999-9999)" required />
+              <input type="text" id="instagram" placeholder="Seu @Instagram atual" required />
+              <textarea id="desafio" rows="3" placeholder="Resuma qual o seu maior desafio de marketing/vendas hoje..." required></textarea>
+              <button type="submit" class="btn btn-primary btn-block">
+                Solicitar Diagnóstico <i class="fa-solid fa-paper-plane"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-col brand">
+        <img src="logo.png" alt="FluxAI" class="footer-logo" />
+        <p class="footer-desc">Soluções de marketing digital, posicionamento e aceleração de resultados para marcas que lideram seus setores.</p>
+        <div class="footer-social">
+          <a href="https://instagram.com/fluxai.mark" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://wa.me/5571981114694" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="http://www.fluxaidigital.com.br" target="_blank" aria-label="Website"><i class="fa-solid fa-globe"></i></a>
+        </div>
+      </div>
+      <div class="footer-col links">
+        <h4>Nossa Expertise</h4>
+        <a href="#servicos">Branding</a>
+        <a href="#servicos">Gestão de Redes</a>
+        <a href="#servicos">Landing Pages</a>
+        <a href="#servicos">Tráfego Pago</a>
+        <a href="#servicos">Capacitação IA</a>
+      </div>
+      <div class="footer-col links">
+        <h4>Empresa</h4>
+        <a href="#sobre">Quem Somos</a>
+        <a href="#diferenciais">Nossa Estratégia</a>
+        <a href="#depoimentos">Cases de Sucesso</a>
+        <a href="#diagnostico">Solicitar Diagnóstico</a>
+      </div>
+      <div class="footer-col links">
+        <h4>Contato Direct</h4>
+        <a href="https://wa.me/5571981114694" target="_blank">Clique para WhatsApp</a>
+        <a href="https://instagram.com/fluxai.mark" target="_blank">Direct no Instagram</a>
+        <a href="mailto:fluxai.marketingdigital@gmail.com.br">fluxai.marketingdigital@gmail.com.br</a>
+        <a href="http://www.fluxaidigital.com.br" target="_blank">www.fluxaidigital.com.br</a>
+      </div>
     </div>
+    <div class="container footer-bottom">
+      <div class="footer-bottom-flex">
+        <p>&copy; 2026 FluxAI. Todos os direitos reservados. 
+          <a href="#" class="legal-link">Termos de Uso</a> | 
+          <a href="#" class="legal-link">Privacidade</a>
+        </p>
+        <a href="#" class="back-to-top">Voltar ao topo <i class="fa-solid fa-arrow-up"></i></a>
+      </div>
+    </div>
+  </footer>
 
-    <!-- BOTÕES -->
-    <a class="btn" href="https://wa.me/5571981114694" target="_blank">
-      💬 Falar no WhatsApp
-    </a>
-
-    <a class="btn" href="https://instagram.com/fluxai.mark" target="_blank">
-      📱 Instagram
-    </a>
-
-    <footer>
-      © 2026 · FluxAI
-    </footer>
-
+  <!-- Modal de Serviços -->
+  <div class="service-modal" id="serviceModal">
+    <div class="modal-overlay" id="modalOverlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="closeModal" aria-label="Fechar"><i class="fa-solid fa-xmark"></i></button>
+      <div class="modal-body" id="modalBody">
+        <!-- Conteúdo dinâmico via JS -->
+      </div>
+    </div>
   </div>
 
+  <!-- Assistente Flutuante (Mascote Fluxo) -->
+  <div class="mascot-assistant" id="mascotAssistant">
+    <div class="mascot-bubble" id="mascotBubble">
+      Olá! Vamos escalar o seu negócio hoje? 🚀
+    </div>
+    <div class="mascot-img-side" id="mascotTrigger">
+      <img src="fluxo.png" alt="Fluxo" class="floating-mascot-img" />
+    </div>
+  </div>
+
+  <!-- Botão Flutuante de WhatsApp -->
+  <a href="https://wa.me/5571981114694" target="_blank" class="fab-whatsapp" aria-label="WhatsApp">
+    <i class="fa-brands fa-whatsapp"></i>
+  </a>
+
+  <script src="script.js"></script>
 </body>
 </html>
-
-
