@@ -370,41 +370,128 @@ const initAIAssistant = () => {
 
   if (!aiBtn) return;
 
+  // --- FAQ ENGINE ---
+  const faq = [
+    {
+      keywords: ['oi', 'olá', 'ola', 'hey', 'boa tarde', 'bom dia', 'boa noite', 'tudo bem', 'tudo'],
+      answer: 'Olá! Fico feliz em te ver por aqui 😊 Sou o Flux, assistente da FluxAI. Posso te ajudar com informações sobre nossos serviços de Marketing Digital, Branding, Social Media, Sites, Tráfego Pago e IA. Como posso te ajudar? 💎'
+    },
+    {
+      keywords: ['branding', 'identidade', 'logo', 'marca', 'visual', 'logotipo', 'brandbook'],
+      answer: 'Nossa identidade visual é feita para posicionar sua marca como referência! 🎨 Criamos Logo, Paleta de Cores, Tipografia, Manual da Marca (Brandbook) e Design para redes sociais. Tudo com padrão High-Ticket. Quer agendar um diagnóstico gratuito?'
+    },
+    {
+      keywords: ['social', 'redes', 'instagram', 'facebook', 'tiktok', 'conteúdo', 'gestão', 'post', 'stories'],
+      answer: 'Gerenciamos suas redes sociais do zero ao resultado! 📲 Fazemos planejamento de conteúdo, Copywriting, Design de Posts e Stories e análise de métricas. Transformamos seguidores em clientes reais. Posso te conectar com nossa equipe!'
+    },
+    {
+      keywords: ['site', 'landing', 'página', 'web', 'seo', 'google', 'indexar', 'aparecer'],
+      answer: 'Desenvolvemos Landing Pages e Sites Institucionais focados em SEO e captura de leads! 💻 Otimizados para Google, mobile e super rápidos. Seu site já está no ar? Precisa de upgrades ou um novo projeto?'
+    },
+    {
+      keywords: ['tráfego', 'ads', 'anúncios', 'meta', 'campanha', 'facebook ads', 'google ads', 'vendas', 'leads', 'remarketing'],
+      answer: 'Gerenciamos campanhas de Tráfego Pago no Meta (Facebook/Instagram) e Google Ads! 🎯 Instalamos Pixel, criamos estratégias de Remarketing e entregamos relatórios de ROI mensais. Quer saber como atrair mais clientes agora?'
+    },
+    {
+      keywords: ['ia', 'inteligência artificial', 'imagem', 'capacitação', 'prompt', 'gpt', 'ai', 'automação'],
+      answer: 'Trabalhamos com IA aplicada ao marketing! 🤖 Treinamos equipes em Prompt Engineering, criamos imagens realistas via IA e desenvolvemos fluxos de trabalho automatizados para escalar sua produção de conteúdo. Interessante né?'
+    },
+    {
+      keywords: ['estratégia', 'dados', 'analytics', 'ga4', 'dashboard', 'roi', 'resultado', 'métricas'],
+      answer: 'Nossa área de Estratégia & Dados configura seu Google Analytics 4, cria Dashboards de Performance e faz análise de CRO (taxa de conversão). Decisões inteligentes = crescimento acelerado! 📊 Quer saber mais?'
+    },
+    {
+      keywords: ['preço', 'valor', 'quanto', 'custo', 'investimento', 'pacote', 'plano', 'orçamento'],
+      answer: 'Cada projeto é único e personalizado! 💰 Os valores dependem do escopo, mas trabalhamos com pacotes sob medida para cada fase do seu negócio. O primeiro passo é um Diagnóstico Gratuito — assim mapeamos exatamente o que você precisa. Posso te conectar com nossa equipe?'
+    },
+    {
+      keywords: ['contato', 'falar', 'conversar', 'whatsapp', 'chamar', 'atendimento', 'equipe', 'especialista'],
+      answer: 'Claro! Você pode falar diretamente com nossa equipe agora mesmo pelo WhatsApp 👇\n\n📲 <a href="https://wa.me/5571981114694" target="_blank" style="color:var(--primary); font-weight:700;">Clique aqui para abrir o WhatsApp</a>'
+    },
+    {
+      keywords: ['diagnóstico', 'diagnostico', 'gratuito', 'consultoria', 'análise', 'teste'],
+      answer: 'O Diagnóstico de Alto Valor da FluxAI é GRATUITO! 🔥 Nossa equipe analisa sua presença digital e entrega um plano estratégico personalizado. Para solicitar, é só preencher o formulário lá embaixo na página ou chamar no WhatsApp. Vamos juntos?'
+    },
+    {
+      keywords: ['obrigad', 'valeu', 'grato', 'grata', 'ótimo', 'otimo', 'perfeito', 'excelente'],
+      answer: 'Fico feliz em ajudar! 🙌 Se tiver mais dúvidas ou quiser agendar seu diagnóstico, é só perguntar. Estamos sempre aqui para elevar o nível da sua marca! 💎'
+    },
+    {
+      keywords: ['fluxai', 'agência', 'agencia', 'empresa', 'quem', 'vocês', 'historia'],
+      answer: 'A FluxAI é uma agência premium de Marketing Digital especializada em posicionamento High-Ticket! 🚀 Unimos Branding, IA, Tráfego Pago e Estratégia para transformar marcas em referências de mercado. Já ajudamos +50 marcas a escalar. Quer ser a próxima?'
+    }
+  ];
+
+  const getResponse = (text) => {
+    const lower = text.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    for (const item of faq) {
+      if (item.keywords.some(kw => lower.includes(kw.normalize('NFD').replace(/[\u0300-\u036f]/g, '')))) {
+        return item.answer;
+      }
+    }
+    return 'Boa pergunta! 🤔 Não encontrei uma resposta específica para isso, mas nossa equipe com certeza pode te ajudar. Chama a gente no WhatsApp: <a href="https://wa.me/5571981114694" target="_blank" style="color:var(--primary); font-weight:700;">Clique aqui</a> 💎';
+  };
+  // --- END FAQ ENGINE ---
+
   aiBtn.addEventListener('click', () => {
     aiWindow.classList.toggle('active');
     if (aiWindow.classList.contains('active')) {
-      // Simulate welcome message
       if (aiBody.children.length === 0) {
-        setTimeout(() => addAIMessage("Olá! Sou o Flux. Como posso ajudar a elevar o posicionamento da sua marca hoje? 💎"), 500);
+        setTimeout(() => addAIMessage('Olá! Sou o <strong>Flux</strong>, assistente da FluxAI 💎<br>Pergunte sobre nossos serviços, preços ou qualquer dúvida!'), 500);
       }
     }
   });
 
   aiClose.addEventListener('click', () => aiWindow.classList.remove('active'));
 
+  const sendMessage = () => {
+    const text = aiInput.value.trim();
+    if (!text) return;
+    addMessage(text, 'user');
+    aiInput.value = '';
+
+    // Show typing indicator
+    const typingId = showTyping();
+    setTimeout(() => {
+      removeTyping(typingId);
+      addAIMessage(getResponse(text));
+    }, 800);
+  };
+
   aiInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter' && aiInput.value.trim() !== '') {
-      const userMsg = aiInput.value;
-      addMessage(userMsg, 'user');
-      aiInput.value = '';
-      
-      // AI Response simulation
-      setTimeout(() => {
-        addAIMessage("Entendi. Nossos especialistas em tecnologia e design High-Ticket podem transformar essa visão em realidade. Gostaria de agendar um diagnóstico gratuito?");
-      }, 1000);
-    }
+    if (e.key === 'Enter') sendMessage();
   });
+
+  // Optional send button support
+  const sendBtn = document.getElementById('aiSend');
+  if (sendBtn) sendBtn.addEventListener('click', sendMessage);
 
   const addMessage = (text, sender) => {
     const msg = document.createElement('div');
     msg.style.marginBottom = '12px';
     msg.style.textAlign = sender === 'user' ? 'right' : 'left';
-    msg.innerHTML = `<span style="display:inline-block; padding:8px 12px; border-radius:12px; background:${sender === 'user' ? 'var(--primary)' : 'var(--bg-slate-dark)'}; color:${sender === 'user' ? '#fff' : 'inherit'}">${text}</span>`;
+    msg.innerHTML = `<span style="display:inline-block; padding:10px 14px; border-radius:14px; max-width:85%; text-align:left; line-height:1.5; background:${sender === 'user' ? 'var(--primary)' : 'var(--bg-slate-dark)'}; color:${sender === 'user' ? '#fff' : 'var(--text-main)'}">${text}</span>`;
     aiBody.appendChild(msg);
     aiBody.scrollTop = aiBody.scrollHeight;
   };
 
   const addAIMessage = (text) => addMessage(text, 'ai');
+
+  const showTyping = () => {
+    const id = 'typing-' + Date.now();
+    const msg = document.createElement('div');
+    msg.id = id;
+    msg.style.marginBottom = '12px';
+    msg.innerHTML = `<span style="display:inline-block; padding:10px 14px; border-radius:14px; background:var(--bg-slate-dark); color:var(--text-muted);">✦ digitando...</span>`;
+    aiBody.appendChild(msg);
+    aiBody.scrollTop = aiBody.scrollHeight;
+    return id;
+  };
+
+  const removeTyping = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  };
 };
 
 /* ---------------------------------------------------------
