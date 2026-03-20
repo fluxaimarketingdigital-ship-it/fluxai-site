@@ -52,12 +52,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- PREMIUM DARK MODE TOGGLE ---
   const initDarkMode = () => {
-    // Default: dark mode (Premium). Saved choice overrides.
+    // Default: light mode. Saved preference overrides.
     const saved = localStorage.getItem('theme');
-    const isDark = saved ? saved === 'dark' : true; // dark by default
+    const isDark = saved === 'dark'; // light by default for new visitors
 
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-    if (!saved) localStorage.setItem('theme', 'dark'); // persist default
 
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
@@ -67,12 +66,11 @@ document.addEventListener('DOMContentLoaded', () => {
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
 
-        // Update icon
         const icon = themeToggle.querySelector('i');
         icon.className = newTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
       });
 
-      // Initial icon state
+      // Initial icon
       const icon = themeToggle.querySelector('i');
       icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
     }
