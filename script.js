@@ -1,5 +1,83 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+  // --- LUXURY CUSTOM CURSOR ---
+  const cursor = document.createElement('div');
+  const cursorOutline = document.createElement('div');
+  cursor.className = 'custom-cursor';
+  cursorOutline.className = 'custom-cursor-outline';
+  document.body.appendChild(cursor);
+  document.body.appendChild(cursorOutline);
+
+  let mouseX = 0, mouseY = 0;
+  let cursorX = 0, cursorY = 0;
+  let outlineX = 0, outlineY = 0;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    
+    // Immediate cursor
+    cursor.style.left = mouseX + 'px';
+    cursor.style.top = mouseY + 'px';
+  });
+
+  // Smooth outline follow
+  const animateCursor = () => {
+    outlineX += (mouseX - outlineX) * 0.15;
+    outlineY += (mouseY - outlineY) * 0.15;
+    cursorOutline.style.left = outlineX + 'px';
+    cursorOutline.style.top = outlineY + 'px';
+    requestAnimationFrame(animateCursor);
+  };
+  animateCursor();
+
+  // Cursor Hover Effects
+  const interactables = document.querySelectorAll('a, button, .service-card, .btn');
+  interactables.forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+
+  // --- PARALLAX EFFECT ---
+  const parallaxElements = document.querySelectorAll('.parallax-element');
+  window.addEventListener('mousemove', (e) => {
+    const x = (e.clientX - window.innerWidth / 2) / 50;
+    const y = (e.clientY - window.innerHeight / 2) / 50;
+    
+    parallaxElements.forEach(el => {
+      const speed = el.getAttribute('data-speed') || 1;
+      el.style.transform = `translateX(${-x * speed}px) translateY(${-y * speed}px)`;
+    });
+  });
+
+  // --- PREMIUM DARK MODE TOGGLE ---
+  const initDarkMode = () => {
+    const isDark = localStorage.getItem('theme') === 'dark' || 
+                   (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    
+    if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+    
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+      themeToggle.addEventListener('click', () => {
+        const currentTheme = document.documentElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        // Update icon
+        const icon = themeToggle.querySelector('i');
+        icon.className = newTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
+      });
+      
+      // Initial icon state
+      const icon = themeToggle.querySelector('i');
+      if (isDark) icon.className = 'fa-solid fa-sun';
+    }
+  };
+  initDarkMode();
+
+
   // Menu Fixo / Efeito de Sombra
   const header = document.querySelector('.header');
   window.addEventListener('scroll', () => {
@@ -274,59 +352,59 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ---------------------------------------------------------
-   ASSISTENTE FLUTUANTE (MASCOTE FLUXO)
+   AI ASSISTANT (LUXURY CHAT)
 --------------------------------------------------------- */
-const initMascotAssistant = () => {
-  const mascot = document.getElementById('mascotAssistant');
-  const bubble = document.getElementById('mascotBubble');
-  const trigger = document.getElementById('mascotTrigger');
-  
-  const messages = {
-    inicio: "Sua marca merece o padrão High-Ticket. Vamos elevar o nível? 💎",
-    servicos: "Estratégia + IA: Garanta seu diagnóstico e triplique seu ROI. 📈",
-    portfolio: "Gostou do que viu? Sua marca pode ser o nosso próximo case de sucesso. 🎨",
-    diferenciais: "O diferencial FluxAI é o que separa o amadorismo do lucro real. 🤖",
-    depoimentos: "Resultados validados por quem já escalou. Sua vez agora? ⭐️",
-    diagnostico: "Clique aqui para solicitar seu Diagnóstico de Alto Valor Agora! 👇"
-  };
+const initAIAssistant = () => {
+  const aiBtn = document.getElementById('aiBtn');
+  const aiWindow = document.getElementById('aiWindow');
+  const aiClose = document.getElementById('aiClose');
+  const aiInput = document.getElementById('aiInput');
+  const aiBody = document.getElementById('aiBody');
 
-  // Aparece após 3 segundos
-  setTimeout(() => {
-    mascot.classList.add('active');
-  }, 3000);
+  if (!aiBtn) return;
 
-  // Troca mensagem conforme seção
-  const observerOptions = { threshold: 0.5 };
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        const sectionId = entry.target.id;
-        if (messages[sectionId]) {
-          bubble.innerText = messages[sectionId];
-        }
+  aiBtn.addEventListener('click', () => {
+    aiWindow.classList.toggle('active');
+    if (aiWindow.classList.contains('active')) {
+      // Simulate welcome message
+      if (aiBody.children.length === 0) {
+        setTimeout(() => addAIMessage("Olá! Sou o Assistente FluxAI. Como posso ajudar a elevar o posicionamento da sua marca hoje? 💎"), 500);
       }
-    });
-  }, observerOptions);
-
-  ['inicio', 'servicos', 'portfolio', 'diferenciais', 'depoimentos', 'diagnostico'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) observer.observe(el);
+    }
   });
 
-  // Ação de Clique
-  const goToDiagnostico = () => {
-    document.getElementById('diagnostico').scrollIntoView({ behavior: 'smooth' });
+  aiClose.addEventListener('click', () => aiWindow.classList.remove('active'));
+
+  aiInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && aiInput.value.trim() !== '') {
+      const userMsg = aiInput.value;
+      addMessage(userMsg, 'user');
+      aiInput.value = '';
+      
+      // AI Response simulation
+      setTimeout(() => {
+        addAIMessage("Entendi. Nossos especialistas em tecnologia e design High-Ticket podem transformar essa visão em realidade. Gostaria de agendar um diagnóstico gratuito?");
+      }, 1000);
+    }
+  });
+
+  const addMessage = (text, sender) => {
+    const msg = document.createElement('div');
+    msg.style.marginBottom = '12px';
+    msg.style.textAlign = sender === 'user' ? 'right' : 'left';
+    msg.innerHTML = `<span style="display:inline-block; padding:8px 12px; border-radius:12px; background:${sender === 'user' ? 'var(--primary)' : 'var(--bg-slate-dark)'}; color:${sender === 'user' ? '#fff' : 'inherit'}">${text}</span>`;
+    aiBody.appendChild(msg);
+    aiBody.scrollTop = aiBody.scrollHeight;
   };
-  
-  bubble.addEventListener('click', goToDiagnostico);
-  trigger.addEventListener('click', goToDiagnostico);
+
+  const addAIMessage = (text) => addMessage(text, 'ai');
 };
 
 // INICIALIZAR AO CARREGAR
   // Smooth Entrance (Fade-in ao carregar)
   window.addEventListener('load', () => {
     document.body.classList.add('loaded');
-    initMascotAssistant();
+    initAIAssistant();
   });
 
 });

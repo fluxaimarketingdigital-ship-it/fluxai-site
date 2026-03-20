@@ -76,6 +76,9 @@
       </nav>
 
       <div class="nav-right">
+        <button id="themeToggle" class="nav-icon" aria-label="Alterar Tema">
+          <i class="fa-solid fa-moon"></i>
+        </button>
         <a href="https://instagram.com/fluxai.mark" target="_blank" class="nav-icon" aria-label="Instagram FluxAI">
           <i class="fa-brands fa-instagram"></i>
         </a>
@@ -123,10 +126,10 @@
           <div class="visual-blob"></div>
           
           <!-- Imagem Principal -->
-          <img src="mulher.png" alt="Profissional de Marketing FluxAI" class="hero-main-img" />
+          <img src="mulher.png" alt="Profissional de Marketing FluxAI" class="hero-main-img parallax-element" data-speed="1.5" fetchpriority="high" />
 
           <!-- Card Flutuante 1 -->
-          <div class="floating-card float-1">
+          <div class="floating-card float-1 parallax-element" data-speed="2.5">
             <div class="icon-box"><i class="fa-solid fa-chart-line"></i></div>
             <div class="card-info">
               <strong>Alta Performance</strong>
@@ -135,7 +138,7 @@
           </div>
 
           <!-- Card Flutuante 2 -->
-          <div class="floating-card float-2">
+          <div class="floating-card float-2 parallax-element" data-speed="2">
             <div class="icon-box"><i class="fa-solid fa-rocket"></i></div>
             <div class="card-info">
               <strong>Soluções com IA</strong>
@@ -516,13 +519,22 @@
     </div>
   </div>
 
-  <!-- Assistente Flutuante (Mascote Fluxo) -->
-  <div class="mascot-assistant" id="mascotAssistant">
-    <div class="mascot-bubble" id="mascotBubble">
-      Olá! Vamos escalar o seu negócio hoje? 🚀
+  <!-- Assistente Flutuante (IA LUXURY) -->
+  <div class="ai-assistant-container">
+    <div class="ai-window glass-card" id="aiWindow">
+      <div class="ai-header">
+        <span>Assistente FluxAI 💎</span>
+        <button id="aiClose" style="background:transparent; border:none; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="ai-body" id="aiBody">
+        <!-- Conversa Simulada -->
+      </div>
+      <div class="ai-footer">
+        <input type="text" id="aiInput" class="ai-input" placeholder="Pergunte sobre posicionamento..." />
+      </div>
     </div>
-    <div class="mascot-img-side" id="mascotTrigger">
-      <img src="fluxo.png" alt="Fluxo" class="floating-mascot-img" />
+    <div class="ai-btn" id="aiBtn" title="Falar com IA">
+      <i class="fa-solid fa-wand-magic-sparkles"></i>
     </div>
   </div>
 
