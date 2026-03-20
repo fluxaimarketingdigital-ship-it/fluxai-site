@@ -412,6 +412,7 @@ const initAIAssistant = () => {
 --------------------------------------------------------- */
 const initWelcomePopup = () => {
   const popup = document.getElementById('welcomePopup');
+  const overlay = document.getElementById('welcomeOverlay');
   const close = document.getElementById('closeWelcome');
   
   if (!popup) return;
@@ -419,13 +420,16 @@ const initWelcomePopup = () => {
   // Show after 2.5 seconds
   setTimeout(() => {
     popup.classList.add('active');
+    if (overlay) overlay.classList.add('active');
   }, 2500);
 
-  if (close) {
-    close.addEventListener('click', () => {
-      popup.classList.remove('active');
-    });
-  }
+  const closeAll = () => {
+    popup.classList.remove('active');
+    if (overlay) overlay.classList.remove('active');
+  };
+
+  if (close) close.addEventListener('click', closeAll);
+  if (overlay) overlay.addEventListener('click', closeAll);
 };
 
 // INICIALIZAR AO CARREGAR
