@@ -324,6 +324,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.style.overflow = ''; // Destrava o scroll
   }
 
+  if (closeModal) {
+    closeModal.addEventListener('click', closeModalFunc);
+  }
+  if (modalOverlay) {
+    modalOverlay.addEventListener('click', closeModalFunc);
+  }
+
   // Rastreamento de Cliques (WhatsApp e Instagram)
   document.querySelectorAll('a[href*="wa.me"], a[href*="instagram.com"]').forEach(link => {
     link.addEventListener('click', function() {
@@ -352,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   /* ---------------------------------------------------------
-   AI ASSISTANT (LUXURY CHAT)
+   AI ASSISTANT (FLUX)
 --------------------------------------------------------- */
 const initAIAssistant = () => {
   const aiBtn = document.getElementById('aiBtn');
@@ -368,7 +375,7 @@ const initAIAssistant = () => {
     if (aiWindow.classList.contains('active')) {
       // Simulate welcome message
       if (aiBody.children.length === 0) {
-        setTimeout(() => addAIMessage("Olá! Sou o Assistente FluxAI. Como posso ajudar a elevar o posicionamento da sua marca hoje? 💎"), 500);
+        setTimeout(() => addAIMessage("Olá! Sou o Flux. Como posso ajudar a elevar o posicionamento da sua marca hoje? 💎"), 500);
       }
     }
   });
@@ -400,11 +407,32 @@ const initAIAssistant = () => {
   const addAIMessage = (text) => addMessage(text, 'ai');
 };
 
+/* ---------------------------------------------------------
+   WELCOME POP-UP LOGIC
+--------------------------------------------------------- */
+const initWelcomePopup = () => {
+  const popup = document.getElementById('welcomePopup');
+  const close = document.getElementById('closeWelcome');
+  
+  if (!popup) return;
+
+  // Show after 2.5 seconds
+  setTimeout(() => {
+    popup.classList.add('active');
+  }, 2500);
+
+  if (close) {
+    close.addEventListener('click', () => {
+      popup.classList.remove('active');
+    });
+  }
+};
+
 // INICIALIZAR AO CARREGAR
   // Smooth Entrance (Fade-in ao carregar)
-  window.addEventListener('load', () => {
-    document.body.classList.add('loaded');
-    initAIAssistant();
-  });
+  // Initial Execution
+  document.body.classList.add('loaded');
+  initAIAssistant();
+  initWelcomePopup();
 
 });
