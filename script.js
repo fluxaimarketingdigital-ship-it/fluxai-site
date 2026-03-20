@@ -52,11 +52,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // --- PREMIUM DARK MODE TOGGLE ---
   const initDarkMode = () => {
-    const isDark = localStorage.getItem('theme') === 'dark' || 
-                   (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    
-    if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
-    
+    // Default: dark mode (Premium). Saved choice overrides.
+    const saved = localStorage.getItem('theme');
+    const isDark = saved ? saved === 'dark' : true; // dark by default
+
+    document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
+    if (!saved) localStorage.setItem('theme', 'dark'); // persist default
+
     const themeToggle = document.getElementById('themeToggle');
     if (themeToggle) {
       themeToggle.addEventListener('click', () => {
@@ -64,15 +66,15 @@ document.addEventListener('DOMContentLoaded', () => {
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        
+
         // Update icon
         const icon = themeToggle.querySelector('i');
         icon.className = newTheme === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
       });
-      
+
       // Initial icon state
       const icon = themeToggle.querySelector('i');
-      if (isDark) icon.className = 'fa-solid fa-sun';
+      icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
     }
   };
   initDarkMode();
