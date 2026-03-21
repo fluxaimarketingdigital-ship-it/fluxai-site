@@ -340,10 +340,13 @@ document.addEventListener('DOMContentLoaded', () => {
           'contact_type': type,
           'location': 'footer_or_nav'
         });
-        // Se for WhatsApp, também podemos contar como um lead em potencial
         if (type === 'whatsapp') {
           gtag('event', 'generate_lead', { 'method': 'direct_whatsapp' });
         }
+      }
+      // Meta Pixel: Lead em todos os cliques de WhatsApp
+      if (type === 'whatsapp' && typeof fbq === 'function') {
+        fbq('track', 'Lead');
       }
     });
   });
@@ -355,6 +358,8 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof gtag === 'function') {
         gtag('event', 'generate_lead', { 'method': 'floating_whatsapp' });
       }
+      // Meta Pixel: Lead no botão flutuante
+      if (typeof fbq === 'function') fbq('track', 'Lead');
     });
   }
 
