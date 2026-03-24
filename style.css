@@ -808,6 +808,106 @@ a {
   font-size: 0.95rem;
 }
 
+/* ECOSSISTEMA FLUXAI */
+.ecosystem {
+  padding: 80px 0;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-slate);
+}
+.eco-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 30px;
+  align-items: center;
+}
+.eco-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  height: 100%;
+}
+.eco-card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-md);
+}
+.brand-card {
+  border-top: 4px solid var(--primary);
+}
+.tech-card {
+  border-top: 4px solid var(--secondary);
+}
+.eco-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 16px;
+  background: rgba(248, 96, 24, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+}
+.tech-card .eco-icon {
+  background: rgba(114, 121, 68, 0.15);
+  color: var(--secondary);
+}
+.eco-card h3 {
+  font-size: 1.4rem;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+.eco-card p {
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+.eco-list {
+  list-style: none;
+}
+.eco-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  color: var(--text-main);
+  font-weight: 500;
+}
+.eco-list li i {
+  color: var(--primary);
+}
+.eco-mascot-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+.eco-mascot {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 15px 25px rgba(0,0,0,0.1));
+}
+.floating-bot {
+  animation: floatBot 6s ease-in-out infinite;
+}
+@keyframes floatBot {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+@media (max-width: 900px) {
+  .eco-grid {
+    grid-template-columns: 1fr;
+  }
+  .eco-mascot {
+    width: 120px;
+  }
+}
+
 /* POPUP IG MINIATURE RESPONSIVENESS */
 .popup-ig-miniature {
   margin: 15px 0;
