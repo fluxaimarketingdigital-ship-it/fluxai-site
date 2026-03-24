@@ -806,11 +806,15 @@ div[class*="elfsight-app"] [class*="eapps-instagram-feed-title"],
 div[class*="elfsight-app"] [class*="Title__Container"],
 div[class*="elfsight-app"] [class*="Header__Container"],
 div[class*="elfsight-app"] a[href*="elfsight.com"],
-div[class*="elfsight-app"] [class*="Badge__Container"] {
+div[class*="elfsight-app"] [class*="Badge__Container"],
+a[href*="elfsight.com"],
+.eapps-link {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
     height: 0 !important;
+    position: absolute !important;
+    pointer-events: none !important;
 }
 
 /* DIFERENCIAIS (ESTRUTURA COM MASCOTE) */

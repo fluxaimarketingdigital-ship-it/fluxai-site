@@ -532,3 +532,12 @@ const initWelcomePopup = () => {
   initWelcomePopup();
 
 });
+
+// Agressively remove Elfsight branding asynchronously
+setInterval(() => {
+  const elfsightBadges = document.querySelectorAll('a[href*="elfsight.com"], .eapps-link');
+  elfsightBadges.forEach(badge => {
+    badge.style.setProperty('display', 'none', 'important');
+    badge.remove();
+  });
+}, 800);
