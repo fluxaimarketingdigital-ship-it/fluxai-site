@@ -862,6 +862,8 @@ a[href*="elfsight.com"],
   padding: 1.5rem;
   max-height: 85vh;
   overflow-y: auto;
+  top: 5vh;
+  transform: translateX(-50%);
 }
 .welcome-title {
   font-size: 1.25rem;
