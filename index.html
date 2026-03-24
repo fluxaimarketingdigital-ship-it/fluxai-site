@@ -488,11 +488,7 @@ fbq('track', 'ViewContent');
   </main>
 
   <!-- Instagram Feed Section -->
-  <section class="section feed-section" style="background-color: var(--bg-color);">
-    <div class="container" style="text-align: center; margin-bottom: 2rem;">
-      <h2 class="section-title" data-reveal="fade-up">Acompanhe o <span class="highlight">Alto Padrão</span></h2>
-      <p class="section-desc" data-reveal="fade-up">O posicionamento diário da FluxAI em tempo real direto do nosso Instagram.</p>
-    </div>
+  <section class="section feed-section" style="background-color: var(--bg-color); padding-top: 2rem;">
     <div class="container" style="max-width: 1200px; padding: 0;" data-reveal="fade-up">
       <!-- Elfsight Instagram Feed -->
       <script src="https://elfsightcdn.com/platform.js" async></script>
@@ -587,10 +583,17 @@ fbq('track', 'ViewContent');
       <h3>Dê o Próximo Passo 🚀</h3>
       <button class="welcome-close" id="closeWelcome"><i class="fa-solid fa-xmark"></i></button>
     </div>
-    <div class="welcome-body">
-      <p>Clicando abaixo, a sua marca passará por uma verdadeira revolução digital. Vamos elevar o seu padrão?</p>
-      <a href="https://wa.me/5571981114694" target="_blank" class="btn-welcome">
-        <i class="fa-brands fa-whatsapp"></i> Sim, Quero Revolucionar!
+    <div class="welcome-content">
+      <h3 class="welcome-title">Bem-vindo(a) ao Padrão <span class="highlight">FluxAI</span></h3>
+      <p class="welcome-desc">Você está a um passo de posicionar sua marca onde ela realmente merece estar: no topo. Veja nossas últimas atualizações em tempo real:</p>
+      
+      <!-- Miniatura do Insta no Popup -->
+      <div class="popup-ig-miniature" style="margin: 15px 0; width: 100%; border-radius: 8px; overflow: hidden;">
+        <div class="elfsight-app-d364afe3-5f47-4e9d-9693-8838f4143f53" data-elfsight-app-lazy></div>
+      </div>
+
+      <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline blink-brand" style="margin-top: 0px;" onclick="if(typeof fbq === 'function') fbq('track', 'Lead');">
+        <i class="fa-brands fa-whatsapp"></i> Iniciar Diagnóstico
       </a>
     </div>
   </div>
