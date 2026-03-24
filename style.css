@@ -857,6 +857,18 @@ a[href*="elfsight.com"],
   justify-content: center;
   font-size: 1.25rem;
 }
+.welcome-popup {
+  width: 95%;
+  padding: 1.5rem;
+  max-height: 85vh;
+  overflow-y: auto;
+}
+.welcome-title {
+  font-size: 1.25rem;
+}
+.welcome-desc {
+  font-size: 0.95rem;
+}
 .diff-card h3 {
   font-size: 1.15rem;
   color: var(--text-main);
