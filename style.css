@@ -797,6 +797,15 @@ a {
   font-size: 0.95rem;
 }
 
+/* POPUP IG MINIATURE RESPONSIVENESS */
+.popup-ig-miniature {
+  margin: 15px 0;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+}
+
 /* =========================================================================
    19. OVERRIDES DE WIDGETS EXTERNOS (ELFSIGHT)
    ========================================================================= */
@@ -1666,11 +1675,29 @@ a[href*="elfsight.com"],
   box-shadow: 0 15px 30px rgba(37, 211, 102, 0.4);
 }
 
-@media (max-width: 600px) {
+/* POPUP IG MINIATURE DESKTOP VS MOBILE PARITY */
+.popup-ig-miniature {
+  margin: 15px 0;
+  width: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: block;
+}
+
+@media (max-width: 768px) {
   .welcome-popup {
-    width: calc(100% - 40px);
-    right: 20px;
-    top: auto;
-    bottom: 20px;
+    top: 50% !important;
+    left: 50% !important;
+    bottom: auto !important;
+    right: auto !important;
+    transform: translate(-50%, -50%) !important;
+    max-height: 85vh;
+    width: 95%;
+  }
+  .popup-ig-miniature {
+    max-height: 230px !important;
+    overflow-y: auto !important;
   }
 }
+
