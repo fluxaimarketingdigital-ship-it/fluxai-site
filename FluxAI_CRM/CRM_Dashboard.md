@@ -26,6 +26,8 @@ Tudo que já está finalizado (Copy + Imagem/Vídeo) salvo na pasta `Posts_Pront
 - [x] [REELS] A diferença entre o Design Amador e o Branding High-Ticket. *(Conteúdo gerado > `Posts_Prontos\Reels_Design_HighTicket.md`)*
 - [x] [REELS] Por que você precisa de uma Assessoria High-Ticket. *(Conteúdo gerado > `Posts_Prontos\Reels_Importancia_Assessoria.md`)*
 - [x] [REELS] Marketing para a Área da Saúde (Usando metáforas Visuais). *(Conteúdo gerado > `Posts_Prontos\Reels_Saude_Assessoria.md`)*
+- [x] [PORTFÓLIO] Mostrando o nosso trabalho na prática (IMG_0369.MOV). *(Conteúdo gerado > `Posts_Prontos\Post_Portfolio_MarcaDagua.md`)*
+
 
 ---
 
