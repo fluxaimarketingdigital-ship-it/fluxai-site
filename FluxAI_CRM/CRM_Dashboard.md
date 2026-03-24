@@ -9,7 +9,6 @@ Quando quiser criar uma nova postagem, basta pedir ao Antigravity: *"Crie um pos
 Anote aqui as ideias soltas que você teve. Quando quiser produzir, eu transformo a ideia em roteiro.
 
 - [ ] Ideia: Como a IA reduz custos de produção em 80%.
-- [ ] Ideia: A diferença entre um design de R$ 50 e um de R$ 5.000.
 - [ ] Ideia: Por que cliques não significam vendas (o segredo do tráfego high-ticket).
 
 ---
@@ -24,7 +23,7 @@ Conteúdos que eu (Antigravity) estou roteirizando, criando a Copy ou gerando a 
 ## ✅ Prontos para Postar (Agendados)
 Tudo que já está finalizado (Copy + Imagem/Vídeo) salvo na pasta `Posts_Prontos`. Pronto para copiar e colar nas redes sociais.
 
-- Nenhum post aguardando no momento.
+- [x] [REELS] A diferença entre o Design Amador e o Branding High-Ticket. *(Conteúdo gerado > `Posts_Prontos\Reels_Design_HighTicket.md`)*
 
 ---
 
