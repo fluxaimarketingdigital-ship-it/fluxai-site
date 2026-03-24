@@ -443,6 +443,17 @@ a {
   50% { transform: translate(-260px, 62px); }
 }
 
+@media (max-width: 768px) {
+  .hero-main-img {
+    transform: translate(-120px, 40px);
+    animation: floatWomanMobile 10s ease-in-out infinite;
+  }
+}
+@keyframes floatWomanMobile {
+  0%, 100% { transform: translate(-120px, 40px); }
+  50% { transform: translate(-120px, 20px); }
+}
+
 /* AI ASSISTANT COMPONENT */
 .ai-assistant-container {
   position: fixed;
