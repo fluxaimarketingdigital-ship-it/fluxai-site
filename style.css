@@ -797,6 +797,22 @@ a {
   font-size: 0.95rem;
 }
 
+/* =========================================================================
+   19. OVERRIDES DE WIDGETS EXTERNOS (ELFSIGHT)
+   ========================================================================= */
+/* Tenta ocultar o cabeçalho e marca d'água do Elfsight no plano gratuito */
+div[class*="elfsight-app"] [class*="eapps-instagram-feed-header"],
+div[class*="elfsight-app"] [class*="eapps-instagram-feed-title"],
+div[class*="elfsight-app"] [class*="Title__Container"],
+div[class*="elfsight-app"] [class*="Header__Container"],
+div[class*="elfsight-app"] a[href*="elfsight.com"],
+div[class*="elfsight-app"] [class*="Badge__Container"] {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    height: 0 !important;
+}
+
 /* DIFERENCIAIS (ESTRUTURA COM MASCOTE) */
 .diff-split-wrapper {
   display: grid;
