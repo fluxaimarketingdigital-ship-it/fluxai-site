@@ -1,4 +1,4 @@
-/* CUSTOM SCROLLBAR - Padrão FluxAI */
+﻿/* CUSTOM SCROLLBAR - PadrÃ£o FluxAI */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-white); }
 ::-webkit-scrollbar-thumb { 
@@ -7,7 +7,7 @@
 }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-/* RESET E VARIÁVEIS DO ESTILO CLEAN */
+/* RESET E VARIÃVEIS DO ESTILO CLEAN */
 :root {
   --bg-white: #ffffff;
   --bg-slate: #f8fafc;
@@ -74,7 +74,7 @@ body {
   background-color: var(--bg-white);
   line-height: 1.5;
   overflow-x: hidden;
-  opacity: 0; /* Começa invisível para o fade-in */
+  opacity: 0; /* ComeÃ§a invisÃ­vel para o fade-in */
   transition: opacity 1s ease;
 }
 body.loaded {
@@ -119,7 +119,7 @@ a {
   color: inherit;
 }
 
-/* UTILITÁRIOS */
+/* UTILITÃRIOS */
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -175,7 +175,7 @@ a {
   opacity: 0.8;
 }
 
-/* BOTÕES GERAIS */
+/* BOTÃ•ES GERAIS */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -273,7 +273,7 @@ a {
 }
 .logo-img {
   height: 190px;
-  /* Se a logo do cliente for escura ou colorida, ficará linda aqui */
+  /* Se a logo do cliente for escura ou colorida, ficarÃ¡ linda aqui */
 }
 
 .menu {
@@ -332,7 +332,7 @@ a {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr; /* Proporção mais equilibrada */
+  grid-template-columns: 1.1fr 0.9fr; /* ProporÃ§Ã£o mais equilibrada */
   gap: 80px;
   align-items: center;
 }
@@ -629,7 +629,7 @@ a {
 .marquee-group {
   display: flex;
   gap: 60px;
-  padding-right: 60px; /* Mantém o gap correto pro próximo grupo copiar */
+  padding-right: 60px; /* MantÃ©m o gap correto pro prÃ³ximo grupo copiar */
   align-items: center;
 }
 .marquee-group img {
@@ -648,7 +648,7 @@ a {
   100% { transform: translateX(-50%); }
 }
 
-/* RESULTADOS / NÚMEROS */
+/* RESULTADOS / NÃšMEROS */
 .results {
   padding: 40px 0;
   border-bottom: 1px solid var(--border);
@@ -678,14 +678,14 @@ a {
   letter-spacing: 0.5px;
 }
 
-/* SOBRE NÓS */
+/* SOBRE NÃ“S */
 .sobre {
   background-color: var(--bg-white);
   padding: 90px 0;
 }
 .sobre-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr; /* Invertido para balanço visual com o texto */
+  grid-template-columns: 1.1fr 0.9fr; /* Invertido para balanÃ§o visual com o texto */
   gap: 80px;
   align-items: center;
 }
@@ -749,7 +749,7 @@ a {
   letter-spacing: 0.5px;
 }
 
-/* TÍTULOS DE SEÇÃO */
+/* TÃTULOS DE SEÃ‡ÃƒO */
 .section-title {
   max-width: 800px;
   margin: 0 auto 48px;
@@ -758,7 +758,7 @@ a {
   font-size: clamp(2.2rem, 3.8vw, 3.2rem); 
   font-weight: 800;
   letter-spacing: -1.2px;
-  margin-top: 8px; /* Espaço harmônico com o label superior */
+  margin-top: 8px; /* EspaÃ§o harmÃ´nico com o label superior */
   margin-bottom: 0;
   line-height: 1.1;
 }
@@ -767,7 +767,7 @@ a {
   font-size: 1.1rem;
 }
 
-/* SERVIÇOS */
+/* SERVIÃ‡OS */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -920,7 +920,7 @@ a {
 /* =========================================================================
    19. OVERRIDES DE WIDGETS EXTERNOS (ELFSIGHT)
    ========================================================================= */
-/* Tenta ocultar o cabeçalho e marca d'água do Elfsight no plano gratuito */
+/* Tenta ocultar o cabeÃ§alho e marca d'Ã¡gua do Elfsight no plano gratuito */
 div[class*="elfsight-app"] [class*="eapps-instagram-feed-header"],
 div[class*="elfsight-app"] [class*="eapps-instagram-feed-title"],
 div[class*="elfsight-app"] [class*="Title__Container"],
@@ -1148,7 +1148,7 @@ a[href*="elfsight.com"],
   letter-spacing: 1px;
 }
 
-/* CTA FINAL / FORMULÁRIO */
+/* CTA FINAL / FORMULÃRIO */
 .cta {
   padding-bottom: 0;
 }
@@ -1158,7 +1158,7 @@ a[href*="elfsight.com"],
   border-radius: 24px;
   padding: 60px 40px;
   box-shadow: var(--shadow-lg);
-  transform: translateY(40px); /* Sobrepõe levemente o footer */
+  transform: translateY(40px); /* SobrepÃµe levemente o footer */
   position: relative;
   z-index: 10;
 }
@@ -1181,7 +1181,7 @@ a[href*="elfsight.com"],
   line-height: 1.7;
 }
 
-/* FORMULÁRIO DE CAPTAÇÃO */
+/* FORMULÃRIO DE CAPTAÃ‡ÃƒO */
 .contact-form {
   display: flex;
   flex-direction: column;
@@ -1334,7 +1334,7 @@ a[href*="elfsight.com"],
 
 
 
-/* ANIMAÇÃO DE REVEAL AO SCROLLAR */
+/* ANIMAÃ‡ÃƒO DE REVEAL AO SCROLLAR */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
@@ -1750,3 +1750,126 @@ a[href*="elfsight.com"],
   }
 }
 
+
+/* --- MASCOTE FLUTUANTE LUXURY (SEM CIRCULOS - ESCALA 5.0) --- */
+.floating-mascot-container {
+    position: fixed;
+    bottom: 35px;
+    right: 35px;
+    width: 70px;
+    height: 70px;
+    z-index: 2147483647 !important;
+    cursor: pointer;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mascot-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(5.0) translateY(-25px); /* GIGANTE E LIVRE */
+    filter: drop-shadow(0 25px 45px rgba(0,0,0,0.6));
+    transition: all 0.4s ease;
+    animation: floating-ai 3s infinite ease-in-out;
+}
+
+@keyframes floating-ai {
+    0% { transform: scale(5.0) translateY(-25px); }
+    50% { transform: scale(5.3) translateY(-45px); }
+    100% { transform: scale(5.0) translateY(-25px); }
+}
+
+.floating-mascot-container:hover .mascot-img {
+    transform: scale(5.6) translateY(-35px);
+}
+
+/* Tooltip Customizado (Caixa de Dialogo) */
+.custom-tooltip {
+    position: fixed;
+    bottom: 170px;
+    right: 35px;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 16px 26px;
+    border-radius: 20px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    line-height: 1.4;
+    max-width: 250px;
+    text-align: center;
+    box-shadow: 0 15px 45px rgba(0,0,0,0.7);
+    border: 2px solid #FF6B00;
+    z-index: 2147483647 !important;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.8);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+.custom-tooltip.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.custom-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    right: 32px;
+    width: 20px;
+    height: 20px;
+    background: #1a1a1a;
+    border-right: 2px solid #FF6B00;
+    border-bottom: 2px solid #FF6B00;
+    transform: rotate(45deg);
+}
+
+/* HIDE TYPEBOT COMPLETELY */
+#typebot-bubble, [id*='typebot'], [class*='typebot'], .typebot-standard-branding {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    z-index: -100 !important;
+}
+
+/* AI WINDOW (LOCAL) */
+#aiWindow {
+    position: fixed;
+    bottom: 125px;
+    right: 30px;
+    width: 380px;
+    height: 600px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    z-index: 2147483646 !important;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transform: translateY(30px) scale(0.9);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(0,0,0,0.1);
+}
+
+#aiWindow.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+}
+
+.ai-header {
+    background: linear-gradient(135deg, #1a1a1a, #000);
+    color: white;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #FF6B00;
+}

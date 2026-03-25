@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
+﻿document.addEventListener('DOMContentLoaded', () => {
 
   // --- LUXURY CUSTOM CURSOR ---
   const cursor = document.createElement('div');
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Scroll Suave Melhorado (Corrige espaço do header preso)
+  // Scroll Suave Melhorado (Corrige espaÃ§o do header preso)
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
       const targetId = this.getAttribute('href');
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
           return;
         }
         entry.target.classList.add('active');
-        // Para parar de observar depois que já revelou:
+        // Para parar de observar depois que jÃ¡ revelou:
         observer.unobserve(entry.target);
       });
     }, revealOptions);
@@ -167,7 +167,7 @@ document.addEventListener('DOMContentLoaded', () => {
       revealObserver.observe(el);
     });
     
-    // Dispara tbm uma vez no carregamento, para garantir que algo no topo apareça imediatamente.
+    // Dispara tbm uma vez no carregamento, para garantir que algo no topo apareÃ§a imediatamente.
     setTimeout(() => {
       revealElements.forEach(el => {
          const top = el.getBoundingClientRect().top;
@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
   }
 
-  // Formulário: Envio de Dados via WhatsApp
+  // FormulÃ¡rio: Envio de Dados via WhatsApp
   const diagnosticoForm = document.getElementById('diagnosticoForm');
   if (diagnosticoForm) {
     diagnosticoForm.addEventListener('submit', function(e) {
@@ -190,17 +190,17 @@ document.addEventListener('DOMContentLoaded', () => {
       const instagram = document.getElementById('instagram').value;
       const desafio = document.getElementById('desafio').value;
 
-      const numeroDestino = '5571981114694'; // Número da FluxAI
-      const mensagem = `🔥 *Nova Aplicação - Consultoria FluxAI*\n\n` +
+      const numeroDestino = '5571981114694'; // NÃºmero da FluxAI
+      const mensagem = `ðŸ”¥ *Nova AplicaÃ§Ã£o - Consultoria FluxAI*\n\n` +
                        `*Nome/Empresa:* ${nome}\n` +
                        `*WhatsApp:* ${whatsapp}\n` +
                        `*Instagram:* ${instagram}\n` +
                        `*Resumo do Desafio:* ${desafio}\n\n` +
-                       `_Enviado através da Landing Page._`;
+                       `_Enviado atravÃ©s da Landing Page._`;
 
       const url = `https://wa.me/${numeroDestino}?text=${encodeURIComponent(mensagem)}`;
       
-      // Rastreamento GA4 - Lead via Formulário
+      // Rastreamento GA4 - Lead via FormulÃ¡rio
       if (typeof gtag === 'function') {
         gtag('event', 'generate_lead', {
           'method': 'form_diagnostico',
@@ -214,7 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Lógica do Modal de Serviços
+  // LÃ³gica do Modal de ServiÃ§os
   const modal = document.getElementById('serviceModal');
   const modalBody = document.getElementById('modalBody');
   const closeModal = document.getElementById('closeModal');
@@ -223,68 +223,68 @@ document.addEventListener('DOMContentLoaded', () => {
   const servicesData = {
     branding: {
       title: "Identidade Visual & Branding",
-      desc: "Sua marca não é apenas um logo; é a percepção de valor que você gera no mercado.",
+      desc: "Sua marca nÃ£o Ã© apenas um logo; Ã© a percepÃ§Ã£o de valor que vocÃª gera no mercado.",
       features: [
-        "Criação de Logo e Variações",
+        "CriaÃ§Ã£o de Logo e VariaÃ§Ãµes",
         "Paleta de Cores e Tipografia",
         "Manual da Marca (Brandbook)",
         "Design para Papelaria e Social Media",
-        "Estratégia de Posicionamento Premium"
+        "EstratÃ©gia de Posicionamento Premium"
       ]
     },
     social: {
-      title: "Social Media & Gestão",
-      desc: "Transformamos seguidores em clientes através de conteúdo que conecta e gera desejo.",
+      title: "Social Media & GestÃ£o",
+      desc: "Transformamos seguidores em clientes atravÃ©s de conteÃºdo que conecta e gera desejo.",
       features: [
-        "Planejamento Mensal de Conteúdo",
+        "Planejamento Mensal de ConteÃºdo",
         "Copywriting Persuasivo (Legendas)",
-        "Design de Posts e Stories de Alto Nível",
-        "Análise de Métricas e Engajamento",
-        "Gestão Ativa de Comunidade"
+        "Design de Posts e Stories de Alto NÃ­vel",
+        "AnÃ¡lise de MÃ©tricas e Engajamento",
+        "GestÃ£o Ativa de Comunidade"
       ]
     },
     sites: {
       title: "Sites & Landing Pages",
       desc: "Desenvolvemos sua sede digital com foco total em velocidade, SEO e captura de leads qualificados.",
       features: [
-        "Landing Pages de Alta Conversão (Captura de Leads)",
+        "Landing Pages de Alta ConversÃ£o (Captura de Leads)",
         "Sites Institucionais com Foco em SEO",
-        "Entrega Orgânica & Performance no Google",
-        "Otimização para Dispositivos Móveis",
-        "Integração com CRM e Funis de Vendas"
+        "Entrega OrgÃ¢nica & Performance no Google",
+        "OtimizaÃ§Ã£o para Dispositivos MÃ³veis",
+        "IntegraÃ§Ã£o com CRM e Funis de Vendas"
       ]
     },
     ads: {
-      title: "Tráfego Pago & Performance",
-      desc: "Colocamos sua marca na frente de quem realmente quer comprar, com precisão técnica absoluta.",
+      title: "TrÃ¡fego Pago & Performance",
+      desc: "Colocamos sua marca na frente de quem realmente quer comprar, com precisÃ£o tÃ©cnica absoluta.",
       features: [
-        "Gestão de Campanhas (Meta/Google/TikTok)",
-        "Instalação de Pixel Meta & API de Conversão",
-        "Remarketing Estratégico para Recuperação",
-        "Segmentação Avançada de Público Alvo",
-        "Relatórios de ROI e Otimização Constante"
+        "GestÃ£o de Campanhas (Meta/Google/TikTok)",
+        "InstalaÃ§Ã£o de Pixel Meta & API de ConversÃ£o",
+        "Remarketing EstratÃ©gico para RecuperaÃ§Ã£o",
+        "SegmentaÃ§Ã£o AvanÃ§ada de PÃºblico Alvo",
+        "RelatÃ³rios de ROI e OtimizaÃ§Ã£o Constante"
       ]
     },
     ia: {
-      title: "Capacitação de Imagens (IA)",
-      desc: "O futuro do design está aqui. Treinamos processos para escala infinita.",
+      title: "CapacitaÃ§Ã£o de Imagens (IA)",
+      desc: "O futuro do design estÃ¡ aqui. Treinamos processos para escala infinita.",
       features: [
-        "Criação de Imagens Realistas via IA",
-        "Prompt Engineering para Negócios",
+        "CriaÃ§Ã£o de Imagens Realistas via IA",
+        "Prompt Engineering para NegÃ³cios",
         "Fluxos de Trabalho Automatizados",
-        "Consistência Visual com IA",
-        "Capacitação para Equipes Criativas"
+        "ConsistÃªncia Visual com IA",
+        "CapacitaÃ§Ã£o para Equipes Criativas"
       ]
     },
     strategy: {
-      title: "Estratégia & Dados",
-      desc: "Mudamos a história do seu negócio através de dados reais e decisões inteligentes.",
+      title: "EstratÃ©gia & Dados",
+      desc: "Mudamos a histÃ³ria do seu negÃ³cio atravÃ©s de dados reais e decisÃµes inteligentes.",
       features: [
-        "Configuração de Google Analytics 4 (GA4)",
-        "Criação de Dashboards de Performance",
-        "Análise de Funil e Taxa de Conversão (CRO)",
-        "Estratégia de LTV e Retenção de Clientes",
-        "Posicionamento Competitivo e Plano de Expansão"
+        "ConfiguraÃ§Ã£o de Google Analytics 4 (GA4)",
+        "CriaÃ§Ã£o de Dashboards de Performance",
+        "AnÃ¡lise de Funil e Taxa de ConversÃ£o (CRO)",
+        "EstratÃ©gia de LTV e RetenÃ§Ã£o de Clientes",
+        "Posicionamento Competitivo e Plano de ExpansÃ£o"
       ]
     }
   };
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
           </ul>
           <div class="modal-cta-wrap">
             <a href="#diagnostico" class="btn btn-primary btn-block" id="modalCta">
-              Solicitar Diagnóstico para este Serviço
+              Solicitar DiagnÃ³stico para este ServiÃ§o
             </a>
           </div>
         `;
@@ -351,14 +351,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // Rastreamento do Botão Flutuante (WhatsApp)
+  // Rastreamento do BotÃ£o Flutuante (WhatsApp)
   const fabWhatsApp = document.querySelector('.fab-whatsapp');
   if (fabWhatsApp) {
     fabWhatsApp.addEventListener('click', () => {
       if (typeof gtag === 'function') {
         gtag('event', 'generate_lead', { 'method': 'floating_whatsapp' });
       }
-      // Meta Pixel: Lead no botão flutuante
+      // Meta Pixel: Lead no botÃ£o flutuante
       if (typeof fbq === 'function') fbq('track', 'Lead');
     });
   }
@@ -378,52 +378,52 @@ const initAIAssistant = () => {
   // --- FAQ ENGINE ---
   const faq = [
     {
-      keywords: ['oi', 'olá', 'ola', 'hey', 'boa tarde', 'bom dia', 'boa noite', 'tudo bem', 'tudo'],
-      answer: 'Olá! Fico feliz em te ver por aqui 😊 Sou o Flux, assistente da FluxAI. Posso te ajudar com informações sobre nossos serviços de Marketing Digital, Branding, Social Media, Sites, Tráfego Pago e IA. Como posso te ajudar? 💎'
+      keywords: ['oi', 'olÃ¡', 'ola', 'hey', 'boa tarde', 'bom dia', 'boa noite', 'tudo bem', 'tudo'],
+      answer: 'OlÃ¡! Fico feliz em te ver por aqui ðŸ˜Š Sou o Flux, assistente da FluxAI. Posso te ajudar com informaÃ§Ãµes sobre nossos serviÃ§os de Marketing Digital, Branding, Social Media, Sites, TrÃ¡fego Pago e IA. Como posso te ajudar? ðŸ’Ž'
     },
     {
       keywords: ['branding', 'identidade', 'logo', 'marca', 'visual', 'logotipo', 'brandbook'],
-      answer: 'Nossa identidade visual é feita para posicionar sua marca como referência! 🎨 Criamos Logo, Paleta de Cores, Tipografia, Manual da Marca (Brandbook) e Design para redes sociais. Tudo com padrão High-Ticket. Quer agendar um diagnóstico gratuito?'
+      answer: 'Nossa identidade visual Ã© feita para posicionar sua marca como referÃªncia! ðŸŽ¨ Criamos Logo, Paleta de Cores, Tipografia, Manual da Marca (Brandbook) e Design para redes sociais. Tudo com padrÃ£o High-Ticket. Quer agendar um diagnÃ³stico gratuito?'
     },
     {
-      keywords: ['social', 'redes', 'instagram', 'facebook', 'tiktok', 'conteúdo', 'gestão', 'post', 'stories'],
-      answer: 'Gerenciamos suas redes sociais do zero ao resultado! 📲 Fazemos planejamento de conteúdo, Copywriting, Design de Posts e Stories e análise de métricas. Transformamos seguidores em clientes reais. Posso te conectar com nossa equipe!'
+      keywords: ['social', 'redes', 'instagram', 'facebook', 'tiktok', 'conteÃºdo', 'gestÃ£o', 'post', 'stories'],
+      answer: 'Gerenciamos suas redes sociais do zero ao resultado! ðŸ“² Fazemos planejamento de conteÃºdo, Copywriting, Design de Posts e Stories e anÃ¡lise de mÃ©tricas. Transformamos seguidores em clientes reais. Posso te conectar com nossa equipe!'
     },
     {
-      keywords: ['site', 'landing', 'página', 'web', 'seo', 'google', 'indexar', 'aparecer'],
-      answer: 'Desenvolvemos Landing Pages e Sites Institucionais focados em SEO e captura de leads! 💻 Otimizados para Google, mobile e super rápidos. Seu site já está no ar? Precisa de upgrades ou um novo projeto?'
+      keywords: ['site', 'landing', 'pÃ¡gina', 'web', 'seo', 'google', 'indexar', 'aparecer'],
+      answer: 'Desenvolvemos Landing Pages e Sites Institucionais focados em SEO e captura de leads! ðŸ’» Otimizados para Google, mobile e super rÃ¡pidos. Seu site jÃ¡ estÃ¡ no ar? Precisa de upgrades ou um novo projeto?'
     },
     {
-      keywords: ['tráfego', 'ads', 'anúncios', 'meta', 'campanha', 'facebook ads', 'google ads', 'vendas', 'leads', 'remarketing'],
-      answer: 'Gerenciamos campanhas de Tráfego Pago no Meta (Facebook/Instagram) e Google Ads! 🎯 Instalamos Pixel, criamos estratégias de Remarketing e entregamos relatórios de ROI mensais. Quer saber como atrair mais clientes agora?'
+      keywords: ['trÃ¡fego', 'ads', 'anÃºncios', 'meta', 'campanha', 'facebook ads', 'google ads', 'vendas', 'leads', 'remarketing'],
+      answer: 'Gerenciamos campanhas de TrÃ¡fego Pago no Meta (Facebook/Instagram) e Google Ads! ðŸŽ¯ Instalamos Pixel, criamos estratÃ©gias de Remarketing e entregamos relatÃ³rios de ROI mensais. Quer saber como atrair mais clientes agora?'
     },
     {
-      keywords: ['ia', 'inteligência artificial', 'imagem', 'capacitação', 'prompt', 'gpt', 'ai', 'automação'],
-      answer: 'Trabalhamos com IA aplicada ao marketing! 🤖 Treinamos equipes em Prompt Engineering, criamos imagens realistas via IA e desenvolvemos fluxos de trabalho automatizados para escalar sua produção de conteúdo. Interessante né?'
+      keywords: ['ia', 'inteligÃªncia artificial', 'imagem', 'capacitaÃ§Ã£o', 'prompt', 'gpt', 'ai', 'automaÃ§Ã£o'],
+      answer: 'Trabalhamos com IA aplicada ao marketing! ðŸ¤– Treinamos equipes em Prompt Engineering, criamos imagens realistas via IA e desenvolvemos fluxos de trabalho automatizados para escalar sua produÃ§Ã£o de conteÃºdo. Interessante nÃ©?'
     },
     {
-      keywords: ['estratégia', 'dados', 'analytics', 'ga4', 'dashboard', 'roi', 'resultado', 'métricas'],
-      answer: 'Nossa área de Estratégia & Dados configura seu Google Analytics 4, cria Dashboards de Performance e faz análise de CRO (taxa de conversão). Decisões inteligentes = crescimento acelerado! 📊 Quer saber mais?'
+      keywords: ['estratÃ©gia', 'dados', 'analytics', 'ga4', 'dashboard', 'roi', 'resultado', 'mÃ©tricas'],
+      answer: 'Nossa Ã¡rea de EstratÃ©gia & Dados configura seu Google Analytics 4, cria Dashboards de Performance e faz anÃ¡lise de CRO (taxa de conversÃ£o). DecisÃµes inteligentes = crescimento acelerado! ðŸ“Š Quer saber mais?'
     },
     {
-      keywords: ['preço', 'valor', 'quanto', 'custo', 'investimento', 'pacote', 'plano', 'orçamento'],
-      answer: 'Cada projeto é único e personalizado! 💰 Os valores dependem do escopo, mas trabalhamos com pacotes sob medida para cada fase do seu negócio. O primeiro passo é um Diagnóstico Gratuito — assim mapeamos exatamente o que você precisa. Posso te conectar com nossa equipe?'
+      keywords: ['preÃ§o', 'valor', 'quanto', 'custo', 'investimento', 'pacote', 'plano', 'orÃ§amento'],
+      answer: 'Cada projeto Ã© Ãºnico e personalizado! ðŸ’° Os valores dependem do escopo, mas trabalhamos com pacotes sob medida para cada fase do seu negÃ³cio. O primeiro passo Ã© um DiagnÃ³stico Gratuito â€” assim mapeamos exatamente o que vocÃª precisa. Posso te conectar com nossa equipe?'
     },
     {
       keywords: ['contato', 'falar', 'conversar', 'whatsapp', 'chamar', 'atendimento', 'equipe', 'especialista'],
-      answer: 'Claro! Você pode falar diretamente com nossa equipe agora mesmo pelo WhatsApp 👇\n\n📲 <a href="https://wa.me/5571981114694" target="_blank" style="color:var(--primary); font-weight:700;">Clique aqui para abrir o WhatsApp</a>'
+      answer: 'Claro! VocÃª pode falar diretamente com nossa equipe agora mesmo pelo WhatsApp ðŸ‘‡\n\nðŸ“² <a href="https://wa.me/5571981114694" target="_blank" style="color:var(--primary); font-weight:700;">Clique aqui para abrir o WhatsApp</a>'
     },
     {
-      keywords: ['diagnóstico', 'diagnostico', 'gratuito', 'consultoria', 'análise', 'teste'],
-      answer: 'O Diagnóstico de Alto Valor da FluxAI é GRATUITO! 🔥 Nossa equipe analisa sua presença digital e entrega um plano estratégico personalizado. Para solicitar, é só preencher o formulário lá embaixo na página ou chamar no WhatsApp. Vamos juntos?'
+      keywords: ['diagnÃ³stico', 'diagnostico', 'gratuito', 'consultoria', 'anÃ¡lise', 'teste'],
+      answer: 'O DiagnÃ³stico de Alto Valor da FluxAI Ã© GRATUITO! ðŸ”¥ Nossa equipe analisa sua presenÃ§a digital e entrega um plano estratÃ©gico personalizado. Para solicitar, Ã© sÃ³ preencher o formulÃ¡rio lÃ¡ embaixo na pÃ¡gina ou chamar no WhatsApp. Vamos juntos?'
     },
     {
-      keywords: ['obrigad', 'valeu', 'grato', 'grata', 'ótimo', 'otimo', 'perfeito', 'excelente'],
-      answer: 'Fico feliz em ajudar! 🙌 Se tiver mais dúvidas ou quiser agendar seu diagnóstico, é só perguntar. Estamos sempre aqui para elevar o nível da sua marca! 💎'
+      keywords: ['obrigad', 'valeu', 'grato', 'grata', 'Ã³timo', 'otimo', 'perfeito', 'excelente'],
+      answer: 'Fico feliz em ajudar! ðŸ™Œ Se tiver mais dÃºvidas ou quiser agendar seu diagnÃ³stico, Ã© sÃ³ perguntar. Estamos sempre aqui para elevar o nÃ­vel da sua marca! ðŸ’Ž'
     },
     {
-      keywords: ['fluxai', 'agência', 'agencia', 'empresa', 'quem', 'vocês', 'historia'],
-      answer: 'A FluxAI é uma agência premium de Marketing Digital especializada em posicionamento High-Ticket! 🚀 Unimos Branding, IA, Tráfego Pago e Estratégia para transformar marcas em referências de mercado. Já ajudamos +50 marcas a escalar. Quer ser a próxima?'
+      keywords: ['fluxai', 'agÃªncia', 'agencia', 'empresa', 'quem', 'vocÃªs', 'historia'],
+      answer: 'A FluxAI Ã© uma agÃªncia premium de Marketing Digital especializada em posicionamento High-Ticket! ðŸš€ Unimos Branding, IA, TrÃ¡fego Pago e EstratÃ©gia para transformar marcas em referÃªncias de mercado. JÃ¡ ajudamos +50 marcas a escalar. Quer ser a prÃ³xima?'
     }
   ];
 
@@ -434,7 +434,7 @@ const initAIAssistant = () => {
         return item.answer;
       }
     }
-    return 'Boa pergunta! 🤔 Não encontrei uma resposta específica para isso, mas nossa equipe com certeza pode te ajudar. Chama a gente no WhatsApp: <a href="https://wa.me/5571981114694" target="_blank" style="color:var(--primary); font-weight:700;">Clique aqui</a> 💎';
+    return 'Boa pergunta! ðŸ¤” NÃ£o encontrei uma resposta especÃ­fica para isso, mas nossa equipe com certeza pode te ajudar. Chama a gente no WhatsApp: <a href="https://wa.me/5571981114694" target="_blank" style="color:var(--primary); font-weight:700;">Clique aqui</a> ðŸ’Ž';
   };
   // --- END FAQ ENGINE ---
 
@@ -442,7 +442,7 @@ const initAIAssistant = () => {
     aiWindow.classList.toggle('active');
     if (aiWindow.classList.contains('active')) {
       if (aiBody.children.length === 0) {
-        setTimeout(() => addAIMessage('Olá! Sou o <strong>Flux</strong>, assistente da FluxAI 💎<br>Pergunte sobre nossos serviços, preços ou qualquer dúvida!'), 500);
+        setTimeout(() => addAIMessage('OlÃ¡! Sou o <strong>Flux</strong>, assistente da FluxAI ðŸ’Ž<br>Pergunte sobre nossos serviÃ§os, preÃ§os ou qualquer dÃºvida!'), 500);
       }
     }
   });
@@ -487,7 +487,7 @@ const initAIAssistant = () => {
     const msg = document.createElement('div');
     msg.id = id;
     msg.style.marginBottom = '12px';
-    msg.innerHTML = `<span style="display:inline-block; padding:10px 14px; border-radius:14px; background:var(--bg-slate-dark); color:var(--text-muted);">✦ digitando...</span>`;
+    msg.innerHTML = `<span style="display:inline-block; padding:10px 14px; border-radius:14px; background:var(--bg-slate-dark); color:var(--text-muted);">âœ¦ digitando...</span>`;
     aiBody.appendChild(msg);
     aiBody.scrollTop = aiBody.scrollHeight;
     return id;
@@ -528,7 +528,7 @@ const initWelcomePopup = () => {
   // Smooth Entrance (Fade-in ao carregar)
   // Initial Execution
   document.body.classList.add('loaded');
-  // initAIAssistant(); // Removido em favor do Typebot AI real
+  initAIAssistant(); // Restaurado em favor do Typebot AI real
   initWelcomePopup();
 
 });

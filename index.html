@@ -59,6 +59,13 @@
     /></noscript>
     <!-- End Meta Pixel Code -->
     <script>
+      // BLOQUEIO PREVENTIVO DE INJEÇÕES EXTERNAS (Typebot GTM)
+      window.Typebot = { 
+        initBubble: function() { console.log('Typebot injection blocked by local assistant.'); },
+        initPopup: function() { console.log('Typebot injection blocked by local assistant.'); }
+      };
+    </script>
+    <script>
 fbq('track', 'ViewContent');
 </script>
 
@@ -78,7 +85,7 @@ fbq('track', 'ViewContent');
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css?v=3" />
 </head>
 <body>
 
@@ -602,23 +609,48 @@ fbq('track', 'ViewContent');
     </div>
   </div>
 
-  <!-- Assistente Flutuante (IA LUXURY) - TYPEBOT OFICIAL -->
-  <script type="module">
-    import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0.3/dist/web.js'
+  <!-- AI Assistant Window (LOCAL LUXURY) -->
+  <div id="aiWindow">
+    <div class="ai-header">
+      <div class="ai-header-info">
+        <img src="https://fluxaidigital.com.br/fluxo.png" alt="Flux Avatar" class="ai-avatar-mini">
+        <div>
+          <div style="font-weight: 700;">Mascote Flux</div>
+          <div class="ai-status">Online agora</div>
+        </div>
+      </div>
+      <button id="aiClose" style="background:none; border:none; color:white; cursor:pointer; font-size:1.2rem;">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+    <div id="aiBody"></div>
+    <div class="ai-footer">
+      <input type="text" id="aiInput" placeholder="Digite sua dúvida aqui...">
+      <button class="ai-send-btn" id="aiSend">
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
+    </div>
+  </div>
 
-    Typebot.initBubble({
-      typebot: "basic-chat-gpt-9t1avfj",
-      apiHost: "https://typebot.co",
-      theme: {
-        button: { 
-          backgroundColor: "#0d0d0d", 
-          customIconSrc: "https://fluxaidigital.com.br/fluxo.png",
-          size: "large"
-        },
-        chatWindow: {
-          backgroundColor: "#0d0d0d"
-        }
-      }
+  <!-- Assistente Flutuante (IA LUXURY) - MIGRADO PARA LOCAL PARA CONTROLE TOTAL -->
+  <div id="aiBtn" class="floating-mascot-container">
+    <div id="custom-mascot-tooltip" class="custom-tooltip">
+      Sou seu assistente <strong>Flux</strong>,<br>clique aqui para eu te ajudar.
+    </div>
+    <img src="https://fluxaidigital.com.br/fluxo.png" alt="Flux Assistente" class="mascot-img">
+  </div>
+
+  <script>
+    // Controle do Tooltip Customizado
+    setTimeout(() => {
+      const tooltip = document.getElementById('custom-mascot-tooltip');
+      if (tooltip) tooltip.classList.add('active');
+    }, 1500);
+
+    // Ajuste: Fecha tooltip ao clicar no Mascote
+    document.getElementById('aiBtn').addEventListener('click', () => {
+      const tooltip = document.getElementById('custom-mascot-tooltip');
+      if (tooltip) tooltip.classList.remove('active');
     });
   </script>
 
@@ -644,11 +676,13 @@ fbq('track', 'ViewContent');
     </div>
   </div>
 
+  <!-- Tooltip Customizado para o Mascote removido daqui, movido para o container acima -->
+
   <!-- Botão Flutuante de WhatsApp -->
   <a href="https://wa.me/5571981114694" target="_blank" class="fab-whatsapp" aria-label="WhatsApp">
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
-  <script src="script.js"></script>
+  <script src="script.js?v=3"></script>
 </body>
 </html>
