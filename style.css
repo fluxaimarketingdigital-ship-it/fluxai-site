@@ -1861,31 +1861,28 @@ a[href*="typebot.io"],
 }
 
 
-/* --- MASCOTE FLUTUANTE LUXURY (V6 - 170PX OFFSET) --- */
+/* --- MASCOTE FLUTUANTE LUXURY (V7 - Z-INDEX FIX) --- */
 .floating-mascot-container {
     position: fixed;
     bottom: 35px;
-    right: 170px !important; /* Aumentado para 170px para escala 5.0 não cortar */
+    right: 170px !important;
     width: 65px;
     height: 65px;
-    z-index: 2147483647 !important;
+    z-index: 100000; /* Reduzido para ficar atrás do chat ao abrir */
     cursor: pointer;
     background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
 }
 
-/* SELETOR ESPECIFICO para evitar escalar imagens internas do chat */
 .floating-mascot-container .mascot-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
     transform: scale(5.0) translateY(-20px);
     filter: drop-shadow(0 25px 45px rgba(0,0,0,0.6));
-    animation: floating-ai-v6 3s infinite ease-in-out;
+    animation: floating-ai-v7 3s infinite ease-in-out;
 }
 
-@keyframes floating-ai-v6 {
+@keyframes floating-ai-v7 {
     0% { transform: scale(5.0) translateY(-20px); }
     50% { transform: scale(5.2) translateY(-40px); }
     100% { transform: scale(5.0) translateY(-20px); }
@@ -1893,15 +1890,16 @@ a[href*="typebot.io"],
 
 #aiWindow {
     position: fixed;
-    bottom: 115px;
-    right: 60px;
+    bottom: 120px;
+    right: 40px;
     width: 380px;
     max-width: 90vw;
     height: 600px;
+    max-height: 80vh;
     background: #ffffff;
     border-radius: 24px;
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    z-index: 2147483646 !important;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    z-index: 2147483647 !important; /* MÁXIMO PARA O CHAT */
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -1912,23 +1910,23 @@ a[href*="typebot.io"],
     border: 1px solid rgba(0,0,0,0.1);
 }
 
-[data-theme="dark"] #aiWindow { background: #121212; border-color: rgba(255,255,255,0.1); }
 #aiWindow.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
 
 .ai-header {
     background: linear-gradient(135deg, #1a1a1a, #000);
     color: white;
-    padding: 15px 25px;
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid #FF6B00;
+    flex-shrink: 0;
 }
 
 .ai-avatar-mini {
-    width: 40px !important;
-    height: 40px !important;
-    transform: none !important; /* GARANTIR QUE NAO ESCALE */
+    width: 35px !important;
+    height: 35px !important;
+    transform: none !important; /* PROTEÇÃO CONTRA SCALE */
     background: #fff;
     border-radius: 50%;
     padding: 2px;
@@ -1936,43 +1934,40 @@ a[href*="typebot.io"],
 
 #aiBody {
     flex: 1;
-    padding: 20px;
+    padding: 15px;
     overflow-y: auto;
     background: #fdfdfd;
 }
 
-[data-theme="dark"] #aiBody { background: #0a0a0a; }
-
 .ai-footer {
-    padding: 15px;
+    padding: 12px 15px;
     background: #f8f9fa;
     display: flex;
-    gap: 10px;
-    border-top: 1px solid rgba(0,0,0,0.1);
+    gap: 8px;
+    border-top: 1px solid #eee;
+    flex-shrink: 0;
 }
-
-[data-theme="dark"] .ai-footer { background: #1a1a1a; }
 
 #aiInput {
     flex: 1;
     background: #fff;
-    border: 1px solid #ddd;
-    padding: 12px 18px;
-    border-radius: 30px;
-    color: #000;
+    border: 1px solid #ccc;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    color: #333;
 }
 
-[data-theme="dark"] #aiInput { background: #2a2a2a; color: #fff; border-color: #444; }
-
 .ai-send-btn {
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     background: #FF6B00;
     color: #fff;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    border: none;
     cursor: pointer;
 }
 
