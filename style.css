@@ -1750,14 +1750,124 @@ a[href*="elfsight.com"],
   }
 }
 
+/* MASCOTE FLUTUANTE LUXURY (Sem cÃ­rculos, livre na tela) */
+.floating-mascot-container {
+    position: fixed;
+    bottom: 30px;
+    right: 35px;
+    width: 60px;
+    height: 60px;
+    z-index: 1050;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.mascot-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transform: scale(3.2); /* Tamanho imponente solicitado */
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
+    transition: all 0.4s ease;
+    animation: floating-ai 3s infinite ease-in-out;
+}
+
+@keyframes floating-ai {
+    0% { transform: scale(3.2) translateY(0); }
+    50% { transform: scale(3.3) translateY(-15px); }
+    100% { transform: scale(3.2) translateY(0); }
+}
+
+.floating-mascot-container:hover .mascot-img {
+    transform: scale(3.5) translateY(-10px);
+}
+
+.floating-mascot-container:hover {
+    filter: brightness(1.2);
+}
+
+/* Ajuste para nÃ£o colidir com o WhatsApp se necessÃ¡rio */
+@media (max-width: 768px) {
+    .floating-mascot-container {
+        bottom: 85px;
+        right: 25px;
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* AGRESSIVE BRANDING REMOVAL: Oculta o 'Made with Typebot' */
+[class*="typebot-branding"], 
+.typebot-branding,
+a[href*="typebot.io"],
+.typebot-standard-branding {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    height: 0 !important;
+    width: 0 !important;
+    overflow: hidden !important;
+}
+
+/* Tooltip Customizado (Caixa de DiÃ¡logo) */
+.custom-tooltip {
+    position: fixed;
+    bottom: 110px; /* Ajustado para ficar acima do mascote maior */
+    right: 35px;
+    background: #1a1a1a;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 15px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    line-height: 1.4;
+    max-width: 220px;
+    text-align: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,107,0,0.5);
+    z-index: 1099;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(20px) scale(0.8);
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    pointer-events: none;
+}
+
+.custom-tooltip.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    animation: pulse-border 2s infinite ease-in-out;
+}
+
+@keyframes pulse-border {
+    0% { border-color: rgba(255,107,0,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+    50% { border-color: rgba(255,107,0,0.9); box-shadow: 0 15px 45px rgba(255,107,0,0.2); }
+    100% { border-color: rgba(255,107,0,0.5); box-shadow: 0 15px 35px rgba(0,0,0,0.5); }
+}
+
+.custom-tooltip::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    right: 30px;
+    width: 16px;
+    height: 16px;
+    background: #1a1a1a;
+    border-right: 1px solid rgba(255,107,0,0.5);
+    border-bottom: 1px solid rgba(255,107,0,0.5);
+    transform: rotate(45deg);
+}
+
 
 /* --- MASCOTE FLUTUANTE LUXURY (SEM CIRCULOS - ESCALA 5.0) --- */
 .floating-mascot-container {
     position: fixed;
     bottom: 35px;
-    right: 35px;
-    width: 70px;
-    height: 70px;
+    right: 90px; /* Aumentado de 35px para 90px para manter na tela em escala 5.0 */
+    width: 65px;
+    height: 65px;
     z-index: 2147483647 !important;
     cursor: pointer;
     background: transparent !important;
@@ -1770,30 +1880,26 @@ a[href*="elfsight.com"],
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transform: scale(5.0) translateY(-25px); /* GIGANTE E LIVRE */
-    filter: drop-shadow(0 25px 45px rgba(0,0,0,0.6));
+    transform: scale(5.0) translateY(-15px);
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
     transition: all 0.4s ease;
     animation: floating-ai 3s infinite ease-in-out;
 }
 
 @keyframes floating-ai {
-    0% { transform: scale(5.0) translateY(-25px); }
-    50% { transform: scale(5.3) translateY(-45px); }
-    100% { transform: scale(5.0) translateY(-25px); }
+    0% { transform: scale(5.0) translateY(-15px); }
+    50% { transform: scale(5.2) translateY(-35px); }
+    100% { transform: scale(5.0) translateY(-15px); }
 }
 
-.floating-mascot-container:hover .mascot-img {
-    transform: scale(5.6) translateY(-35px);
-}
-
-/* Tooltip Customizado (Caixa de Dialogo) */
+/* Tooltip Customizado (Dialogo) */
 .custom-tooltip {
     position: fixed;
-    bottom: 170px;
-    right: 35px;
+    bottom: 160px;
+    right: 90px;
     background: #1a1a1a;
     color: #fff;
-    padding: 16px 26px;
+    padding: 15px 24px;
     border-radius: 20px;
     font-size: 0.95rem;
     font-weight: 700;
@@ -1814,35 +1920,29 @@ a[href*="elfsight.com"],
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
+    animation: pulse-flux 2s infinite;
 }
 
-.custom-tooltip::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    right: 32px;
-    width: 20px;
-    height: 20px;
-    background: #1a1a1a;
-    border-right: 2px solid #FF6B00;
-    border-bottom: 2px solid #FF6B00;
-    transform: rotate(45deg);
+@keyframes pulse-flux {
+    0% { border-color: #FF6B00; }
+    50% { border-color: #fff; }
+    100% { border-color: #FF6B00; }
 }
 
-/* HIDE TYPEBOT COMPLETELY */
-#typebot-bubble, [id*='typebot'], [class*='typebot'], .typebot-standard-branding {
+/* HIDE EXTERNAL TYPEBOT */
+#typebot-bubble, [id*="typebot"], [class*="typebot"] {
     display: none !important;
     opacity: 0 !important;
     visibility: hidden !important;
-    z-index: -100 !important;
 }
 
-/* AI WINDOW (LOCAL) */
+/* AI WINDOW (LOCAL LUXURY 2.0) */
 #aiWindow {
     position: fixed;
-    bottom: 125px;
-    right: 30px;
+    bottom: 115px;
+    right: 60px;
     width: 380px;
+    max-width: 90vw;
     height: 600px;
     background: #ffffff;
     border-radius: 24px;
@@ -1856,6 +1956,11 @@ a[href*="elfsight.com"],
     visibility: hidden;
     transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(0,0,0,0.1);
+}
+
+[data-theme="dark"] #aiWindow {
+    background: #121212;
+    border-color: rgba(255,255,255,0.1);
 }
 
 #aiWindow.active {
@@ -1873,3 +1978,105 @@ a[href*="elfsight.com"],
     align-items: center;
     border-bottom: 2px solid #FF6B00;
 }
+
+.ai-header-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ai-avatar-mini {
+    width: 35px;
+    height: 35px;
+    background: #fff;
+    border-radius: 50%;
+    padding: 2px;
+}
+
+#aiBody {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #fdfdfd;
+}
+
+[data-theme="dark"] #aiBody {
+    background: #0a0a0a;
+}
+
+/* Bolhas de Conversa Luxo */
+.chat-msg {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-msg.user { align-items: flex-end; }
+.chat-msg.ai { align-items: flex-start; }
+
+.chat-bubble {
+    padding: 12px 18px;
+    border-radius: 18px;
+    max-width: 85%;
+    line-height: 1.5;
+    font-size: 0.95rem;
+}
+
+.chat-msg.user .chat-bubble {
+    background: #FF6B00;
+    color: #fff;
+    border-bottom-right-radius: 4px;
+}
+
+.chat-msg.ai .chat-bubble {
+    background: #f0f0f0;
+    color: #1a1a1a;
+    border-bottom-left-radius: 4px;
+}
+
+[data-theme="dark"] .chat-msg.ai .chat-bubble {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.ai-footer {
+    padding: 15px 20px;
+    background: #f8f9fa;
+    display: flex;
+    gap: 10px;
+    border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+[data-theme="dark"] .ai-footer {
+    background: #1a1a1a;
+}
+
+#aiInput {
+    flex: 1;
+    background: #fff;
+    border: 1px solid rgba(0,0,0,0.1);
+    padding: 12px 18px;
+    border-radius: 30px;
+    outline: none;
+    color: #000;
+}
+
+[data-theme="dark"] #aiInput {
+    background: #2a2a2a;
+    color: #fff;
+}
+
+.ai-send-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    background: #FF6B00;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.ai-send-btn:hover { transform: scale(1.1); filter: brightness(1.1); }
+

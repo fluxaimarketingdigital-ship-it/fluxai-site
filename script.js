@@ -214,7 +214,7 @@
     });
   }
 
-  // LÃ³gica do Modal de ServiÃ§os
+  // LÃ³gica do Modal de serviços
   const modal = document.getElementById('serviceModal');
   const modalBody = document.getElementById('modalBody');
   const closeModal = document.getElementById('closeModal');
@@ -379,7 +379,7 @@ const initAIAssistant = () => {
   const faq = [
     {
       keywords: ['oi', 'olÃ¡', 'ola', 'hey', 'boa tarde', 'bom dia', 'boa noite', 'tudo bem', 'tudo'],
-      answer: 'OlÃ¡! Fico feliz em te ver por aqui ðŸ˜Š Sou o Flux, assistente da FluxAI. Posso te ajudar com informaÃ§Ãµes sobre nossos serviÃ§os de Marketing Digital, Branding, Social Media, Sites, TrÃ¡fego Pago e IA. Como posso te ajudar? ðŸ’Ž'
+      answer: 'OlÃ¡! Fico feliz em te ver por aqui ðŸ˜Š Sou o Flux, assistente da FluxAI. Posso te ajudar com informaÃ§Ãµes sobre nossos serviços de Marketing Digital, Branding, Social Media, Sites, TrÃ¡fego Pago e IA. Como posso te ajudar? ðŸ’Ž'
     },
     {
       keywords: ['branding', 'identidade', 'logo', 'marca', 'visual', 'logotipo', 'brandbook'],
@@ -419,7 +419,7 @@ const initAIAssistant = () => {
     },
     {
       keywords: ['obrigad', 'valeu', 'grato', 'grata', 'Ã³timo', 'otimo', 'perfeito', 'excelente'],
-      answer: 'Fico feliz em ajudar! ðŸ™Œ Se tiver mais dÃºvidas ou quiser agendar seu diagnÃ³stico, Ã© sÃ³ perguntar. Estamos sempre aqui para elevar o nÃ­vel da sua marca! ðŸ’Ž'
+      answer: 'Fico feliz em ajudar! ðŸ™Œ Se tiver mais dúvidas ou quiser agendar seu diagnÃ³stico, Ã© sÃ³ perguntar. Estamos sempre aqui para elevar o nÃ­vel da sua marca! ðŸ’Ž'
     },
     {
       keywords: ['fluxai', 'agÃªncia', 'agencia', 'empresa', 'quem', 'vocÃªs', 'historia'],
@@ -442,7 +442,7 @@ const initAIAssistant = () => {
     aiWindow.classList.toggle('active');
     if (aiWindow.classList.contains('active')) {
       if (aiBody.children.length === 0) {
-        setTimeout(() => addAIMessage('OlÃ¡! Sou o <strong>Flux</strong>, assistente da FluxAI ðŸ’Ž<br>Pergunte sobre nossos serviÃ§os, preÃ§os ou qualquer dÃºvida!'), 500);
+        setTimeout(() => addAIMessage('Olá! Sou o <strong>Flux</strong>, assistente da FluxAI ðŸ’Ž<br>Pergunte sobre nossos serviços, preÃ§os ou qualquer dúvida!'), 500);
       }
     }
   });
@@ -487,7 +487,7 @@ const initAIAssistant = () => {
     const msg = document.createElement('div');
     msg.id = id;
     msg.style.marginBottom = '12px';
-    msg.innerHTML = `<span style="display:inline-block; padding:10px 14px; border-radius:14px; background:var(--bg-slate-dark); color:var(--text-muted);">âœ¦ digitando...</span>`;
+    msg.innerHTML = `<span style="display:inline-block; padding:10px 14px; border-radius:14px; background:var(--bg-slate-dark); color:var(--text-muted);">✦ digitando...</span>`;
     aiBody.appendChild(msg);
     aiBody.scrollTop = aiBody.scrollHeight;
     return id;
