@@ -1861,11 +1861,11 @@ a[href*="typebot.io"],
 }
 
 
-/* --- MASCOTE FLUTUANTE LUXURY (SEM CIRCULOS - ESCALA 5.0) --- */
+/* --- MASCOTE FLUTUANTE LUXURY (V6 - 170PX OFFSET) --- */
 .floating-mascot-container {
     position: fixed;
     bottom: 35px;
-    right: 90px; /* Aumentado de 35px para 90px para manter na tela em escala 5.0 */
+    right: 170px !important; /* Aumentado para 170px para escala 5.0 não cortar */
     width: 65px;
     height: 65px;
     z-index: 2147483647 !important;
@@ -1873,70 +1873,24 @@ a[href*="typebot.io"],
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.mascot-img {
+/* SELETOR ESPECIFICO para evitar escalar imagens internas do chat */
+.floating-mascot-container .mascot-img {
     width: 100%;
     height: 100%;
     object-fit: contain;
-    transform: scale(5.0) translateY(-15px);
-    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
-    transition: all 0.4s ease;
-    animation: floating-ai 3s infinite ease-in-out;
+    transform: scale(5.0) translateY(-20px);
+    filter: drop-shadow(0 25px 45px rgba(0,0,0,0.6));
+    animation: floating-ai-v6 3s infinite ease-in-out;
 }
 
-@keyframes floating-ai {
-    0% { transform: scale(5.0) translateY(-15px); }
-    50% { transform: scale(5.2) translateY(-35px); }
-    100% { transform: scale(5.0) translateY(-15px); }
+@keyframes floating-ai-v6 {
+    0% { transform: scale(5.0) translateY(-20px); }
+    50% { transform: scale(5.2) translateY(-40px); }
+    100% { transform: scale(5.0) translateY(-20px); }
 }
 
-/* Tooltip Customizado (Dialogo) */
-.custom-tooltip {
-    position: fixed;
-    bottom: 160px;
-    right: 90px;
-    background: #1a1a1a;
-    color: #fff;
-    padding: 15px 24px;
-    border-radius: 20px;
-    font-size: 0.95rem;
-    font-weight: 700;
-    line-height: 1.4;
-    max-width: 250px;
-    text-align: center;
-    box-shadow: 0 15px 45px rgba(0,0,0,0.7);
-    border: 2px solid #FF6B00;
-    z-index: 2147483647 !important;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(20px) scale(0.8);
-    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    pointer-events: none;
-}
-
-.custom-tooltip.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-    animation: pulse-flux 2s infinite;
-}
-
-@keyframes pulse-flux {
-    0% { border-color: #FF6B00; }
-    50% { border-color: #fff; }
-    100% { border-color: #FF6B00; }
-}
-
-/* HIDE EXTERNAL TYPEBOT */
-#typebot-bubble, [id*="typebot"], [class*="typebot"] {
-    display: none !important;
-    opacity: 0 !important;
-    visibility: hidden !important;
-}
-
-/* AI WINDOW (LOCAL LUXURY 2.0) */
 #aiWindow {
     position: fixed;
     bottom: 115px;
@@ -1958,36 +1912,23 @@ a[href*="typebot.io"],
     border: 1px solid rgba(0,0,0,0.1);
 }
 
-[data-theme="dark"] #aiWindow {
-    background: #121212;
-    border-color: rgba(255,255,255,0.1);
-}
-
-#aiWindow.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-}
+[data-theme="dark"] #aiWindow { background: #121212; border-color: rgba(255,255,255,0.1); }
+#aiWindow.active { opacity: 1; visibility: visible; transform: translateY(0) scale(1); }
 
 .ai-header {
     background: linear-gradient(135deg, #1a1a1a, #000);
     color: white;
-    padding: 20px 25px;
+    padding: 15px 25px;
     display: flex;
     justify-content: space-between;
     align-items: center;
     border-bottom: 2px solid #FF6B00;
 }
 
-.ai-header-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
-
 .ai-avatar-mini {
-    width: 35px;
-    height: 35px;
+    width: 40px !important;
+    height: 40px !important;
+    transform: none !important; /* GARANTIR QUE NAO ESCALE */
     background: #fff;
     border-radius: 50%;
     padding: 2px;
@@ -2000,83 +1941,38 @@ a[href*="typebot.io"],
     background: #fdfdfd;
 }
 
-[data-theme="dark"] #aiBody {
-    background: #0a0a0a;
-}
-
-/* Bolhas de Conversa Luxo */
-.chat-msg {
-    margin-bottom: 15px;
-    display: flex;
-    flex-direction: column;
-}
-
-.chat-msg.user { align-items: flex-end; }
-.chat-msg.ai { align-items: flex-start; }
-
-.chat-bubble {
-    padding: 12px 18px;
-    border-radius: 18px;
-    max-width: 85%;
-    line-height: 1.5;
-    font-size: 0.95rem;
-}
-
-.chat-msg.user .chat-bubble {
-    background: #FF6B00;
-    color: #fff;
-    border-bottom-right-radius: 4px;
-}
-
-.chat-msg.ai .chat-bubble {
-    background: #f0f0f0;
-    color: #1a1a1a;
-    border-bottom-left-radius: 4px;
-}
-
-[data-theme="dark"] .chat-msg.ai .chat-bubble {
-    background: #2a2a2a;
-    color: #fff;
-}
+[data-theme="dark"] #aiBody { background: #0a0a0a; }
 
 .ai-footer {
-    padding: 15px 20px;
+    padding: 15px;
     background: #f8f9fa;
     display: flex;
     gap: 10px;
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid rgba(0,0,0,0.1);
 }
 
-[data-theme="dark"] .ai-footer {
-    background: #1a1a1a;
-}
+[data-theme="dark"] .ai-footer { background: #1a1a1a; }
 
 #aiInput {
     flex: 1;
     background: #fff;
-    border: 1px solid rgba(0,0,0,0.1);
+    border: 1px solid #ddd;
     padding: 12px 18px;
     border-radius: 30px;
-    outline: none;
     color: #000;
 }
 
-[data-theme="dark"] #aiInput {
-    background: #2a2a2a;
-    color: #fff;
-}
+[data-theme="dark"] #aiInput { background: #2a2a2a; color: #fff; border-color: #444; }
 
 .ai-send-btn {
     width: 45px;
     height: 45px;
-    border-radius: 50%;
     background: #FF6B00;
-    color: white;
-    border: none;
-    cursor: pointer;
+    color: #fff;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
 }
-.ai-send-btn:hover { transform: scale(1.1); filter: brightness(1.1); }
 

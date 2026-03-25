@@ -379,7 +379,7 @@ const initAIAssistant = () => {
   const faq = [
     {
       keywords: ['oi', 'olÃ¡', 'ola', 'hey', 'boa tarde', 'bom dia', 'boa noite', 'tudo bem', 'tudo'],
-      answer: 'OlÃ¡! Fico feliz em te ver por aqui ðŸ˜Š Sou o Flux, assistente da FluxAI. Posso te ajudar com informaÃ§Ãµes sobre nossos serviços de Marketing Digital, Branding, Social Media, Sites, TrÃ¡fego Pago e IA. Como posso te ajudar? ðŸ’Ž'
+      answer: 'Olá! Fico feliz em te ver por aqui ðŸ˜Š Sou o Flux, assistente da FluxAI. Posso te ajudar com informaÃ§Ãµes sobre nossos serviços de Marketing Digital, Branding, Social Media, Sites, TrÃ¡fego Pago e IA. Como posso te ajudar? ðŸ’Ž'
     },
     {
       keywords: ['branding', 'identidade', 'logo', 'marca', 'visual', 'logotipo', 'brandbook'],
