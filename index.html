@@ -602,24 +602,25 @@ fbq('track', 'ViewContent');
     </div>
   </div>
 
-  <!-- Assistente Flutuante (IA LUXURY) -->
-  <div class="ai-assistant-container">
-    <div class="ai-window glass-card" id="aiWindow">
-      <div class="ai-header">
-        <span>Flux 💎</span>
-        <button id="aiClose" style="background:transparent; border:none; cursor:pointer;"><i class="fa-solid fa-xmark"></i></button>
-      </div>
-      <div class="ai-body" id="aiBody">
-        <!-- Conversa Simulada -->
-      </div>
-      <div class="ai-footer">
-        <input type="text" id="aiInput" class="ai-input" placeholder="Pergunte sobre posicionamento..." />
-      </div>
-    </div>
-    <div class="ai-btn" id="aiBtn" title="Falar com o Flux">
-      <img src="fluxo.png" alt="Flux Mascot" />
-    </div>
-  </div>
+  <!-- Assistente Flutuante (IA LUXURY) - TYPEBOT OFICIAL -->
+  <script type="module">
+    import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0.3/dist/web.js'
+
+    Typebot.initBubble({
+      typebot: "basic-chat-gpt-9t1avfj",
+      apiHost: "https://typebot.co",
+      theme: {
+        button: { 
+          backgroundColor: "#0d0d0d", 
+          customIconSrc: "https://fluxaidigital.com.br/fluxo.png",
+          size: "large"
+        },
+        chatWindow: {
+          backgroundColor: "#0d0d0d"
+        }
+      }
+    });
+  </script>
 
   <!-- Welcome Pop-up (Revolução da Marca) -->
   <div class="welcome-overlay" id="welcomeOverlay"></div>

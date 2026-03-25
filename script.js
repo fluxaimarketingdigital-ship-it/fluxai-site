@@ -528,7 +528,7 @@ const initWelcomePopup = () => {
   // Smooth Entrance (Fade-in ao carregar)
   // Initial Execution
   document.body.classList.add('loaded');
-  initAIAssistant();
+  // initAIAssistant(); // Removido em favor do Typebot AI real
   initWelcomePopup();
 
 });

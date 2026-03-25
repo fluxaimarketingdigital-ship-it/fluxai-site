@@ -1332,69 +1332,7 @@ a[href*="elfsight.com"],
   box-shadow: 0 15px 25px -3px rgba(37, 211, 102, 0.4);
 }
 
-/* SMART MASCOT ASSISTANT */
-.mascot-assistant {
-  position: fixed;
-  bottom: 24px;
-  left: 24px;
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
-  z-index: 1050;
-  pointer-events: none;
-  opacity: 0;
-  transform: translateX(-30px);
-  transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.mascot-assistant.active {
-  pointer-events: auto;
-  opacity: 1;
-  transform: translateX(0);
-}
-.mascot-bubble {
-  background: var(--bg-white);
-  padding: 16px 24px;
-  border-radius: 20px 20px 20px 4px;
-  box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-  max-width: 240px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: var(--text-main);
-  line-height: 1.4;
-  border: 1px solid var(--border);
-  position: relative;
-  cursor: pointer;
-  transition: var(--transition);
-}
-.mascot-bubble:hover {
-  border-color: var(--primary);
-  transform: translateY(-5px);
-}
-.mascot-img-side {
-  width: 100px; /* Maior e sem círculo agora */
-  cursor: pointer;
-  transition: var(--transition);
-}
-.mascot-img-side:hover {
-  transform: scale(1.1) rotate(-5deg);
-}
-.floating-mascot-img {
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 10px 15px rgba(0,0,0,0.1));
-  animation: floatMascotSimple 4s ease-in-out infinite;
-}
 
-@keyframes floatMascotSimple {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@media (max-width: 600px) {
-  .mascot-assistant { bottom: 85px; left: 10px; flex-direction: column-reverse; align-items: flex-start; }
-  .mascot-img-side { width: 80px; }
-  .mascot-bubble { max-width: 200px; margin-bottom: 8px; border-radius: 20px 20px 20px 20px; }
-}
 
 /* ANIMAÇÃO DE REVEAL AO SCROLLAR */
 .reveal {
