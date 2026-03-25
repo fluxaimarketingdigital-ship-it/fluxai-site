@@ -1861,40 +1861,36 @@ a[href*="typebot.io"],
 }
 
 
-/* --- MASCOTE FLUTUANTE LUXURY (V8 - ANCORADO NO WHATSAPP) --- */
-.floating-mascot-container {
+/* --- MASCOTE FLUTUANTE LUXURY (V9 - FINAL FIX) --- */
+#hugeMascotContainer {
     position: fixed;
-    bottom: 100px; /* ACIMA DO WHATSAPP (que esta em bottom 24px) */
-    right: 22px;   /* ALINHADO AO CENTRO DO WHATSAPP */
-    width: 65px;
-    height: 65px;
-    z-index: 100000;
+    bottom: 105px; /* Alinhado acima do WhatsApp */
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    z-index: 9999;
     cursor: pointer;
-    background: transparent !important;
 }
 
-/* SELETOR UNICO PARA EVITAR ESCALAS INDESEJADAS NO CHAT */
-.main-mascot-img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    transform: scale(3.5); /* Escala 3.5 para impacto sem transbordar */
+#hugeMascotImg {
+    width: 60px;
+    height: 60px;
+    transform: scale(3.5);
     transform-origin: bottom center;
     filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
-    animation: floating-ai-v8 3s infinite ease-in-out;
+    animation: floating-v9 3s infinite ease-in-out;
 }
 
-@keyframes floating-ai-v8 {
+@keyframes floating-v9 {
     0% { transform: scale(3.5) translateY(0); }
     50% { transform: scale(3.6) translateY(-15px); }
     100% { transform: scale(3.5) translateY(0); }
 }
 
-/* Tooltip sobre a cabeca do mascote */
-.custom-tooltip {
+#custom-tooltip-v9 {
     position: fixed;
-    bottom: 200px; /* Ajustado para ficar sobre a cabeca do mascote 3.5 */
-    right: 22px;
+    bottom: 220px; /* Acima da cabeca do mascote escala 3.5 */
+    right: 40px;
     background: #1a1a1a;
     color: #fff;
     padding: 12px 20px;
@@ -1902,25 +1898,17 @@ a[href*="typebot.io"],
     font-size: 0.9rem;
     font-weight: 700;
     line-height: 1.4;
-    max-width: 220px;
-    text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.6);
     border: 1px solid #FF6B00;
-    z-index: 100001;
+    z-index: 10000;
     opacity: 0;
     visibility: hidden;
-    transform: translateY(10px) scale(0.9);
     transition: all 0.4s ease;
-    pointer-events: none;
 }
 
-.custom-tooltip.active {
-    opacity: 1;
-    visibility: visible;
-    transform: translateY(0) scale(1);
-}
+#custom-tooltip-v9.active { opacity: 1; visibility: visible; }
 
-.custom-tooltip::after {
+#custom-tooltip-v9::after {
     content: "";
     position: absolute;
     bottom: -8px;
@@ -1936,14 +1924,14 @@ a[href*="typebot.io"],
 /* AI WINDOW (LOCAL) */
 #aiWindow {
     position: fixed;
-    bottom: 180px;
+    bottom: 110px;
     right: 30px;
     width: 380px;
+    height: 580px;
     max-width: 90vw;
-    height: 550px;
     background: #ffffff;
     border-radius: 20px;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
     z-index: 2147483647 !important;
     display: flex;
     flex-direction: column;
@@ -1956,41 +1944,44 @@ a[href*="typebot.io"],
 
 #aiWindow.active { opacity: 1; visibility: visible; transform: translateY(0); }
 
-/* PROTECAO CONTRA ESCALA NO CHAT */
-.ai-avatar-mini {
+.ai-header {
+    background: #1a1a1a;
+    color: #fff;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 2px solid #FF6B00;
+}
+
+.mini-avatar {
     width: 35px !important;
     height: 35px !important;
-    transform: none !important;
-    object-fit: contain;
+    transform: none !important; /* PROTECAO TOTAL */
+    border-radius: 50%;
+    background: white;
 }
 
 #aiBody {
     flex: 1;
     padding: 15px;
     overflow-y: auto;
-    background: #fdfdfd;
-}
-
-.chat-bubble {
-    padding: 10px 15px;
-    border-radius: 15px;
-    font-size: 0.95rem;
-    margin-bottom: 10px;
-    max-width: 85%;
+    background: #fff;
+    color: #333;
 }
 
 .ai-footer {
-    padding: 10px 15px;
-    background: #f0f0f0;
+    padding: 12px;
+    background: #f8f9fa;
     display: flex;
     gap: 10px;
+    border-top: 1px solid #eee;
 }
 
 #aiInput {
     flex: 1;
-    padding: 10px 15px;
     border: 1px solid #ddd;
+    padding: 10px 15px;
     border-radius: 20px;
-    outline: none;
 }
 
