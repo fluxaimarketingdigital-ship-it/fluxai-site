@@ -1,4 +1,4 @@
-﻿/* CUSTOM SCROLLBAR - PadrÃ£o FluxAI */
+﻿/* CUSTOM SCROLLBAR - Padrão FluxAI */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-white); }
 ::-webkit-scrollbar-thumb { 
@@ -74,7 +74,7 @@ body {
   background-color: var(--bg-white);
   line-height: 1.5;
   overflow-x: hidden;
-  opacity: 0; /* ComeÃ§a invisÃ­vel para o fade-in */
+  opacity: 0; /* Começa invisível para o fade-in */
   transition: opacity 1s ease;
 }
 body.loaded {
@@ -273,7 +273,7 @@ a {
 }
 .logo-img {
   height: 190px;
-  /* Se a logo do cliente for escura ou colorida, ficarÃ¡ linda aqui */
+  /* Se a logo do cliente for escura ou colorida, ficará linda aqui */
 }
 
 .menu {
@@ -332,7 +332,7 @@ a {
 
 .hero-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr; /* ProporÃ§Ã£o mais equilibrada */
+  grid-template-columns: 1.1fr 0.9fr; /* Proporção mais equilibrada */
   gap: 80px;
   align-items: center;
 }
@@ -629,7 +629,7 @@ a {
 .marquee-group {
   display: flex;
   gap: 60px;
-  padding-right: 60px; /* MantÃ©m o gap correto pro prÃ³ximo grupo copiar */
+  padding-right: 60px; /* Mantém o gap correto pro próximo grupo copiar */
   align-items: center;
 }
 .marquee-group img {
@@ -685,7 +685,7 @@ a {
 }
 .sobre-grid {
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr; /* Invertido para balanÃ§o visual com o texto */
+  grid-template-columns: 1.1fr 0.9fr; /* Invertido para balanço visual com o texto */
   gap: 80px;
   align-items: center;
 }
@@ -749,7 +749,7 @@ a {
   letter-spacing: 0.5px;
 }
 
-/* TÃTULOS DE SEÃ‡ÃƒO */
+/* TÃTULOS DE SEÇÃƒO */
 .section-title {
   max-width: 800px;
   margin: 0 auto 48px;
@@ -758,7 +758,7 @@ a {
   font-size: clamp(2.2rem, 3.8vw, 3.2rem); 
   font-weight: 800;
   letter-spacing: -1.2px;
-  margin-top: 8px; /* EspaÃ§o harmÃ´nico com o label superior */
+  margin-top: 8px; /* Espaço harmônico com o label superior */
   margin-bottom: 0;
   line-height: 1.1;
 }
@@ -767,7 +767,7 @@ a {
   font-size: 1.1rem;
 }
 
-/* SERVIÃ‡OS */
+/* SERVIÇOS */
 .services-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -920,7 +920,7 @@ a {
 /* =========================================================================
    19. OVERRIDES DE WIDGETS EXTERNOS (ELFSIGHT)
    ========================================================================= */
-/* Tenta ocultar o cabeÃ§alho e marca d'Ã¡gua do Elfsight no plano gratuito */
+/* Tenta ocultar o cabeçalho e marca d'água do Elfsight no plano gratuito */
 div[class*="elfsight-app"] [class*="eapps-instagram-feed-header"],
 div[class*="elfsight-app"] [class*="eapps-instagram-feed-title"],
 div[class*="elfsight-app"] [class*="Title__Container"],
@@ -1158,7 +1158,7 @@ a[href*="elfsight.com"],
   border-radius: 24px;
   padding: 60px 40px;
   box-shadow: var(--shadow-lg);
-  transform: translateY(40px); /* SobrepÃµe levemente o footer */
+  transform: translateY(40px); /* Sobrepõe levemente o footer */
   position: relative;
   z-index: 10;
 }
@@ -1181,7 +1181,7 @@ a[href*="elfsight.com"],
   line-height: 1.7;
 }
 
-/* FORMULÃRIO DE CAPTAÃ‡ÃƒO */
+/* FORMULÃRIO DE CAPTAÇÃƒO */
 .contact-form {
   display: flex;
   flex-direction: column;
@@ -1334,7 +1334,7 @@ a[href*="elfsight.com"],
 
 
 
-/* ANIMAÃ‡ÃƒO DE REVEAL AO SCROLLAR */
+/* ANIMAÇÃƒO DE REVEAL AO SCROLLAR */
 .reveal {
   opacity: 0;
   transform: translateY(30px);
@@ -1750,7 +1750,7 @@ a[href*="elfsight.com"],
   }
 }
 
-/* MASCOTE FLUTUANTE LUXURY (Sem cÃ­rculos, livre na tela) */
+/* MASCOTE FLUTUANTE LUXURY (Sem círculos, livre na tela) */
 .floating-mascot-container {
     position: fixed;
     bottom: 30px;
@@ -1786,7 +1786,7 @@ a[href*="elfsight.com"],
     filter: brightness(1.2);
 }
 
-/* Ajuste para nÃ£o colidir com o WhatsApp se necessÃ¡rio */
+/* Ajuste para não colidir com o WhatsApp se necessário */
 @media (max-width: 768px) {
     .floating-mascot-container {
         bottom: 85px;
@@ -1810,7 +1810,7 @@ a[href*="typebot.io"],
     overflow: hidden !important;
 }
 
-/* Tooltip Customizado (Caixa de DiÃ¡logo) */
+/* Tooltip Customizado (Caixa de Diálogo) */
 .custom-tooltip {
     position: fixed;
     bottom: 110px; /* Ajustado para ficar acima do mascote maior */
@@ -1861,127 +1861,62 @@ a[href*="typebot.io"],
 }
 
 
-/* --- MASCOTE FLUTUANTE LUXURY (V9 - FINAL FIX) --- */
-#hugeMascotContainer {
-    position: fixed;
-    bottom: 105px; /* Alinhado acima do WhatsApp */
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    z-index: 9999;
-    cursor: pointer;
+
+/* WELCOME POPUP PREMIUM */
+.welcome-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.85); z-index: 999999;
+  opacity: 0; visibility: hidden; transition: 0.5s; backdrop-filter: blur(8px);
 }
+.welcome-overlay.active { opacity: 1; visibility: visible; }
 
-#hugeMascotImg {
-    width: 60px;
-    height: 60px;
-    transform: scale(3.5);
-    transform-origin: bottom center;
-    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.5));
-    animation: floating-v9 3s infinite ease-in-out;
+.welcome-popup {
+  position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.9);
+  width: 450px; max-width: 90vw; background: #1a1a1a; border-radius: 24px;
+  z-index: 1000000; padding: 30px; border: 1px solid rgba(255,107,0,0.3);
+  opacity: 0; visibility: hidden; transition: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 40px 100px rgba(0,0,0,0.8);
 }
+.welcome-popup.active { opacity: 1; visibility: visible; transform: translate(-50%, -50%) scale(1); }
+.welcome-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+.welcome-header h3 { color: #FF6B00; font-weight: 800; margin: 0; font-size: 1.2rem; }
+.welcome-close { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; }
+.welcome-title { color: #fff; font-size: 1.6rem; margin-bottom: 10px; font-weight: 900; }
+.welcome-desc { color: #ccc; line-height: 1.6; margin-bottom: 20px; font-size: 0.95rem; }
+.highlight { color: #FF6B00; }
 
-@keyframes floating-v9 {
-    0% { transform: scale(3.5) translateY(0); }
-    50% { transform: scale(3.6) translateY(-15px); }
-    100% { transform: scale(3.5) translateY(0); }
+/* MASCOTE MASRTER (V10 SCALE 5.0) */
+#fluxBotTrigger {
+    position: fixed; bottom: 120px; right: 180px; width: 60px; height: 60px; cursor: pointer; z-index: 1050;
 }
-
-#custom-tooltip-v9 {
-    position: fixed;
-    bottom: 220px; /* Acima da cabeca do mascote escala 3.5 */
-    right: 40px;
-    background: #1a1a1a;
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: 15px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    line-height: 1.4;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-    border: 1px solid #FF6B00;
-    z-index: 10000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.4s ease;
+#fluxBotImg {
+    width: 100%; height: 100%; object-fit: contain; transform: scale(5.0); transform-origin: center;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6)); animation: flux-wave 2.5s infinite ease-in-out;
 }
-
-#custom-tooltip-v9.active { opacity: 1; visibility: visible; }
-
-#custom-tooltip-v9::after {
-    content: "";
-    position: absolute;
-    bottom: -8px;
-    right: 25px;
-    width: 16px;
-    height: 16px;
-    background: #1a1a1a;
-    border-right: 1px solid #FF6B00;
-    border-bottom: 1px solid #FF6B00;
-    transform: rotate(45deg);
+@keyframes flux-wave {
+    0% { transform: scale(5.0) rotate(0deg); }
+    25% { transform: scale(5.1) rotate(5deg); }
+    50% { transform: scale(5.0) rotate(0deg); }
+    75% { transform: scale(5.1) rotate(-5deg); }
+    100% { transform: scale(5.0) rotate(0deg); }
 }
-
-/* AI WINDOW (LOCAL) */
-#aiWindow {
-    position: fixed;
-    bottom: 110px;
-    right: 30px;
-    width: 380px;
-    height: 580px;
-    max-width: 90vw;
-    background: #ffffff;
-    border-radius: 20px;
-    box-shadow: 0 25px 60px rgba(0,0,0,0.5);
-    z-index: 2147483647 !important;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateY(20px);
-    transition: all 0.4s ease;
+#fluxTooltip {
+    position: absolute; bottom: 250px; right: 0px; background: #1a1a1a; color: #fff; padding: 12px 20px;
+    border-radius: 15px; font-size: 0.85rem; border: 1px solid #FF6B00; opacity: 0; visibility: hidden; transition: 0.5s;
+    width: 200px; text-align: center;
 }
+#fluxTooltip.active { opacity: 1; visibility: visible; }
 
-#aiWindow.active { opacity: 1; visibility: visible; transform: translateY(0); }
-
-.ai-header {
-    background: #1a1a1a;
-    color: #fff;
-    padding: 15px 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    border-bottom: 2px solid #FF6B00;
+/* CHAT WINDOW UNIFIED */
+#fluxChatWindow {
+    position: fixed; bottom: 300px; right: 30px; width: 380px; height: 550px; max-width: 90vw;
+    background: #fff; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+    display: none; flex-direction: column; overflow: hidden; border: 1px solid rgba(0,0,0,0.1); z-index: 1000001;
 }
-
-.mini-avatar {
-    width: 35px !important;
-    height: 35px !important;
-    transform: none !important; /* PROTECAO TOTAL */
-    border-radius: 50%;
-    background: white;
-}
-
-#aiBody {
-    flex: 1;
-    padding: 15px;
-    overflow-y: auto;
-    background: #fff;
-    color: #333;
-}
-
-.ai-footer {
-    padding: 12px;
-    background: #f8f9fa;
-    display: flex;
-    gap: 10px;
-    border-top: 1px solid #eee;
-}
-
-#aiInput {
-    flex: 1;
-    border: 1px solid #ddd;
-    padding: 10px 15px;
-    border-radius: 20px;
-}
-
+#fluxChatWindow.active { display: flex; }
+.flux-header { background: #000; color: #fff; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FF6B00; }
+.flux-avatar-mini { width: 35px; height: 35px; border-radius: 50%; }
+#fluxMessages { flex: 1; padding: 20px; overflow-y: auto; background: #fff; }
+.flux-footer { padding: 15px; background: #f8f9fa; display: flex; gap: 10px; border-top: 1px solid #eee; }
+#fluxInput { flex: 1; border: 1px solid #ddd; padding: 12px; border-radius: 25px; outline: none; }
+.flux-send { width: 45px; height: 45px; background: #FF6B00; color: #fff; border-radius: 50%; border: none; cursor: pointer; }
