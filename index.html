@@ -61,7 +61,7 @@
     <!-- End Meta Pixel Code -->
     <script>
       // BLOQUEIO PREVENTIVO DE INJEES EXTERNAS (Typebot GTM)
-      window.Typebot = { 
+      window.TypebotDisabled = { 
         initBubble: function() { console.log('Typebot injection blocked by local assistant.'); },
         initPopup: function() { console.log('Typebot injection blocked by local assistant.'); }
       };
@@ -387,7 +387,7 @@ fbq('track', 'ViewContent');
           </div>
           <div class="service-card reveal" data-service="strategy" style="transition-delay: 500ms;">
             <div class="service-icon"><i class="fa-solid fa-handshake-angle"></i></div>
-            <h3>estratégia & Dados</h3>
+            <h3>Estratégia & Dados</h3>
             <p>Google Analytics e inteligência de dados para escalar com segurança.</p>
             <span class="service-link">Ver Detalhes <i class="fa-solid fa-plus"></i></span>
           </div>
@@ -652,30 +652,9 @@ fbq('track', 'ViewContent');
   <!-- Style moved -->
 
   
-  <div id="fluxBotTrigger">
-    <div id="fluxTooltip">
-      Sou seu assistente <strong>Flux</strong>,<br>clique aqui para eu te ajudar.
-    </div>
-    <img src="https://fluxaidigital.com.br/fluxo.png" id="fluxBotImg" alt="Flux Assistente">
-  </div>
+  <!-- fluxBotTrigger removed to allow GTM Typebot -->
 
-  <div id="fluxChatWindow">
-    <div class="flux-header">
-      <div style="display:flex; align-items:center; gap:12px;">
-        <img src="https://fluxaidigital.com.br/fluxo.png" class="flux-avatar-mini" alt="Flux">
-        <div>
-          <div style="font-weight:800; font-size:0.95rem;">Assistente Flux</div>
-          <div style="font-size:0.75rem; color:#00ff88;">● Online agora</div>
-        </div>
-      </div>
-      <button id="closeFluxChat" style="background:none; border:none; color:#fff; cursor:pointer; font-size:1.5rem;">&times;</button>
-    </div>
-    <div id="fluxMessages"></div>
-    <div class="flux-footer">
-      <input type="text" id="fluxInput" placeholder="Como posso te ajudar hoje?">
-      <button class="flux-send" id="sendFluxBot">➤</button>
-    </div>
-  </div>
+  <!-- fluxChatWindow removed to allow GTM Typebot -->
 
 
   <!-- Botão Flutuante de WhatsApp -->
@@ -694,13 +673,9 @@ fbq('track', 'ViewContent');
     </div>
     <div class="welcome-content">
       <h3 class="welcome-title">Bem-vindo(a) ao Padrão <span class="highlight">FluxAI</span></h3>
-      <p class="welcome-desc">Você está a um passo de posicionar sua marca onde ela realmente merece estar: no topo. Veja nossas últimas atualizações em tempo real:</p>
+      <p class="welcome-desc">Você está a um passo de posicionar sua marca onde ela realmente merece estar: no topo. Veja nossas soluções e comece sua jornada estratégica:</p>
       
-      <div class="popup-ig-miniature" style="margin: 15px 0; width: 100%; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); max-height: 280px; overflow-y: auto;">
-        <div class="elfsight-app-d364afe3-5f47-4e9d-9693-8838f4143f53" data-elfsight-app-lazy></div>
-      </div>
-
-      <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline blink-brand" style="width:100%; text-align:center;">
+      <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline blink-brand" style="width:100%; text-align:center; margin-top: 15px;">
         <i class="fa-brands fa-whatsapp"></i> Iniciar Diagnóstico
       </a>
     </div>

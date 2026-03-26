@@ -132,51 +132,20 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeServiceModal) closeServiceModal.addEventListener('click', hideServiceModal);
     if (modalOverlay) modalOverlay.addEventListener('click', hideServiceModal);
 
-    // 8. UNIFIED FLUX BOT (RESTAURAÇÃO V10)
-    const initFluxBot = () => {
-        const trigger = document.getElementById('fluxBotTrigger');
-        const win = document.getElementById('fluxChatWindow');
-        const close = document.getElementById('closeFluxChat');
-        const send = document.getElementById('sendFluxBot');
-        const input = document.getElementById('fluxInput');
-        const msgs = document.getElementById('fluxMessages');
-        const tooltip = document.getElementById('fluxTooltip');
-
-        if (!trigger || !win) return;
-
-        const appendMsg = (text, sender) => {
-            const d = document.createElement('div');
-            d.style.marginBottom = '15px';
-            d.style.textAlign = sender === 'user' ? 'right' : 'left';
-            d.innerHTML = `<span style="display:inline-block; padding:12px 18px; border-radius:18px; max-width:85%; background:${sender === 'user' ? '#FF6B00' : '#f1f1f1'}; color:${sender === 'user' ? '#fff' : '#1a1a1a'}; font-size:0.95rem;">${text}</span>`;
-            msgs.appendChild(d);
-            msgs.scrollTop = msgs.scrollHeight;
-        };
-
-        trigger.addEventListener('click', () => {
-            win.classList.add('active');
-            if (tooltip) tooltip.classList.remove('active');
-            if (msgs.children.length === 0) {
-                setTimeout(() => appendMsg('Olá! Sou o <b>Flux</b>, seu assistente da FluxAI. 🚀<br>No que posso te ajudar hoje?', 'ai'), 600);
-            }
+    // 8. DIAGNOSTICO FORM (WHATSAPP REDIRECT)
+    const diagnosticoForm = document.getElementById('diagnosticoForm');
+    if (diagnosticoForm) {
+        diagnosticoForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const wpp = document.getElementById('whatsapp').value;
+            const inst = document.getElementById('instagram').value;
+            const des = document.getElementById('desafio').value;
+            
+            const msg = `Olá! Tenho interesse no Diagnóstico Estratégico.%0A%0A*Nome:* ${nome}%0A*WhatsApp:* ${wpp}%0A*Instagram:* ${inst}%0A*Meu Desafio:* ${des}`;
+            window.open(`https://wa.me/5571981114694?text=${msg}`, '_blank');
         });
-
-        if (close) close.addEventListener('click', () => win.classList.remove('active'));
-
-        const handleSend = () => {
-            const val = input.value.trim();
-            if (!val) return;
-            appendMsg(val, 'user');
-            input.value = '';
-            setTimeout(() => appendMsg('Entendi! Vou analisar sua dúvida e te conectar a um especialista.', 'ai'), 1000);
-        };
-
-        if (send) send.addEventListener('click', handleSend);
-        if (input) input.addEventListener('keypress', (e) => { if(e.key === 'Enter') handleSend(); });
-
-        setTimeout(() => { if(tooltip) tooltip.classList.add('active'); }, 2000);
-    };
-    initFluxBot();
+    }
 
     // 9. WELCOME POPUP
     const initWelcomePopup = () => {
