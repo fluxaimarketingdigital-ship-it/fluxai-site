@@ -672,23 +672,43 @@ fbq('track', 'ViewContent');
     }
   </style>
 
+  <!-- Custom Typebot Window -->
+  <div id="customTypebotWindow" style="display: none; position: fixed; bottom: 120px; right: 30px; width: 380px; height: 600px; max-width: 90vw; background: #0d0d0d; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 2000001; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); flex-direction: column;">
+    <div style="background: #1a1a1a; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FF6B00;">
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <img src="https://fluxaidigital.com.br/fluxo.png" style="width: 30px; height: 30px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));" alt="Flux">
+        <div>
+          <strong style="color: #fff; font-size: 0.95rem;">Assistente FluxAI</strong>
+          <div style="color: #00ff88; font-size: 0.75rem;">● Online agora</div>
+        </div>
+      </div>
+      <button id="closeCustomTypebot" style="background: transparent; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; padding: 0 5px;">&times;</button>
+    </div>
+    <div id="typebot-container" style="width: 100%; flex-grow: 1;"></div>
+  </div>
+
   <script type="module">
     import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0.3/dist/web.js'
 
-    Typebot.initPopup({
-      typebot: "basic-chat-gpt-9t1avfj",
+    Typebot.initStandard({
       apiHost: "https://typebot.co",
+      typebot: "basic-chat-gpt-9t1avfj",
       theme: {
         chatWindow: {
           backgroundColor: "#0d0d0d"
         }
       }
-    });
+    }, document.getElementById('typebot-container'));
 
+    const botWin = document.getElementById('customTypebotWindow');
     document.getElementById('fluxBotTrigger').addEventListener('click', () => {
-      Typebot.open();
+      botWin.style.display = 'flex';
       const tooltip = document.getElementById('fluxTooltip');
       if(tooltip) tooltip.style.display = 'none';
+    });
+    
+    document.getElementById('closeCustomTypebot').addEventListener('click', () => {
+      botWin.style.display = 'none';
     });
   </script>
 
