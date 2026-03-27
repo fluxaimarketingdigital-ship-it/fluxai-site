@@ -702,13 +702,19 @@ fbq('track', 'ViewContent');
 
     const botWin = document.getElementById('customTypebotWindow');
     const openBot = () => {
-      botWin.style.display = 'flex';
+      console.log('Abrindo Chatbot FluxAI...');
+      botWin.setAttribute('style', 'display: flex !important; position: fixed; bottom: 120px; right: 30px; width: 380px; height: 600px; max-width: 90vw; background: #0d0d0d; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 2000001; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); flex-direction: column;');
       const tooltip = document.getElementById('fluxTooltip');
       if(tooltip) tooltip.style.display = 'none';
     };
     
-    document.getElementById('fluxBotTrigger').addEventListener('click', openBot);
+    document.getElementById('fluxBotTrigger').addEventListener('click', (e) => {
+      console.log('Trigger clicado');
+      openBot();
+    });
+    
     document.getElementById('fluxBotImg').addEventListener('click', (e) => {
+      console.log('Imagem clicada');
       e.stopPropagation();
       openBot();
     });
