@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR" prefix="og: http://ogp.me/ns#">
 <head>
-    <meta charset="UTF-8">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
@@ -60,15 +59,8 @@
     /></noscript>
     <!-- End Meta Pixel Code -->
     <script>
-      // BLOQUEIO PREVENTIVO DE INJEES EXTERNAS (Typebot GTM)
-      window.TypebotDisabled = { 
-        initBubble: function() { console.log('Typebot injection blocked by local assistant.'); },
-        initPopup: function() { console.log('Typebot injection blocked by local assistant.'); }
-      };
+      fbq('track', 'ViewContent');
     </script>
-    <script>
-fbq('track', 'ViewContent');
-</script>
 
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="favicon.png" />
@@ -78,7 +70,7 @@ fbq('track', 'ViewContent');
     <meta name="theme-color" content="#FF6B00" />
     
     <meta name="description" content="FluxAI: agência de marketing digital especializada em branding high-ticket, Tráfego pago com remarketing e inteligência artificial aplicada." />
-  <meta name="keywords" content="marketing digital, posicionamento, agência, conteúdo" />
+    <meta name="keywords" content="marketing digital, posicionamento, agência, conteúdo" />
   
   <!-- Fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -118,7 +110,6 @@ fbq('track', 'ViewContent');
     .welcome-popup { position: fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:450px; max-width:90vw; background:#1a1a1a; color:#fff; padding:30px; border-radius:24px; z-index:999999; opacity:0; visibility:hidden; transition:0.5s; }
     .welcome-popup.active { opacity:1; visibility:visible; }
   </style>
-
 </head>
 <body>
 
@@ -441,7 +432,6 @@ fbq('track', 'ViewContent');
     </section>
 
     <!-- Diferenciais -->
-    <!-- Diferenciais -->
     <section class="section-light" id="Diferenciais">
       <div class="container">
         <div class="section-title text-center reveal">
@@ -632,7 +622,6 @@ fbq('track', 'ViewContent');
   </footer>
 
   <!-- Modal de Serviços -->
-
   <div class="welcome-overlay" id="serviceModalOverlay"></div>
   <div class="welcome-popup" id="serviceModal">
     <div class="welcome-header">
@@ -644,16 +633,7 @@ fbq('track', 'ViewContent');
     </div>
   </div>
 
-
-  <!-- Style moved -->
-
-  
-  <!-- fluxBotTrigger removed to allow GTM Typebot -->
-
-  <!-- fluxChatWindow removed to allow GTM Typebot -->
-
-
-  <!-- Assistente Flutuante (IA LUXURY) - TYPEBOT OFICIAL (Groq Integrado) -->
+  <!-- Assistente Flutuante (IA LUXURY) -->
   <div id="fluxBotTrigger" style="position: fixed; bottom: 20px; right: 140px; width: 80px; height: 80px; cursor: pointer; z-index: 2000000; display: flex; align-items: center; justify-content: center;">
     <div id="fluxTooltip" class="active" style="position: absolute; bottom: 120px; right: 320%; background: #1a1a1a; color: #fff; padding: 12px 18px; border-radius: 15px; font-size: 0.85rem; border: 1px solid #FF6B00; white-space: normal; width: 220px; text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5); line-height: 1.4; pointer-events: none;">
       Sou seu assistente <strong>Flux</strong>,<br>clique aqui para eu te ajudar.
@@ -666,10 +646,15 @@ fbq('track', 'ViewContent');
       0%, 100% { transform: scale(4.5) rotate(0deg); }
       50% { transform: scale(4.7) rotate(3deg); }
     }
+    #customTypebotWindow {
+      display: none; position: fixed; bottom: 120px; right: 30px; width: 380px; height: 600px;
+      max-width: 90vw; background: #0d0d0d; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+      z-index: 2000001; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); flex-direction: column;
+    }
   </style>
 
   <!-- Custom Typebot Window -->
-  <div id="customTypebotWindow" style="display: none; position: fixed; bottom: 120px; right: 30px; width: 380px; height: 600px; max-width: 90vw; background: #0d0d0d; border-radius: 15px; box-shadow: 0 15px 40px rgba(0,0,0,0.6); z-index: 2000001; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); flex-direction: column;">
+  <div id="customTypebotWindow">
     <div style="background: #1a1a1a; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #FF6B00;">
       <div style="display: flex; align-items: center; gap: 10px;">
         <img src="https://fluxaidigital.com.br/fluxo.png" style="width: 30px; height: 30px; object-fit: contain; filter: drop-shadow(0 0 5px rgba(255,255,255,0.2));" alt="Flux">
@@ -686,14 +671,12 @@ fbq('track', 'ViewContent');
   <script type="module">
     import Typebot from 'https://cdn.jsdelivr.net/npm/@typebot.io/js@0.3/dist/web.js'
 
-
     const botWin = document.getElementById('customTypebotWindow');
     let botInitialized = false;
 
     const openBot = () => {
       console.log('Abrindo Chatbot FluxAI...');
       botWin.style.display = 'flex';
-      botWin.style.flexDirection = 'column';
       const tooltip = document.getElementById('fluxTooltip');
       if(tooltip) tooltip.style.display = 'none';
 
@@ -707,15 +690,7 @@ fbq('track', 'ViewContent');
       }
     };
     
-    document.getElementById('fluxBotTrigger').addEventListener('click', (e) => {
-      openBot();
-    });
-    
-    document.getElementById('fluxBotImg').addEventListener('click', (e) => {
-      e.stopPropagation();
-      openBot();
-    });
-    
+    document.getElementById('fluxBotTrigger').addEventListener('click', openBot);
     document.getElementById('closeCustomTypebot').addEventListener('click', () => {
       botWin.style.display = 'none';
     });
@@ -728,7 +703,7 @@ fbq('track', 'ViewContent');
 
   <script src="script.js"></script>
 
-  <!-- Welcome Pop-up (Revolucionar) -->
+  <!-- Welcome Pop-up -->
   <div class="welcome-overlay" id="welcomeOverlay"></div>
   <div class="welcome-popup" id="welcomePopup">
     <div class="welcome-header">
@@ -737,7 +712,7 @@ fbq('track', 'ViewContent');
     </div>
     <div class="welcome-content">
       <h3 class="welcome-title">Bem-vindo(a) ao Padrão <span class="highlight">FluxAI</span></h3>
-      <p class="welcome-desc">Você está a um passo de posicionar sua marca onde ela realmente merece estar: no topo. Veja nossas soluções e comece sua jornada estratégica:</p>
+      <p class="welcome-desc">Você está a um passo de posicionar sua marca onde ela realmente merece estar. Inicie seu diagnóstico estratégico agora:</p>
       
       <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline blink-brand" style="width:100%; text-align:center; margin-top: 15px;">
         <i class="fa-brands fa-whatsapp"></i> Iniciar Diagnóstico
@@ -745,12 +720,5 @@ fbq('track', 'ViewContent');
     </div>
   </div>
 
-
-
-
 </body>
 </html>
-
-
-
-
