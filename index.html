@@ -80,36 +80,8 @@
 
   <link rel="stylesheet" href="style.css" />
 
-  <style id="rescue-styles">
-    #fluxBotImg { 
-      width: 100%; height: 100%; object-fit: contain; transform: scale(5.0) !important; 
-      transform-origin: center; filter: drop-shadow(0 20px 40px rgba(0,0,0,0.6));
-      animation: flux-wave-rescue 2.5s infinite ease-in-out;
-    }
-    @keyframes flux-wave-rescue {
-      0%, 100% { transform: scale(5.0) rotate(0deg); }
-      50% { transform: scale(5.2) rotate(3deg); }
-    }
-    #fluxTooltip {
-      position: fixed; bottom: 250px; right: 80px; background: #1a1a1a; color: #fff;
-      padding: 12px 20px; border-radius: 15px; font-size: 0.9rem; border: 1px solid #FF6B00;
-      opacity: 0; visibility: hidden; transition: 0.5s; z-index: 2000001;
-    }
-    #fluxTooltip.active { opacity: 1; visibility: visible; }
-    
-    #fluxChatWindow {
-      position: fixed; bottom: 300px; right: 30px; width: 380px; height: 550px;
-      background: #fff; border-radius: 24px; box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-      display: none; flex-direction: column; overflow: hidden; z-index: 2000002;
-      border: 1px solid rgba(0,0,0,0.1);
-    }
-    #fluxChatWindow.active { display: flex !important; }
-    
-    .welcome-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:999998; opacity:0; visibility:hidden; transition:0.5s; }
-    .welcome-overlay.active { opacity:1; visibility:visible; }
-    .welcome-popup { position: fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:450px; max-width:90vw; background:#1a1a1a; color:#fff; padding:30px; border-radius:24px; z-index:999999; opacity:0; visibility:hidden; transition:0.5s; }
-    .welcome-popup.active { opacity:1; visibility:visible; }
-  </style>
+    <!-- Google Search Console -->
+    <meta name="google-site-verification" content="8wE_iY_f0Oa5-iZ_v8KjW9_v8KjW9_v8KjW9_v8" />
 </head>
 <body>
 
@@ -137,7 +109,7 @@
         <a href="https://instagram.com/fluxai.mark" target="_blank" class="nav-icon" aria-label="Instagram FluxAI">
           <i class="fa-brands fa-instagram"></i>
         </a>
-        <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline blink-brand" rel="noopener noreferrer">
+        <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline blink-brand" rel="noopener noreferrer" onclick="fbq('track', 'Contact');">
           Falar no WhatsApp
         </a>
         <button class="menu-toggle" id="menuToggle" aria-label="Abrir menu">
@@ -217,6 +189,7 @@
               <img src="parceiro-03.png" alt="Parceiro 3" />
               <img src="parceiro-04.png" alt="Parceiro 4" />
               <img src="parceiro-05.png" alt="Parceiro 5" />
+              <img src="parceiro-06.png" alt="Parceiro 6" />
             </div>
             <!-- Grupo 2 copia idêntica para o loop perfeito -->
             <div class="marquee-group">
@@ -225,6 +198,7 @@
               <img src="parceiro-03.png" alt="Parceiro 3" />
               <img src="parceiro-04.png" alt="Parceiro 4" />
               <img src="parceiro-05.png" alt="Parceiro 5" />
+              <img src="parceiro-06.png" alt="Parceiro 6" />
             </div>
           </div>
         </div>
@@ -581,7 +555,7 @@
           <a href="https://www.linkedin.com/company/fluxaidigital" target="_blank" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
           <a href="https://instagram.com/fluxai.mark" target="_blank" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
           <a href="https://www.facebook.com/fluxaidigital" target="_blank" aria-label="Facebook"><i class="fa-brands fa-facebook"></i></a>
-          <a href="https://wa.me/5571981114694" target="_blank" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+          <a href="https://wa.me/5571981114694" target="_blank" aria-label="WhatsApp" onclick="fbq('track', 'Contact');"><i class="fa-brands fa-whatsapp"></i></a>
           <a href="https://fluxaidigital.com.br" target="_blank" aria-label="Website"><i class="fa-solid fa-globe"></i></a>
         </div>
       </div>
@@ -602,7 +576,7 @@
       </div>
       <div class="footer-col links">
         <h4>Contato Direct</h4>
-        <a href="https://wa.me/5571981114694" target="_blank"><i class="fa-brands fa-whatsapp"></i> Clique para WhatsApp</a>
+        <a href="https://wa.me/5571981114694" target="_blank" onclick="fbq('track', 'Contact');"><i class="fa-brands fa-whatsapp"></i></a> Clique para WhatsApp
         <a href="https://www.linkedin.com/company/fluxaidigital" target="_blank"><i class="fa-brands fa-linkedin"></i> LinkedIn FluxAI</a>
         <a href="https://instagram.com/fluxai.mark" target="_blank"><i class="fa-brands fa-instagram"></i> Direct no Instagram</a>
         <a href="https://www.facebook.com/fluxaidigital" target="_blank"><i class="fa-brands fa-facebook"></i> Facebook FluxAI</a>
@@ -690,7 +664,7 @@
   </script>
 
   <!-- Botão Flutuante de WhatsApp -->
-  <a href="https://wa.me/5571981114694" target="_blank" class="fab-whatsapp" aria-label="WhatsApp" style="z-index: 2147483645;">
+  <a href="https://wa.me/5571981114694" target="_blank" class="fab-whatsapp" aria-label="WhatsApp" style="z-index: 2147483645;" onclick="fbq('track', 'Contact');">
     <i class="fa-brands fa-whatsapp"></i>
   </a>
 
@@ -707,7 +681,7 @@
       <h3 class="welcome-title">Bem-vindo(a) ao Padrão <span class="highlight">FluxAI</span></h3>
       <p class="welcome-desc">Você está a um passo de posicionar sua marca onde ela realmente merece estar. Inicie seu diagnóstico estratégico agora:</p>
       
-      <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline blink-brand" style="width:100%; text-align:center; margin-top: 15px;">
+      <a href="https://wa.me/5571981114694" target="_blank" class="btn btn-outline blink-brand" style="width:100%; text-align:center; margin-top: 15px;" onclick="fbq('track', 'Contact');">
         <i class="fa-brands fa-whatsapp"></i> Iniciar Diagnóstico
       </a>
     </div>

@@ -1,4 +1,4 @@
-﻿/* CUSTOM SCROLLBAR - Padrão FluxAI */
+/* CUSTOM SCROLLBAR - Padrão FluxAI */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-white); }
 ::-webkit-scrollbar-thumb { 
@@ -53,7 +53,7 @@
   transition: filter 0.4s ease;
 }
 [data-theme="dark"] .partners img {
-  filter: brightness(0) invert(1);
+  filter: brightness(0) invert(0.7); /* Cinza claro no modo escuro */
   opacity: 0.85;
 }
 
@@ -633,10 +633,10 @@ a {
   align-items: center;
 }
 .marquee-group img {
-  height: 44px;
+  height: 50px;
   width: auto;
   object-fit: contain;
-  filter: brightness(0) opacity(0.5);
+  filter: brightness(0) opacity(0.5); /* Cinza escuro */
   transition: var(--transition);
 }
 .marquee-group img:hover {
