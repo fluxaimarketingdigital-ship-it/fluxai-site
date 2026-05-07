@@ -131,11 +131,11 @@ a {
 .section-white { background-color: var(--bg-white); padding: 100px 0; position: relative; transition: background-color 0.8s ease; }
 .section-light { background-color: var(--bg-slate); padding: 100px 0; position: relative; transition: background-color 0.8s ease; }
 
-/* REVEAL SYSTEM - Consolidado */
+/* REVEAL SYSTEM - Suavidade Cinematográfica */
 .reveal {
   opacity: 0;
   transform: translateY(20px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity 1.2s cubic-bezier(0.2, 0.8, 0.2, 1), transform 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .reveal.active {
   opacity: 1;
@@ -235,10 +235,10 @@ a {
   top: 0;
   left: 0;
   width: 100%;
-  padding: 20px 0;
+  padding: 30px 0; /* Mais respiro inicial (Designer Touch) */
   z-index: 1000;
   transition: var(--transition);
-  background: rgba(255, 255, 255, 0.85); /* Fundo claro transparente */
+  background: rgba(255, 255, 255, 0.85);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid transparent;
 }
@@ -434,14 +434,16 @@ a {
 
 @media (max-width: 768px) {
   .hero-main-img {
-    transform: translate(-50px, 20px);
-    width: 150%;
+    transform: translate(0, 20px); /* Centralizado no mobile */
+    width: 110%; /* Escala mais equilibrada */
+    max-width: none;
+    margin: 0 auto;
     animation: floatWomanMobile 10s ease-in-out infinite;
   }
 }
 @keyframes floatWomanMobile {
-  0%, 100% { transform: translate(-120px, 40px); }
-  50% { transform: translate(-120px, 20px); }
+  0%, 100% { transform: translateY(40px); }
+  50% { transform: translateY(20px); }
 }
 
 /* AI ASSISTANT COMPONENT */
