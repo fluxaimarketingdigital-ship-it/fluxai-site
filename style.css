@@ -486,48 +486,59 @@ a {
 .ai-btn:hover img {
   transform: translateY(5px) scale(1.1);
 }
-/* PIPELINE OPERACIONAL - Estilo Editorial */
-.pipeline { padding: 120px 0; }
-.pipeline-grid {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 20px;
+/* FLUXAI OS - Estética de Núcleos Operacionais */
+.os-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 40px;
   margin-top: 60px;
 }
-.step-item {
-  flex: 1;
-  text-align: center;
-  position: relative;
+.os-core {
+  background: var(--bg-dark);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--transition);
 }
-.step-item span {
+.os-core:hover {
+  border-color: var(--secondary);
+  box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+}
+.os-header {
+  padding: 30px;
+  background: rgba(107, 122, 69, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 1px solid var(--border);
+}
+.os-header i { font-size: 1.5rem; color: var(--secondary); }
+.os-header h3 { font-size: 1.4rem; color: #fff; margin: 0; }
+
+.os-content { padding: 30px; }
+.os-item {
+  padding: 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+.os-item:last-child { border-bottom: none; }
+.os-item strong {
   display: block;
-  font-size: 0.8rem;
-  font-weight: 800;
+  font-family: 'Montserrat', sans-serif;
   color: var(--secondary);
-  margin-bottom: 12px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
   letter-spacing: 2px;
-}
-.step-item strong {
-  display: block;
-  font-size: 1.2rem;
-  color: var(--text-main);
   margin-bottom: 8px;
 }
-.step-item p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  line-height: 1.4;
-}
-.step-arrow {
-  color: var(--border);
-  font-size: 1.2rem;
-  opacity: 0.5;
+.os-item p {
+  color: var(--text-dark);
+  font-size: 0.95rem;
+  opacity: 0.8;
+  margin: 0;
 }
 
-@media (max-width: 992px) {
-  .pipeline-grid { flex-direction: column; gap: 40px; }
-  .step-arrow { transform: rotate(90deg); }
+@media (max-width: 768px) {
+  .os-grid { grid-template-columns: 1fr; }
 }
 /* Curiosity Ping */
 .ai-btn::after {
