@@ -36,16 +36,26 @@ document.addEventListener('DOMContentLoaded', () => {
         el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
     });
 
-    // 3. PARALLAX EFFECT
+    // 3. PARALLAX EFFECT (Optimized with requestAnimationFrame)
     const parallaxElements = document.querySelectorAll('.parallax-element');
+    let targetX = 0, targetY = 0;
+    let currentX = 0, currentY = 0;
+
     window.addEventListener('mousemove', (e) => {
-        const x = (e.clientX - window.innerWidth / 2) / 50;
-        const y = (e.clientY - window.innerHeight / 2) / 50;
+        targetX = (e.clientX - window.innerWidth / 2) / 50;
+        targetY = (e.clientY - window.innerHeight / 2) / 50;
+    });
+
+    const animateParallax = () => {
+        currentX += (targetX - currentX) * 0.1;
+        currentY += (targetY - currentY) * 0.1;
         parallaxElements.forEach(el => {
             const speed = el.getAttribute('data-speed') || 1;
-            el.style.transform = `translateX(${-x * speed}px) translateY(${-y * speed}px)`;
+            el.style.transform = `translateX(${-currentX * speed}px) translateY(${-currentY * speed}px)`;
         });
-    });
+        requestAnimationFrame(animateParallax);
+    };
+    animateParallax();
 
     // SCROLL REVEAL ANIMATION
     const revealObserver = new IntersectionObserver((entries) => {
@@ -105,18 +115,24 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeServiceModal = document.getElementById('closeServiceModal');
 
     const servicesData = {
-        branding: { title: "Identidade Visual & Branding", desc: "Design sofisticado e posicionamento premium.", features: ["Logo & Variações", "Paleta de Cores", "Brandbook"] },
-        social: { title: "Social Media & Gestão", desc: "Conteúdo que gera desejo e autoridade.", features: ["Planejamento", "Design High-Ticket", "Análise de Dados"] },
-        sites: { title: "Sites & SEO", desc: "Desenvolvimento de estruturas de alta conversão.", features: ["Sites & Landing Pages", "Otimização SEO", "Hospedagem Dedicada"] },
-        ads: { title: "Tráfego & Performance", desc: "Anúncios que colocam seu negócio no topo.", features: ["Google Ads", "Meta Ads", "Remarketing"] },
-        ia: { title: "Automação & Agentes de IA", desc: "Escala real no seu atendimento e conversão.", features: ["Chatbots Inteligentes", "Assistentes Virtuais", "Integração CRM"] },
-        strategy: { title: "Estratégia & Dados", desc: "Crescimento embasado em métricas precisas.", features: ["Diagnóstico Online", "Análise de Concorrência", "Relatórios de Performance"] }
+        positioning: { title: "FluxAI Positioning™", desc: "Arquitetura de autoridade e diferenciação de elite.", features: ["Narrativa Soberana", "Identidade Visual Premium", "Análise de Concorrência"] },
+        content: { title: "FluxAI Content Engine™", desc: "Engenharia de conteúdo focada em ativos de retenção.", features: ["Conteúdo de Alta Densidade", "Scripts Estratégicos", "Gestão de Ativos Digitais"] },
+        growth: { title: "FluxAI Growth System™", desc: "Infraestrutura de aquisição e escala de receita.", features: ["Tráfego Pago Especializado", "Funis de Alta Conversão", "Inteligência de Dados"] },
+        intelligence: { title: "FluxAI Intelligence Core™", desc: "Núcleo tecnológico de automação e IA aplicada.", features: ["Agentes Comerciais de IA", "Arquitetura de CRM", "Eficiência Operacional"] }
     };
 
-    document.querySelectorAll('.service-card').forEach(card => {
+    document.querySelectorAll('.service-card, .os-item').forEach(card => {
         card.addEventListener('click', () => {
-            const s = card.getAttribute('data-service');
-            const d = servicesData[s];
+            const s = card.getAttribute('data-service') || card.querySelector('strong')?.innerText.toLowerCase();
+            // Fallback for names
+            let d = servicesData[s];
+            if(!d) {
+                if(s?.includes('positioning')) d = servicesData.positioning;
+                if(s?.includes('content')) d = servicesData.content;
+                if(s?.includes('acquisition') || s?.includes('growth')) d = servicesData.growth;
+                if(s?.includes('intelligence') || s?.includes('ia')) d = servicesData.intelligence;
+            }
+
             if (d && modal && modalBody) {
                 modalBody.innerHTML = `<h3>${d.title}</h3><p style="margin-bottom:15px; color:#ccc;">${d.desc}</p><ul style="list-style:none; padding:0; margin:0;">${d.features.map(f => `<li style="margin-bottom:8px;"><i class="fa-solid fa-check" style="color:#FF6B00; margin-right:8px;"></i>${f}</li>`).join('')}</ul>`;
                 modal.classList.add('active');
@@ -162,7 +178,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 
-// 10. CLEAN UP ELFSIGHT BRANDING
-setInterval(() => {
+// 10. CLEAN UP ELFSIGHT BRANDING (Optimized with MutationObserver)
+const cleanElfsight = () => {
     document.querySelectorAll('a[href*="elfsight.com"], .eapps-link').forEach(el => el.remove());
-}, 1000);
+};
+
+const observer = new MutationObserver((mutations) => {
+    mutations.forEach(() => cleanElfsight());
+});
+
+observer.observe(document.body, { childList: true, subtree: true });
+cleanElfsight();

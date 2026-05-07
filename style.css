@@ -131,11 +131,11 @@ a {
 .section-white { background-color: var(--bg-white); padding: 100px 0; position: relative; transition: background-color 0.8s ease; }
 .section-light { background-color: var(--bg-slate); padding: 100px 0; position: relative; transition: background-color 0.8s ease; }
 
-/* SCROLL REVEAL - Editorial Entry (Subtle) */
+/* REVEAL SYSTEM - Consolidado */
 .reveal {
   opacity: 0;
-  transform: translateY(15px);
-  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1), transform 1s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(20px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 .reveal.active {
   opacity: 1;
@@ -144,11 +144,6 @@ a {
 .reveal-delay-1 { transition-delay: 0.1s; }
 .reveal-delay-2 { transition-delay: 0.2s; }
 .reveal-delay-3 { transition-delay: 0.3s; }
-
-/* REMOVED GLOW FOR EDITORIAL SOBER LOOK */
-.bg-aura {
-  display: none;
-}
 
 .section-top-label { 
   color: var(--text-light); 
@@ -231,7 +226,7 @@ a {
   perspective: 1000px;
 }
 .parallax-element {
-  transition: transform 0.1s ease-out;
+  transition: none; /* Handled by JS lerp for performance */
 }
 
 /* MENU HEADER */
@@ -941,11 +936,11 @@ a {
   filter: drop-shadow(0 15px 25px rgba(0,0,0,0.1));
 }
 .floating-bot {
-  animation: floatBot 6s ease-in-out infinite;
+  animation: floatGeneric 6s ease-in-out infinite;
 }
-@keyframes floatBot {
+@keyframes floatGeneric {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-20px); }
+  50% { transform: translateY(-15px); }
 }
 
 @media (max-width: 900px) {
@@ -1054,12 +1049,7 @@ a[href*="elfsight.com"],
   width: 100%;
   height: auto;
   filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
-  animation: floatMascot 6s ease-in-out infinite;
-}
-
-@keyframes floatMascot {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-15px); }
+  animation: floatGeneric 6s ease-in-out infinite;
 }
 
 @media (max-width: 1100px) {
@@ -1446,16 +1436,7 @@ a[href*="elfsight.com"],
 
 
 
-/* ANIMAÇÃƒO DE REVEAL AO SCROLLAR */
-.reveal {
-  opacity: 0;
-  transform: translateY(30px);
-  transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
-}
-.reveal.active {
-  opacity: 1;
-  transform: translateY(0);
-}
+/* REVEAL LOGIC ALREADY DEFINED ABOVE */
 
 /* RESPONSIVIDADE */
 @media (max-width: 1024px) {
