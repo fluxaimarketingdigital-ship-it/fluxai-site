@@ -1330,6 +1330,69 @@ a[href*="elfsight.com"],
 .footer-bottom {
   padding-top: 30px;
 }
+/* BLUEPRINT ARQUITETURAL - Estilo de Engenharia */
+.methodology { padding: 140px 0; }
+.blueprint-grid {
+  max-width: 900px;
+  margin: 80px auto 0;
+  position: relative;
+}
+.blueprint-grid::before {
+  content: '';
+  position: absolute;
+  left: 30px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(107, 122, 69, 0.2);
+}
+.blueprint-layer {
+  display: flex;
+  align-items: flex-start;
+  gap: 40px;
+  margin-bottom: 80px;
+  position: relative;
+}
+.blueprint-layer:last-child { margin-bottom: 0; }
+.layer-number {
+  width: 60px;
+  height: 60px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  color: var(--secondary);
+  font-size: 1.1rem;
+  z-index: 2;
+  transition: var(--transition);
+}
+.blueprint-layer:hover .layer-number {
+  background: var(--secondary);
+  color: #fff;
+  border-color: var(--secondary);
+}
+.layer-info h3 {
+  font-size: 1.6rem;
+  color: var(--text-main);
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+.layer-info p {
+  color: var(--text-muted);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  max-width: 650px;
+}
+
+@media (max-width: 768px) {
+  .blueprint-grid::before { left: 20px; }
+  .blueprint-layer { gap: 20px; }
+  .layer-number { width: 40px; height: 40px; font-size: 0.9rem; }
+  .layer-info h3 { font-size: 1.3rem; }
+}
 .footer-bottom-flex {
   display: flex;
   justify-content: space-between;
