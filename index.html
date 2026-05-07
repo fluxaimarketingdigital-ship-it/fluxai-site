@@ -82,6 +82,31 @@
 
     <!-- Google Search Console -->
     <meta name="google-site-verification" content="8wE_iY_f0Oa5-iZ_v8KjW9_v8KjW9_v8KjW9_v8" />
+
+    <!-- Dados Estruturados (JSON-LD) - Webmaster Authority -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfessionalService",
+      "name": "FluxAI Labs",
+      "image": "https://fluxaidigital.com.br/logo.png",
+      "@id": "https://fluxaidigital.com.br",
+      "url": "https://fluxaidigital.com.br",
+      "telephone": "+5571981114694",
+      "address": {
+        "@type": "PostalAddress",
+        "addressLocality": "Salvador",
+        "addressRegion": "BA",
+        "addressCountry": "BR"
+      },
+      "sameAs": [
+        "https://instagram.com/fluxai.mark",
+        "https://www.linkedin.com/company/fluxaidigital",
+        "https://www.facebook.com/fluxaidigital"
+      ],
+      "description": "Consultoria de Sistemas de Crescimento, Engenharia de Autoridade e Infraestrutura Digital para marcas de alto valor."
+    }
+    </script>
 </head>
 <body>
 
@@ -569,7 +594,7 @@
       <div class="container text-center reveal">
         <h2 class="impact-title">O mercado não perdoa a falta de estrutura. <br><span>Consolide sua marca com a FluxAI Labs.</span></h2>
         <p class="impact-desc">Pare de tentar a sorte com ações isoladas. Implementamos a infraestrutura que as marcas líderes usam para escalar com segurança e previsibilidade.</p>
-        <a href="#diagnostico" class="btn btn-primary btn-large pulse">
+        <a href="#diagnostico" class="btn btn-primary btn-large pulse" onclick="fbq('track', 'Lead');">
           Garantir Meu Diagnóstico Estratégico <i class="fa-solid fa-fire"></i>
         </a>
       </div>
@@ -589,7 +614,7 @@
               <input type="text" id="whatsapp" placeholder="Seu WhatsApp (ex: 71 9999-9999)" required />
               <input type="text" id="instagram" placeholder="Seu @Instagram atual" required />
               <textarea id="desafio" rows="3" placeholder="Resuma qual o seu maior desafio de marketing/vendas hoje..." required></textarea>
-              <button type="submit" class="btn btn-primary btn-block">
+              <button type="submit" class="btn btn-primary btn-block" onclick="fbq('track', 'Lead');">
                 Solicitar Diagnóstico <i class="fa-solid fa-paper-plane"></i>
               </button>
             </form>
