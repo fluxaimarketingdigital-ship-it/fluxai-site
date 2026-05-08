@@ -419,6 +419,8 @@ a {
   filter: none;
   transform: none;
   animation: none;
+  mask-image: radial-gradient(circle, black 50%, transparent 95%);
+  -webkit-mask-image: radial-gradient(circle, black 50%, transparent 95%);
 }
 
 @keyframes floatWoman {
@@ -1654,6 +1656,8 @@ a[href*="elfsight.com"],
   height: auto;
   display: block;
   transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+  mask-image: radial-gradient(circle, black 60%, transparent 98%);
+  -webkit-mask-image: radial-gradient(circle, black 60%, transparent 98%);
 }
 .case-item:hover .case-visual img {
   transform: scale(1.05);
