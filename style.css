@@ -10,26 +10,17 @@
 /* RESET E VARIÁVEIS DO ESTILO SÓBRIO */
 :root {
   --bg-white: #ffffff;
-  --bg-slate: #f5f5f2;      /* Official Off White */
-  --bg-dark: #111111;       /* Official Carvão */
-  
-  --primary: #6b7a45; /* Verde Oliva FluxAI - Mais sóbrio */
-  --secondary: #27272a; /* Slate 800 - Executivo */
-  --accent: #ff6b00; /* Laranja apenas como detalhe cirúrgico */
-  --bg-dark: #0f172a;
   --bg-slate: #f8fafc;
+  --bg-dark: #0f172a;
+  --primary: #6b7a45; 
+  --secondary: #0f172a; 
+  --accent: #f86018; 
   --text-main: #0f172a;
   --text-muted: #64748b;
-  --text-light: #94a3b8;
-  --border: rgba(15, 23, 42, 0.1);
-  --glass: rgba(255, 255, 255, 0.8);
-  
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-  
-  --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --radius: 0; /* Arquitetura sem bordas arredondadas SaaS */
+  --border: rgba(15, 23, 42, 0.08); 
+  --shadow-layered: 0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04), 0 12px 24px rgba(0,0,0,.05);
+  --transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --radius: 0;
 }
 
 /* PREMIUM SOBER MODE FOUNDATION */
@@ -73,10 +64,11 @@ body {
   transition: opacity 1s ease;
 }
 
-h1, h2, h3, h4, h5, h6, .montserrat {
-  font-family: 'Montserrat', sans-serif;
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Inter', sans-serif;
   font-weight: 800;
-  letter-spacing: -0.5px;
+  letter-spacing: -0.045em; /* Linear/OpenAI Style */
+  line-height: 1.05;
 }
 body.loaded {
   opacity: 1;
@@ -127,8 +119,20 @@ a {
   padding: 0 24px;
 }
 .text-center { text-align: center; }
-.section-white { background-color: var(--bg-white); padding: 160px 0; position: relative; transition: background-color 0.8s ease; }
-.section-light { background-color: var(--bg-slate); padding: 160px 0; position: relative; transition: background-color 0.8s ease; }
+.section-white { 
+  background-color: var(--bg-white); 
+  padding: 200px 0; 
+  position: relative; 
+  border-bottom: 0.5px solid var(--border);
+}
+.section-light { 
+  background-color: var(--bg-slate); 
+  padding: 200px 0; 
+  position: relative; 
+  background-image: radial-gradient(var(--border) 0.8px, transparent 0.8px);
+  background-size: 32px 32px; /* Engineering Grid */
+  border-bottom: 0.5px solid var(--border);
+}
 
 /* REVEAL SYSTEM - Suavidade Cinematográfica */
 .reveal {
