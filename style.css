@@ -626,29 +626,42 @@ a {
   padding: 50px 0;
   border-bottom: 1px solid var(--border);
 }
-/* SEGMENTOS ESTRATÉGICOS (Antigo Parceiros) */
+/* SEGMENTOS ESTRATÉGICOS */
 .segments-grid {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 16px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
   margin-top: 40px;
 }
-.segment-item {
-  padding: 14px 28px;
+.segment-card {
+  padding: 40px;
   background: var(--bg-white);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  font-size: 0.95rem;
-  font-weight: 600;
-  letter-spacing: -0.01em;
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
   transition: var(--transition);
 }
-.segment-item:hover {
-  color: var(--secondary);
-  border-color: var(--secondary);
+.segment-card:hover {
+  border-color: rgba(15, 23, 42, 0.15);
   box-shadow: var(--shadow-layered);
-  transform: translateY(-2px);
+  transform: translateY(-4px);
+}
+.segment-card h3 {
+  font-size: 1.25rem;
+  color: var(--secondary);
+  margin-bottom: 12px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.segment-card p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+
+@media (max-width: 900px) {
+  .segments-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 
@@ -1321,7 +1334,7 @@ a[href*="elfsight.com"],
 /* ESTRUTURAS IMPLEMENTADAS (Grid de Serviços) */
 .structures-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   gap: 24px;
   margin-top: 60px;
 }
@@ -1348,64 +1361,68 @@ a[href*="elfsight.com"],
   color: var(--text-muted);
   line-height: 1.6;
 }
-@media (max-width: 768px) {
+@media (max-width: 900px) {
   .structures-grid {
     grid-template-columns: 1fr;
     gap: 16px;
   }
 }
 
-/* BLUEPRINT ARQUITETURAL - Estilo de Engenharia */
-.methodology { padding: 140px 0; }
-.blueprint-grid {
+/* COMO FUNCIONA - Pipeline Operacional */
+.how-it-works { padding: 140px 0; }
+.pipeline-grid {
   max-width: 900px;
   margin: 80px auto 0;
   position: relative;
 }
-.blueprint-grid::before {
+.pipeline-grid::before {
   content: '';
   position: absolute;
   left: 30px;
   top: 0;
   bottom: 0;
   width: 1px;
-  background: transparent;
+  background: var(--border);
 }
-.blueprint-layer {
+.pipeline-step {
   display: flex;
   align-items: flex-start;
   gap: 40px;
   margin-bottom: 80px;
   position: relative;
 }
-.blueprint-layer:last-child { margin-bottom: 0; }
-.layer-number {
+.pipeline-step:last-child { margin-bottom: 0; }
+.step-number {
   width: 60px;
   height: 60px;
   background: var(--bg-white);
-  border: none;
+  border: 1px solid var(--border);
+  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-family: 'Montserrat', sans-serif;
   font-weight: 800;
   color: var(--secondary);
   font-size: 1.1rem;
   z-index: 2;
   transition: var(--transition);
+  box-shadow: 0 10px 20px rgba(0,0,0,0.05);
 }
-.blueprint-layer:hover .layer-number {
+.pipeline-step:hover .step-number {
   background: var(--secondary);
   color: #fff;
   border-color: var(--secondary);
+  transform: scale(1.1);
 }
-.layer-info h3 {
-  font-size: 1.6rem;
+.step-content h3 {
+  font-size: 1.5rem;
   color: var(--text-main);
   margin-bottom: 12px;
   font-weight: 700;
+  letter-spacing: -0.03em;
+  padding-top: 14px;
 }
-.layer-info p {
+.step-content p {
   color: var(--text-muted);
   font-size: 1.05rem;
   line-height: 1.6;
@@ -1413,10 +1430,10 @@ a[href*="elfsight.com"],
 }
 
 @media (max-width: 768px) {
-  .blueprint-grid::before { left: 20px; }
-  .blueprint-layer { gap: 20px; }
-  .layer-number { width: 40px; height: 40px; font-size: 0.9rem; }
-  .layer-info h3 { font-size: 1.3rem; }
+  .pipeline-grid::before { left: 20px; }
+  .pipeline-step { gap: 20px; margin-bottom: 50px; }
+  .step-number { width: 40px; height: 40px; font-size: 0.9rem; }
+  .step-content h3 { font-size: 1.3rem; padding-top: 8px; }
 }
 .footer-bottom-flex {
   display: flex;
