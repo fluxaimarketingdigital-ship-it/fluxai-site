@@ -127,8 +127,8 @@ a {
   padding: 0 24px;
 }
 .text-center { text-align: center; }
-.section-white { background-color: var(--bg-white); padding: 120px 0; position: relative; transition: background-color 0.8s ease; }
-.section-light { background-color: var(--bg-slate); padding: 120px 0; position: relative; transition: background-color 0.8s ease; }
+.section-white { background-color: var(--bg-white); padding: 160px 0; position: relative; transition: background-color 0.8s ease; }
+.section-light { background-color: var(--bg-slate); padding: 160px 0; position: relative; transition: background-color 0.8s ease; }
 
 /* REVEAL SYSTEM - Suavidade Cinematográfica */
 .reveal {
@@ -414,13 +414,11 @@ a {
   width: 100%;
   max-width: 900px;
   height: auto;
-  object-fit: contain;
+  object-fit: cover;
   border-radius: 0;
-  filter: none;
+  filter: grayscale(0.2);
   transform: none;
   animation: none;
-  mask-image: radial-gradient(circle, black 50%, transparent 95%);
-  -webkit-mask-image: radial-gradient(circle, black 50%, transparent 95%);
 }
 
 @keyframes floatWoman {
@@ -1656,8 +1654,6 @@ a[href*="elfsight.com"],
   height: auto;
   display: block;
   transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
-  mask-image: radial-gradient(circle, black 60%, transparent 98%);
-  -webkit-mask-image: radial-gradient(circle, black 60%, transparent 98%);
 }
 .case-item:hover .case-visual img {
   transform: scale(1.05);
