@@ -257,15 +257,33 @@ a {
   align-items: center;
 }
 .logo-img {
-  width: 170px; /* Official Desktop Size */
+  width: 195px; /* Official Desktop Size (+15%) */
   height: auto;
   transition: var(--transition);
 }
 
 @media (max-width: 768px) {
   .logo-img {
-    width: 110px; /* Official Mobile Size */
+    width: 125px; /* Official Mobile Size (+15%) */
   }
+}
+
+/* BOTÃO DE DIAGNÓSTICO (Header) */
+.btn-diagnostic {
+  padding: 8px 20px;
+  background: transparent;
+  border: 0.5px solid var(--border);
+  color: var(--text-main);
+  border-radius: 4px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  transition: var(--transition);
+}
+.btn-diagnostic:hover {
+  background: var(--bg-slate);
+  color: var(--secondary);
+  border-color: var(--secondary);
 }
 
 .menu {
