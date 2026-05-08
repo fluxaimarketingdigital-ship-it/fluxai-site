@@ -1240,6 +1240,43 @@ a[href*="elfsight.com"],
 .footer-bottom {
   padding-top: 30px;
 }
+/* ESTRUTURAS IMPLEMENTADAS (Grid de Serviços) */
+.structures-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+}
+.structure-card {
+  background: var(--bg-white);
+  padding: 40px;
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-layered);
+  transition: var(--transition);
+}
+.structure-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(15, 23, 42, 0.15);
+}
+.structure-card h3 {
+  font-size: 1.3rem;
+  color: var(--text-main);
+  margin-bottom: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.structure-card p {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+}
+@media (max-width: 768px) {
+  .structures-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
 /* BLUEPRINT ARQUITETURAL - Estilo de Engenharia */
 .methodology { padding: 140px 0; }
 .blueprint-grid {
