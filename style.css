@@ -1760,6 +1760,7 @@ a[href*="elfsight.com"],
   padding: 30px;
   border-bottom: 0.5px solid var(--border);
   background: var(--bg-slate);
+  position: relative; /* Âncora para o .data-badge */
 }
 .diag-tag {
   font-size: 0.75rem;
