@@ -137,16 +137,15 @@ a {
 
 /* --- LINEAR-AESTHETIC (Micro-Dosagem de Autoridade) --- */
 .system-status {
-  position: absolute;
-  top: 140px;
-  left: 5vw;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
   letter-spacing: 1.5px;
+  margin-bottom: 16px;
+  position: relative;
   z-index: 10;
 }
 .system-status .blink {
@@ -367,7 +366,7 @@ a {
 
 /* HERO SECTION */
 .hero {
-  padding: 240px 0 80px;
+  padding: 280px 0 80px;
   background: linear-gradient(90deg, var(--secondary) 0%, var(--secondary) 40%, var(--bg-slate) 80%);
   position: relative;
   overflow: hidden;
