@@ -1695,77 +1695,90 @@ a[href*="elfsight.com"],
 }
 
 /* CASES VERTICAIS (EDITORIAL) */
-.cases-vertical {
+/* DIAGNÓSTICOS APLICADOS (Raciocínio Clínico) */
+.diagnostics-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+  margin-top: 60px;
+}
+.diagnostic-card {
+  background: var(--bg-white);
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-sm);
   display: flex;
   flex-direction: column;
-  gap: 120px;
-  margin-top: 80px;
+  transition: var(--transition);
 }
-.case-item {
-  display: flex;
-  align-items: center;
-  gap: 80px;
-  text-align: left;
+.diagnostic-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(15, 23, 42, 0.15);
+  box-shadow: var(--shadow-layered);
 }
-.case-info {
-  flex: 1;
+.diag-header {
+  padding: 30px;
+  border-bottom: 0.5px solid var(--border);
+  background: var(--bg-slate);
 }
-.case-category {
-  display: inline-block;
-  font-size: 0.8rem;
+.diag-tag {
+  font-size: 0.75rem;
   font-weight: 800;
   text-transform: uppercase;
-  letter-spacing: 2px;
+  letter-spacing: 1.5px;
   color: var(--primary);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  display: inline-block;
 }
-.case-info h3 {
-  font-size: clamp(1.8rem, 3vw, 2.4rem);
-  margin-bottom: 24px;
-  line-height: 1.1;
+.diag-header h3 {
+  font-size: 1.4rem;
   color: var(--text-main);
+  margin: 0;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
-.case-details {
+.diag-body {
+  padding: 30px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 24px;
 }
-.case-details p {
-  font-size: 1.05rem;
-  line-height: 1.6;
-  color: var(--text-muted);
+.diag-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.case-details strong {
-  color: var(--text-main);
-  font-weight: 700;
-  display: block;
-  margin-bottom: 4px;
-  font-size: 0.9rem;
+.diag-item strong {
+  font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  color: var(--text-main);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
-.case-visual {
-  flex: 1;
-  border-radius: 0;
-  overflow: visible;
-  background: transparent;
-  box-shadow: none;
+.diag-item strong i {
+  color: var(--text-muted);
 }
-.case-visual img {
-  width: 100%;
-  height: auto;
-  display: block;
-  transition: transform 0.8s cubic-bezier(0.33, 1, 0.68, 1);
+.diag-item p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  margin: 0;
 }
-.case-item:hover .case-visual img {
-  transform: scale(1.05);
+.diag-item.highlight strong i,
+.diag-item.highlight strong {
+  color: var(--secondary);
+}
+.diag-item.highlight p {
+  color: var(--text-main);
+  font-weight: 500;
 }
 
 @media (max-width: 900px) {
-  .case-item, .case-item:nth-child(even) {
-    flex-direction: column !important;
-    gap: 40px;
-    text-align: center;
+  .diagnostics-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
 }
 
