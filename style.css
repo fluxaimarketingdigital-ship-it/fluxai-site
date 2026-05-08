@@ -413,11 +413,11 @@ a {
   position: relative;
   z-index: 2;
   width: 100%;
-  max-width: 1000px;
+  max-width: 900px;
   height: auto;
-  object-fit: cover;
-  border-radius: 24px;
-  filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.3));
+  object-fit: contain;
+  border-radius: 0;
+  filter: none;
   transform: none;
   animation: none;
 }
@@ -1645,9 +1645,10 @@ a[href*="elfsight.com"],
 }
 .case-visual {
   flex: 1;
-  border-radius: 24px;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
+  border-radius: 0;
+  overflow: visible;
+  background: transparent;
+  box-shadow: none;
 }
 .case-visual img {
   width: 100%;
