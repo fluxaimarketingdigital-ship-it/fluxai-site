@@ -13,24 +13,23 @@
   --bg-slate: #f5f5f2;      /* Official Off White */
   --bg-dark: #111111;       /* Official Carvão */
   
-  --text-main: #111111;     /* Charcoal for clarity */
-  --text-muted: #545454;    /* Official Cinza Apoio */
-  --text-light: #6b7a45;    /* Verde FluxAI as subtle text */
-  --text-dark: #f5f5f2;     /* Off White for dark backgrounds */
-  
-  --primary: #f86018;       /* Official Laranja FluxAI */
-  --primary-hover: #e05312;
-  --secondary: #6b7a45;     /* Official Verde FluxAI */
-  
-  --border: rgba(107, 122, 69, 0.2); /* Soft Olive border */
+  --primary: #6b7a45; /* Verde Oliva FluxAI - Mais sóbrio */
+  --secondary: #27272a; /* Slate 800 - Executivo */
+  --accent: #ff6b00; /* Laranja apenas como detalhe cirúrgico */
+  --bg-dark: #0f172a;
+  --bg-slate: #f8fafc;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --text-light: #94a3b8;
+  --border: rgba(15, 23, 42, 0.1);
   --glass: rgba(255, 255, 255, 0.8);
   
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   
   --transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  --radius: 12px; /* Smoother, more professional radius */
+  --radius: 0; /* Arquitetura sem bordas arredondadas SaaS */
 }
 
 /* PREMIUM SOBER MODE FOUNDATION */
@@ -878,16 +877,16 @@ a {
   align-items: center;
   padding: 20px;
 }
+/* Mascote removido */
 .eco-mascot {
   width: 100%;
-  max-width: 420px;
+  max-width: 480px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 20px 50px rgba(0,0,0,0.3));
-  border-radius: 24px;
+  filter: none;
 }
 .floating-bot {
-  animation: floatGeneric 6s ease-in-out infinite;
+  animation: none;
 }
 @keyframes floatGeneric {
   0%, 100% { transform: translateY(0); }
