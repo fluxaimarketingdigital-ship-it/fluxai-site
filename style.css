@@ -129,9 +129,45 @@ a {
   background-color: var(--bg-slate); 
   padding: 200px 0; 
   position: relative; 
-  background-image: radial-gradient(var(--border) 0.8px, transparent 0.8px);
-  background-size: 32px 32px; /* Engineering Grid */
+  background-image: linear-gradient(rgba(15, 23, 42, 0.025) 1px, transparent 1px),
+  linear-gradient(90deg, rgba(15, 23, 42, 0.025) 1px, transparent 1px);
+  background-size: 40px 40px;
   border-bottom: 0.5px solid var(--border);
+}
+
+/* --- LINEAR-AESTHETIC (Micro-Dosagem de Autoridade) --- */
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  margin-bottom: 24px;
+}
+.system-status .blink {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background-color: #10b981;
+  animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+@keyframes pulse-green {
+  0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(16, 185, 129, 0.4); }
+  50% { opacity: 0.3; box-shadow: none; }
+}
+
+.data-badge {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  opacity: 0.5;
+  letter-spacing: 0.5px;
+  pointer-events: none;
 }
 
 /* REVEAL SYSTEM - Suavidade Cinematográfica */
@@ -1381,7 +1417,7 @@ a[href*="elfsight.com"],
   left: 30px;
   top: 0;
   bottom: 0;
-  width: 1px;
+  width: 0.5px;
   background: var(--border);
 }
 .pipeline-step {
