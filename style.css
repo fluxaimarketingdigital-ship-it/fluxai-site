@@ -144,7 +144,7 @@ a {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.6);
   letter-spacing: 1.5px;
-  margin-bottom: 16px;
+  margin-bottom: 24px; /* Mais respiro entre HUD e o Selo */
   position: relative;
   z-index: 10;
 }
@@ -308,14 +308,14 @@ a {
 
 /* BOTÃO DE DIAGNÓSTICO (Header) */
 .btn-diagnostic {
-  padding: 8px 20px;
+  padding: 8px 24px;
   background: transparent;
-  border: 0.5px solid var(--border);
+  border: 1px solid rgba(0, 0, 0, 0.1);
   color: var(--text-main);
-  border-radius: 4px;
-  font-size: 0.85rem;
+  border-radius: 2px; /* Corte mais reto, menos startup */
+  font-size: 0.8rem;
   font-weight: 500;
-  letter-spacing: -0.01em;
+  letter-spacing: 0.02em;
   transition: var(--transition);
 }
 .btn-diagnostic:hover {
@@ -331,7 +331,8 @@ a {
 .menu a {
   color: var(--text-muted);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  letter-spacing: 0.03em; /* Tracking Editorial */
   transition: var(--transition);
 }
 .menu a:hover {
@@ -381,7 +382,7 @@ a {
 .hero-grid {
   display: grid;
   grid-template-columns: 1.1fr 0.9fr; /* Proporção mais equilibrada */
-  gap: 80px;
+  gap: 140px; /* Mais ar entre o texto e a arquitetura visual */
   align-items: center;
 }
 
@@ -405,7 +406,7 @@ a {
   font-weight: 600;
   color: var(--secondary);
   box-shadow: var(--shadow-sm);
-  margin-bottom: 24px;
+  margin-bottom: 40px; /* Mais respiro entre o selo e o H1 */
 }
 .hero-badge i {
   color: var(--primary); /* Laranja pra contrastar com o branco */
@@ -414,12 +415,14 @@ a {
 .hero-content h1 {
   font-size: clamp(2.8rem, 6.5vw, 5.2rem); 
   font-weight: 900;
-  line-height: 0.95; 
+  line-height: 1.15; /* Quebra o aspecto de 'bloco' e dá respiro */
   letter-spacing: -3px;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
   color: #ffffff;
 }
 .hero-content h1 span {
+  font-weight: 500; /* Reduz a briga de hierarquia com a primeira frase */
+  opacity: 0.9;
   background: linear-gradient(90deg, var(--primary), #ffb885);
   background-clip: text;
   -webkit-background-clip: text;
