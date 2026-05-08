@@ -2162,29 +2162,26 @@ a[href*="typebot.io"],
 
 .data-badge {
   position: absolute;
-  top: 15px;
-  right: 20px;
+  top: 20px;
+  right: 25px;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.65rem;
-  font-weight: 800;
-  color: var(--text-main); /* Cor principal para mais contraste */
-  letter-spacing: 1px;
-  opacity: 0.7; /* Aumentada de 0.4 para 0.7 */
-  background: rgba(0,0,0,0.07); /* Fundo um pouco mais denso */
-  padding: 3px 8px;
-  border-radius: 3px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 1.2px;
+  opacity: 0.5; /* Sutil, mas presente */
+  background: transparent;
+  padding: 0;
   text-transform: uppercase;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: none;
   display: inline-block;
   line-height: 1;
   z-index: 5;
 }
 
 [data-theme="dark"] .data-badge {
-  background: rgba(255,255,255,0.15);
-  border-color: rgba(255,255,255,0.2);
-  color: #fff;
-  opacity: 0.8;
+  color: var(--text-muted);
+  opacity: 0.4;
 }
 
 .structure-card h3 {
