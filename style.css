@@ -507,7 +507,7 @@ a {
   gap: 15px;
   border-bottom: 1px solid var(--border);
 }
-.os-header i { font-size: 1.5rem; color: var(--secondary); }
+.os-header i { font-size: 1.5rem; color: #fff; opacity: 0.8; }
 .os-header h3 { font-size: 1.4rem; color: #fff; margin: 0; }
 
 .os-content { padding: 30px; }
@@ -518,17 +518,16 @@ a {
 .os-item:last-child { border-bottom: none; }
 .os-item strong {
   display: block;
-  font-family: 'Montserrat', sans-serif;
-  color: var(--secondary);
+  font-family: 'Inter', sans-serif;
+  color: #fff;
   font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 2px;
   margin-bottom: 8px;
 }
 .os-item p {
-  color: var(--text-dark);
+  color: rgba(255, 255, 255, 0.7);
   font-size: 0.95rem;
-  opacity: 0.8;
   margin: 0;
 }
 
