@@ -2166,23 +2166,25 @@ a[href*="typebot.io"],
   right: 20px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.65rem;
-  font-weight: 700;
-  color: var(--text-muted);
+  font-weight: 800;
+  color: var(--text-main); /* Cor principal para mais contraste */
   letter-spacing: 1px;
-  opacity: 0.4;
-  background: rgba(0,0,0,0.03);
-  padding: 2px 6px;
+  opacity: 0.7; /* Aumentada de 0.4 para 0.7 */
+  background: rgba(0,0,0,0.07); /* Fundo um pouco mais denso */
+  padding: 3px 8px;
   border-radius: 3px;
   text-transform: uppercase;
-  border: 0.5px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.1);
   display: inline-block;
   line-height: 1;
+  z-index: 5;
 }
 
 [data-theme="dark"] .data-badge {
-  background: rgba(255,255,255,0.05);
-  border-color: rgba(255,255,255,0.1);
-  color: var(--text-muted);
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.2);
+  color: #fff;
+  opacity: 0.8;
 }
 
 .structure-card h3 {
