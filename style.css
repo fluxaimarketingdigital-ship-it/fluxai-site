@@ -137,7 +137,7 @@ a {
 
 /* --- LINEAR-AESTHETIC (Micro-Dosagem de Autoridade) --- */
 .system-status {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 8px;
   font-family: 'Courier New', Courier, monospace;
