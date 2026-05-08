@@ -609,40 +609,31 @@ a {
   padding: 50px 0;
   border-bottom: 1px solid var(--border);
 }
-.marquee-wrapper {
-  overflow: hidden;
-  width: 100%;
-  position: relative;
-  /* Faz as bordas terem um fading sutil */
-  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-}
-.marquee-content {
+/* SEGMENTOS ESTRATÉGICOS (Antigo Parceiros) */
+.segments-grid {
   display: flex;
-  width: max-content;
-  animation: scrollMarquee 25s linear infinite;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 40px;
 }
-.marquee-group {
-  display: flex;
-  gap: 60px;
-  padding-right: 60px; /* Mantém o gap correto pro próximo grupo copiar */
-  align-items: center;
-}
-.marquee-group img {
-  height: 50px;
-  width: auto;
-  object-fit: contain;
-  filter: brightness(0) opacity(0.5); /* Cinza escuro */
+.segment-item {
+  padding: 14px 28px;
+  background: var(--bg-white);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
   transition: var(--transition);
 }
-.marquee-group img:hover {
-  filter: brightness(0) opacity(0.9);
+.segment-item:hover {
+  color: var(--secondary);
+  border-color: var(--secondary);
+  box-shadow: var(--shadow-layered);
+  transform: translateY(-2px);
 }
 
-@keyframes scrollMarquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
-}
 
 /* RESULTADOS / NÃšMEROS */
 .results {
@@ -936,45 +927,35 @@ a[href*="elfsight.com"],
 }
 
 /* DIFERENCIAIS (ESTRUTURA COM MASCOTE) */
-.diff-split-wrapper {
+/* TESE DE OPERAÇÃO / FILOSOFIA */
+.philosophy-grid {
   display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 60px;
-  align-items: center;
-  margin-top: 40px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  margin-top: 60px;
 }
-.diff-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-.diff-card {
+.phil-card {
+  padding: 40px;
   background: var(--bg-white);
-  padding: 30px;
-  border-radius: 20px;
-  border: none;
-  box-shadow: var(--shadow-sm);
-  transition: var(--transition);
+  border: 0.5px solid var(--border);
+  box-shadow: var(--shadow-layered);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 20px;
+  transition: var(--transition);
 }
-.diff-card:hover {
-  transform: translateY(-8px);
-  box-shadow: var(--shadow-lg);
-  border-color: rgba(114, 121, 68, 0.2); 
+.phil-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(15, 23, 42, 0.15);
 }
-.diff-icon {
-  width: 44px;
-  height: 44px;
-  background: rgba(114, 121, 68, 0.1); 
-  color: var(--secondary);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
+.phil-number {
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 1.5rem;
+  color: var(--primary);
+  opacity: 0.8;
 }
+
 .welcome-popup {
   width: 95%;
   padding: 1.5rem;
@@ -989,40 +970,26 @@ a[href*="elfsight.com"],
 .welcome-desc {
   font-size: 0.95rem;
 }
-.diff-card h3 {
-  font-size: 1.15rem;
+.phil-card h3 {
+  font-size: 1.25rem;
   color: var(--text-main);
   font-weight: 700;
+  margin: 0;
+  letter-spacing: -0.02em;
 }
-.diff-card p {
-  font-size: 0.9rem;
+.phil-card p {
+  font-size: 0.95rem;
   color: var(--text-muted);
-  line-height: 1.5;
-}
-.diff-mascot {
-  width: 100%;
-  height: auto;
-  filter: drop-shadow(0 20px 30px rgba(0,0,0,0.1));
-  animation: floatGeneric 6s ease-in-out infinite;
+  line-height: 1.6;
 }
 
 @media (max-width: 1100px) {
-  .diff-split-wrapper {
-    grid-template-columns: 1fr;
-    gap: 40px;
-  }
-  .diff-img-side {
-    max-width: 140px; /* Mascote menor no mobile como solicitado */
-    margin: 0 auto 20px;
-    order: -1; 
-  }
-  .diff-mascot {
-    filter: drop-shadow(0 10px 20px rgba(0,0,0,0.05));
-    animation: floatMascot 4s ease-in-out infinite;
+  .philosophy-grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
-@media (max-width: 600px) {
-  .diff-grid {
+@media (max-width: 768px) {
+  .philosophy-grid {
     grid-template-columns: 1fr;
   }
 }
