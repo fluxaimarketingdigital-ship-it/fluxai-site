@@ -406,25 +406,20 @@ a {
 }
 
 .visual-blob {
-  position: absolute;
-  width: 450px;
-  height: 450px;
-  background: linear-gradient(135deg, rgba(248, 96, 24, 0.1), rgba(114, 121, 68, 0.1));
-  border-radius: 50%;
-  z-index: 1;
-  filter: blur(20px);
+  display: none;
 }
 
 .hero-main-img {
   position: relative;
   z-index: 2;
-  width: 200%;
-  max-width: 200%;
+  width: 100%;
+  max-width: 1000px;
   height: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.15));
-  transform: translate(-260px, 80px);
-  animation: floatWoman 10s ease-in-out infinite;
+  object-fit: cover;
+  border-radius: 24px;
+  filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.3));
+  transform: none;
+  animation: none;
 }
 
 @keyframes floatWoman {
@@ -603,56 +598,8 @@ a {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* CARDS FLUTUANTES */
-.floating-card {
-  position: absolute;
-  background: var(--bg-white);
-  padding: 16px;
-  border-radius: var(--radius);
-  border: none;
-  box-shadow: var(--shadow-lg);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  z-index: 3;
-  width: 260px;
-}
-.floating-card .icon-box {
-  width: 44px;
-  height: 44px;
-  background: var(--bg-slate-dark);
-  color: var(--primary);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-}
-.card-info strong {
-  display: block;
-  font-size: 0.95rem;
-  color: var(--text-main);
-}
-.card-info span {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-}
-
-.float-1 {
-  top: 10%;
-  left: -240px;
-  animation: floatCard 4.5s ease-in-out infinite alternate;
-}
-.float-2 {
-  bottom: 10%;
-  right: 200px;
-  animation: floatCard 5.5s ease-in-out infinite alternate-reverse;
-}
-
-@keyframes floatCard {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-12px); }
-}
+/* Floating Cards Removidos por Silêncio Visual Executivo */
+.floating-card { display: none; }
 
 /* PARCEIROS (MARCADORES) */
 .partners {
@@ -932,10 +879,12 @@ a {
   padding: 20px;
 }
 .eco-mascot {
-  width: 140px;
+  width: 100%;
+  max-width: 420px;
   height: auto;
   object-fit: contain;
-  filter: drop-shadow(0 15px 25px rgba(0,0,0,0.1));
+  filter: drop-shadow(0 20px 50px rgba(0,0,0,0.3));
+  border-radius: 24px;
 }
 .floating-bot {
   animation: floatGeneric 6s ease-in-out infinite;
