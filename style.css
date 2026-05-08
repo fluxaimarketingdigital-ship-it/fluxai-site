@@ -128,8 +128,8 @@ a {
   padding: 0 24px;
 }
 .text-center { text-align: center; }
-.section-white { background-color: var(--bg-white); padding: 100px 0; position: relative; transition: background-color 0.8s ease; }
-.section-light { background-color: var(--bg-slate); padding: 100px 0; position: relative; transition: background-color 0.8s ease; }
+.section-white { background-color: var(--bg-white); padding: 120px 0; position: relative; transition: background-color 0.8s ease; }
+.section-light { background-color: var(--bg-slate); padding: 120px 0; position: relative; transition: background-color 0.8s ease; }
 
 /* REVEAL SYSTEM - Suavidade Cinematográfica */
 .reveal {
@@ -492,7 +492,7 @@ a {
 }
 .os-core {
   background: var(--bg-dark);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius);
   overflow: hidden;
   transition: var(--transition);
@@ -609,7 +609,7 @@ a {
   background: var(--bg-white);
   padding: 16px;
   border-radius: var(--radius);
-  border: 1px solid var(--border);
+  border: none;
   box-shadow: var(--shadow-lg);
   display: flex;
   align-items: center;
@@ -821,7 +821,7 @@ a {
 }
 .service-card {
   background: var(--bg-white);
-  border: 1px solid var(--border);
+  border: none;
   padding: 40px;
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
@@ -868,7 +868,7 @@ a {
 }
 .eco-card {
   background: var(--bg-white);
-  border: 1px solid var(--border);
+  border: none;
   padding: 40px;
   border-radius: 20px;
   box-shadow: var(--shadow-sm);
@@ -1000,7 +1000,7 @@ a[href*="elfsight.com"],
   background: var(--bg-white);
   padding: 30px;
   border-radius: 20px;
-  border: 1px solid var(--border);
+  border: none;
   box-shadow: var(--shadow-sm);
   transition: var(--transition);
   display: flex;
@@ -1084,7 +1084,7 @@ a[href*="elfsight.com"],
 }
 .testim-card {
   background: var(--bg-white);
-  border: 1px solid var(--border);
+  border: none;
   border-radius: var(--radius);
   padding: 36px;
   box-shadow: var(--shadow-sm);
@@ -1336,7 +1336,7 @@ a[href*="elfsight.com"],
   top: 0;
   bottom: 0;
   width: 1px;
-  background: rgba(107, 122, 69, 0.2);
+  background: transparent;
 }
 .blueprint-layer {
   display: flex;
@@ -1350,7 +1350,7 @@ a[href*="elfsight.com"],
   width: 60px;
   height: 60px;
   background: var(--bg-white);
-  border: 1px solid var(--border);
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
