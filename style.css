@@ -1090,6 +1090,33 @@ a[href*="elfsight.com"],
   position: relative;
   z-index: 2;
 }
+
+/* Micro Diagrama Estrutural (Manifesto) */
+.structural-element {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 60px auto 0;
+}
+.structural-element .node {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--text-muted);
+  opacity: 0.4;
+}
+.structural-element .main-node {
+  width: 9px;
+  height: 9px;
+  background: var(--secondary);
+  opacity: 1;
+}
+.structural-element .connector {
+  width: 45px;
+  height: 1px;
+  background: var(--border);
+}
 .btn-large.pulse {
   animation: btnPulse 2s infinite;
 }
