@@ -137,14 +137,17 @@ a {
 
 /* --- LINEAR-AESTHETIC (Micro-Dosagem de Autoridade) --- */
 .system-status {
+  position: absolute;
+  top: 140px;
+  left: 5vw;
   display: flex;
   align-items: center;
   gap: 8px;
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.7rem;
-  color: var(--text-muted);
-  letter-spacing: 1px;
-  margin-bottom: 24px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 1.5px;
+  z-index: 10;
 }
 .system-status .blink {
   width: 4px;
