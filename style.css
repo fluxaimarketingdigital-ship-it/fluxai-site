@@ -9,19 +9,22 @@
 
 /* RESET E VARIÁVEIS DO ESTILO SÓBRIO */
 :root {
-  --bg-white: #ffffff;
-  --bg-slate: #f8fafc;
-  --bg-dark: #0f172a;
-  --primary: #6b7a45; 
-  --secondary: #0f172a; 
-  --accent: #f86018; 
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border: rgba(15, 23, 42, 0.08); 
-  --shadow-layered: 0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04), 0 12px 24px rgba(0,0,0,.05);
+  --bg-white: #0a0c10; /* Dark Antracita */
+  --bg-slate: #111827; /* Navy Profundo */
+  --bg-dark: #020617;
+  --primary: #f86018; /* Laranja Oficial */
+  --secondary: #ffffff; 
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08); 
+  --shadow-layered: 0 0 0 1px rgba(255,255,255,.05), 0 20px 40px rgba(0,0,0,.4);
   --transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-  --radius: 0;
+  --radius: 4px;
 }
+
+.section-light { background-color: var(--bg-slate); }
+.section-white { background-color: var(--bg-white); }
+.section-dark { background-color: var(--bg-dark); }
 
 /* PREMIUM SOBER MODE FOUNDATION */
 [data-theme="dark"] {
@@ -38,7 +41,7 @@
   padding: 80px 0;
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  background: #f4f6f8; /* Cinza executivo para contraste real */
+  background: var(--bg-slate);
 }
 
 .partners-grid {
@@ -59,8 +62,8 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: brightness(0); /* Mantém preto para autoridade */
-  opacity: 0.4; /* Aumentada para visibilidade real */
+  filter: brightness(0) invert(1); /* Agora inverte para branco no fundo escuro */
+  opacity: 0.4;
   transition: var(--transition);
 }
 
