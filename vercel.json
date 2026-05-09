@@ -24,6 +24,11 @@
       "source": "/zap",
       "destination": "https://wa.me/5571981114694",
       "permanent": true
+    },
+    {
+      "source": "/wpp",
+      "destination": "/?utm_source=whatsapp&utm_medium=profile&utm_campaign=perfil_soberano",
+      "permanent": true
     }
   ]
 }
