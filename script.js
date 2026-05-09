@@ -175,7 +175,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // WEBHOOK INTEGRAÇÃO (Make/n8n/Zapier)
             // Insira sua URL de Webhook abaixo quando tiver uma.
-            const WEBHOOK_URL = ""; 
+            const WEBHOOK_URL = "https://hook.us2.make.com/e6ydrb095p983d2z6s6m2jzwgff3mpt2"; 
 
             const payload = {
                 data: new Date().toISOString(),
