@@ -147,6 +147,19 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeServiceModal) closeServiceModal.addEventListener('click', hideServiceModal);
     if (modalOverlay) modalOverlay.addEventListener('click', hideServiceModal);
 
+    // 13. TRACK SOCIAL PROOF CLICKS (GA4)
+    document.querySelectorAll('.social-link').forEach(link => {
+        link.addEventListener('click', () => {
+            const platform = link.getAttribute('data-platform');
+            if(typeof gtag === 'function') {
+                gtag('event', 'click_social_proof', {
+                    'event_category': 'engagement',
+                    'event_label': platform
+                });
+            }
+        });
+    });
+
     // 8. DIAGNOSTICO FORM (WEBHOOK + WHATSAPP REDIRECT)
     const diagnosticoForm = document.getElementById('diagnosticoForm');
     if (diagnosticoForm) {
