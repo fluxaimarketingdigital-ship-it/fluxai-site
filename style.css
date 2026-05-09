@@ -36,17 +36,18 @@
 
 /* PARTNER LOGOS: White in dark mode, natural in light */
 .partners img {
-  filter: grayscale(1) contrast(1.1);
-  opacity: 0.6; /* Aumentada de 0.3 para 0.6 */
+  filter: invert(1) grayscale(1); /* Inverte branco para preto e remove cores */
+  opacity: 0.7;
   transition: var(--transition);
+  max-width: 140px;
 }
 .partners img:hover {
-  filter: grayscale(0) contrast(1);
+  filter: invert(0) grayscale(0); /* Mostra a cor original no hover */
   opacity: 1;
 }
 [data-theme="dark"] .partners img {
   filter: brightness(0) invert(1);
-  opacity: 0.4;
+  opacity: 0.5;
 }
 [data-theme="dark"] .partners img:hover {
   opacity: 0.8;
