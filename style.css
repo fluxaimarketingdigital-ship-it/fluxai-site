@@ -2441,3 +2441,72 @@ a[href*="typebot.io"],
     bottom: 0;
   }
 }
+
+/* --- NOVO LAYOUT EDITORIAL (Segmentos Estratégicos) --- */
+.segments-editorial {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.segments-text-side {
+  position: sticky;
+  top: 100px;
+}
+.segments-text-side h2 {
+  font-size: 3rem;
+  margin-bottom: 20px;
+}
+.segments-text-side p {
+  font-size: 1.1rem;
+  color: #64748b;
+  line-height: 1.8;
+}
+.segments-list-side {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+.segment-list-item {
+  display: flex;
+  gap: 20px;
+  padding: 30px;
+  background: var(--bg-light);
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+.segment-list-item:hover {
+  background: #fff;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  border-color: rgba(0,0,0,0.1);
+}
+.segment-number {
+  font-family: monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  opacity: 0.8;
+  padding-top: 5px;
+}
+.segment-info h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: var(--secondary);
+}
+.segment-info p {
+  color: #64748b;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 992px) {
+  .segments-editorial {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  .segments-text-side {
+    position: static;
+  }
+}
+
