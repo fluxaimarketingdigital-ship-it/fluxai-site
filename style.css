@@ -1873,26 +1873,42 @@ a[href*="elfsight.com"],
   box-shadow: var(--shadow-layered);
 }
 
-/* PHILOSOPHY SECTION */
-.philosophy-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 40px;
-  margin-top: 60px;
+/* MANIFESTO SECTION (BREAK RHYTHM) */
+.section-manifesto {
+  padding: 160px 0;
+  background: var(--bg-white);
+  border-bottom: 0.5px solid var(--border);
 }
 
-.phil-card h3 {
-  font-size: 1.4rem;
-  font-weight: 600;
-  color: var(--text-main);
-  margin-bottom: 16px;
-  letter-spacing: -0.5px;
+.manifesto-content {
+  max-width: 900px;
+  margin: 0 auto;
 }
 
-.phil-card p {
+.manifesto-title {
+  font-size: clamp(2rem, 5vw, 3.2rem);
+  font-weight: 800;
+  color: var(--secondary);
+  line-height: 1.1;
+  letter-spacing: -2px;
+  margin-bottom: 40px;
+}
+
+.manifesto-title strong {
+  color: var(--primary);
+}
+
+.manifesto-text {
+  font-size: 1.25rem;
   color: var(--text-muted);
-  font-size: 0.95rem;
-  line-height: 1.7;
+  line-height: 1.8;
+  max-width: 750px;
+  margin: 0 auto;
+}
+
+@media (max-width: 768px) {
+  .section-manifesto { padding: 100px 0; }
+  .manifesto-text { font-size: 1.1rem; }
 }
 .diag-header {
   padding: 30px;
