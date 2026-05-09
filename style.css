@@ -76,9 +76,12 @@ body {
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Inter', sans-serif;
   font-weight: 800;
-  letter-spacing: -0.045em; /* Linear/OpenAI Style */
-  line-height: 1.05;
+  letter-spacing: -0.04em; /* Levemente menos apertado */
+  line-height: 1.1;
 }
+
+h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 20px; }
+h3 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: 16px; }
 body.loaded {
   opacity: 1;
 }
@@ -422,11 +425,11 @@ a {
 }
 
 .hero-content h1 {
-  font-size: clamp(2.8rem, 6.5vw, 5.2rem); 
-  font-weight: 900;
-  line-height: 1.15; /* Quebra o aspecto de 'bloco' e dá respiro */
-  letter-spacing: -3px;
-  margin-bottom: 32px;
+  font-size: clamp(2.2rem, 4.5vw, 3.6rem); /* Escala reduzida para elegância */
+  font-weight: 800;
+  line-height: 1.1; 
+  letter-spacing: -1.5px; /* Menos agressivo que -3px */
+  margin-bottom: 24px;
   color: #ffffff;
 }
 .hero-content h1 span {
