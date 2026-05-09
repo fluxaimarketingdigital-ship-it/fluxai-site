@@ -470,34 +470,80 @@ a {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* HERO VISUAL (IMAGEM) */
+/* HERO VISUAL (COMPOSIÇÃO EDITORIAL) */
 .hero-visual {
   position: relative;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 500px;
+  justify-content: flex-end;
 }
 
-.visual-blob {
-  display: none;
+.composition-grid {
+  position: relative;
+  width: 100%;
+  max-width: 800px;
+  display: grid;
+  grid-template-columns: 1fr;
+  padding: 20px;
 }
 
 .hero-main-img {
-  position: relative;
-  z-index: 2;
   width: 100%;
-  max-width: 900px;
   height: auto;
-  object-fit: cover;
-  border-radius: 0;
-  filter: grayscale(0.2);
-  transform: none;
-  animation: none;
+  border-radius: 4px;
+  box-shadow: 0 40px 80px rgba(0,0,0,0.4);
+  filter: grayscale(0.1) contrast(1.05);
+  z-index: 1;
 }
 
-@keyframes floatWoman {
-  0%, 100% { transform: translate(-260px, 80px); }
+.mini-data-module {
+  position: absolute;
+  bottom: -40px;
+  left: -60px;
+  width: 240px;
+  background: var(--bg-dark);
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  z-index: 10;
+  border-radius: 2px;
+}
+
+.mini-data-module img {
+  width: 100%;
+  height: auto;
+  opacity: 0.8;
+  filter: brightness(0.8) sepia(0.2);
+}
+
+.module-label {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.6rem;
+  color: var(--primary);
+  margin-top: 8px;
+  letter-spacing: 1px;
+  text-align: right;
+}
+
+/* EDITORIAL SYSTEMS */
+.editorial-image-wrap {
+  position: relative;
+  margin: 60px auto;
+  max-width: 1000px;
+  overflow: hidden;
+  border-radius: 4px;
+  box-shadow: 0 50px 100px rgba(0,0,0,0.4);
+}
+
+.full-width-editorial {
+  width: 100%;
+  display: block;
+  filter: grayscale(0.1) brightness(0.9);
+  transition: transform 1.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.editorial-image-wrap:hover .full-width-editorial {
+  transform: scale(1.03);
+}
   50% { transform: translate(-260px, 75px); }
 }
 
