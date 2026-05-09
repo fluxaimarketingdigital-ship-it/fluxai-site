@@ -1,0 +1,29 @@
+{
+  "redirects": [
+    {
+      "source": "/ig",
+      "destination": "/?utm_source=instagram&utm_medium=bio&utm_campaign=perfil_soberano",
+      "permanent": true
+    },
+    {
+      "source": "/in",
+      "destination": "/?utm_source=linkedin&utm_medium=bio&utm_campaign=perfil_soberano",
+      "permanent": true
+    },
+    {
+      "source": "/fb",
+      "destination": "/?utm_source=facebook&utm_medium=page&utm_campaign=perfil_soberano",
+      "permanent": true
+    },
+    {
+      "source": "/diagnostico",
+      "destination": "/#diagnostico",
+      "permanent": true
+    },
+    {
+      "source": "/zap",
+      "destination": "https://wa.me/5571981114694",
+      "permanent": true
+    }
+  ]
+}
