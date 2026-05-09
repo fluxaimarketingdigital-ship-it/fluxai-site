@@ -124,7 +124,6 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.service-card, .os-item').forEach(card => {
         card.addEventListener('click', () => {
             const s = card.getAttribute('data-service') || card.querySelector('strong')?.innerText.toLowerCase();
-            // Fallback for names
             let d = servicesData[s];
             if(!d) {
                 if(s?.includes('positioning')) d = servicesData.positioning;
@@ -166,15 +165,13 @@ document.addEventListener('DOMContentLoaded', () => {
             const gar = document.getElementById('gargalo').value;
             const des = document.getElementById('desafio').value;
             
-            // Tracking Events
+            // Tracking Events (FB & GA4)
             if(typeof fbq === 'function') fbq('track', 'Lead');
             if(typeof gtag === 'function') gtag('event', 'generate_lead', {
                 'event_category': 'engagement',
                 'event_label': 'Formulário Diagnóstico'
             });
 
-            // WEBHOOK INTEGRAÇÃO (Make/n8n/Zapier)
-            // Insira sua URL de Webhook abaixo quando tiver uma.
             const WEBHOOK_URL = "https://hook.us2.make.com/e6ydrb095p983d2z6s6m2jzwgff3mpt2"; 
 
             const payload = {
@@ -192,6 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     await fetch(WEBHOOK_URL, {
                         method: 'POST',
+                        mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
@@ -226,9 +224,21 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     initWelcomePopup();
 
+    // 10. TRACK WHATSAPP CLICKS (GA4)
+    document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
+        link.addEventListener('click', () => {
+            if(typeof gtag === 'function') {
+                gtag('event', 'contact_whatsapp', {
+                    'event_category': 'engagement',
+                    'event_label': 'Clique WhatsApp'
+                });
+            }
+        });
+    });
+
 });
 
-// 10. CLEAN UP ELFSIGHT BRANDING (Optimized with MutationObserver)
+// 11. CLEAN UP ELFSIGHT BRANDING
 const cleanElfsight = () => {
     document.querySelectorAll('a[href*="elfsight.com"], .eapps-link').forEach(el => el.remove());
 };
@@ -240,7 +250,7 @@ const observer = new MutationObserver((mutations) => {
 observer.observe(document.body, { childList: true, subtree: true });
 cleanElfsight();
 
-// 11. ANTI-COPY & SOURCE PROTECTION
+// 12. ANTI-COPY & SOURCE PROTECTION
 document.addEventListener("contextmenu", (e) => e.preventDefault());
 document.addEventListener("keydown", (e) => {
     if (e.key === "F12" || 
@@ -251,4 +261,3 @@ document.addEventListener("keydown", (e) => {
         e.preventDefault();
     }
 });
-
