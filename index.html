@@ -25,7 +25,7 @@
 
     <!-- Twitter/X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="FluxAI Labs | Sistemas de Crescimento & Posicionamento Premium" />
+    <meta name="twitter:title" content="FluxAI Labs | Sistemas de Crescimento e Inteligência Operacional" />
     <meta name="twitter:description" content="Engenharia de Autoridade e Sistemas de Crescimento Sustentável para Marcas de Alto Valor." />
     <meta name="twitter:image" content="https://fluxaidigital.com.br/logo.png?v=5" />
 
@@ -497,7 +497,7 @@
     <section class="impact-cta">
       <div class="container text-center reveal">
         <h2 class="impact-title">Estruture sua operação para crescer com previsibilidade.</h2>
-        <p class="impact-desc">Reduza a dependência de ações isoladas. Implementamos a infraestrutura que as operações estruturadas utilizam para escalar com segurança e previsibilidade.</p>
+        <p class="impact-desc">Reduza a dependência de ações isoladas. Estruture uma operação com posicionamento, aquisição, retenção e inteligência operacional.</p>
         <a href="#diagnostico" class="btn btn-primary btn-large" onclick="fbq('track', 'Lead');">
           Garantir Meu Diagnóstico Estratégico <i class="fa-solid fa-fire"></i>
         </a>
@@ -517,34 +517,35 @@
             <form id="diagnosticoForm" class="contact-form">
               <div class="form-block">
                 <span class="block-label">Identificação</span>
-                <input type="text" placeholder="Nome / Empresa" required />
-                <input type="tel" placeholder="WhatsApp (ex: 71 9999-9999)" required />
-                <input type="text" placeholder="Instagram ou Site" required />
+                <input type="text" id="nome" name="nome" placeholder="Nome / Empresa" required />
+                <input type="tel" id="whatsapp" name="whatsapp" placeholder="WhatsApp (ex: 71 9999-9999)" required />
+                <input type="text" id="instagram" name="instagram" placeholder="Instagram ou Site" required />
               </div>
 
               <div class="form-block">
                 <span class="block-label">Diagnóstico</span>
-                <select required>
-                  <option value="" disabled selected>Qual estágio melhor define sua operação hoje?</option>
-                  <option>Estruturando posicionamento</option>
-                  <option>Operação em crescimento</option>
-                  <option>Escalando aquisição</option>
-                  <option>Reorganizando processos</option>
-                  <option>Consolidando autoridade</option>
+                <select id="segmento" name="segmento" required>
+                  <option value="" disabled selected>Selecione seu Segmento</option>
+                  <option value="Clínicas e Saúde">Clínicas e Saúde</option>
+                  <option value="Educação e Infoprodutos">Educação e Infoprodutos</option>
+                  <option value="Consultoria e Serviços B2B">Consultoria e Serviços B2B</option>
+                  <option value="Tecnologia e SaaS">Tecnologia e SaaS</option>
+                  <option value="Imobiliário e Construção">Imobiliário e Construção</option>
+                  <option value="Outros">Outros</option>
                 </select>
 
-                <select required>
+                <select id="gargalo" name="gargalo" required>
                   <option value="" disabled selected>Qual é o maior gargalo hoje?</option>
-                  <option>Baixa geração de demanda</option>
-                  <option>Falta de posicionamento</option>
-                  <option>Conteúdo sem resultado</option>
-                  <option>Operação desorganizada</option>
-                  <option>Falta de previsibilidade</option>
-                  <option>Baixa retenção de clientes</option>
-                  <option>Escala operacional</option>
+                  <option value="Baixa geração de demanda">Baixa geração de demanda</option>
+                  <option value="Falta de posicionamento">Falta de posicionamento</option>
+                  <option value="Conteúdo sem resultado">Conteúdo sem resultado</option>
+                  <option value="Operação desorganizada">Operação desorganizada</option>
+                  <option value="Falta de previsibilidade">Falta de previsibilidade</option>
+                  <option value="Baixa retenção de clientes">Baixa retenção de clientes</option>
+                  <option value="Escala operacional">Escala operacional</option>
                 </select>
 
-                <textarea placeholder="Descreva brevemente o cenário atual da sua operação." required></textarea>
+                <textarea id="desafio" name="desafio" placeholder="Descreva brevemente seu cenário atual" required></textarea>
               </div>
 
               <button type="submit" class="btn btn-primary btn-full">

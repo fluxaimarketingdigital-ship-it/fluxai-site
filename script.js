@@ -148,18 +148,68 @@ document.addEventListener('DOMContentLoaded', () => {
     if (closeServiceModal) closeServiceModal.addEventListener('click', hideServiceModal);
     if (modalOverlay) modalOverlay.addEventListener('click', hideServiceModal);
 
-    // 8. DIAGNOSTICO FORM (WHATSAPP REDIRECT)
+    // 8. DIAGNOSTICO FORM (WEBHOOK + WHATSAPP REDIRECT)
     const diagnosticoForm = document.getElementById('diagnosticoForm');
     if (diagnosticoForm) {
-        diagnosticoForm.addEventListener('submit', (e) => {
+        diagnosticoForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            
+            const btnSubmit = diagnosticoForm.querySelector('button[type="submit"]');
+            const originalText = btnSubmit.innerHTML;
+            btnSubmit.innerHTML = 'Enviando... <i class="fa-solid fa-spinner fa-spin"></i>';
+            btnSubmit.disabled = true;
+
             const nome = document.getElementById('nome').value;
             const wpp = document.getElementById('whatsapp').value;
             const inst = document.getElementById('instagram').value;
+            const seg = document.getElementById('segmento').value;
+            const gar = document.getElementById('gargalo').value;
             const des = document.getElementById('desafio').value;
             
-            const msg = `Olá! Tenho interesse no Diagnóstico Estratégico.%0A%0A*Nome:* ${nome}%0A*WhatsApp:* ${wpp}%0A*Instagram:* ${inst}%0A*Meu Desafio:* ${des}`;
+            // Tracking Events
+            if(typeof fbq === 'function') fbq('track', 'Lead');
+            if(typeof gtag === 'function') gtag('event', 'generate_lead', {
+                'event_category': 'engagement',
+                'event_label': 'Formulário Diagnóstico'
+            });
+
+            // WEBHOOK INTEGRAÇÃO (Make/n8n/Zapier)
+            // Insira sua URL de Webhook abaixo quando tiver uma.
+            const WEBHOOK_URL = ""; 
+
+            const payload = {
+                data: new Date().toISOString(),
+                nome: nome,
+                whatsapp: wpp,
+                instagram: inst,
+                segmento: seg,
+                gargalo: gar,
+                desafio: des,
+                origem: document.referrer || 'Direto'
+            };
+
+            if(WEBHOOK_URL) {
+                try {
+                    await fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                } catch(error) {
+                    console.error("Erro ao enviar para webhook, redirecionando para WhatsApp...", error);
+                }
+            }
+
+            // WhatsApp Redirect
+            const msg = `Olá! Tenho interesse no Diagnóstico Estratégico.%0A%0A*Nome:* ${nome}%0A*WhatsApp:* ${wpp}%0A*Instagram:* ${inst}%0A*Segmento:* ${seg}%0A*Gargalo:* ${gar}%0A*Cenário Atual:* ${des}`;
             window.open(`https://wa.me/5571981114694?text=${msg}`, '_blank');
+            
+            btnSubmit.innerHTML = 'Enviado com Sucesso <i class="fa-solid fa-check"></i>';
+            setTimeout(() => {
+                btnSubmit.innerHTML = originalText;
+                btnSubmit.disabled = false;
+                diagnosticoForm.reset();
+            }, 3000);
         });
     }
 
