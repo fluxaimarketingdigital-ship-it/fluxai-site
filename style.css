@@ -9,20 +9,29 @@
 
 /* RESET E VARIÁVEIS DO ESTILO SÓBRIO */ /* ELITE NIGHT MODE PERMANENTE */
 :root {
-  --bg-white: #0a0c10; /* Dark Antracita */
-  --bg-slate: #111827; /* Navy Profundo */
-  --bg-dark: #020617;
   --primary: #f86018; /* Laranja Oficial */
-  --secondary: #1e293b; /* Slate médio para elementos secundários */
-  --text-main: #ffffff;
-  --text-muted: #94a3b8;
-  --border: rgba(255, 255, 255, 0.08); 
-  --shadow-layered: 0 0 0 1px rgba(255,255,255,.05), 0 20px 40px rgba(0,0,0,.4);
+  --secondary: #0f172a; 
+  --bg-white: #ffffff;
+  --bg-slate: #f8fafc;
+  --bg-dark: #0f172a;
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+  --border: rgba(15, 23, 42, 0.08); 
+  --shadow-layered: 0 0 0 1px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.04), 0 12px 24px rgba(0,0,0,.05);
   --transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
   --radius: 4px;
 }
 
-/* Removemos o seletor [data-theme="dark"] pois o site agora é NATIVAMENTE escuro */
+/* ELITE NIGHT MODE */
+[data-theme="dark"] {
+  --bg-white: #0a0c10;
+  --bg-slate: #111827;
+  --bg-dark: #020617;
+  --secondary: #ffffff; 
+  --text-main: #ffffff;
+  --text-muted: #94a3b8;
+  --border: rgba(255, 255, 255, 0.08);
+}
 
 .section-light { background-color: var(--bg-slate); }
 .section-white { background-color: var(--bg-white); }
@@ -53,9 +62,13 @@
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
-  filter: brightness(0) invert(1); /* Agora inverte para branco no fundo escuro */
+  filter: brightness(0); /* Preto por padrão */
   opacity: 0.4;
   transition: var(--transition);
+}
+
+[data-theme="dark"] .partners img {
+  filter: brightness(0) invert(1); /* Branco no dark mode */
 }
 
 .partners img:hover {
@@ -314,7 +327,7 @@ a {
   padding: 30px 0; 
   z-index: 1000;
   transition: var(--transition);
-  background: rgba(10, 12, 16, 0.85); /* ELITE NIGHT GLASS */
+  background: var(--bg-white); /* Agora segue o tema */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
@@ -414,6 +427,7 @@ a {
 .hero {
   padding: 280px 0 80px;
   background: var(--bg-white);
+  transition: background 0.6s ease;
   position: relative;
   overflow: hidden;
 }
