@@ -68,26 +68,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
 
-    // 4. DARK MODE
-    const initDarkMode = () => {
-        const saved = localStorage.getItem('theme');
-        const isDark = saved === 'dark';
-        document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-        const themeToggle = document.getElementById('themeToggle');
-        if (themeToggle) {
-            themeToggle.addEventListener('click', () => {
-                const current = document.documentElement.getAttribute('data-theme');
-                const next = current === 'dark' ? 'light' : 'dark';
-                document.documentElement.setAttribute('data-theme', next);
-                localStorage.setItem('theme', next);
-                const icon = themeToggle.querySelector('i');
-                if (icon) icon.className = next === 'dark' ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-            });
-            const icon = themeToggle.querySelector('i');
-            if (icon) icon.className = isDark ? 'fa-solid fa-sun' : 'fa-solid fa-moon';
-        }
-    };
-    initDarkMode();
+    // 4. THEME REMOVED (ELITE NIGHT MODE IS PERMANENT)
+    // Dark mode logic removed to ensure consistent authority branding.
 
     // 5. SCROLL EFFECTS (Header)
     const header = document.querySelector('.header');
