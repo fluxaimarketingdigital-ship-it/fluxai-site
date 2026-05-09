@@ -476,13 +476,45 @@
           </div>
           <div class="cta-form-side">
             <form id="diagnosticoForm" class="contact-form">
-              <input type="text" id="nome" placeholder="Seu Nome / Nome da Empresa" required />
-              <input type="text" id="whatsapp" placeholder="Seu WhatsApp (ex: 71 9999-9999)" required />
-              <input type="text" id="instagram" placeholder="Seu @Instagram (Opcional)" />
-              <textarea id="desafio" rows="3" placeholder="Resuma qual o seu maior desafio de marketing/vendas hoje..." required></textarea>
-              <button type="submit" class="btn btn-primary btn-block" onclick="fbq('track', 'Lead');">
-                Solicitar Diagnóstico <i class="fa-solid fa-paper-plane"></i>
+              <div class="form-block">
+                <span class="block-label">Identificação</span>
+                <input type="text" placeholder="Nome / Empresa" required />
+                <input type="tel" placeholder="WhatsApp (ex: 71 9999-9999)" required />
+                <input type="text" placeholder="Instagram ou Site" required />
+              </div>
+
+              <div class="form-block">
+                <span class="block-label">Diagnóstico</span>
+                <select required>
+                  <option value="" disabled selected>Qual estágio melhor define sua operação hoje?</option>
+                  <option>Estruturando posicionamento</option>
+                  <option>Operação em crescimento</option>
+                  <option>Escalando aquisição</option>
+                  <option>Reorganizando processos</option>
+                  <option>Consolidando autoridade</option>
+                </select>
+
+                <select required>
+                  <option value="" disabled selected>Qual é o maior gargalo hoje?</option>
+                  <option>Baixa geração de demanda</option>
+                  <option>Falta de posicionamento</option>
+                  <option>Conteúdo sem resultado</option>
+                  <option>Operação desorganizada</option>
+                  <option>Falta de previsibilidade</option>
+                  <option>Baixa retenção de clientes</option>
+                  <option>Escala operacional</option>
+                </select>
+
+                <textarea placeholder="Descreva brevemente o cenário atual da sua operação." required></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary btn-full">
+                Iniciar Aplicação Estratégica <i class="fa-solid fa-paper-plane"></i>
               </button>
+              
+              <p class="form-note">
+                As informações enviadas serão analisadas para identificarmos aderência estratégica e maturidade operacional.
+              </p>
             </form>
           </div>
         </div>
