@@ -236,12 +236,12 @@
     <section class="partners reveal">
       <div class="container">
         <div class="partners-grid">
-          <div class="partner-item"><img src="parceiro-01.webp?v=2" alt="Marca Parceira" loading="lazy" /></div>
-          <div class="partner-item"><img src="parceiro-02.webp?v=2" alt="Marca Parceira" loading="lazy" /></div>
-          <div class="partner-item"><img src="parceiro-03.webp?v=2" alt="Marca Parceira" loading="lazy" /></div>
-          <div class="partner-item"><img src="parceiro-04.webp?v=2" alt="Marca Parceira" loading="lazy" /></div>
-          <div class="partner-item"><img src="parceiro-05.webp?v=2" alt="Marca Parceira" loading="lazy" /></div>
-          <div class="partner-item"><img src="parceiro-06.webp?v=2" alt="Marca Parceira" loading="lazy" /></div>
+          <div class="partner-item"><img src="parceiro-01.webp?v=2" alt="Certificação Técnica" loading="lazy" /></div>
+          <div class="partner-item"><img src="parceiro-02.webp?v=2" alt="Parceiro Estratégico" loading="lazy" /></div>
+          <div class="partner-item"><img src="parceiro-03.webp?v=2" alt="Infraestrutura Digital" loading="lazy" /></div>
+          <div class="partner-item"><img src="parceiro-04.webp?v=2" alt="Tecnologia Corporativa" loading="lazy" /></div>
+          <div class="partner-item"><img src="parceiro-05.webp?v=2" alt="Segurança de Dados" loading="lazy" /></div>
+          <div class="partner-item"><img src="parceiro-06.webp?v=2" alt="Eficiência Operacional" loading="lazy" /></div>
         </div>
       </div>
     </section>
@@ -297,43 +297,54 @@
           <span class="section-top-label">Instalações</span>
           <h2>Estruturas que Implementamos.</h2>
         </div>
-        <div class="structures-grid reveal">
-          <a href="posicionamento-estrategico.html" class="structure-card">
-            <span class="data-badge">[MOD.01]</span>
-            <h3>Posicionamento Estratégico</h3>
-            <p>Arquitetura de marca, diferenciação e percepção premium para consolidar autoridade.</p>
-            <span class="card-link">Ver detalhes <i class="fa-solid fa-chevron-right"></i></span>
-          </a>
-          <a href="engenharia-de-conteudo.html" class="structure-card">
-            <span class="data-badge">[MOD.02]</span>
-            <h3>Engenharia de Conteúdo</h3>
-            <p>Sistema editorial voltado para presença, retenção e desejo contínuo.</p>
-            <span class="card-link">Ver detalhes <i class="fa-solid fa-chevron-right"></i></span>
-          </a>
-          <a href="sistemas-de-aquisicao.html" class="structure-card">
-            <span class="data-badge">[MOD.03]</span>
-            <h3>Sistemas de Aquisição</h3>
-            <p>Estruturas de geração de demanda, funis e conversão comercial.</p>
-            <span class="card-link">Ver detalhes <i class="fa-solid fa-chevron-right"></i></span>
-          </a>
-          <a href="inteligencia-operacional.html" class="structure-card">
-            <span class="data-badge">[MOD.04]</span>
-            <h3>Inteligência Operacional</h3>
-            <p>Automação, IA, dados e processos para reduzir fricção e aumentar eficiência.</p>
-            <span class="card-link">Ver detalhes <i class="fa-solid fa-chevron-right"></i></span>
-          </a>
-          <a href="sistemas-de-retencao.html" class="structure-card">
-            <span class="data-badge">[MOD.05]</span>
-            <h3>Sistemas de Retenção</h3>
-            <p>Estruturas de relacionamento, recorrência e valorização da base de clientes.</p>
-            <span class="card-link">Ver detalhes <i class="fa-solid fa-chevron-right"></i></span>
-          </a>
-          <a href="plataformas-proprietarias.html" class="structure-card">
-            <span class="data-badge">[MOD.06]</span>
-            <h3>Plataformas Proprietárias</h3>
-            <p>Desenvolvimento de infraestrutura própria, centralização de dados e integração de ambientes digitais.</p>
-            <span class="card-link">Ver detalhes <i class="fa-solid fa-chevron-right"></i></span>
-          </a>
+        <div class="dashboard-wrapper reveal">
+          <div class="dashboard-nav" role="tablist">
+            <a href="posicionamento-estrategico.html" class="nav-item active" role="tab" aria-selected="true" data-module="posicionamento-estrategico">
+              <span class="nav-mod">[MOD.01]</span>
+              <span class="nav-title">Posicionamento Estratégico</span>
+            </a>
+            <a href="engenharia-de-conteudo.html" class="nav-item" role="tab" aria-selected="false" data-module="engenharia-de-conteudo">
+              <span class="nav-mod">[MOD.02]</span>
+              <span class="nav-title">Engenharia de Conteúdo</span>
+            </a>
+            <a href="sistemas-de-aquisicao.html" class="nav-item" role="tab" aria-selected="false" data-module="sistemas-de-aquisicao">
+              <span class="nav-mod">[MOD.03]</span>
+              <span class="nav-title">Sistemas de Aquisição</span>
+            </a>
+            <a href="inteligencia-operacional.html" class="nav-item" role="tab" aria-selected="false" data-module="inteligencia-operacional">
+              <span class="nav-mod">[MOD.04]</span>
+              <span class="nav-title">Inteligência Operacional</span>
+            </a>
+            <a href="sistemas-de-retencao.html" class="nav-item" role="tab" aria-selected="false" data-module="sistemas-de-retencao">
+              <span class="nav-mod">[MOD.05]</span>
+              <span class="nav-title">Sistemas de Retenção</span>
+            </a>
+            <a href="plataformas-proprietarias.html" class="nav-item" role="tab" aria-selected="false" data-module="plataformas-proprietarias">
+              <span class="nav-mod">[MOD.06]</span>
+              <span class="nav-title">Plataformas Proprietárias</span>
+            </a>
+          </div>
+          
+          <div class="dashboard-display" id="module-display">
+            <!-- O conteúdo será injetado dinamicamente via script.js -->
+            <div class="display-content reveal active">
+              <div class="display-header">
+                <span class="data-badge">[MOD.01]</span>
+                <h3>Posicionamento Estratégico</h3>
+              </div>
+              <div class="display-body">
+                <p>Marcas não lideram mercados por acidente. Lideram porque ocupam um espaço mental intransponível na cabeça do decisor. O Posicionamento Estratégico é a engenharia por trás dessa percepção.</p>
+                <ul class="display-list">
+                  <li><i class="fa-solid fa-check"></i> Construção de Narrativa de Elite</li>
+                  <li><i class="fa-solid fa-check"></i> Diferenciação Arquitetural</li>
+                  <li><i class="fa-solid fa-check"></i> Consolidação de Previsibilidade Comercial</li>
+                </ul>
+              </div>
+              <div class="display-footer">
+                <a href="posicionamento-estrategico.html" class="btn btn-secondary">Explorar Arquitetura Completa <i class="fa-solid fa-arrow-right"></i></a>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -671,6 +682,7 @@
 
 
   <script src="script.js"></script>
+  <script src="dashboard.js"></script>
 
   <!-- Welcome Pop-up Removido por UX Authority -->
 

@@ -106,6 +106,18 @@ document.addEventListener('DOMContentLoaded', () => {
             icon.classList.toggle('fa-bars');
             icon.classList.toggle('fa-xmark');
         });
+
+        // Close menu on link click (Mobile UX)
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.remove('active');
+                const icon = menuToggle.querySelector('i');
+                if (icon) {
+                    icon.classList.add('fa-bars');
+                    icon.classList.remove('fa-xmark');
+                }
+            });
+        });
     }
 
     // 7. SERVICE MODAL
