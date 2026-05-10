@@ -1,4 +1,0 @@
-TOKEN DE ACESSO META CAPI (FLUXAI LABS):
-EAALnrAkxg2gBRaZAsOtsFLnaOQ0vZBcpPOp8dCQih7wEOEjQO5zE1SA6kG5c1XarAwZAEg31A1hYq9FfaB2Gy2XvoKz7Iv05ObNUTRvO6WloPs8DqZCGYBmeq2PDuZAtLZBdHqk8yITHWLqbYtITJwRLn1YBuTczX46RzZB5QU5BMawR0RVzmEr0rjCoUXCigZDZD
-
-AVISO: Mantenha este código em segredo. Ele permite que o seu sistema (Make.com) envie dados de conversão diretamente para o Facebook sem depender do navegador do cliente.
