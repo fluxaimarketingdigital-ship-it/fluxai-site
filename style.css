@@ -2510,3 +2510,9 @@ a[href*="typebot.io"],
   }
 }
 
+
+/* Satellite Page Links */
+.structure-card { text-decoration: none !important; color: inherit !important; display: flex !important; flex-direction: column; }
+.card-link { margin-top: auto; padding-top: 20px; color: var(--primary); font-weight: 700; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; transition: var(--transition); opacity: 0.8; }
+.structure-card:hover .card-link { gap: 12px; opacity: 1; }
+
