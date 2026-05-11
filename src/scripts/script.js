@@ -133,18 +133,27 @@ document.addEventListener('DOMContentLoaded', () => {
         command: { title: "FluxAI Command Center™", desc: "Arquitetura de autoridade e diferenciação de elite.", features: ["Narrativa Soberana", "Identidade Visual Premium", "Análise de Concorrência"] },
         content: { title: "FluxAI Content Engine™", desc: "Engenharia de conteúdo focada em ativos de retenção.", features: ["Conteúdo de Alta Densidade", "Scripts Estratégicos", "Gestão de Ativos Digitais"] },
         crm: { title: "FluxAI CRM Intelligence™", desc: "Infraestrutura de aquisição e escala de receita.", features: ["Tráfego Pago Especializado", "Funis de Alta Conversão", "Inteligência de Dados"] },
-        automation: { title: "FluxAI Automation Hub™", desc: "Núcleo tecnológico de automação e IA aplicada.", features: ["Agentes Comerciais de IA", "Arquitetura de CRM", "Eficiência Operacional"] }
+        automation: { title: "FluxAI Automation Hub™", desc: "Núcleo tecnológico de automação e IA aplicada.", features: ["Agentes Comerciais de IA", "Arquitetura de CRM", "Eficiência Operacional"] },
+        analytics: { title: "FluxAI Analytics Intelligence™", desc: "Arquitetura de inteligência de dados e LTV.", features: ["Rastreamento Avançado", "Dashboard de Performance", "Otimização de Conversão"] },
+        govos: { title: "FluxAI GovOS™", desc: "Plataforma proprietária de governança operacional.", features: ["Gestão de Ativos", "Protocolos de Segurança", "Escala Sistêmica"] }
     };
 
-    document.querySelectorAll('.service-card, .os-item').forEach(card => {
-        card.addEventListener('click', () => {
-            const s = card.getAttribute('data-service') || card.querySelector('strong')?.innerText.toLowerCase();
+    document.querySelectorAll('.service-card, .os-item, .nav-item').forEach(card => {
+        card.addEventListener('click', (e) => {
+            // Se for link do dashboard, o dashboard.js já cuida
+            if (card.classList.contains('nav-item')) return;
+
+            const s = card.getAttribute('data-service') || card.getAttribute('data-module') || card.querySelector('strong')?.innerText.toLowerCase() || '';
             let d = servicesData[s];
+            
             if(!d) {
-                if(s?.includes('command') || s?.includes('center')) d = servicesData.command;
-                if(s?.includes('content')) d = servicesData.content;
-                if(s?.includes('crm') || s?.includes('intelligence')) d = servicesData.crm;
-                if(s?.includes('automation') || s?.includes('hub')) d = servicesData.automation;
+                const searchStr = s.toLowerCase();
+                if(searchStr.includes('command') || searchStr.includes('center')) d = servicesData.command;
+                else if(searchStr.includes('content')) d = servicesData.content;
+                else if(searchStr.includes('crm') || searchStr.includes('intelligence')) d = servicesData.crm;
+                else if(searchStr.includes('automation') || searchStr.includes('hub')) d = servicesData.automation;
+                else if(searchStr.includes('analytics')) d = servicesData.analytics;
+                else if(searchStr.includes('govos')) d = servicesData.govos;
             }
 
             if (d && modal && modalBody) {
