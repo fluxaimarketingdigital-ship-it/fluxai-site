@@ -1,4 +1,6 @@
-.agent/
-node_modules/
+_backup_refatoracao/
+.env
+.env.local
 .DS_Store
+.vercel/
 

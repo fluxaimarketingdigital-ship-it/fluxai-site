@@ -1,4 +1,5 @@
 {
+  "cleanUrls": true,
   "redirects": [
     {
       "source": "/ig",
@@ -30,5 +31,13 @@
       "destination": "/?utm_source=whatsapp&utm_medium=profile&utm_campaign=perfil_soberano",
       "permanent": true
     }
+  ],
+  "rewrites": [
+    { "source": "/posicionamento-estrategico", "destination": "/pages/posicionamento-estrategico.html" },
+    { "source": "/engenharia-de-conteudo", "destination": "/pages/engenharia-de-conteudo.html" },
+    { "source": "/sistemas-de-aquisicao", "destination": "/pages/sistemas-de-aquisicao.html" },
+    { "source": "/inteligencia-operacional", "destination": "/pages/inteligencia-operacional.html" },
+    { "source": "/sistemas-de-retencao", "destination": "/pages/sistemas-de-retencao.html" },
+    { "source": "/plataformas-proprietarias", "destination": "/pages/plataformas-proprietarias.html" }
   ]
 }

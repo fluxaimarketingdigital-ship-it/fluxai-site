@@ -1,3 +1,6 @@
+import { INTEGRATIONS } from '../config/integrations.js';
+import { CONTACT_INFO } from '../config/constants.js';
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // 1. BODY LOADED FADE-IN
@@ -197,7 +200,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 'event_label': 'Formulário Diagnóstico'
             });
 
-            const WEBHOOK_URL = "https://hook.us2.make.com/e6ydrb095p983d2z6s6m2jzwgff3mpt2"; 
+            const WEBHOOK_URL = INTEGRATIONS.webhookUrl; 
+
+            // Captura de Inteligência de Tráfego (UTMs)
+            const urlParams = new URLSearchParams(window.location.search);
+            const utmSource = urlParams.get('utm_source') || 'Direto';
+            const utmMedium = urlParams.get('utm_medium') || 'Orgânico';
+            const utmCampaign = urlParams.get('utm_campaign') || 'N/A';
 
             const payload = {
                 data: new Date().toISOString(),
@@ -207,7 +216,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 segmento: seg,
                 gargalo: gar,
                 desafio: des,
-                origem: document.referrer || 'Direto'
+                origem: utmSource,
+                meio: utmMedium,
+                campanha: utmCampaign,
+                referencia: document.referrer || 'Direto'
             };
 
             if(WEBHOOK_URL) {
@@ -225,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // WhatsApp Redirect
             const msg = `Olá! Tenho interesse no Diagnóstico Estratégico.%0A%0A*Nome:* ${nome}%0A*WhatsApp:* ${wpp}%0A*Instagram:* ${inst}%0A*Segmento:* ${seg}%0A*Gargalo:* ${gar}%0A*Cenário Atual:* ${des}`;
-            window.open(`https://wa.me/5571981114694?text=${msg}`, '_blank');
+            window.open(`${CONTACT_INFO.whatsappLink}?text=${msg}`, '_blank');
             
             btnSubmit.innerHTML = 'Enviado com Sucesso <i class="fa-solid fa-check"></i>';
             setTimeout(() => {

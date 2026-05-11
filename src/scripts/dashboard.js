@@ -1,6 +1,5 @@
-
 // FLUXAI OS™ DASHBOARD CORE
-const initDashboard = () => {
+export const initDashboard = () => {
     const navItems = document.querySelectorAll('.dashboard-nav .nav-item');
     const display = document.getElementById('module-display');
     const cache = {};
