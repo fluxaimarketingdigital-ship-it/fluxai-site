@@ -62,7 +62,7 @@ export const initDashboard = () => {
         updateDisplay(loadingHtml);
 
         try {
-            const fetchUrl = url.includes(".") ? url : (url.startsWith("/") ? "/pages" + url + ".html" : "/pages/" + url + ".html"); const response = await fetch(fetchUrl);
+            const fetchUrl = url.startsWith("/pages/") ? url : "/pages/" + url.split("/").pop().replace(".html", "") + ".html"; const response = await fetch(fetchUrl);
             const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
