@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | CRM Intelligence</title>
+    <link rel="stylesheet" href="/src/styles/os/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        .crm-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .crm-table th { text-align: left; padding: 15px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--os-text-muted); border-bottom: 1px solid var(--os-border); }
+        .crm-table td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid var(--os-border); color: var(--os-text-main); }
+        .temp-badge { padding: 4px 8px; border-radius: 20px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; }
+        .temp-quente { background: rgba(255, 77, 77, 0.1); color: var(--os-danger); }
+        .temp-morno { background: rgba(255, 204, 0, 0.1); color: var(--os-warning); }
+        .temp-frio { background: rgba(77, 148, 255, 0.1); color: var(--os-info); }
+        .health-bar { height: 4px; background: rgba(255,255,255,0.05); border-radius: 2px; width: 60px; display: inline-block; vertical-align: middle; margin-right: 10px; }
+        .health-fill { height: 100%; background: var(--os-success); border-radius: 2px; }
+        .action-needed { color: var(--os-primary); font-weight: 600; display: flex; align-items: center; gap: 8px; }
+    </style>
+</head>
+<body class="os-mode">
+
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+
+        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h1>CRM Intelligence</h1>
+                        <p>Central de relacionamento operacional e saúde de ativos comerciais.</p>
+                    </div>
+                    <button class="btn-os" style="background: var(--os-primary); border: none; color: #fff; padding: 10px 20px; font-size: 0.8rem; font-weight: 700; border-radius: 4px; cursor: pointer;">
+                        <i class="fa-solid fa-plus"></i> Novo Relacionamento
+                    </button>
+                </div>
+
+                <div class="os-widget-grid">
+                    <!-- MÉTRICAS COMERCIAIS -->
+                    <div class="os-widget" id="metric-opps" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-conv" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-cycle" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-pipeline" style="grid-column: span 3;"></div>
+
+                    <!-- CENTRAL DE AÇÕES (QUEM EXIGE AÇÃO AGORA?) -->
+                    <div class="os-widget" style="grid-column: span 12;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Central de Ações Prioritárias</span>
+                        </div>
+                        <table class="crm-table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente / Empresa</th>
+                                    <th>Temperatura</th>
+                                    <th>Health Score</th>
+                                    <th>Estado Atual</th>
+                                    <th>Último Contato</th>
+                                    <th>Ação Necessária</th>
+                                    <th>Risco</th>
+                                </tr>
+                            </thead>
+                            <tbody id="crm-table-body">
+                                <!-- Injetado via data -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- APRENDIZADO OPERACIONAL -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Aprendizado Operacional CRM</span>
+                        </div>
+                        <div class="os-activity-log" id="crm-feedback-log">
+                            <div class="log-entry">
+                                <span class="log-time">[HOJE]</span>
+                                <span class="log-user">SISTEMA:</span>
+                                <span class="log-msg">Lead-815 migrado para Prioridade Crítica por inatividade de 72h.</span>
+                            </div>
+                            <div class="log-entry">
+                                <span class="log-time">[ONTEM]</span>
+                                <span class="log-user">CONSULTOR:</span>
+                                <span class="log-msg">Ajustado protocolo de follow-up para setor Logístico.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RISCO DE RETENÇÃO (CHURN PREDICTION) -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Análise de Risco e Retenção</span>
+                        </div>
+                        <div style="font-size: 0.85rem; color: var(--os-text-muted);">
+                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                 <span>Probabilidade de Fechamento (Média)</span>
+                                 <span style="color: var(--os-success);">74%</span>
+                             </div>
+                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                 <span>Risco de Perda em Pipeline</span>
+                                 <span style="color: var(--os-warning);">12%</span>
+                             </div>
+                             <div style="margin-top: 20px; padding: 15px; background: rgba(255,255,255,0.02); border: 1px solid var(--os-border);">
+                                 <strong>Sugestão Estratégica:</strong> Intensificar follow-up técnico com Lead-815 para reduzir risco médio.
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { OS_UI, OS_AUTH } from './js/os-core.js';
+        import { crmLeadsData, crmMetrics } from './data/crm.js';
+        
+        OS_AUTH.check();
+        OS_UI.renderSidebar('crm-intelligence');
+        OS_UI.renderTopbar();
+
+        // Render Metrics
+        OS_UI.renderMetric('metric-opps', { label: 'Oportunidades Ativas', value: crmMetrics.activeOpportunities, trend: '+3', meta: 'em pipeline' });
+        OS_UI.renderMetric('metric-conv', { label: 'Taxa de Conversão', value: crmMetrics.conversionRate, trend: '+1.5%', meta: 'Meta: 15%' });
+        OS_UI.renderMetric('metric-cycle', { label: 'Ciclo Médio', value: crmMetrics.avgSalesCycle, trend: '-2d', meta: 'Eficiência' });
+        OS_UI.renderMetric('metric-pipeline', { label: 'Volume Pipeline', value: crmMetrics.totalPipelineValue, trend: '+12%', meta: 'Valor Total' });
+
+        // Render CRM Table
+        const tableBody = document.getElementById('crm-table-body');
+        crmLeadsData.forEach(lead => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="font-weight: 600;">${lead.client} <br><span style="font-size: 0.65rem; color: var(--os-text-muted); font-family: var(--os-font-mono);">${lead.id}</span></td>
+                <td><span class="temp-badge temp-${lead.temperature}">${lead.temperature}</span></td>
+                <td>
+                    <div class="health-bar"><div class="health-fill" style="width: ${lead.healthScore}%; background: ${lead.healthScore < 50 ? 'var(--os-danger)' : (lead.healthScore < 80 ? 'var(--os-warning)' : 'var(--os-success)')}"></div></div>
+                    <span>${lead.healthScore}</span>
+                </td>
+                <td style="text-transform: capitalize;">${lead.status}</td>
+                <td style="font-size: 0.8rem; color: var(--os-text-muted);">${lead.lastFollowUp}</td>
+                <td><div class="action-needed"><i class="fa-solid fa-bell"></i> ${lead.nextAction}</div></td>
+                <td><span style="font-size: 0.75rem; color: ${lead.risk === 'baixo' ? 'var(--os-success)' : (lead.risk === 'médio' ? 'var(--os-warning)' : 'var(--os-danger)')}">${lead.risk}</span></td>
+            `;
+            tableBody.appendChild(row);
+        });
+    </script>
+</body>
+</html>
