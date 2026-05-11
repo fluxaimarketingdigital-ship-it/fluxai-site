@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Command Center</title>
+    <link rel="stylesheet" href="/src/styles/os/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+</head>
+<body class="os-mode">
+
+    <div class="os-layout">
+        <!-- SIDEBAR -->
+        <aside class="os-sidebar">
+            <div class="os-logo">
+                <i class="fa-solid fa-cube"></i> FLUXAI OS™
+            </div>
+            <nav class="os-nav">
+                <a href="command-center.html" class="os-nav-item active">
+                    <i class="fa-solid fa-gauge-high"></i> Command Center
+                </a>
+                <a href="content-engine.html" class="os-nav-item">
+                    <i class="fa-solid fa-pen-nib"></i> Content Engine
+                </a>
+                <a href="crm-intelligence.html" class="os-nav-item">
+                    <i class="fa-solid fa-users-gear"></i> CRM Intelligence
+                </a>
+                <a href="automation-hub.html" class="os-nav-item">
+                    <i class="fa-solid fa-robot"></i> Automation Hub
+                </a>
+                <a href="analytics-intelligence.html" class="os-nav-item">
+                    <i class="fa-solid fa-chart-line"></i> Analytics
+                </a>
+                <a href="govos.html" class="os-nav-item">
+                    <i class="fa-solid fa-shield-halved"></i> GovOS
+                </a>
+            </nav>
+            <div style="margin-top: auto; padding-top: 20px; border-top: 1px solid var(--os-border);">
+                <a href="../index.html" class="os-nav-item">
+                    <i class="fa-solid fa-arrow-left"></i> Sair da OS
+                </a>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main class="os-main">
+            <header class="os-header">
+                <div>
+                    <h1>Command Center</h1>
+                    <p style="color: var(--os-muted); font-size: 0.8rem; margin-top: 5px;">Núcleo de Inteligência Operacional</p>
+                </div>
+                <div class="os-status-bar">
+                    <span><span class="status-dot"></span> SYSTEM_LIVE</span>
+                    <span>|</span>
+                    <span>UPTIME: 99.98%</span>
+                    <span>|</span>
+                    <span>v1.0.3_OPERATIONAL</span>
+                </div>
+            </header>
+
+            <div class="os-grid">
+                <!-- METRIC WIDGETS -->
+                <div class="os-card" style="grid-column: span 3;">
+                    <h3>Lead Velocity</h3>
+                    <div class="metric-value">14.2<span style="font-size: 1rem; color: var(--os-muted);">/dia</span></div>
+                    <div class="metric-trend plus"><i class="fa-solid fa-arrow-up"></i> 12% vs last week</div>
+                </div>
+                <div class="os-card" style="grid-column: span 3;">
+                    <h3>Content Efficiency</h3>
+                    <div class="metric-value">88%</div>
+                    <div class="metric-trend minus"><i class="fa-solid fa-arrow-down"></i> 2% (Action Required)</div>
+                </div>
+                <div class="os-card" style="grid-column: span 3;">
+                    <h3>CRM Health</h3>
+                    <div class="metric-value">94.5</div>
+                    <div class="metric-trend plus"><i class="fa-solid fa-arrow-up"></i> 5.2 points</div>
+                </div>
+                <div class="os-card" style="grid-column: span 3;">
+                    <h3>ROAS Operacional</h3>
+                    <div class="metric-value">6.8x</div>
+                    <div class="metric-trend plus"><i class="fa-solid fa-arrow-up"></i> 0.4x</div>
+                </div>
+
+                <!-- ALERTS & TASKS -->
+                <div class="os-card" style="grid-column: span 4; grid-row: span 2;">
+                    <h3>Alertas do Sistema</h3>
+                    <div class="alert-item">
+                        <div>
+                            <div class="alert-title priority-high">Erro de Conexão CRM</div>
+                            <div class="alert-meta">Módulo: CRM Intelligence | 10m atrás</div>
+                        </div>
+                        <i class="fa-solid fa-circle-exclamation priority-high"></i>
+                    </div>
+                    <div class="alert-item">
+                        <div>
+                            <div class="alert-title">Lote de Conteúdo Aprovado</div>
+                            <div class="alert-meta">Módulo: Content Engine | 1h atrás</div>
+                        </div>
+                        <i class="fa-solid fa-circle-check" style="color: var(--os-success);"></i>
+                    </div>
+                    <div class="alert-item">
+                        <div>
+                            <div class="alert-title">Backup de Dados GovOS</div>
+                            <div class="alert-meta">Concluído com sucesso | 4h atrás</div>
+                        </div>
+                        <i class="fa-solid fa-database"></i>
+                    </div>
+                </div>
+
+                <!-- PIPELINE -->
+                <div class="os-card" style="grid-column: span 8;">
+                    <h3>Pipeline Estratégico (Estados Atuais)</h3>
+                    <div class="pipeline-list">
+                        <div class="pipeline-item">
+                            <span class="stage-name">Diagnóstico</span>
+                            <div class="stage-bar-bg"><div class="stage-bar-fill" style="width: 40%;"></div></div>
+                            <span class="stage-count">08</span>
+                        </div>
+                        <div class="pipeline-item">
+                            <span class="stage-name">Estratégia</span>
+                            <div class="stage-bar-bg"><div class="stage-bar-fill" style="width: 25%;"></div></div>
+                            <span class="stage-count">03</span>
+                        </div>
+                        <div class="pipeline-item">
+                            <span class="stage-name">Implementação</span>
+                            <div class="stage-bar-bg"><div class="stage-bar-fill" style="width: 70%;"></div></div>
+                            <span class="stage-count">12</span>
+                        </div>
+                        <div class="pipeline-item">
+                            <span class="stage-name">Escala</span>
+                            <div class="stage-bar-bg"><div class="stage-bar-fill" style="width: 15%;"></div></div>
+                            <span class="stage-count">02</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- RECENT ACTIVITY -->
+                <div class="os-card" style="grid-column: span 8;">
+                    <h3>Log de Atividades Recentes</h3>
+                    <div style="font-family: monospace; font-size: 0.8rem;">
+                        <div style="padding: 8px 0; border-bottom: 1px solid var(--os-border);">
+                            <span style="color: var(--os-accent);">[17:05:22]</span> ADMIN: Atualizou protocolos de CRM Intelligence.
+                        </div>
+                        <div style="padding: 8px 0; border-bottom: 1px solid var(--os-border);">
+                            <span style="color: var(--os-accent);">[16:42:10]</span> SYSTEM: Auto-scaling ativado no cluster de automação.
+                        </div>
+                        <div style="padding: 8px 0; border-bottom: 1px solid var(--os-border);">
+                            <span style="color: var(--os-accent);">[15:12:05]</span> AGENT_GPT: Gerou 5 briefings de conteúdo de alta densidade.
+                        </div>
+                        <div style="padding: 8px 0;">
+                            <span style="color: var(--os-accent);">[14:30:00]</span> GOV_OS: Verificação de segurança concluída. Integridade 100%.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script type="module">
+        // Futura lógica de carregamento de dados do command-center.js
+        console.log("FluxAI OS Operational Layer Initialized.");
+    </script>
+</body>
+</html>
