@@ -5,46 +5,46 @@
 
 export const crmLeadsData = [
     {
-        id: "LEAD-742",
-        client: "Logística Alpha S.A.",
+        id: "L-1024",
+        name: "Indústrias Delta S.A.",
+        contact: "Roberto Silva (CTO)",
         temperature: "quente",
         healthScore: 92,
-        status: "negociação",
-        lastFollowUp: "2h atrás",
-        nextAction: "Validar Contrato",
-        priority: "alta",
+        lastFollowUp: "2 dias atrás",
+        nextAction: "Apresentação de Diagnóstico",
+        impact: "R$ 450k/ano",
         risk: "baixo",
-        impact: "receita"
+        status: "ativo"
     },
     {
-        id: "LEAD-815",
-        client: "Varejo Prime Group",
-        temperature: "morno",
+        id: "L-1025",
+        name: "TechFlow Soluções",
+        contact: "Ana Costa (CEO)",
+        temperature: "morna",
         healthScore: 65,
-        status: "diagnóstico",
-        lastFollowUp: "3d atrás",
-        nextAction: "Agendar Apresentação",
-        priority: "crítica",
+        lastFollowUp: "1 semana atrás",
+        nextAction: "Follow-up de Proposta",
+        impact: "R$ 120k/ano",
         risk: "médio",
-        impact: "operação"
+        status: "atenção"
     },
     {
-        id: "LEAD-690",
-        client: "BioTech Solutions",
-        temperature: "frio",
-        healthScore: 42,
-        status: "aguardando",
-        lastFollowUp: "12d atrás",
-        nextAction: "Reativar Contato",
-        priority: "baixa",
+        id: "L-1026",
+        name: "Global Logistics Ltd.",
+        contact: "Carlos Magno (COO)",
+        temperature: "quente",
+        healthScore: 45,
+        lastFollowUp: "10 dias atrás",
+        nextAction: "Reunião de Retenção",
+        impact: "R$ 800k/ano",
         risk: "alto",
-        impact: "retenção"
+        status: "crítico"
     }
 ];
 
 export const crmMetrics = {
     activeOpportunities: 18,
-    conversionRate: "14.2%",
-    avgSalesCycle: "18 dias",
-    totalPipelineValue: "R$ 4.2M"
+    avgSalesCycle: "24 dias",
+    retentionRate: "96.5%",
+    pipelineValue: "R$ 4.2M"
 };
