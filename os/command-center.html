@@ -13,157 +13,33 @@
 <body class="os-mode">
 
     <div class="os-shell">
-        <!-- SIDEBAR INSTITUCIONAL -->
-        <aside class="os-sidebar">
-            <div class="os-sidebar-header">
-                <div class="os-brand">
-                    <i class="fa-solid fa-cube"></i> FLUXAI <span>OS™</span>
-                </div>
-            </div>
-            <nav class="os-sidebar-nav">
-                <span class="os-nav-label">Núcleo Estratégico</span>
-                <a href="command-center.html" class="os-nav-link active">
-                    <i class="fa-solid fa-gauge-high"></i> Command Center
-                </a>
-                
-                <span class="os-nav-label">Módulos Operacionais</span>
-                <a href="content-engine.html" class="os-nav-link">
-                    <i class="fa-solid fa-pen-nib"></i> Content Engine
-                </a>
-                <a href="crm-intelligence.html" class="os-nav-link">
-                    <i class="fa-solid fa-users-gear"></i> CRM Intelligence
-                </a>
-                <a href="automation-hub.html" class="os-nav-link">
-                    <i class="fa-solid fa-robot"></i> Automation Hub
-                </a>
-                <a href="analytics.html" class="os-nav-link">
-                    <i class="fa-solid fa-chart-line"></i> Analytics
-                </a>
-                
-                <span class="os-nav-label">Governança</span>
-                <a href="govos.html" class="os-nav-link">
-                    <i class="fa-solid fa-shield-halved"></i> GovOS
-                </a>
-            </nav>
-            <div class="os-sidebar-footer">
-                <a href="../index.html" class="os-nav-link">
-                    <i class="fa-solid fa-arrow-left"></i> Sair da Interface
-                </a>
-            </div>
-        </aside>
+        <!-- SIDEBAR (Renderizada via Core) -->
+        <aside class="os-sidebar"></aside>
 
-        <!-- MAIN VIEWPORT -->
         <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
-            <!-- TOPBAR EXECUTIVA -->
-            <header class="os-topbar">
-                <div class="os-topbar-left">
-                    <div class="os-status-indicator">
-                        <span class="os-dot"></span> ESTADO_OPERACIONAL: ESTÁVEL
-                    </div>
-                </div>
-                <div class="os-topbar-right">
-                    <div class="os-user-profile">
-                        <div class="os-avatar">FL</div>
-                        <span>Admin FluxAI</span>
-                    </div>
-                </div>
-            </header>
+            <!-- TOPBAR (Renderizada via Core) -->
+            <header class="os-topbar"></header>
 
             <main class="os-viewport">
                 <div class="os-page-title">
-                    <h1>Command Center</h1>
-                    <p>Visão geral da inteligência e estados operacionais da FluxAI Labs.</p>
+                    <h1 id="page-title">Command Center</h1>
+                    <p id="page-desc">Visão geral da inteligência e estados operacionais da FluxAI Labs.</p>
                 </div>
 
                 <div class="os-widget-grid">
-                    <!-- MÉTRICAS PRINCIPAIS -->
-                    <div class="os-widget" style="grid-column: span 3;">
-                        <div class="os-widget-header">
-                            <span class="os-widget-label">Fluxo Comercial</span>
-                            <i class="fa-solid fa-arrow-trend-up trend-up"></i>
-                        </div>
-                        <div class="os-metric">
-                            <div class="os-metric-value">14.2</div>
-                            <div class="os-metric-meta">
-                                <span class="trend-up">+12.5%</span> 
-                                <span style="color: var(--os-text-muted);">vs semana anterior</span>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- MÉTRICAS PRINCIPAIS (Containers) -->
+                    <div class="os-widget" id="metric-comercial" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-conteudo" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-crm" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-roas" style="grid-column: span 3;"></div>
 
-                    <div class="os-widget" style="grid-column: span 3;">
-                        <div class="os-widget-header">
-                            <span class="os-widget-label">Eficiência de Conteúdo</span>
-                            <i class="fa-solid fa-circle-exclamation trend-down" style="color: var(--os-warning);"></i>
-                        </div>
-                        <div class="os-metric">
-                            <div class="os-metric-value">88%</div>
-                            <div class="os-metric-meta">
-                                <span class="trend-down">-2.1%</span> 
-                                <span style="color: var(--os-text-muted);">Ação Necessária</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="os-widget" style="grid-column: span 3;">
-                        <div class="os-widget-header">
-                            <span class="os-widget-label">Saúde do CRM</span>
-                        </div>
-                        <div class="os-metric">
-                            <div class="os-metric-value">94.5</div>
-                            <div class="os-metric-meta">
-                                <span class="trend-up">+5.2</span> 
-                                <span style="color: var(--os-text-muted);">Pontos de Ativos</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="os-widget" style="grid-column: span 3;">
-                        <div class="os-widget-header">
-                            <span class="os-widget-label">ROAS Operacional</span>
-                        </div>
-                        <div class="os-metric">
-                            <div class="os-metric-value">6.8x</div>
-                            <div class="os-metric-meta">
-                                <span class="trend-up">+0.4x</span> 
-                                <span style="color: var(--os-text-muted);">Estável</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- ALERTAS E PRIORIDADES -->
+                    <!-- CENTRAL DE ALERTAS -->
                     <div class="os-widget" style="grid-column: span 4; grid-row: span 2;">
                         <div class="os-widget-header">
                             <span class="os-widget-label">Central de Alertas</span>
                         </div>
-                        <div class="os-alert-list">
-                            <div class="os-alert-item">
-                                <div class="os-alert-icon" style="color: var(--os-danger);">
-                                    <i class="fa-solid fa-circle-exclamation"></i>
-                                </div>
-                                <div class="os-alert-content">
-                                    <h4>Desconexão API CRM</h4>
-                                    <p>Impacto: Receita | Prioridade: Alta</p>
-                                </div>
-                            </div>
-                            <div class="os-alert-item">
-                                <div class="os-alert-icon" style="color: var(--os-success);">
-                                    <i class="fa-solid fa-circle-check"></i>
-                                </div>
-                                <div class="os-alert-content">
-                                    <h4>Lote Editorial Aprovado</h4>
-                                    <p>Impacto: Autoridade | 1h atrás</p>
-                                </div>
-                            </div>
-                            <div class="os-alert-item">
-                                <div class="os-alert-icon" style="color: var(--os-info);">
-                                    <i class="fa-solid fa-database"></i>
-                                </div>
-                                <div class="os-alert-content">
-                                    <h4>Backup GovOS Concluído</h4>
-                                    <p>Impacto: Segurança | 4h atrás</p>
-                                </div>
-                            </div>
+                        <div class="os-alert-list" id="alerts-container">
+                            <!-- Injetado via data -->
                         </div>
                     </div>
 
@@ -172,27 +48,8 @@
                         <div class="os-widget-header">
                             <span class="os-widget-label">Pipeline Estratégico (Fluxo de Estados)</span>
                         </div>
-                        <div class="os-pipeline">
-                            <div class="os-pipeline-stage">
-                                <span class="stage-label">Diagnóstico</span>
-                                <div class="stage-track"><div class="stage-progress" style="width: 40%;"></div></div>
-                                <span class="stage-value">08</span>
-                            </div>
-                            <div class="os-pipeline-stage">
-                                <span class="stage-label">Estratégia</span>
-                                <div class="stage-track"><div class="stage-progress" style="width: 25%;"></div></div>
-                                <span class="stage-value">03</span>
-                            </div>
-                            <div class="os-pipeline-stage">
-                                <span class="stage-label">Implementação</span>
-                                <div class="stage-track"><div class="stage-progress" style="width: 70%;"></div></div>
-                                <span class="stage-value">12</span>
-                            </div>
-                            <div class="os-pipeline-stage">
-                                <span class="stage-label">Escala</span>
-                                <div class="stage-track"><div class="stage-progress" style="width: 15%;"></div></div>
-                                <span class="stage-value">02</span>
-                            </div>
+                        <div class="os-pipeline" id="pipeline-container">
+                            <!-- Injetado via data -->
                         </div>
                     </div>
 
@@ -201,22 +58,8 @@
                         <div class="os-widget-header">
                             <span class="os-widget-label">Atividade Operacional Recente</span>
                         </div>
-                        <div class="os-activity-log">
-                            <div class="log-entry">
-                                <span class="log-time">[17:05]</span>
-                                <span class="log-user">ADMIN:</span>
-                                <span class="log-msg">Atualizou protocolos de CRM Intelligence.</span>
-                            </div>
-                            <div class="log-entry">
-                                <span class="log-time">[16:42]</span>
-                                <span class="log-user">SISTEMA:</span>
-                                <span class="log-msg">Auto-scaling ativado no cluster de automação.</span>
-                            </div>
-                            <div class="log-entry">
-                                <span class="log-time">[15:12]</span>
-                                <span class="log-user">AGENT_GPT:</span>
-                                <span class="log-msg">Gerou 5 briefings de conteúdo de alta densidade.</span>
-                            </div>
+                        <div class="os-activity-log" id="activity-log">
+                            <!-- Injetado via data -->
                         </div>
                     </div>
                 </div>
@@ -224,9 +67,44 @@
         </div>
     </div>
 
+    <!-- CORE ENGINE INITIALIZATION -->
     <script type="module">
-        import { systemConfig } from './data/system.js';
-        console.log(`FluxAI OS™ Base Global Inicializada: ${systemConfig.version}`);
+        import { OS_UI, OS_AUTH } from './js/os-core.js';
+        
+        // 1. Validar Acesso
+        OS_AUTH.check();
+
+        // 2. Renderizar Base Global
+        OS_UI.renderSidebar('command-center');
+        OS_UI.renderTopbar();
+
+        // 3. Mock Data para demonstração inicial (depois virá de os/data/command-center.js)
+        OS_UI.renderMetric('metric-comercial', { label: 'Fluxo Comercial', value: '14.2', trend: '+12.5%', meta: 'vs semana anterior' });
+        OS_UI.renderMetric('metric-conteudo', { label: 'Eficiência de Conteúdo', value: '88%', trend: '-2.1%', meta: 'Ação Necessária' });
+        OS_UI.renderMetric('metric-crm', { label: 'Saúde do CRM', value: '94.5', trend: '+5.2', meta: 'Pontos de Ativos' });
+        OS_UI.renderMetric('metric-roas', { label: 'ROAS Operacional', value: '6.8x', trend: '+0.4x', meta: 'Estável' });
+
+        // Injeção de Alertas, Pipeline e Atividade (Mock rápido para validação da base)
+        document.getElementById('alerts-container').innerHTML = `
+            <div class="os-alert-item">
+                <div class="os-alert-icon" style="color: var(--os-danger);"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <div class="os-alert-content"><h4>Desconexão API CRM</h4><p>Impacto: Receita | Prioridade: Alta</p></div>
+            </div>
+            <div class="os-alert-item">
+                <div class="os-alert-icon" style="color: var(--os-success);"><i class="fa-solid fa-circle-check"></i></div>
+                <div class="os-alert-content"><h4>Lote Editorial Aprovado</h4><p>Impacto: Autoridade | 1h atrás</p></div>
+            </div>
+        `;
+
+        document.getElementById('pipeline-container').innerHTML = `
+            <div class="os-pipeline-stage"><span class="stage-label">Diagnóstico</span><div class="stage-track"><div class="stage-progress" style="width: 40%;"></div></div><span class="stage-value">08</span></div>
+            <div class="os-pipeline-stage"><span class="stage-label">Implementação</span><div class="stage-track"><div class="stage-progress" style="width: 70%;"></div></div><span class="stage-value">12</span></div>
+        `;
+
+        document.getElementById('activity-log').innerHTML = `
+            <div class="log-entry"><span class="log-time">[17:05]</span><span class="log-user">ADMIN:</span><span class="log-msg">Atualizou protocolos de CRM Intelligence.</span></div>
+            <div class="log-entry"><span class="log-time">[16:42]</span><span class="log-user">SISTEMA:</span><span class="log-msg">Auto-scaling ativado no cluster de automação.</span></div>
+        `;
     </script>
 </body>
 </html>
