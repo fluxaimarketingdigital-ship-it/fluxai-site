@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Content Engine</title>
+    <link rel="stylesheet" href="/src/styles/os/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        .pipeline-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .pipeline-table th { text-align: left; padding: 15px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--os-text-muted); border-bottom: 1px solid var(--os-border); }
+        .pipeline-table td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid var(--os-border); color: var(--os-text-main); }
+        .badge { padding: 4px 8px; border-radius: 2px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .badge-priority-alta { background: rgba(255, 77, 77, 0.1); color: var(--os-danger); }
+        .badge-priority-critica { background: var(--os-danger); color: #fff; }
+        .badge-status-revisao { background: rgba(255, 204, 0, 0.1); color: var(--os-warning); }
+        .badge-status-producao { background: rgba(77, 148, 255, 0.1); color: var(--os-info); }
+        .badge-status-analise { background: rgba(0, 204, 102, 0.1); color: var(--os-success); }
+        .approval-dots { display: flex; gap: 6px; }
+        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--os-border); }
+        .dot.approved { background: var(--os-success); }
+    </style>
+</head>
+<body class="os-mode">
+
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+
+        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h1>Content Engine</h1>
+                        <p>Gestão de ativos editoriais e infraestrutura de retenção.</p>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="btn-os" style="background: var(--os-card); border: 1px solid var(--os-border); color: #fff; padding: 10px 20px; font-size: 0.8rem; border-radius: 4px; cursor: pointer;">
+                            <i class="fa-solid fa-brain"></i> Consultar GPT Editorial
+                        </button>
+                        <button class="btn-os" style="background: var(--os-primary); border: none; color: #fff; padding: 10px 20px; font-size: 0.8rem; font-weight: 700; border-radius: 4px; cursor: pointer;">
+                            <i class="fa-solid fa-plus"></i> Novo Ativo
+                        </button>
+                    </div>
+                </div>
+
+                <div class="os-widget-grid">
+                    <!-- MÉTRICAS EDITORIAIS -->
+                    <div class="os-widget" id="metric-assets" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-quality" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-time" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-reach" style="grid-column: span 3;"></div>
+
+                    <!-- PIPELINE VIVO -->
+                    <div class="os-widget" style="grid-column: span 12;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Pipeline Editorial Operational (Fluxo de Aprovação)</span>
+                        </div>
+                        <table class="pipeline-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Título do Ativo</th>
+                                    <th>Estado</th>
+                                    <th>Prioridade</th>
+                                    <th>Plataforma</th>
+                                    <th>Impacto</th>
+                                    <th>Aprovações (I/S/C)</th>
+                                    <th>Prazo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="content-pipeline-body">
+                                <!-- Injetado via data -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- MATRIZ DE GOVERNANÇA IA -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Governança Editorial IA</span>
+                        </div>
+                        <div style="font-size: 0.85rem; line-height: 1.6; color: var(--os-text-muted);">
+                            <p style="margin-bottom: 20px;">Toda geração de conteúdo via GPTs consome automaticamente os seguintes contextos da FluxAI OS™:</p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px solid var(--os-border);">
+                                    <strong style="color: var(--os-primary); display: block; margin-bottom: 5px;">DNA da Marca</strong>
+                                    Tom de voz soberano e técnico.
+                                </div>
+                                <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px solid var(--os-border);">
+                                    <strong style="color: var(--os-primary); display: block; margin-bottom: 5px;">Histórico de Performance</strong>
+                                    Dados de retenção de ativos anteriores.
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FEEDBACK LOOP -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Feedback Loop & Aprendizado</span>
+                        </div>
+                        <div class="os-activity-log" id="feedback-log">
+                            <div class="log-entry">
+                                <span class="log-time">[HÁ 2D]</span>
+                                <span class="log-user">ANALYTICS:</span>
+                                <span class="log-msg">Ativo CONT-003 superou meta de retenção em 15%.</span>
+                            </div>
+                            <div class="log-entry">
+                                <span class="log-time">[HÁ 5D]</span>
+                                <span class="log-user">GPT_LEARN:</span>
+                                <span class="log-msg">Ajustado tom de voz para C-Level após análise de rejeição.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module">
+        import { OS_UI, OS_AUTH } from './js/os-core.js';
+        import { contentPipelineData, editorialMetrics } from './data/content.js';
+        
+        OS_AUTH.check();
+        OS_UI.renderSidebar('content-engine');
+        OS_UI.renderTopbar();
+
+        // Render Metrics
+        OS_UI.renderMetric('metric-assets', { label: 'Ativos Ativos', value: editorialMetrics.activeAssets, trend: '+4', meta: 'em produção' });
+        OS_UI.renderMetric('metric-quality', { label: 'Score de Qualidade', value: editorialMetrics.qualityScore, trend: '+0.2', meta: 'Meta: 9.0' });
+        OS_UI.renderMetric('metric-time', { label: 'Prazo Médio', value: editorialMetrics.avgCompletionTime, trend: '-0.5d', meta: 'Eficiência' });
+        OS_UI.renderMetric('metric-reach', { label: 'Alcance Estimado', value: editorialMetrics.distributionReach, trend: '+15%', meta: 'Total Acumulado' });
+
+        // Render Pipeline Table
+        const pipelineBody = document.getElementById('content-pipeline-body');
+        contentPipelineData.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="font-family: var(--os-font-mono); font-size: 0.75rem;">${item.id}</td>
+                <td style="font-weight: 600;">${item.title}</td>
+                <td><span class="badge badge-status-${item.stage}">${item.stage}</span></td>
+                <td><span class="badge badge-priority-${item.priority}">${item.priority}</span></td>
+                <td style="font-size: 0.8rem; color: var(--os-text-muted);">${item.platform}</td>
+                <td><span style="font-size: 0.75rem; border-left: 2px solid var(--os-primary); padding-left: 8px;">${item.impact}</span></td>
+                <td>
+                    <div class="approval-dots">
+                        <div class="dot ${item.approvals.internal ? 'approved' : ''}" title="Interna"></div>
+                        <div class="dot ${item.approvals.strategic ? 'approved' : ''}" title="Estratégica"></div>
+                        <div class="dot ${item.approvals.client ? 'approved' : ''}" title="Cliente"></div>
+                    </div>
+                </td>
+                <td style="font-family: var(--os-font-mono); font-size: 0.75rem;">${item.deadline}</td>
+            `;
+            pipelineBody.appendChild(row);
+        });
+    </script>
+</body>
+</html>
