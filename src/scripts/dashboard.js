@@ -1,4 +1,4 @@
-﻿// FLUXAI OS™ DASHBOARD CORE
+// FLUXAI OS™ DASHBOARD CORE
 export const initDashboard = () => {
     const navItems = document.querySelectorAll('.dashboard-nav .nav-item');
     const display = document.getElementById('module-display');
@@ -62,7 +62,7 @@ export const initDashboard = () => {
         updateDisplay(loadingHtml);
 
         try {
-            const fetchUrl = url.startsWith("/") ? url : (url.startsWith("pages/") ? "/" + url : url); const response = await fetch(fetchUrl);
+            const fetchUrl = url.includes(".") ? url : (url.startsWith("/") ? "/pages" + url + ".html" : "/pages/" + url + ".html"); const response = await fetch(fetchUrl);
             const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
