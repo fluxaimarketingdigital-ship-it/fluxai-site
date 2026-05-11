@@ -56,7 +56,7 @@ export const initDashboard = () => {
                 <h3>Processando...</h3>
             </div>
             <div class="display-body">
-                <p>Carregando infraestrutura de ${moduleId.replace(/-/g, ' ')}...</p>
+                <p>Carregando infraestrutura de ${moduleId.replace(/-/g, ' ').toUpperCase()}...</p>
             </div>
         </div>`;
         updateDisplay(loadingHtml);

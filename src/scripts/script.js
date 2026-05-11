@@ -130,10 +130,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeServiceModal = document.getElementById('closeServiceModal');
 
     const servicesData = {
-        positioning: { title: "FluxAI Positioning™", desc: "Arquitetura de autoridade e diferenciação de elite.", features: ["Narrativa Soberana", "Identidade Visual Premium", "Análise de Concorrência"] },
+        command: { title: "FluxAI Command Center™", desc: "Arquitetura de autoridade e diferenciação de elite.", features: ["Narrativa Soberana", "Identidade Visual Premium", "Análise de Concorrência"] },
         content: { title: "FluxAI Content Engine™", desc: "Engenharia de conteúdo focada em ativos de retenção.", features: ["Conteúdo de Alta Densidade", "Scripts Estratégicos", "Gestão de Ativos Digitais"] },
-        growth: { title: "FluxAI Growth System™", desc: "Infraestrutura de aquisição e escala de receita.", features: ["Tráfego Pago Especializado", "Funis de Alta Conversão", "Inteligência de Dados"] },
-        intelligence: { title: "FluxAI Intelligence Core™", desc: "Núcleo tecnológico de automação e IA aplicada.", features: ["Agentes Comerciais de IA", "Arquitetura de CRM", "Eficiência Operacional"] }
+        crm: { title: "FluxAI CRM Intelligence™", desc: "Infraestrutura de aquisição e escala de receita.", features: ["Tráfego Pago Especializado", "Funis de Alta Conversão", "Inteligência de Dados"] },
+        automation: { title: "FluxAI Automation Hub™", desc: "Núcleo tecnológico de automação e IA aplicada.", features: ["Agentes Comerciais de IA", "Arquitetura de CRM", "Eficiência Operacional"] }
     };
 
     document.querySelectorAll('.service-card, .os-item').forEach(card => {
@@ -141,10 +141,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const s = card.getAttribute('data-service') || card.querySelector('strong')?.innerText.toLowerCase();
             let d = servicesData[s];
             if(!d) {
-                if(s?.includes('positioning')) d = servicesData.positioning;
+                if(s?.includes('command') || s?.includes('center')) d = servicesData.command;
                 if(s?.includes('content')) d = servicesData.content;
-                if(s?.includes('acquisition') || s?.includes('growth')) d = servicesData.growth;
-                if(s?.includes('intelligence') || s?.includes('ia')) d = servicesData.intelligence;
+                if(s?.includes('crm') || s?.includes('intelligence')) d = servicesData.crm;
+                if(s?.includes('automation') || s?.includes('hub')) d = servicesData.automation;
             }
 
             if (d && modal && modalBody) {

@@ -5,6 +5,36 @@
       "source": "/ig",
       "destination": "/?utm_source=instagram&utm_medium=bio&utm_campaign=perfil_soberano",
       "permanent": true
+    },
+    {
+      "source": "/pages/sistemas-de-aquisicao",
+      "destination": "/pages/crm-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/pages/inteligencia-operacional",
+      "destination": "/pages/automation-hub",
+      "permanent": true
+    },
+    {
+      "source": "/pages/posicionamento-estrategico",
+      "destination": "/pages/command-center",
+      "permanent": true
+    },
+    {
+      "source": "/pages/engenharia-de-conteudo",
+      "destination": "/pages/content-engine",
+      "permanent": true
+    },
+    {
+      "source": "/pages/sistemas-de-retencao",
+      "destination": "/pages/analytics",
+      "permanent": true
+    },
+    {
+      "source": "/pages/plataformas-proprietarias",
+      "destination": "/pages/govos",
+      "permanent": true
     }
   ]
 }
