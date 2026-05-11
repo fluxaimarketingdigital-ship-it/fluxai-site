@@ -21,6 +21,7 @@ export const OS_UI = {
             { id: 'crm-intelligence', label: 'CRM Intelligence', icon: 'fa-users-gear', group: 'Módulos Operacionais' },
             { id: 'automation-hub', label: 'Automation Hub', icon: 'fa-robot', group: 'Módulos Operacionais' },
             { id: 'analytics', label: 'Analytics', icon: 'fa-chart-line', group: 'Módulos Operacionais' },
+            { id: 'governance', label: 'Governança', icon: 'fa-user-shield', group: 'Governança' },
             { id: 'govos', label: 'GovOS', icon: 'fa-shield-halved', group: 'Governança' }
         ];
 
