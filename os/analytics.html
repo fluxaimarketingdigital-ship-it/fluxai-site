@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         .insight-card { padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); border-left: 3px solid var(--os-primary); border-radius: 4px; margin-bottom: 15px; }
         .insight-card.atenção { border-left-color: var(--os-warning); }
@@ -106,18 +108,50 @@
     <script type="module">
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { decisionalMetrics, operationalInsights, behavioralData, socialSignals } from './data/analytics.js';
+        import { getSupabase } from './services/supabase-client.js';
         
         OS_AUTH.check();
         OS_UI.renderSidebar('analytics');
         OS_UI.renderTopbar();
 
-        // Render Decisional Metrics
-        OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: decisionalMetrics[0].value, trend: '+1.2%', meta: decisionalMetrics[0].impact });
-        OS_UI.renderMetric('metric-cac', { label: 'CAC (Aquisição)', value: decisionalMetrics[1].value, trend: '+15%', meta: decisionalMetrics[1].impact });
-        OS_UI.renderMetric('metric-ltv', { label: 'LTV Projetado', value: decisionalMetrics[2].value, trend: 'Estável', meta: decisionalMetrics[2].impact });
-        OS_UI.renderMetric('metric-speed', { label: 'Tempo de Resposta', value: decisionalMetrics[3].value, trend: '-2m', meta: decisionalMetrics[3].impact });
+        const renderAnalyticsData = async () => {
+            const supabase = getSupabase();
+            
+            let decisional = decisionalMetrics;
+            let behavioral = behavioralData;
+            let social = socialSignals;
 
-        // Render Insights
+            if (supabase) {
+                // Fetch Latest Snapshot
+                const { data, error } = await supabase
+                    .from('analytics_snapshots')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+
+                if (!error && data && data.length > 0) {
+                    const snap = data[0].data;
+                    if (snap.decisionalMetrics) decisional = snap.decisionalMetrics;
+                    if (snap.behavioralData) behavioral = snap.behavioralData;
+                    if (snap.socialSignals) social = snap.socialSignals;
+                }
+            }
+
+            // Render Decisional Metrics
+            OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: decisional[0].value, trend: '+1.2%', meta: decisional[0].impact });
+            OS_UI.renderMetric('metric-cac', { label: 'CAC (Aquisição)', value: decisional[1].value, trend: '+15%', meta: decisional[1].impact });
+            OS_UI.renderMetric('metric-ltv', { label: 'LTV Projetado', value: decisional[2].value, trend: 'Estável', meta: decisional[2].impact });
+            OS_UI.renderMetric('metric-speed', { label: 'Tempo de Resposta', value: decisional[3].value, trend: '-2m', meta: decisional[3].impact });
+
+            // Render Behavioral & Social
+            document.getElementById('watch-time').innerText = behavioral.avgWatchTime;
+            document.getElementById('save-rate').innerText = behavioral.saveRate;
+            document.getElementById('social-context').innerText = social.context;
+            document.getElementById('reach').innerText = social.totalReach;
+            document.getElementById('impressions').innerText = social.impressions;
+        };
+
+        // Render Insights (Static from Mock for now as requested)
         const insightsBody = document.getElementById('insights-container');
         operationalInsights.forEach(insight => {
             const card = document.createElement('div');
@@ -129,12 +163,7 @@
             insightsBody.appendChild(card);
         });
 
-        // Render Behavioral & Social
-        document.getElementById('watch-time').innerText = behavioralData.avgWatchTime;
-        document.getElementById('save-rate').innerText = behavioralData.saveRate;
-        document.getElementById('social-context').innerText = socialSignals.context;
-        document.getElementById('reach').innerText = socialSignals.totalReach;
-        document.getElementById('impressions').innerText = socialSignals.impressions;
+        renderAnalyticsData();
     </script>
 </body>
 </html>

@@ -141,8 +141,8 @@
                         <span class="status-pill status-${item.status.toLowerCase()}">${item.status}</span>
                     </div>
                     <div class="approval-actions">
-                        <button class="btn-action btn-review">Revisar</button>
-                        <button class="btn-action btn-approve" onclick="window.approveItem('${item.id}')">Aprovar</button>
+                        <button class="btn-action btn-review" onclick="window.handleAction('${item.id}', 'REJECTED')">Rejeitar</button>
+                        <button class="btn-action btn-approve" onclick="window.handleAction('${item.id}', 'APPROVED')">Aprovar</button>
                     </div>
                 `;
                 queueContainer.appendChild(card);
@@ -162,26 +162,33 @@
             });
         };
 
-        window.approveItem = async (id) => {
-            console.log('[GOV] Tentando aprovar item:', id);
+        window.handleAction = async (id, status) => {
+            console.log(`[GOV] Tentando ${status} item:`, id);
             const supabase = getSupabase();
             if (!supabase) {
                 alert('Erro: Supabase não inicializado.');
                 return;
             }
             
-            const { error } = await supabase.from('approvals').update({ status: 'APPROVED' }).eq('id', id);
+            // Feedback Visual Imediato (Otimista)
+            const btn = event.target;
+            const originalText = btn.innerText;
+            btn.innerText = 'Processando...';
+            btn.disabled = true;
+
+            const { error } = await supabase.from('approvals').update({ status: status }).eq('id', id);
             
             if (error) {
-                console.error('[GOV] Erro ao aprovar:', error);
-                alert('Erro do Supabase: ' + error.message + '\n\nVerifique se você rodou o comando SQL de permissões (UPDATE/INSERT).');
+                console.error('[GOV] Erro na ação:', error);
+                alert('Erro do Supabase: ' + error.message);
+                btn.innerText = originalText;
+                btn.disabled = false;
             } else {
-                console.log('[GOV] Item aprovado com sucesso.');
+                console.log(`[GOV] Item ${status} com sucesso.`);
                 await supabase.from('audit_logs').insert({ 
-                    action: `Item ${id} aprovado via painel real`, 
+                    action: `Item ${id} foi ${status} via painel real`, 
                     module: 'governance' 
                 });
-                alert('Item aprovado com sucesso!');
                 renderGovernanceData();
             }
         };
