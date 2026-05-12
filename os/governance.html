@@ -88,15 +88,24 @@
         import { approvalQueue, auditLog, governanceMetrics } from './data/governance.js';
         import { getSupabase } from './services/supabase-client.js';
         
-        OS_AUTH.check();
-        OS_UI.renderSidebar('governance');
-        OS_UI.renderTopbar();
+        async function init() {
+            // 1. Validar Acesso Real
+            const user = await OS_AUTH.check();
+            if (!user) return;
 
-        // Render Metrics
-        OS_UI.renderMetric('metric-approval-time', { label: 'Tempo de Aprovação', value: governanceMetrics.avgApprovalTime, trend: 'Estável', meta: 'Eficiência' });
-        OS_UI.renderMetric('metric-compliance', { label: 'Taxa de Conformidade', value: governanceMetrics.complianceRate, trend: 'Ideal', meta: 'Segurança' });
-        OS_UI.renderMetric('metric-integrity', { label: 'Integridade Sistema', value: governanceMetrics.systemIntegrity, trend: '100%', meta: 'Monitorado' });
-        OS_UI.renderMetric('metric-audits', { label: 'Auditorias Ativas', value: governanceMetrics.activeAudits, trend: 'Zera', meta: 'Risco Mínimo' });
+            // 2. Renderizar Base Global
+            OS_UI.renderSidebar('governance');
+            await OS_UI.renderTopbar();
+
+            // 3. Render Metrics
+            OS_UI.renderMetric('metric-approval-time', { label: 'Tempo de Aprovação', value: governanceMetrics.avgApprovalTime, trend: 'Estável', meta: 'Eficiência' });
+            OS_UI.renderMetric('metric-compliance', { label: 'Taxa de Conformidade', value: governanceMetrics.complianceRate, trend: 'Ideal', meta: 'Segurança' });
+            OS_UI.renderMetric('metric-integrity', { label: 'Integridade Sistema', value: governanceMetrics.systemIntegrity, trend: '100%', meta: 'Monitorado' });
+            OS_UI.renderMetric('metric-audits', { label: 'Auditorias Ativas', value: governanceMetrics.activeAudits, trend: 'Zera', meta: 'Risco Mínimo' });
+
+            // 4. Render Data
+            await renderGovernanceData();
+        }
 
         const renderGovernanceData = async () => {
             const queueContainer = document.getElementById('approval-queue-container');
@@ -193,7 +202,7 @@
             }
         };
 
-        renderGovernanceData();
+        init();
     </script>
 </body>
 </html>

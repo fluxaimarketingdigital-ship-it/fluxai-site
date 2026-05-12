@@ -108,17 +108,25 @@
         import { crmLeadsData, crmMetrics } from './data/crm.js';
         import { getSupabase } from './services/supabase-client.js';
         
-        OS_AUTH.check();
-        OS_UI.renderSidebar('crm-intelligence');
-        OS_UI.renderTopbar();
+        async function init() {
+            // 1. Validar Acesso Real
+            const user = await OS_AUTH.check();
+            if (!user) return;
 
-        // Render Metrics
-        OS_UI.renderMetric('metric-value', { label: 'Valor em Pipeline', value: crmMetrics.pipelineValue, trend: '+15%', meta: 'Projetado' });
-        OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: crmMetrics.retentionRate, trend: '+0.5%', meta: 'Meta: 98%' });
-        OS_UI.renderMetric('metric-cycle', { label: 'Ciclo Médio', value: crmMetrics.avgSalesCycle, trend: '-2d', meta: 'Eficiência' });
-        OS_UI.renderMetric('metric-opps', { label: 'Oportunidades Ativas', value: crmMetrics.activeOpportunities, trend: '+3', meta: 'Em negociação' });
+            // 2. Renderizar Base Global
+            OS_UI.renderSidebar('crm-intelligence');
+            await OS_UI.renderTopbar();
 
-        // Render CRM Table from Supabase
+            // 3. Render Metrics
+            OS_UI.renderMetric('metric-value', { label: 'Valor em Pipeline', value: crmMetrics.pipelineValue, trend: '+15%', meta: 'Projetado' });
+            OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: crmMetrics.retentionRate, trend: '+0.5%', meta: 'Meta: 98%' });
+            OS_UI.renderMetric('metric-cycle', { label: 'Ciclo Médio', value: crmMetrics.avgSalesCycle, trend: '-2d', meta: 'Eficiência' });
+            OS_UI.renderMetric('metric-opps', { label: 'Oportunidades Ativas', value: crmMetrics.activeOpportunities, trend: '+3', meta: 'Em negociação' });
+
+            // 4. Render CRM Table from Supabase
+            await renderLeads();
+        }
+
         const renderLeads = async () => {
             const crmBody = document.getElementById('crm-leads-body');
             const supabase = getSupabase();
@@ -170,7 +178,7 @@
             });
         };
 
-        renderLeads();
+        init();
     </script>
 </body>
 </html>

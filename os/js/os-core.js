@@ -94,12 +94,75 @@ export const OS_UI = {
     }
 };
 
-// CONTROLE DE ACESSO
+// CONTROLE DE ACESSO REAL (SUPABASE)
+import { getSupabase } from '../services/supabase-client.js';
+
 export const OS_AUTH = {
-    check: () => {
-        const session = localStorage.getItem('fluxai_session');
+    /**
+     * Validação de Sessão em Tempo Real
+     */
+    check: async () => {
+        const supabase = getSupabase();
+        if (!supabase) return;
+
+        const { data: { session } } = await supabase.auth.getSession();
+        
         if (!session) {
+            console.warn('[AUTH] Sessão não encontrada. Redirecionando...');
+            window.location.href = 'login.html';
+            return null;
+        }
+
+        // Buscar perfil estendido para RBAC
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', session.user.id)
+            .single();
+
+        return { ...session.user, ...profile };
+    },
+
+    /**
+     * Logout Seguro
+     */
+    logout: async () => {
+        const supabase = getSupabase();
+        if (supabase) {
+            await supabase.auth.signOut();
             window.location.href = 'login.html';
         }
     }
+};
+
+// Extensão de UI para dados reais
+const originalRenderTopbar = OS_UI.renderTopbar;
+OS_UI.renderTopbar = async () => {
+    const user = await OS_AUTH.check();
+    if (!user) return;
+
+    const initials = user.full_name ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+    
+    const html = `
+        <div class="os-topbar-left">
+            <div class="os-status-indicator">
+                <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}
+            </div>
+        </div>
+        <div class="os-topbar-right">
+            <div class="os-user-profile" id="user-profile-menu" style="cursor: pointer;">
+                <div class="os-avatar">${initials}</div>
+                <span>${user.full_name || user.email}</span>
+                <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 8px; opacity: 0.5;"></i>
+            </div>
+        </div>`;
+    
+    document.querySelector('.os-topbar').innerHTML = html;
+
+    // Listener para logout (opcional, para UI futura)
+    document.getElementById('user-profile-menu').onclick = () => {
+        if(confirm('Deseja encerrar a sessão operacional?')) {
+            OS_AUTH.logout();
+        }
+    };
 };

@@ -110,9 +110,18 @@
         import { decisionalMetrics, operationalInsights, behavioralData, socialSignals } from './data/analytics.js';
         import { getSupabase } from './services/supabase-client.js';
         
-        OS_AUTH.check();
-        OS_UI.renderSidebar('analytics');
-        OS_UI.renderTopbar();
+        async function init() {
+            // 1. Validar Acesso Real
+            const user = await OS_AUTH.check();
+            if (!user) return;
+
+            // 2. Renderizar Base Global
+            OS_UI.renderSidebar('analytics');
+            await OS_UI.renderTopbar();
+
+            // 3. Render Data
+            await renderAnalyticsData();
+        }
 
         const renderAnalyticsData = async () => {
             const supabase = getSupabase();
@@ -151,7 +160,7 @@
             document.getElementById('impressions').innerText = social.impressions;
         };
 
-        // Render Insights (Static from Mock for now as requested)
+        // Render Insights
         const insightsBody = document.getElementById('insights-container');
         operationalInsights.forEach(insight => {
             const card = document.createElement('div');
@@ -163,7 +172,7 @@
             insightsBody.appendChild(card);
         });
 
-        renderAnalyticsData();
+        init();
     </script>
 </body>
 </html>

@@ -51,12 +51,12 @@
 
         <form class="login-form" id="loginForm">
             <div class="form-group">
-                <label>Acesso do Operador</label>
-                <input type="text" id="username" class="form-control" placeholder="admin" required />
+                <label>E-mail do Operador</label>
+                <input type="email" id="username" class="form-control" placeholder="seu@email.com" required />
             </div>
             <div class="form-group">
                 <label>Chave de Acesso</label>
-                <input type="password" id="password" class="form-control" placeholder="fluxai2024" required />
+                <input type="password" id="password" class="form-control" placeholder="••••••••" required />
             </div>
             <button type="submit" class="btn-login">VALIDAR ACESSO <i class="fa-solid fa-shield-halved"></i></button>
         </form>
@@ -67,18 +67,34 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
-        import { OS_AUTH } from './core/auth.js';
+        import { getSupabase } from './services/supabase-client.js';
 
-        document.getElementById('loginForm').addEventListener('submit', (e) => {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const username = document.getElementById('username').value;
+            const btn = e.target.querySelector('button');
+            const originalText = btn.innerHTML;
+            
+            const email = document.getElementById('username').value;
             const password = document.getElementById('password').value;
 
-            if (OS_AUTH.login({ username, password })) {
-                window.location.href = './modules/command-center/command-center.html';
+            // Feedback Visual
+            btn.innerHTML = 'VALIDANDO... <i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.disabled = true;
+
+            const supabase = getSupabase();
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                alert('Falha na Autenticação: ' + error.message);
+                btn.innerHTML = originalText;
+                btn.disabled = false;
             } else {
-                alert('Credenciais Inválidas');
+                window.location.href = 'command-center.html';
             }
         });
     </script>
