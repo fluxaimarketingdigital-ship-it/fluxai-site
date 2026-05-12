@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Governança</title>
+    <link rel="stylesheet" href="../../styles/interface.css" />
+    <link rel="stylesheet" href="../../styles/components.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        .os-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .os-table th, .os-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--os-border); font-size: 0.85rem; }
+        .os-table th { color: var(--os-text-muted); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; }
+        .os-badge { padding: 2px 8px; border-radius: 2px; font-size: 0.7rem; background: var(--os-border); }
+        .status-aguardando { background: var(--os-warning); color: #000; }
+        .status-revisão { background: var(--os-info); color: #fff; }
+        .status-concluído { background: var(--os-success); color: #fff; }
+        .priority-crítica { color: var(--os-danger); font-weight: 700; }
+        .priority-alta { color: var(--os-warning); }
+        .actions-cell { display: flex; gap: 8px; }
+    </style>
+</head>
+<body class="os-mode">
+
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+
+        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-title">
+                    <h1>Governança e Auditoria</h1>
+                    <p>Central de controle operacional e integridade de processos.</p>
+                </div>
+
+                <div class="os-widget-grid">
+                    <div class="os-widget" id="metric-approval" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-compliance" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-audits" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-integrity" style="grid-column: span 3;"></div>
+
+                    <div class="os-widget" style="grid-column: span 12;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Monitoramento de Infraestrutura & Telemetria</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 10px;" id="tech-stats">
+                            <!-- Stats injetados via JS -->
+                        </div>
+                    </div>
+
+                    <div class="os-widget" style="grid-column: span 12;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Fila de Aprovação Operacional</span>
+                        </div>
+                        <table class="os-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Alvo</th>
+                                    <th>Módulo</th>
+                                    <th>Solicitante</th>
+                                    <th>Impacto</th>
+                                    <th>Status</th>
+                                    <th>Prioridade</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="queue-body"></tbody>
+                        </table>
+                    </div>
+
+                    <div class="os-widget" style="grid-column: span 12;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Log de Auditoria em Tempo Real</span>
+                        </div>
+                        <div class="os-activity-log" id="audit-list"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="./governance.js"></script>
+</body>
+</html>

@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FluxAI OS™ | Login</title>
-    <link rel="stylesheet" href="/src/styles/os/interface.css" />
+    <link rel="stylesheet" href="./styles/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -52,27 +52,34 @@
         <form class="login-form" id="loginForm">
             <div class="form-group">
                 <label>Acesso do Operador</label>
-                <input type="text" class="form-control" placeholder="ID ou E-mail" required />
+                <input type="text" id="username" class="form-control" placeholder="admin" required />
             </div>
             <div class="form-group">
                 <label>Chave de Acesso</label>
-                <input type="password" class="form-control" placeholder="••••••••" required />
+                <input type="password" id="password" class="form-control" placeholder="fluxai2024" required />
             </div>
             <button type="submit" class="btn-login">VALIDAR ACESSO <i class="fa-solid fa-shield-halved"></i></button>
         </form>
 
         <div class="login-footer">
-            <p>Infraestrutura de Inteligência FluxAI Labs v1.0.4</p>
-            <a href="../pages/fluxai-os.html" style="color: var(--os-primary); text-decoration: none; display: block; margin-top: 15px;">Solicitar Acesso à Infraestrutura</a>
+            <p>Infraestrutura de Inteligência FluxAI Labs v1.1.0</p>
+            <a href="/" style="color: var(--os-primary); text-decoration: none; display: block; margin-top: 15px;">Solicitar Acesso à Infraestrutura</a>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { OS_AUTH } from './core/auth.js';
+
         document.getElementById('loginForm').addEventListener('submit', (e) => {
             e.preventDefault();
-            // Simulação de autenticação
-            localStorage.setItem('fluxai_session', 'active_operator_123');
-            window.location.href = 'command-center.html';
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            if (OS_AUTH.login({ username, password })) {
+                window.location.href = './modules/command-center/command-center.html';
+            } else {
+                alert('Credenciais Inválidas');
+            }
         });
     </script>
 </body>

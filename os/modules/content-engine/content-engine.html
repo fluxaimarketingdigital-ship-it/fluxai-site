@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Content Engine</title>
+    <link rel="stylesheet" href="../../styles/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        .os-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .os-table th, .os-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--os-border); font-size: 0.85rem; }
+        .os-table th { color: var(--os-text-muted); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; }
+        .os-badge { background: var(--os-primary); color: #fff; padding: 2px 8px; border-radius: 2px; font-size: 0.7rem; }
+        .os-priority-crítica { color: var(--os-danger); font-weight: 700; }
+        .os-priority-alta { color: var(--os-warning); }
+    </style>
+</head>
+<body class="os-mode">
+
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+
+        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-title">
+                    <h1>Motor de Conteúdo</h1>
+                    <p>Gestão de ativos editoriais e autoridade técnica.</p>
+                </div>
+
+                <div class="os-widget-grid">
+                    <div class="os-widget" id="metric-assets" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-completion" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-quality" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-reach" style="grid-column: span 3;"></div>
+
+                    <div class="os-widget" style="grid-column: span 12;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Pipeline de Produção de Ativos</span>
+                        </div>
+                        <table class="os-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Título do Ativo</th>
+                                    <th>Estágio</th>
+                                    <th>Prioridade</th>
+                                    <th>Responsável</th>
+                                    <th>Prazo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pipeline-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="./content-engine.js"></script>
+</body>
+</html>

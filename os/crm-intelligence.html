@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         .crm-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         .crm-table th { text-align: left; padding: 15px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--os-text-muted); border-bottom: 1px solid var(--os-border); }
@@ -97,9 +99,6 @@
                                 <li>Personalização de abordagem via Contexto Histórico.</li>
                                 <li>Priorização baseada em LTV (Lifetime Value) Estimado.</li>
                             </ul>
-                        </div>
-                    </div>
-                </div>
             </main>
         </div>
     </div>
@@ -107,6 +106,7 @@
     <script type="module">
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { crmLeadsData, crmMetrics } from './data/crm.js';
+        import { getSupabase } from './services/supabase-client.js';
         
         OS_AUTH.check();
         OS_UI.renderSidebar('crm-intelligence');
@@ -118,28 +118,47 @@
         OS_UI.renderMetric('metric-cycle', { label: 'Ciclo Médio', value: crmMetrics.avgSalesCycle, trend: '-2d', meta: 'Eficiência' });
         OS_UI.renderMetric('metric-opps', { label: 'Oportunidades Ativas', value: crmMetrics.activeOpportunities, trend: '+3', meta: 'Em negociação' });
 
-        // Render CRM Table
-        const crmBody = document.getElementById('crm-leads-body');
-        crmLeadsData.forEach(item => {
-            const healthClass = item.healthScore > 80 ? '' : (item.healthScore > 50 ? 'warning' : 'danger');
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>
-                    <div style="font-weight: 700;">${item.name}</div>
-                    <div style="font-size: 0.75rem; color: var(--os-text-muted);">${item.contact}</div>
-                </td>
-                <td style="width: 150px;">
-                    <div style="font-family: var(--os-font-mono); font-size: 0.8rem;">${item.healthScore}%</div>
-                    <div class="health-bar"><div class="health-fill ${healthClass}" style="width: ${item.healthScore}%;"></div></div>
-                </td>
-                <td><span class="temp-badge temp-${item.temperature}">${item.temperature}</span></td>
-                <td style="font-size: 0.8rem; color: var(--os-text-muted);">${item.lastFollowUp}</td>
-                <td style="font-weight: 600; color: var(--os-primary);">${item.nextAction}</td>
-                <td style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: ${item.risk === 'alto' ? 'var(--os-danger)' : (item.risk === 'médio' ? 'var(--os-warning)' : 'var(--os-success)')}">${item.risk}</td>
-                <td style="font-family: var(--os-font-mono); font-weight: 600;">${item.impact}</td>
-            `;
-            crmBody.appendChild(row);
-        });
+        // Render CRM Table from Supabase
+        const renderLeads = async () => {
+            const crmBody = document.getElementById('crm-leads-body');
+            const supabase = getSupabase();
+            
+            let leads = crmLeadsData; // Fallback inicial
+
+            if (supabase) {
+                const { data, error } = await supabase.from('leads').select('*').order('updated_at', { ascending: false });
+                if (!error && data && data.length > 0) {
+                    leads = data;
+                }
+            }
+
+            crmBody.innerHTML = ''; // Limpa antes de renderizar
+            leads.forEach(item => {
+                // Adaptação dos campos do banco para a UI legada
+                const healthVal = item.health === 'OPTIMAL' ? 95 : (item.health === 'STABLE' ? 70 : 40);
+                const healthClass = healthVal > 80 ? '' : (healthVal > 50 ? 'warning' : 'danger');
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <div style="font-weight: 700;">${item.company}</div>
+                        <div style="font-size: 0.75rem; color: var(--os-text-muted);">${item.name}</div>
+                    </td>
+                    <td style="width: 150px;">
+                        <div style="font-family: var(--os-font-mono); font-size: 0.8rem;">${healthVal}%</div>
+                        <div class="health-bar"><div class="health-fill ${healthClass}" style="width: ${healthVal}%;"></div></div>
+                    </td>
+                    <td><span class="temp-badge temp-${item.status === 'PROPOSAL' ? 'quente' : 'morna'}">${item.status}</span></td>
+                    <td style="font-size: 0.8rem; color: var(--os-text-muted);">Hoje</td>
+                    <td style="font-weight: 600; color: var(--os-primary);">Acompanhamento Real</td>
+                    <td style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: var(--os-success)">BAIXO</td>
+                    <td style="font-family: var(--os-font-mono); font-weight: 600;">R$ ${item.value}</td>
+                `;
+                crmBody.appendChild(row);
+            });
+        };
+
+        renderLeads();
     </script>
 </body>
 </html>

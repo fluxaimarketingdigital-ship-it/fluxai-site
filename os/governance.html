@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
         .approval-card { display: grid; grid-template-columns: 80px 1fr 120px 150px; align-items: center; gap: 20px; padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); border-radius: 4px; margin-bottom: 12px; }
         .approval-id { font-family: var(--os-font-mono); font-size: 0.75rem; color: var(--os-text-muted); }
@@ -84,6 +86,7 @@
     <script type="module">
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { approvalQueue, auditLog, governanceMetrics } from './data/governance.js';
+        import { getSupabase } from './services/supabase-client.js';
         
         OS_AUTH.check();
         OS_UI.renderSidebar('governance');
@@ -95,41 +98,82 @@
         OS_UI.renderMetric('metric-integrity', { label: 'Integridade Sistema', value: governanceMetrics.systemIntegrity, trend: '100%', meta: 'Monitorado' });
         OS_UI.renderMetric('metric-audits', { label: 'Auditorias Ativas', value: governanceMetrics.activeAudits, trend: 'Zera', meta: 'Risco Mínimo' });
 
-        // Render Approval Queue
-        const queueContainer = document.getElementById('approval-queue-container');
-        approvalQueue.forEach(item => {
-            if (item.status === 'concluído') return; // Apenas itens pendentes na fila principal
-            const card = document.createElement('div');
-            card.className = 'approval-card';
-            card.innerHTML = `
-                <div class="approval-id">${item.id}</div>
-                <div>
-                    <div class="approval-target">${item.target}</div>
-                    <div class="approval-meta">Solicitado por: ${item.requestedBy} | Módulo: ${item.module}</div>
-                </div>
-                <div>
-                    <span class="status-pill status-${item.status}">${item.status}</span>
-                </div>
-                <div class="approval-actions">
-                    <button class="btn-action btn-review">Revisar</button>
-                    <button class="btn-action btn-approve">Aprovar</button>
-                </div>
-            `;
-            queueContainer.appendChild(card);
-        });
+        const renderGovernanceData = async () => {
+            const queueContainer = document.getElementById('approval-queue-container');
+            const auditContainer = document.getElementById('audit-log-container');
+            const supabase = getSupabase();
 
-        // Render Audit Log
-        const auditContainer = document.getElementById('audit-log-container');
-        auditLog.forEach(log => {
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            entry.innerHTML = `
-                <span class="log-time">[${log.time}]</span>
-                <span class="log-user">${log.user}:</span>
-                <span class="log-msg">${log.action}</span>
-            `;
-            auditContainer.appendChild(entry);
-        });
+            let approvals = approvalQueue;
+            let logs = auditLog;
+
+            if (supabase) {
+                // Fetch Approvals
+                const { data: appData, error: appErr } = await supabase.from('approvals').select('*').order('created_at', { ascending: false });
+                if (!appErr && appData && appData.length > 0) {
+                    approvals = appData;
+                }
+
+                // Fetch Logs
+                const { data: logData, error: logErr } = await supabase.from('audit_logs').select('*').limit(10).order('created_at', { ascending: false });
+                if (!logErr && logData && logData.length > 0) {
+                    logs = logData.map(l => ({
+                        time: new Date(l.created_at).toLocaleTimeString(),
+                        user: 'SISTEMA',
+                        action: l.action
+                    }));
+                }
+            }
+
+            // Render Approval Queue
+            queueContainer.innerHTML = '';
+            approvals.forEach(item => {
+                if (item.status === 'concluído' || item.status === 'APPROVED') return;
+                
+                const card = document.createElement('div');
+                card.className = 'approval-card';
+                card.innerHTML = `
+                    <div class="approval-id">${item.id.substring ? item.id.substring(0, 8) : item.id}</div>
+                    <div>
+                        <div class="approval-target">${item.target || item.impact || 'Solicitação Crítica'}</div>
+                        <div class="approval-meta">Solicitado por: ${item.requestedBy || 'Operador'} | Módulo: ${item.module}</div>
+                    </div>
+                    <div>
+                        <span class="status-pill status-${item.status.toLowerCase()}">${item.status}</span>
+                    </div>
+                    <div class="approval-actions">
+                        <button class="btn-action btn-review">Revisar</button>
+                        <button class="btn-action btn-approve" onclick="window.approveItem('${item.id}')">Aprovar</button>
+                    </div>
+                `;
+                queueContainer.appendChild(card);
+            });
+
+            // Render Audit Log
+            auditContainer.innerHTML = '';
+            logs.forEach(log => {
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `
+                    <span class="log-time">[${log.time}]</span>
+                    <span class="log-user">${log.user}:</span>
+                    <span class="log-msg">${log.action}</span>
+                `;
+                auditContainer.appendChild(entry);
+            });
+        };
+
+        window.approveItem = async (id) => {
+            const supabase = getSupabase();
+            if (!supabase) return;
+            
+            const { error } = await supabase.from('approvals').update({ status: 'APPROVED' }).eq('id', id);
+            if (!error) {
+                await supabase.from('audit_logs').insert({ action: `Item ${id} aprovado via painel real`, module: 'governance' });
+                renderGovernanceData();
+            }
+        };
+
+        renderGovernanceData();
     </script>
 </body>
 </html>

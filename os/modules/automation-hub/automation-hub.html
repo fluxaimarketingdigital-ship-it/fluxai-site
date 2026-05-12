@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Automation Hub</title>
+    <link rel="stylesheet" href="../../styles/interface.css" />
+    <link rel="stylesheet" href="../../styles/components.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        /* PILAR 1: INTEGRAÇÕES */
+        .integration-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .integration-card { background: var(--os-card); border: 1px solid var(--os-border); padding: 15px; border-radius: 4px; display: flex; align-items: center; gap: 12px; }
+        .int-status { width: 8px; height: 8px; border-radius: 50%; }
+        .status-operacional, .status-estável { background: var(--os-success); box-shadow: 0 0 10px var(--os-success); }
+        .status-atenção { background: var(--os-warning); }
+        .status-falha { background: var(--os-danger); }
+
+        /* PILAR 2: FLUXOS */
+        .os-flow-item { background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); padding: 15px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .flow-path { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; }
+        .flow-path i { color: var(--os-primary); font-size: 0.7rem; }
+
+        /* PILAR 4: FILA */
+        .exec-row { display: grid; grid-template-columns: 80px 1fr 100px 100px; padding: 10px 0; border-bottom: 1px solid var(--os-border); font-size: 0.8rem; }
+        .exec-row:last-child { border-bottom: none; }
+        .status-pill { padding: 2px 6px; border-radius: 2px; font-size: 0.65rem; text-transform: uppercase; }
+        .pill-aguardando { background: rgba(255,255,0,0.1); color: var(--os-warning); }
+        .pill-processando { background: rgba(0,255,255,0.1); color: var(--os-info); }
+        .pill-erro { background: rgba(255,0,0,0.1); color: var(--os-danger); }
+
+        /* ALERTAS */
+        .os-alert-card { border-left: 3px solid var(--os-danger); background: rgba(255,77,77,0.05); padding: 12px; margin-bottom: 10px; border-radius: 2px; }
+        .os-alert-card h4 { font-size: 0.85rem; margin: 0; color: var(--os-danger); }
+        .os-alert-card p { font-size: 0.75rem; margin: 5px 0 0 0; color: var(--os-text-muted); }
+    </style>
+</head>
+<body class="os-mode">
+
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+
+        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-title">
+                    <h1>Central de Automação</h1>
+                    <p>Monitoramento de integridade sistêmica e fluxos operacionais.</p>
+                </div>
+
+                <!-- ESTADO DAS INTEGRAÇÕES -->
+                <div class="integration-grid" id="integrations-container"></div>
+
+                <div class="os-widget-grid">
+                    <!-- FLUXOS OPERACIONAIS -->
+                    <div class="os-widget" style="grid-column: span 8;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Fluxos Estratégicos Ativos</span>
+                        </div>
+                        <div id="flows-container"></div>
+                    </div>
+
+                    <!-- ALERTAS INTELIGENTES -->
+                    <div class="os-widget" style="grid-column: span 4;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Alertas de Confiabilidade</span>
+                        </div>
+                        <div id="alerts-container"></div>
+                    </div>
+
+                    <!-- FILA DE EXECUÇÃO -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Fila de Execução em Tempo Real</span>
+                        </div>
+                        <div class="exec-header exec-row" style="color: var(--os-text-muted); border-bottom: 2px solid var(--os-border);">
+                            <span>ID</span><span>FLUXO</span><span>STATUS</span><span>HORÁRIO</span>
+                        </div>
+                        <div id="queue-container"></div>
+                    </div>
+
+                    <!-- LOGS HUMANOS -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Eventos Operacionais Recentes</span>
+                        </div>
+                        <div class="os-activity-log" id="logs-container"></div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="./automation-hub.js"></script>
+</body>
+</html>
