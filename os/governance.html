@@ -163,12 +163,25 @@
         };
 
         window.approveItem = async (id) => {
+            console.log('[GOV] Tentando aprovar item:', id);
             const supabase = getSupabase();
-            if (!supabase) return;
+            if (!supabase) {
+                alert('Erro: Supabase não inicializado.');
+                return;
+            }
             
             const { error } = await supabase.from('approvals').update({ status: 'APPROVED' }).eq('id', id);
-            if (!error) {
-                await supabase.from('audit_logs').insert({ action: `Item ${id} aprovado via painel real`, module: 'governance' });
+            
+            if (error) {
+                console.error('[GOV] Erro ao aprovar:', error);
+                alert('Erro do Supabase: ' + error.message + '\n\nVerifique se você rodou o comando SQL de permissões (UPDATE/INSERT).');
+            } else {
+                console.log('[GOV] Item aprovado com sucesso.');
+                await supabase.from('audit_logs').insert({ 
+                    action: `Item ${id} aprovado via painel real`, 
+                    module: 'governance' 
+                });
+                alert('Item aprovado com sucesso!');
                 renderGovernanceData();
             }
         };
