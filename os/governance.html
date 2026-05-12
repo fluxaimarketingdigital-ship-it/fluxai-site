@@ -116,18 +116,26 @@
             let logs = auditLog;
 
             if (supabase) {
-                // Fetch Approvals
-                const { data: appData, error: appErr } = await supabase.from('approvals').select('*').order('created_at', { ascending: false });
-                if (!appErr && appData && appData.length > 0) {
-                    approvals = appData;
-                }
+                // 1. Fetch Real Approvals (Pending)
+                const { data: appData, error: appErr } = await supabase
+                    .from('approvals')
+                    .select('*')
+                    .eq('status', 'PENDING')
+                    .order('created_at', { ascending: false });
+                
+                if (!appErr && appData) approvals = appData;
 
-                // Fetch Logs
-                const { data: logData, error: logErr } = await supabase.from('audit_logs').select('*').limit(10).order('created_at', { ascending: false });
-                if (!logErr && logData && logData.length > 0) {
+                // 2. Fetch Real Audit Telemetry (with Profile Join)
+                const { data: logData, error: logErr } = await supabase
+                    .from('audit_logs')
+                    .select('created_at, action, user_id, profiles(full_name)')
+                    .order('created_at', { ascending: false })
+                    .limit(15);
+                
+                if (!logErr && logData) {
                     logs = logData.map(l => ({
-                        time: new Date(l.created_at).toLocaleTimeString(),
-                        user: 'SISTEMA',
+                        time: new Date(l.created_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                        user: l.profiles ? l.profiles.full_name : 'SISTEMA',
                         action: l.action
                     }));
                 }
@@ -136,12 +144,10 @@
             // Render Approval Queue
             queueContainer.innerHTML = '';
             approvals.forEach(item => {
-                if (item.status === 'concluído' || item.status === 'APPROVED') return;
-                
                 const card = document.createElement('div');
                 card.className = 'approval-card';
                 card.innerHTML = `
-                    <div class="approval-id">${item.id.substring ? item.id.substring(0, 8) : item.id}</div>
+                    <div class="approval-id">${item.id.toString().substring(0, 8)}</div>
                     <div>
                         <div class="approval-target">${item.target || item.impact || 'Solicitação Crítica'}</div>
                         <div class="approval-meta">Solicitado por: ${item.requestedBy || 'Operador'} | Módulo: ${item.module}</div>
@@ -172,14 +178,10 @@
         };
 
         window.handleAction = async (id, status) => {
-            console.log(`[GOV] Tentando ${status} item:`, id);
             const supabase = getSupabase();
-            if (!supabase) {
-                alert('Erro: Supabase não inicializado.');
-                return;
-            }
+            const { data: { session } } = await supabase.auth.getSession();
             
-            // Feedback Visual Imediato (Otimista)
+            // Feedback Visual Imediato
             const btn = event.target;
             const originalText = btn.innerText;
             btn.innerText = 'Processando...';
@@ -188,15 +190,15 @@
             const { error } = await supabase.from('approvals').update({ status: status }).eq('id', id);
             
             if (error) {
-                console.error('[GOV] Erro na ação:', error);
-                alert('Erro do Supabase: ' + error.message);
                 btn.innerText = originalText;
                 btn.disabled = false;
+                alert('Erro: ' + error.message);
             } else {
-                console.log(`[GOV] Item ${status} com sucesso.`);
+                // Registrar log de quem aprovou/rejeitou
                 await supabase.from('audit_logs').insert({ 
-                    action: `Item ${id} foi ${status} via painel real`, 
-                    module: 'governance' 
+                    action: `Item ${id.substring(0,8)} foi ${status}`, 
+                    module: 'governance',
+                    user_id: session.user.id
                 });
                 renderGovernanceData();
             }

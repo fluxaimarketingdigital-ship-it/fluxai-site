@@ -22,6 +22,7 @@ export const OS_UI = {
             { id: 'automation-hub', label: 'Automation Hub', icon: 'fa-robot', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
             { id: 'analytics', label: 'Analytics', icon: 'fa-chart-line', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR', 'CLIENT'] },
             { id: 'governance', label: 'Governança', icon: 'fa-user-shield', group: 'Governança', roles: ['ADMIN'] },
+            { id: 'governance-users', label: 'Gestão de Usuários', icon: 'fa-users-cog', group: 'Governança', roles: ['ADMIN'] },
             { id: 'govos', label: 'GovOS', icon: 'fa-shield-halved', group: 'Governança', roles: ['ADMIN'] }
         ];
 
@@ -53,6 +54,14 @@ export const OS_UI = {
             </div>`;
         
         document.querySelector('.os-sidebar').innerHTML = html;
+    },
+
+    /**
+     * Estado de Carregamento (Performance Step 2)
+     */
+    showLoading: (elementId) => {
+        const el = document.getElementById(elementId);
+        if (el) el.innerHTML = `<div class="os-skeleton-inline"></div>`;
     },
 
     /**
