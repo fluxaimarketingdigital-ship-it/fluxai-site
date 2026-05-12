@@ -12,17 +12,17 @@ export const OS_CONFIG = {
 // COMPONENTES REUTILIZÁVEIS
 export const OS_UI = {
     /**
-     * Renderiza a Sidebar padrão da OS
+     * Renderiza a Sidebar filtrada por RBAC
      */
-    renderSidebar: (activeModule) => {
+    renderSidebar: (activeModule, userRole = 'CLIENT') => {
         const navItems = [
-            { id: 'command-center', label: 'Command Center', icon: 'fa-gauge-high', group: 'Núcleo Estratégico' },
-            { id: 'content-engine', label: 'Content Engine', icon: 'fa-pen-nib', group: 'Módulos Operacionais' },
-            { id: 'crm-intelligence', label: 'CRM Intelligence', icon: 'fa-users-gear', group: 'Módulos Operacionais' },
-            { id: 'automation-hub', label: 'Automation Hub', icon: 'fa-robot', group: 'Módulos Operacionais' },
-            { id: 'analytics', label: 'Analytics', icon: 'fa-chart-line', group: 'Módulos Operacionais' },
-            { id: 'governance', label: 'Governança', icon: 'fa-user-shield', group: 'Governança' },
-            { id: 'govos', label: 'GovOS', icon: 'fa-shield-halved', group: 'Governança' }
+            { id: 'command-center', label: 'Command Center', icon: 'fa-gauge-high', group: 'Núcleo Estratégico', roles: ['ADMIN', 'OPERATOR'] },
+            { id: 'content-engine', label: 'Content Engine', icon: 'fa-pen-nib', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR', 'CLIENT'] },
+            { id: 'crm-intelligence', label: 'CRM Intelligence', icon: 'fa-users-gear', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
+            { id: 'automation-hub', label: 'Automation Hub', icon: 'fa-robot', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
+            { id: 'analytics', label: 'Analytics', icon: 'fa-chart-line', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR', 'CLIENT'] },
+            { id: 'governance', label: 'Governança', icon: 'fa-user-shield', group: 'Governança', roles: ['ADMIN'] },
+            { id: 'govos', label: 'GovOS', icon: 'fa-shield-halved', group: 'Governança', roles: ['ADMIN'] }
         ];
 
         let html = `
@@ -33,6 +33,9 @@ export const OS_UI = {
 
         let currentGroup = "";
         navItems.forEach(item => {
+            // Filtro de RBAC: só exibe se o usuário tiver o cargo permitido
+            if (!item.roles.includes(userRole)) return;
+
             if (item.group !== currentGroup) {
                 currentGroup = item.group;
                 html += `<span class="os-nav-label">${currentGroup}</span>`;
@@ -99,28 +102,40 @@ import { getSupabase } from '../services/supabase-client.js';
 
 export const OS_AUTH = {
     /**
-     * Validação de Sessão em Tempo Real
+     * Validação de Sessão e RBAC
+     * @param {string} requiredRole - Cargo mínimo exigido para a página
      */
-    check: async () => {
+    check: async (requiredRole = null) => {
         const supabase = getSupabase();
-        if (!supabase) return;
+        if (!supabase) return null;
 
         const { data: { session } } = await supabase.auth.getSession();
         
         if (!session) {
-            console.warn('[AUTH] Sessão não encontrada. Redirecionando...');
+            console.warn('[AUTH] Sessão não encontrada.');
             window.location.href = 'login.html';
             return null;
         }
 
-        // Buscar perfil estendido para RBAC
+        // Buscar perfil para validar Role
         const { data: profile } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', session.user.id)
             .single();
 
-        return { ...session.user, ...profile };
+        const user = { ...session.user, ...profile };
+
+        // Validação de RBAC
+        if (requiredRole && user.role !== 'ADMIN') {
+            if (user.role !== requiredRole) {
+                console.error('[AUTH] Acesso Negado. Nível insuficiente.');
+                window.location.href = 'access-denied.html';
+                return null;
+            }
+        }
+
+        return user;
     },
 
     /**

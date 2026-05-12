@@ -111,12 +111,12 @@
         import { getSupabase } from './services/supabase-client.js';
         
         async function init() {
-            // 1. Validar Acesso Real
-            const user = await OS_AUTH.check();
+            // 1. Validar Acesso Real (Acesso permitido para ADMIN, OPERATOR e CLIENT)
+            const user = await OS_AUTH.check('CLIENT');
             if (!user) return;
 
             // 2. Renderizar Base Global
-            OS_UI.renderSidebar('analytics');
+            OS_UI.renderSidebar('analytics', user.role);
             await OS_UI.renderTopbar();
 
             // 3. Render Data
