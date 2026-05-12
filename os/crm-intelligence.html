@@ -134,25 +134,37 @@
 
             crmBody.innerHTML = ''; // Limpa antes de renderizar
             leads.forEach(item => {
-                // Adaptação dos campos do banco para a UI legada
-                const healthVal = item.health === 'OPTIMAL' ? 95 : (item.health === 'STABLE' ? 70 : 40);
+                // Mapeamento resiliente: tenta campo real, se não houver, tenta campo do mock
+                const companyName = item.company || item.name || 'Empresa n/a';
+                const contactName = item.company ? item.name : (item.contact || 'Contato n/a');
+                const leadValue = item.value || item.impact || '0';
+                
+                // Saúde: real usa OPTIMAL/STABLE/CRITICAL, mock usa healthScore
+                let healthVal = 0;
+                if (item.health) {
+                    healthVal = item.health === 'OPTIMAL' ? 95 : (item.health === 'STABLE' ? 70 : 40);
+                } else {
+                    healthVal = item.healthScore || 50;
+                }
+                
                 const healthClass = healthVal > 80 ? '' : (healthVal > 50 ? 'warning' : 'danger');
+                const statusName = item.status || 'Ativo';
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td>
-                        <div style="font-weight: 700;">${item.company}</div>
-                        <div style="font-size: 0.75rem; color: var(--os-text-muted);">${item.name}</div>
+                        <div style="font-weight: 700;">${companyName}</div>
+                        <div style="font-size: 0.75rem; color: var(--os-text-muted);">${contactName}</div>
                     </td>
                     <td style="width: 150px;">
                         <div style="font-family: var(--os-font-mono); font-size: 0.8rem;">${healthVal}%</div>
                         <div class="health-bar"><div class="health-fill ${healthClass}" style="width: ${healthVal}%;"></div></div>
                     </td>
-                    <td><span class="temp-badge temp-${item.status === 'PROPOSAL' ? 'quente' : 'morna'}">${item.status}</span></td>
-                    <td style="font-size: 0.8rem; color: var(--os-text-muted);">Hoje</td>
-                    <td style="font-weight: 600; color: var(--os-primary);">Acompanhamento Real</td>
-                    <td style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: var(--os-success)">BAIXO</td>
-                    <td style="font-family: var(--os-font-mono); font-weight: 600;">R$ ${item.value}</td>
+                    <td><span class="temp-badge temp-${statusName === 'PROPOSAL' || statusName === 'quente' ? 'quente' : 'morna'}">${statusName}</span></td>
+                    <td style="font-size: 0.8rem; color: var(--os-text-muted);">${item.lastFollowUp || 'Hoje'}</td>
+                    <td style="font-weight: 600; color: var(--os-primary);">${item.nextAction || 'Acompanhamento'}</td>
+                    <td style="text-transform: uppercase; font-size: 0.7rem; font-weight: 700; color: var(--os-success)">${item.risk || 'BAIXO'}</td>
+                    <td style="font-family: var(--os-font-mono); font-weight: 600;">${leadValue.toString().includes('R$') ? leadValue : 'R$ ' + leadValue}</td>
                 `;
                 crmBody.appendChild(row);
             });
