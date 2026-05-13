@@ -5,34 +5,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FluxAI OS™ | Visualização de Contrato</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet" />
     <style>
         :root { --p-color: #000; --s-color: #666; --accent: #6b7a45; }
         body { background: #f5f5f5; font-family: 'Inter', sans-serif; color: var(--p-color); margin: 0; padding: 40px; }
-        .contract-paper { background: #fff; max-width: 800px; margin: 0 auto; padding: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); min-height: 1000px; position: relative; }
-        
+        .contract-paper { background: #fff; max-width: 800px; margin: 0 auto; padding: 60px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); min-height: 1000px; }
         .header { border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
-        .brand { font-weight: 800; font-size: 1.2rem; letter-spacing: -1px; }
+        .brand { font-weight: 800; font-size: 1.2rem; }
         .brand span { color: var(--accent); }
-        
         .doc-title { text-transform: uppercase; letter-spacing: 2px; font-size: 0.75rem; color: var(--s-color); font-weight: 700; }
-        
         .section { margin-bottom: 35px; }
         .section h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--accent); margin-bottom: 15px; border-left: 3px solid var(--accent); padding-left: 10px; }
         .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .item label { display: block; font-size: 0.65rem; color: var(--s-color); text-transform: uppercase; font-weight: 700; margin-bottom: 4px; }
         .item p { margin: 0; font-size: 0.95rem; font-weight: 500; }
-
-        .deliverables-box { background: #f9f9f9; padding: 20px; border-radius: 4px; font-size: 0.9rem; line-height: 1.6; }
-
+        .deliverables-box { background: #f9f9f9; padding: 20px; border-radius: 4px; font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; }
         .footer { margin-top: 60px; font-size: 0.7rem; color: var(--s-color); border-top: 1px solid #eee; padding-top: 20px; }
-
-        @media print {
-            body { padding: 0; background: #fff; }
-            .contract-paper { box-shadow: none; }
-            .no-print { display: none; }
-        }
-
+        @media print { body { padding: 0; background: #fff; } .contract-paper { box-shadow: none; } .no-print { display: none; } }
         .btn-print { position: fixed; top: 20px; right: 20px; background: var(--accent); color: #fff; border: none; padding: 12px 20px; border-radius: 4px; cursor: pointer; font-weight: 700; display: flex; align-items: center; gap: 10px; }
     </style>
 </head>
@@ -42,72 +31,46 @@
         <i class="fa-solid fa-print"></i> IMPRIMIR / SALVAR PDF
     </button>
 
-    <div class="contract-paper" id="contract-content">
+    <div class="contract-paper">
         <div class="header">
             <div class="brand">FLUXAI <span>OS™</span></div>
             <div class="doc-title">Resumo de Contrato Operacional</div>
         </div>
 
-        <div class="section">
-            <h3>I. Partes Contratantes</h3>
-            <div class="grid">
-                <div class="item">
-                    <label>Contratada</label>
-                    <p>FluxAI Marketing Digital</p>
-                </div>
-                <div class="item">
-                    <label>Contratante (Empresa)</label>
-                    <p id="company-name">...</p>
-                </div>
-                <div class="item">
-                    <label>Responsável</label>
-                    <p id="client-name">...</p>
-                </div>
-                <div class="item">
-                    <label>Segmento</label>
-                    <p id="segment">...</p>
-                </div>
-            </div>
+        <div id="loading-state" style="text-align: center; padding: 50px; color: var(--s-color);">
+            <i class="fa-solid fa-spinner fa-spin"></i> Sincronizando dados estratégicos...
         </div>
 
-        <div class="section">
-            <h3>II. Escopo de Serviços</h3>
-            <div class="deliverables-box" id="deliverables">
-                Carregando detalhes do escopo...
+        <div id="contract-data" style="display: none;">
+            <div class="section">
+                <h3>I. Partes Contratantes</h3>
+                <div class="grid">
+                    <div class="item"><label>Contratada</label><p>FluxAI Marketing Digital</p></div>
+                    <div class="item"><label>Contratante (Empresa)</label><p id="company-name"></p></div>
+                    <div class="item"><label>Responsável</label><p id="client-name"></p></div>
+                    <div class="item"><label>Segmento</label><p id="segment"></p></div>
+                </div>
             </div>
-        </div>
 
-        <div class="section">
-            <h3>III. Condições Financeiras</h3>
-            <div class="grid">
-                <div class="item">
-                    <label>Valor Mensal do Contrato</label>
-                    <p id="contract-value">R$ 0,00</p>
-                </div>
-                <div class="item">
-                    <label>Dia de Vencimento</label>
-                    <p id="due-day">...</p>
-                </div>
-                <div class="item">
-                    <label>Status do Contrato</label>
-                    <p id="status">...</p>
-                </div>
-                <div class="item">
-                    <label>Data de Início</label>
-                    <p id="start-date">...</p>
-                </div>
+            <div class="section">
+                <h3>II. Escopo de Serviços</h3>
+                <div class="deliverables-box" id="deliverables"></div>
             </div>
-        </div>
 
-        <div class="section">
-            <h3>IV. Memória Estratégica (Contexto)</h3>
-            <div class="item" style="margin-bottom: 15px;">
-                <label>ICP (Público-Alvo)</label>
-                <p id="icp" style="font-size: 0.85rem; color: #444; line-height: 1.4;"></p>
+            <div class="section">
+                <h3>III. Condições Financeiras</h3>
+                <div class="grid">
+                    <div class="item"><label>Valor Mensal</label><p id="contract-value"></p></div>
+                    <div class="item"><label>Vencimento</label><p id="due-day"></p></div>
+                    <div class="item"><label>Status</label><p id="status"></p></div>
+                    <div class="item"><label>Data Início</label><p id="start-date"></p></div>
+                </div>
             </div>
-            <div class="item">
-                <label>Objetivos do Ciclo</label>
-                <p id="objectives" style="font-size: 0.85rem; color: #444; line-height: 1.4;"></p>
+
+            <div class="section">
+                <h3>IV. Memória Estratégica (Contexto)</h3>
+                <div class="item" style="margin-bottom: 15px;"><label>ICP (Público-Alvo)</label><p id="icp"></p></div>
+                <div class="item"><label>Objetivos do Ciclo</label><p id="objectives"></p></div>
             </div>
         </div>
 
@@ -120,46 +83,41 @@
     <script type="module">
         import { getSupabase } from '/os/services/supabase-client.js';
 
-        async function loadContract() {
+        async function load() {
             const params = new URLSearchParams(window.location.search);
-            const contractId = params.get('id');
-
-            console.log('[CONTRACT VIEW] Buscando ID:', contractId);
-
-            if (!contractId) {
-                alert('ID do contrato não fornecido.');
-                return;
-            }
-
+            const id = params.get('id');
             const supabase = getSupabase();
+
+            if (!id || !supabase) return;
+
             const { data: c, error } = await supabase
                 .from('contracts')
                 .select('*, projects(*)')
-                .eq('id', contractId)
+                .eq('id', id)
                 .single();
 
             if (error) {
-                console.error('[CONTRACT VIEW ERROR]', error);
-                document.getElementById('deliverables').innerHTML = `<p style="color:red">Erro ao carregar dados: ${error.message}</p>`;
+                document.getElementById('loading-state').innerHTML = `<p style="color:red">Erro: ${error.message}</p>`;
                 return;
             }
 
             if (c) {
-                console.log('[CONTRACT VIEW] Dados carregados:', c);
-                document.getElementById('company-name').innerText = c.company_name || '---';
-                document.getElementById('client-name').innerText = c.client_name || '---';
+                document.getElementById('company-name').innerText = c.company_name;
+                document.getElementById('client-name').innerText = c.client_name;
                 document.getElementById('segment').innerText = c.projects?.segment || 'N/A';
-                document.getElementById('deliverables').innerText = c.deliverables || 'Nenhum escopo definido.';
-                document.getElementById('contract-value').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c.contract_value || 0);
-                document.getElementById('due-day').innerText = `Todo dia ${c.due_day || '--'}`;
-                document.getElementById('status').innerText = c.status || '---';
-                document.getElementById('start-date').innerText = c.start_date ? new Date(c.start_date).toLocaleDateString('pt-BR') : '---';
-                document.getElementById('icp').innerText = c.projects?.icp || 'Contexto não definido.';
-                document.getElementById('objectives').innerText = c.projects?.objectives || 'Objetivos não definidos.';
+                document.getElementById('deliverables').innerText = c.deliverables;
+                document.getElementById('contract-value').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c.contract_value);
+                document.getElementById('due-day').innerText = `Todo dia ${c.due_day}`;
+                document.getElementById('status').innerText = c.status;
+                document.getElementById('start-date').innerText = new Date(c.start_date).toLocaleDateString('pt-BR');
+                document.getElementById('icp').innerText = c.projects?.icp || 'Não definido';
+                document.getElementById('objectives').innerText = c.projects?.objectives || 'Não definido';
+
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('contract-data').style.display = 'block';
             }
         }
-
-        loadContract();
+        load();
     </script>
 </body>
 </html>
