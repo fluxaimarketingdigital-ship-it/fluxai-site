@@ -219,6 +219,9 @@ window.updateStatus = async (id, newStatus) => {
 };
 
 window.deleteAsset = async (id) => {
+    const user = await OS_AUTH.check();
+    if (user?.role !== 'ADMIN') return alert('Apenas administradores podem excluir conteúdos.');
+    
     if (!confirm('Deseja excluir este conteúdo permanentemente?')) return;
     const supabase = getSupabase();
     await supabase.from('content_assets').delete().eq('id', id);
@@ -230,13 +233,28 @@ function renderMetrics(contents) {
         total: contents.length,
         approval: contents.filter(c => c.status === 'APROVAÇÃO').length,
         production: contents.filter(c => c.status === 'PRODUÇÃO').length,
-        ready: contents.filter(c => c.status === 'PRONTO').length
+        ready: contents.filter(c => c.status === 'PRONTO').length,
+        pauta: contents.filter(c => c.status === 'PAUTA').length
     };
 
-    OS_UI.renderMetric('metric-assets', { label: 'Ativos Totais', value: metrics.total, trend: '+12%', meta: 'este mês' });
-    OS_UI.renderMetric('metric-approval', { label: 'Em Aprovação', value: metrics.approval, trend: '-2', meta: 'crítico' });
-    OS_UI.renderMetric('metric-production', { label: 'Em Produção', value: metrics.production, trend: 'stable', meta: 'equipe' });
-    OS_UI.renderMetric('metric-schedule', { label: 'Prontos / Agendados', value: metrics.ready, trend: '+5', meta: 'workflow' });
+    // Lógica de Conformidade de Contrato (Exemplo: 12 posts)
+    const contractPosts = 12; 
+    const diff = metrics.total - contractPosts;
+    let complianceMsg = 'CONTRATO EM DIA';
+    let complianceColor = '#10b981';
+
+    if (diff < 0) {
+        complianceMsg = `FALTAM ${Math.abs(diff)} POSTS`;
+        complianceColor = '#f59e0b';
+    } else if (diff > 0) {
+        complianceMsg = `${diff} POSTS EXTRAS`;
+        complianceColor = '#a855f7';
+    }
+
+    OS_UI.renderMetric('metric-assets', { label: 'Conformidade Contrato', value: complianceMsg, trend: 'v1.0', meta: 'Escopo Mensal', color: complianceColor });
+    OS_UI.renderMetric('metric-approval', { label: 'Em Aprovação', value: metrics.approval, trend: '-2', meta: 'Atenção' });
+    OS_UI.renderMetric('metric-production', { label: 'Em Produção', value: metrics.production, trend: 'stable', meta: 'Designer' });
+    OS_UI.renderMetric('metric-schedule', { label: 'Prontos', value: metrics.ready, trend: '+5', meta: 'Publicação' });
 }
 
 // JANELA DE PUBLICAÇÃO
@@ -277,12 +295,26 @@ document.getElementById('close-pub-modal').onclick = () => {
 };
 
 window.runAiPlanner = async () => {
+    const user = await OS_AUTH.check();
+    if (user?.role !== 'ADMIN' && user?.role !== 'MANAGER') {
+        return alert('Acesso negado. Apenas a Diretoria ou Social Media podem gerar planejamentos.');
+    }
+
     const filter = document.getElementById('project-filter');
     const selectedId = filter.value || currentProject;
-    
     if (!selectedId) return alert('Selecione um projeto primeiro!');
-    
-    currentProject = selectedId; // Sincroniza a variável
+
+    const supabase = getSupabase();
+    const { data: existing } = await supabase.from('content_assets')
+        .select('id')
+        .eq('project_id', selectedId)
+        .eq('status', 'PAUTA');
+
+    if (existing && existing.length > 0) {
+        return alert('Ação Bloqueada! Você já tem conteúdos em PAUTA. \n\nExclua as pautas que não serão usadas antes de gerar um novo planejamento. Curadoria é obrigatória.');
+    }
+
+    currentProject = selectedId;
     await generateSampleContent(selectedId);
 };
 
