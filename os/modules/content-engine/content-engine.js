@@ -121,27 +121,70 @@ function renderContentTable(contents) {
             <td>
                 <div style="font-weight: 700;">${c.title}</div>
                 <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.projects?.company_name || 'N/A'}</div>
+                ${c.status === 'AJUSTE' ? `
+                    <div style="margin-top:8px; padding:10px; background:rgba(255,68,68,0.1); border-left:3px solid #ff4444; border-radius:4px; font-size:0.8rem; color:#ffbaba;">
+                        <i class="fa-solid fa-comment-dots"></i> <strong>FEEDBACK CLIENTE:</strong> ${c.internal_notes || 'Verificar observações.'}
+                    </div>
+                ` : ''}
             </td>
-            <td><span class="status-badge status-${c.status.toLowerCase()}">${c.status}</span></td>
+            <td>
+                <select class="os-select status-dropdown" onchange="window.updateStatus('${c.id}', this.value)" style="font-size:0.7rem; padding:4px 8px; border-color:${getStatusColor(c.status)}">
+                    ${['PAUTA', 'DESIGN', 'REVISÃO', 'APROVAÇÃO', 'AJUSTE', 'PRONTO', 'PUBLICADO'].map(s => 
+                        `<option value="${s}" ${c.status === s ? 'selected' : ''}>${s}</option>`
+                    ).join('')}
+                </select>
+            </td>
             <td><span class="os-priority-${c.priority.toLowerCase()}">${c.priority}</span></td>
             <td><i class="fa-brands fa-${c.platform.toLowerCase()}"></i> ${c.platform}</td>
             <td>
-                ${c.status === 'APROVAÇÃO' ? `
-                    <button class="btn-mini" title="Gerar Link de Aprovação" onclick="window.generateApprovalLink('${c.id}')">
+                ${c.status === 'APROVAÇÃO' || c.status === 'AJUSTE' ? `
+                    <button class="btn-mini" style="background:#6b7a45; color:white" title="Gerar Link de Aprovação" onclick="window.generateApprovalLink('${c.id}')">
                         <i class="fa-solid fa-link"></i> LINK
                     </button>
                 ` : `<span style="font-size: 0.7rem; opacity: 0.5;">${c.status === 'PRONTO' ? '✔ APROVADO' : '---'}</span>`}
             </td>
             <td>
-                <div class="action-btns">
+                <div class="action-btns" style="display:flex; gap:5px;">
                     <button class="btn-mini" onclick="window.openPublicationBridge('${c.id}')" title="Publicar">
                         <i class="fa-solid fa-rocket"></i>
+                    </button>
+                    <button class="btn-mini" onclick="window.deleteAsset('${c.id}')" title="Excluir" style="border-color:#ff4444; color:#ff4444;">
+                        <i class="fa-solid fa-trash"></i>
                     </button>
                 </div>
             </td>
         </tr>
     `).join('');
 }
+
+function getStatusColor(status) {
+    const colors = {
+        'PAUTA': '#666',
+        'DESIGN': '#3b82f6',
+        'REVISÃO': '#f59e0b',
+        'APROVAÇÃO': '#a855f7',
+        'AJUSTE': '#ff4444',
+        'PRONTO': '#10b981',
+        'PUBLICADO': '#000'
+    };
+    return colors[status] || '#666';
+}
+
+window.updateStatus = async (id, newStatus) => {
+    const supabase = getSupabase();
+    const { error } = await supabase.from('content_assets').update({ status: newStatus }).eq('id', id);
+    if (error) alert('Erro ao atualizar: ' + error.message);
+    else {
+        init(); // Recarrega tudo
+    }
+};
+
+window.deleteAsset = async (id) => {
+    if (!confirm('Deseja excluir este conteúdo permanentemente?')) return;
+    const supabase = getSupabase();
+    await supabase.from('content_assets').delete().eq('id', id);
+    init();
+};
 
 function renderMetrics(contents) {
     const metrics = {
