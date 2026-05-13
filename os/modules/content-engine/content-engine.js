@@ -270,6 +270,15 @@ document.getElementById('close-pub-modal').onclick = () => {
     document.getElementById('pub-modal-overlay').style.display = 'none';
 };
 
+window.runAiPlanner = async () => {
+    if (!currentProject) return alert('Selecione um projeto primeiro!');
+    await generateSampleContent(currentProject);
+};
+
+window.openNewContentEditor = () => {
+    alert('Abrindo editor de pauta estrategica...');
+};
+
 window.openWorkspace = () => {
     if (!currentProject) return alert('Selecione um projeto primeiro para ver o calendário!');
     window.open(`/os/workspace.html?project=${currentProject}`, '_blank');
