@@ -80,41 +80,33 @@
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <header class="os-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <div>
-                <h1>Motor de Conteúdo</h1>
-                <p>Orquestração estratégica e produção de ativos de autoridade.</p>
-            </div>
-            <div id="deadline-notice" style="background:rgba(168,85,247,0.1); border:1px solid var(--os-primary); padding:10px 20px; border-radius:8px; display:flex; align-items:center; gap:12px;">
-                <i class="fa-solid fa-calendar-check" style="color:var(--os-primary); font-size:1.2rem;"></i>
-                <div>
-                    <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; opacity:0.7;">Deadline de Planejamento</div>
-                    <div style="font-weight:700; color:var(--os-primary);">TODO DIA 28 <span style="font-weight:400; font-size:0.8rem; color:#fff; opacity:0.6;">(Envio Obrigatório)</span></div>
-                </div>
-            </div>
-            <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
-                        <select id="project-filter" class="os-select">
+                <div class="os-page-header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; flex-wrap: wrap; gap: 20px;">
+                    <div class="os-page-title">
+                        <h1>Motor de Conteúdo</h1>
+                        <p>Orquestração estratégica e produção de ativos de autoridade.</p>
+                    </div>
+                    
+                    <div id="deadline-notice" style="background:rgba(168,85,247,0.1); border:1px solid rgba(168,85,247,0.3); padding:12px 20px; border-radius:12px; display:flex; align-items:center; gap:15px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
+                        <i class="fa-solid fa-calendar-check" style="color:var(--os-primary); font-size:1.5rem;"></i>
+                        <div>
+                            <div style="font-size:0.65rem; text-transform:uppercase; letter-spacing:1px; opacity:0.7; color:var(--os-primary); font-weight:700;">Workflow Institucional</div>
+                            <div style="font-weight:700; color:#fff; font-size:1rem;">DEADLINE: TODO DIA 28</div>
+                        </div>
+                    </div>
+
+                    <div class="os-page-actions" style="display: flex; gap: 12px; align-items: center;">
+                        <select id="project-filter" class="os-select" style="min-width: 200px;">
                             <option value="">Todos os Projetos</option>
                         </select>
-                        <button class="btn-pub" id="btn-ai-planner" style="background: #a855f7;">
+                        <button class="os-btn os-btn-primary" id="btn-ai-planner">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> PLANEJAMENTO IA
                         </button>
-                        <button class="btn-pub" id="btn-new-content">
+                        <button class="os-btn os-btn-outline" id="btn-new-content">
                             <i class="fa-solid fa-plus"></i> NOVO CONTEÚDO
                         </button>
                     </div>
                 </div>
 
-                <div class="os-widget-grid">
-                    <div class="os-widget" id="metric-assets" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-approval" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-production" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-schedule" style="grid-column: span 3;"></div>
-
-                    <div class="os-widget" style="grid-column: span 12;">
-                        <div class="os-widget-header">
-                            <span class="os-widget-label">Esteira de Produção & Aprovação</span>
-                        </div>
                         <table class="os-table">
                             <thead>
                                 <tr>
