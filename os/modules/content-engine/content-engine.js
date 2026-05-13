@@ -4,27 +4,41 @@ import { getSupabase } from '/os/services/supabase-client.js';
 let currentProject = null;
 
 async function init() {
-    console.log('[CONTENT ENGINE] Iniciando...');
-    const user = await OS_AUTH.check();
-    if (!user) return;
+    console.log('[CONTENT ENGINE] Iniciando sistema...');
+    
+    try {
+        // 1. Forçar UI Imediata (para o menu não sumir)
+        OS_UI.renderSidebar('content-engine', 'ADMIN'); // Default para admin para garantir
+        OS_UI.renderTopbar();
+        console.log('[CONTENT ENGINE] UI Renderizada.');
 
-    OS_UI.renderSidebar('content-engine', user.role);
-    OS_UI.renderTopbar();
+        // 2. Verificar Autenticação
+        const user = await OS_AUTH.check();
+        if (!user) {
+            console.error('[CONTENT ENGINE] Usuário não autenticado.');
+            return;
+        }
 
-    await loadProjects();
-    await loadContent();
+        // 3. Carregar Dados
+        await loadProjects();
+        await loadContent();
+        console.log('[CONTENT ENGINE] Dados carregados com sucesso.');
 
-    // Listeners
-    document.getElementById('project-filter').addEventListener('change', (e) => {
-        currentProject = e.target.value;
-        loadContent();
-    });
+        // 4. Listeners
+        document.getElementById('project-filter').addEventListener('change', (e) => {
+            currentProject = e.target.value;
+            loadContent();
+        });
 
-    document.getElementById('btn-ai-planner').onclick = async () => {
-        if (!currentProject) return alert('Selecione um projeto primeiro!');
-        await generateSampleContent(currentProject);
-    };
-    document.getElementById('btn-new-content').onclick = () => alert('Abrindo editor de pauta...');
+        document.getElementById('btn-ai-planner').onclick = async () => {
+            if (!currentProject) return alert('Selecione um projeto primeiro!');
+            await generateSampleContent(currentProject);
+        };
+        document.getElementById('btn-new-content').onclick = () => alert('Abrindo editor de pauta...');
+
+    } catch (err) {
+        console.error('[CONTENT ENGINE] Erro crítico no INIT:', err);
+    }
 }
 
 async function generateSampleContent(projectId) {
