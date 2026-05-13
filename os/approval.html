@@ -79,8 +79,8 @@
 
     <div class="success-msg" id="success-ui">
         <i class="fa-solid fa-circle-check"></i>
-        <h2>Conteúdo Aprovado!</h2>
-        <p>Obrigado! Já estamos preparando tudo para a publicação.</p>
+        <h2 id="success-title">Solicitação Recebida!</h2>
+        <p id="success-message">Obrigado! Já estamos preparando tudo.</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -143,8 +143,9 @@
                         internal_notes: fullNote 
                     }).eq('id', id);
                     
-                    alert('Feedback enviado com sucesso! Vamos trabalhar nos ajustes.');
-                    window.location.reload();
+                    document.getElementById('main-ui').style.display = 'none';
+                    document.getElementById('success-message').innerText = 'Recebemos seu feedback! Nossa equipe já está trabalhando nos ajustes para garantir sua autoridade.';
+                    document.getElementById('success-ui').style.display = 'block';
                 };
 
             } catch (err) {

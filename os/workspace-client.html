@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Workspace do Cliente</title>
+    <link rel="stylesheet" href="/src/styles/os/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .calendar-day { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 8px; min-height: 120px; padding: 10px; position: relative; }
+        .calendar-day.empty { opacity: 0.3; background: transparent; }
+        .day-number { font-size: 0.7rem; font-weight: 700; color: var(--os-primary); margin-bottom: 8px; }
+        .calendar-event { background: rgba(107,122,69,0.2); border-left: 3px solid var(--os-primary); padding: 6px; border-radius: 4px; font-size: 0.65rem; margin-bottom: 5px; cursor: pointer; transition: 0.2s; }
+        .calendar-event:hover { background: var(--os-primary); color: white; }
+        .event-status { display: inline-block; width: 6px; height: 6px; border-radius: 50%; margin-right: 4px; }
+        
+        .workspace-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .client-info { display: flex; align-items: center; gap: 15px; }
+        .client-logo { width: 40px; height: 40px; border-radius: 50%; background: var(--os-primary); display: flex; align-items: center; justify-content: center; font-weight: 800; }
+    </style>
+</head>
+<body class="os-mode">
+    <div class="os-layout">
+        <main class="os-viewport" style="margin-left:0; padding: 40px; max-width: 1200px; margin: 0 auto;">
+            <header class="workspace-header">
+                <div class="client-info">
+                    <div class="client-logo" id="client-initials">--</div>
+                    <div>
+                        <h1 id="client-name" style="font-size:1.5rem; margin:0;">Carregando Workspace...</h1>
+                        <p id="workspace-period" style="font-size:0.8rem; opacity:0.6; margin:0;">Planejamento Estratégico Mensal</p>
+                    </div>
+                </div>
+                <div class="workspace-stats" style="display:flex; gap:20px;">
+                    <div class="os-badge" id="stat-pending" style="background:#f59e0b">0 Pendentes</div>
+                    <div class="os-badge" id="stat-approved" style="background:#10b981">0 Aprovados</div>
+                </div>
+            </header>
+
+            <div class="calendar-grid" id="calendar-body">
+                <!-- Dias do calendário serão gerados via JS -->
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
+        const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+        async function initWorkspace() {
+            const params = new URLSearchParams(window.location.search);
+            const projectId = params.get('project');
+            if (!projectId) return alert('Link inválido. Solicite um novo link ao seu gestor.');
+
+            // 1. Buscar Projeto
+            const { data: project } = await supabase.from('projects').select('*').eq('id', projectId).single();
+            if (project) {
+                document.getElementById('client-name').innerText = project.company_name;
+                document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
+            }
+
+            // 2. Buscar Conteúdos do Mês
+            const { data: contents } = await supabase.from('content_assets')
+                .select('*')
+                .eq('project_id', projectId)
+                .order('scheduled_at', { ascending: true });
+
+            renderCalendar(contents);
+            updateStats(contents);
+        }
+
+        function renderCalendar(contents) {
+            const container = document.getElementById('calendar-body');
+            container.innerHTML = '';
+            
+            // Gerar calendário para o próximo mês (ou mês atual conforme agendado)
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = today.getMonth() + 1; // Focado no próximo mês
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            // Espaços vazios antes do dia 1
+            for (let i = 0; i < firstDay; i++) {
+                container.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            // Dias do mês
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayDate = new Date(year, month, day).toISOString().split('T')[0];
+                const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayDate));
+                
+                let eventsHtml = dayContents.map(c => `
+                    <div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}')">
+                        <span class="event-status" style="background:${getStatusColor(c.status)}"></span>
+                        ${c.title}
+                    </div>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="calendar-day">
+                        <div class="day-number">${day}</div>
+                        ${eventsHtml}
+                    </div>
+                `;
+            }
+        }
+
+        function getStatusColor(status) {
+            if (status === 'PRONTO' || status === 'PUBLICADO') return '#10b981';
+            if (status === 'AJUSTE') return '#ff4444';
+            return '#f59e0b';
+        }
+
+        function updateStats(contents) {
+            const pending = contents.filter(c => c.status !== 'PRONTO' && c.status !== 'PUBLICADO').length;
+            const approved = contents.filter(c => c.status === 'PRONTO' || c.status === 'PUBLICADO').length;
+            document.getElementById('stat-pending').innerText = `${pending} Pendentes`;
+            document.getElementById('stat-approved').innerText = `${approved} Aprovados`;
+        }
+
+        initWorkspace();
+    </script>
+</body>
+</html>

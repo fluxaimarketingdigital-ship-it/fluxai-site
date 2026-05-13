@@ -158,6 +158,9 @@ function renderContentTable(contents) {
             </td>
             <td>
                 <div class="action-btns" style="display:flex; gap:5px;">
+                    <button class="btn-mini" onclick="window.editAsset('${c.id}')" title="Editar Curadoria">
+                        <i class="fa-solid fa-pencil"></i>
+                    </button>
                     <button class="btn-mini" onclick="window.openPublicationBridge('${c.id}')" title="Publicar">
                         <i class="fa-solid fa-rocket"></i>
                     </button>
@@ -169,6 +172,23 @@ function renderContentTable(contents) {
         </tr>
     `}).join('');
 }
+
+window.editAsset = async (id) => {
+    const supabase = getSupabase();
+    const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
+    
+    if (c) {
+        const newTitle = prompt("Título do Post:", c.title);
+        const newCaption = prompt("Legenda / Estratégia:", c.caption);
+        if (newTitle === null) return;
+
+        await supabase.from('content_assets').update({ 
+            title: newTitle, 
+            caption: newCaption 
+        }).eq('id', id);
+        loadContent();
+    }
+};
 
 function getStatusColor(status) {
     const colors = {
