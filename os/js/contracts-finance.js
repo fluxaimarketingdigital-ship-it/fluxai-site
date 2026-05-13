@@ -33,39 +33,60 @@ async function loadFinanceData() {
 }
 
 function renderStats(contracts, payments) {
-    const totalExpected = payments.reduce((acc, p) => acc + Number(p.amount_due), 0);
-    const totalPaid = payments.reduce((acc, p) => acc + Number(p.amount_paid), 0);
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
+
+    // Filtrar apenas pagamentos do mês atual para o Dashboard
+    const monthlyPayments = payments.filter(p => {
+        const d = new Date(p.due_date);
+        return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+    });
+
+    const totalExpected = monthlyPayments.reduce((acc, p) => acc + Number(p.amount_due), 0);
+    const totalPaid = monthlyPayments.reduce((acc, p) => acc + Number(p.amount_paid), 0);
     const totalPending = totalExpected - totalPaid;
 
     document.getElementById('total-expected').innerText = formatCurrency(totalExpected);
     document.getElementById('total-paid').innerText = formatCurrency(totalPaid);
     document.getElementById('total-pending').innerText = formatCurrency(totalPending);
     document.getElementById('active-contracts-count').innerText = contracts.filter(c => c.status === 'ATIVO').length;
+    
+    console.log('[FINANCE] Dashboard atualizado com dados do mês.');
 }
 
 function renderPayments(payments) {
     const body = document.getElementById('payments-body');
-    body.innerHTML = payments.map(p => `
-        <tr>
-            <td>
-                <div style="font-weight: 700;">${p.contracts?.client_name || 'Desconhecido'}</div>
-                <div style="font-size: 0.7rem; color: var(--os-text-muted);">${p.contracts?.company_name || ''}</div>
-            </td>
-            <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(p.amount_due)}</td>
-            <td>${new Date(p.due_date).toLocaleDateString('pt-BR')}</td>
-            <td><span class="status-badge status-${p.status.toLowerCase()}">${p.status}</span></td>
-            <td>
-                <div class="action-btns">
-                    <button class="btn-mini btn-whatsapp" title="Gerar Cobrança WhatsApp" onclick="window.sendWhatsAppBilling('${p.id}')">
-                        <i class="fa-brands fa-whatsapp"></i>
-                    </button>
-                    <button class="btn-mini" title="Marcar como Pago" onclick="window.markAsPaid('${p.id}', ${p.amount_due})">
-                        <i class="fa-solid fa-check"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    body.innerHTML = payments.map(p => {
+        const isPaid = p.status === 'PAGO';
+        const receiptHtml = p.receipt_url ? `<a href="${p.receipt_url}" target="_blank" title="Ver Comprovante" style="color: var(--os-primary); margin-left: 8px;"><i class="fa-solid fa-paperclip"></i></a>` : '';
+        
+        return `
+            <tr>
+                <td>
+                    <div style="font-weight: 700;">${p.contracts?.client_name || 'Desconhecido'}</div>
+                    <div style="font-size: 0.7rem; color: var(--os-text-muted);">${p.contracts?.company_name || ''} ${receiptHtml}</div>
+                </td>
+                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(p.amount_due)}</td>
+                <td>${new Date(p.due_date).toLocaleDateString('pt-BR')}</td>
+                <td><span class="status-badge status-${p.status.toLowerCase()}">${p.status}</span></td>
+                <td>
+                    <div class="action-btns">
+                        ${!isPaid ? `
+                            <button class="btn-mini btn-whatsapp" title="Gerar Cobrança WhatsApp" onclick="window.sendWhatsAppBilling('${p.id}')">
+                                <i class="fa-brands fa-whatsapp"></i>
+                            </button>
+                            <button class="btn-mini" title="Marcar como Pago" onclick="window.markAsPaid('${p.id}', ${p.amount_due})">
+                                <i class="fa-solid fa-check"></i>
+                            </button>
+                        ` : `
+                            <span style="font-size: 0.6rem; color: var(--os-success); font-weight: 700;"><i class="fa-solid fa-circle-check"></i> RECEBIDO</span>
+                        `}
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function renderContracts(contracts) {
