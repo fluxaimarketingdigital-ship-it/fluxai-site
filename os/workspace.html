@@ -49,32 +49,36 @@
         const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+        window.onload = async () => {
+            console.log('[WORKSPACE] Página carregada, iniciando conexão...');
+            await initWorkspace();
+        };
+
         async function initWorkspace() {
+            const statusEl = document.getElementById('client-name');
             const params = new URLSearchParams(window.location.search);
             const projectId = params.get('project');
-            console.log('[WORKSPACE] Iniciando para Projeto:', projectId);
             
             if (!projectId) {
-                document.getElementById('client-name').innerText = 'ID do Projeto não encontrado';
+                statusEl.innerText = 'ID do Projeto não encontrado';
                 return;
             }
 
-            // 1. Tentar Buscar Projeto (Opcional)
             try {
+                statusEl.innerText = 'Conectando à FluxAI Engine...';
+                
+                // 1. Buscar Projeto (Opcional)
                 const { data: project } = await supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle();
                 if (project) {
-                    document.getElementById('client-name').innerText = project.company_name;
+                    statusEl.innerText = project.company_name;
                     document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
                 } else {
-                    document.getElementById('client-name').innerText = 'Workspace Estratégico';
+                    statusEl.innerText = 'Workspace Estratégico';
                 }
-            } catch (pErr) {
-                console.warn('[WORKSPACE] Falha ao carregar nome do projeto:', pErr);
-                document.getElementById('client-name').innerText = 'Workspace Estratégico';
-            }
 
-            // 2. Buscar Conteúdos (Principal)
-            try {
+                statusEl.innerText = 'Buscando Planejamento Mensal...';
+
+                // 2. Buscar Conteúdos (Principal)
                 const { data: contents, error: cError } = await supabase.from('content_assets')
                     .select('*')
                     .eq('project_id', projectId)
@@ -84,13 +88,17 @@
 
                 console.log('[WORKSPACE] Conteúdos carregados:', contents?.length);
                 
+                if (!contents || contents.length === 0) {
+                    statusEl.innerText = (project ? project.company_name : 'Workspace') + ' (Sem posts agendados)';
+                }
+
                 renderCalendar(contents || []);
                 updateStats(contents || []);
                 
             } catch (err) {
-                console.error('[WORKSPACE] Erro crítico ao carregar posts:', err);
-                document.getElementById('client-name').innerText = 'Erro ao carregar planejamento.';
-                renderCalendar([]); // Mostra calendário vazio pelo menos
+                console.error('[WORKSPACE] Erro crítico:', err);
+                statusEl.innerText = 'Erro na conexão. Tente atualizar a página.';
+                renderCalendar([]); 
             }
         }
 
