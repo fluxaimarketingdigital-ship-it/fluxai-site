@@ -124,12 +124,17 @@
                 const dayStr = dayDate.toISOString().split('T')[0];
                 const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
                 
-                let eventsHtml = dayContents.map(c => `
-                    <div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')" title="${c.title}">
-                        <span class="event-status" style="background:${getStatusColor(c.status)}"></span>
-                        ${c.title.substring(0, 20)}...
-                    </div>
-                `).join('');
+                let eventsHtml = dayContents.map(c => {
+                    // Limpar tags de ferramentas e roteiros internos para o cliente se necessário
+                    const cleanCaption = (c.caption || '').replace(/\[TOOL:.*?\]/g, '').trim();
+                    
+                    return `
+                        <div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')" title="${c.title}">
+                            <span class="event-status" style="background:${getStatusColor(c.status)}"></span>
+                            ${c.title}
+                        </div>
+                    `;
+                }).join('');
 
                 container.innerHTML += `
                     <div class="calendar-day">

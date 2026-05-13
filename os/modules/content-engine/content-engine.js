@@ -68,14 +68,30 @@ async function generateSampleContent(projectId) {
         scheduledDate.setHours(18, 0, 0);
 
         const theme = themes[i % themes.length];
+        const isReels = i % 3 === 0;
+        const isCarousel = i % 3 === 1;
+        
+        let caption = `🎯 ESTRATÉGIA: ${theme}\n\n`;
+        
+        if (isReels) {
+            caption += `🎬 ROTEIRO REELS:\n- Gancho: [IA detectou tendência de ${theme}]\n- Meio: Conteúdo focado em autoridade.\n- CTA: Link na Bio.\n\n`;
+        } else if (isCarousel) {
+            caption += `🖼️ ESTRUTURA CARROSSEL:\n- Slide 1: Capa Impactante\n- Slide 2: Problema/Dor\n- Slide 3: Solução FluxAI\n- Slide 4: CTA\n\n`;
+        } else {
+            caption += `📸 POST ÚNICO: Foco em impacto visual e legenda profunda.\n\n`;
+        }
+
+        caption += `📝 LEGENDA: [IA gerando narrativa de alta conversão para ${theme}...]\n\n`;
+        caption += `#FluxAI #EstrategiaDigital #Autoridade #MarketingDeConteudo\n\n`;
+        caption += `[TOOL: Antigravity AI Engine]`; // Invisível para o cliente
 
         samples.push({
             project_id: projectId,
-            title: `[ESTRATÉGIA] ${theme}`,
+            title: isReels ? `🎥 REELS: ${theme}` : (isCarousel ? `🎠 CARROSSEL: ${theme}` : `🖼️ POST: ${theme}`),
             status: 'PAUTA',
             priority: 'MÉDIA',
-            platform: i % 3 === 0 ? 'REELS' : 'INSTAGRAM',
-            caption: `Conteúdo estratégico focado em ${theme.toLowerCase()}, gerado via IA baseada no DNA da marca e objetivos contratuais.`,
+            platform: isReels ? 'REELS' : 'INSTAGRAM',
+            caption: caption,
             scheduled_at: scheduledDate.toISOString(),
             media_url: null
         });
