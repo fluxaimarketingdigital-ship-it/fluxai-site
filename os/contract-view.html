@@ -106,18 +106,23 @@
                     .single();
 
                 if (error) throw error;
-                if (!c) throw new Error('Contrato não encontrado.');
-
-                document.getElementById('company-name').innerText = c.company_name;
-                document.getElementById('client-name').innerText = c.client_name;
+                console.log('[DEBUG] Dados recebidos:', c);
+                
+                document.getElementById('company-name').innerText = c.company_name || '---';
+                document.getElementById('client-name').innerText = c.client_name || '---';
                 document.getElementById('segment').innerText = c.projects?.segment || 'N/A';
-                document.getElementById('deliverables').innerText = c.deliverables;
-                document.getElementById('contract-value').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c.contract_value);
-                document.getElementById('due-day').innerText = `Todo dia ${c.due_day}`;
-                document.getElementById('status').innerText = c.status;
-                document.getElementById('start-date').innerText = new Date(c.start_date).toLocaleDateString('pt-BR');
-                document.getElementById('icp').innerText = c.projects?.icp || 'Não definido';
-                document.getElementById('objectives').innerText = c.projects?.objectives || 'Não definido';
+                
+                // Garantir que o escopo apareça
+                const deliverablesText = c.deliverables || 'Nenhum detalhe de escopo/entregas definido para este contrato.';
+                document.getElementById('deliverables').innerText = deliverablesText;
+
+                document.getElementById('contract-value').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c.contract_value || 0);
+                document.getElementById('due-day').innerText = `Todo dia ${c.due_day || '--'}`;
+                document.getElementById('status').innerText = c.status || '---';
+                document.getElementById('start-date').innerText = c.start_date ? new Date(c.start_date).toLocaleDateString('pt-BR') : '---';
+                
+                document.getElementById('icp').innerText = c.projects?.icp || 'Contexto estratégico não definido.';
+                document.getElementById('objectives').innerText = c.projects?.objectives || 'Objetivos de ciclo não definidos.';
 
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('contract-data').style.display = 'block';
