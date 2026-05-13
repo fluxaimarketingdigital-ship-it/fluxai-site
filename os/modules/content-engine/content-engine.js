@@ -323,8 +323,13 @@ window.openNewContentEditor = () => {
 };
 
 window.openWorkspace = () => {
-    if (!currentProject) return alert('Selecione um projeto primeiro para ver o calendário!');
-    window.open(`/os/workspace.html?project=${currentProject}`, '_blank');
+    const filter = document.getElementById('project-filter');
+    const selectedId = filter.value || currentProject;
+    
+    if (!selectedId) return alert('Selecione um projeto primeiro para ver o calendário!');
+    
+    currentProject = selectedId;
+    window.open(`/os/workspace.html?project=${selectedId}`, '_blank');
 };
 
 init();
