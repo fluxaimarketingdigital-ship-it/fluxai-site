@@ -10,6 +10,6 @@ export const ROUTES = [
     { id: 'automation-hub', label: 'Central de Automação', icon: 'fa-robot', group: 'Módulos Operacionais', path: '../../modules/automation-hub/automation-hub.html', roles: ['ADMIN', 'OPERATOR'] },
     { id: 'analytics', label: 'Análise de Dados', icon: 'fa-chart-line', group: 'Módulos Operacionais', path: '../../modules/analytics/analytics.html', roles: ['ADMIN', 'OPERATOR'] },
     { id: 'client-workspace', label: 'Workspace do Cliente', icon: 'fa-briefcase', group: 'Interface de Valor', path: '../../modules/client-workspace/client-workspace.html', roles: ['ADMIN', 'CLIENT'] },
-    { id: 'contracts-finance', label: 'Contratos & Financeiro', icon: 'fa-file-invoice-dollar', group: 'Governança', path: '../../modules/contracts-finance/contracts-finance.html', roles: ['ADMIN'] },
+    { id: 'contracts-finance', label: 'Contratos & Financeiro', icon: 'fa-file-invoice-dollar', group: 'Governança', path: '../../contracts-finance.html', roles: ['ADMIN'] },
     { id: 'governance', label: 'Governança', icon: 'fa-user-shield', group: 'Governança', path: '../../modules/governance/governance.html', roles: ['ADMIN'] }
 ];
