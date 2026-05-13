@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FluxAI OS™ | Motor de Conteúdo</title>
+    <title>FluxAI OS™ | Content Engine</title>
     <link rel="stylesheet" href="/src/styles/os/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -35,7 +35,7 @@
             <main class="os-viewport">
                 <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
                     <div>
-                        <h1>Motor de Conteúdo</h1>
+                        <h1>Content Engine</h1>
                         <p>Gestão de ativos editoriais e infraestrutura de retenção.</p>
                     </div>
                     <div style="display: flex; gap: 10px;">
@@ -126,46 +126,38 @@
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { contentPipelineData, editorialMetrics } from './data/content.js';
         
-        async function init() {
-            // 1. Validar Acesso Real (ADMIN, OPERATOR ou CLIENT)
-            const user = await OS_AUTH.check('CLIENT');
-            if (!user) return;
+        OS_AUTH.check();
+        OS_UI.renderSidebar('content-engine');
+        OS_UI.renderTopbar();
 
-            // 2. Renderizar Base Global
-            OS_UI.renderSidebar('content-engine', user.role);
-            await OS_UI.renderTopbar();
+        // Render Metrics
+        OS_UI.renderMetric('metric-assets', { label: 'Ativos Ativos', value: editorialMetrics.activeAssets, trend: '+4', meta: 'em produção' });
+        OS_UI.renderMetric('metric-quality', { label: 'Score de Qualidade', value: editorialMetrics.qualityScore, trend: '+0.2', meta: 'Meta: 9.0' });
+        OS_UI.renderMetric('metric-time', { label: 'Prazo Médio', value: editorialMetrics.avgCompletionTime, trend: '-0.5d', meta: 'Eficiência' });
+        OS_UI.renderMetric('metric-reach', { label: 'Alcance Estimado', value: editorialMetrics.distributionReach, trend: '+15%', meta: 'Total Acumulado' });
 
-            // 3. Render Metrics
-            OS_UI.renderMetric('metric-assets', { label: 'Ativos Ativos', value: editorialMetrics.activeAssets, trend: '+4', meta: 'em produção' });
-            OS_UI.renderMetric('metric-quality', { label: 'Score de Qualidade', value: editorialMetrics.qualityScore, trend: '+0.2', meta: 'Meta: 9.0' });
-            OS_UI.renderMetric('metric-time', { label: 'Prazo Médio', value: editorialMetrics.avgCompletionTime, trend: '-0.5d', meta: 'Eficiência' });
-            OS_UI.renderMetric('metric-reach', { label: 'Alcance Estimado', value: editorialMetrics.distributionReach, trend: '+15%', meta: 'Total Acumulado' });
-
-            // 4. Render Pipeline Table
-            const pipelineBody = document.getElementById('content-pipeline-body');
-            contentPipelineData.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="font-family: var(--os-font-mono); font-size: 0.75rem;">${item.id}</td>
-                    <td style="font-weight: 600;">${item.title}</td>
-                    <td><span class="badge badge-status-${item.stage}">${item.stage}</span></td>
-                    <td><span class="badge badge-priority-${item.priority}">${item.priority}</span></td>
-                    <td style="font-size: 0.8rem; color: var(--os-text-muted);">${item.platform}</td>
-                    <td><span style="font-size: 0.75rem; border-left: 2px solid var(--os-primary); padding-left: 8px;">${item.impact}</span></td>
-                    <td>
-                        <div class="approval-dots">
-                            <div class="dot ${item.approvals.internal ? 'approved' : ''}" title="Interna"></div>
-                            <div class="dot ${item.approvals.strategic ? 'approved' : ''}" title="Estratégica"></div>
-                            <div class="dot ${item.approvals.client ? 'approved' : ''}" title="Cliente"></div>
-                        </div>
-                    </td>
-                    <td style="font-family: var(--os-font-mono); font-size: 0.75rem;">${item.deadline}</td>
-                `;
-                pipelineBody.appendChild(row);
-            });
-        }
-
-        init();
+        // Render Pipeline Table
+        const pipelineBody = document.getElementById('content-pipeline-body');
+        contentPipelineData.forEach(item => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td style="font-family: var(--os-font-mono); font-size: 0.75rem;">${item.id}</td>
+                <td style="font-weight: 600;">${item.title}</td>
+                <td><span class="badge badge-status-${item.stage}">${item.stage}</span></td>
+                <td><span class="badge badge-priority-${item.priority}">${item.priority}</span></td>
+                <td style="font-size: 0.8rem; color: var(--os-text-muted);">${item.platform}</td>
+                <td><span style="font-size: 0.75rem; border-left: 2px solid var(--os-primary); padding-left: 8px;">${item.impact}</span></td>
+                <td>
+                    <div class="approval-dots">
+                        <div class="dot ${item.approvals.internal ? 'approved' : ''}" title="Interna"></div>
+                        <div class="dot ${item.approvals.strategic ? 'approved' : ''}" title="Estratégica"></div>
+                        <div class="dot ${item.approvals.client ? 'approved' : ''}" title="Cliente"></div>
+                    </div>
+                </td>
+                <td style="font-family: var(--os-font-mono); font-size: 0.75rem;">${item.deadline}</td>
+            `;
+            pipelineBody.appendChild(row);
+        });
     </script>
 </body>
 </html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Aprovação Operacional</title>
+    <link rel="stylesheet" href="../src/styles/os/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #000; color: #fff; display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; }
+        .approval-container { width: 100%; max-width: 800px; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 8px; overflow: hidden; box-shadow: 0 40px 100px rgba(0,0,0,0.8); }
+        .approval-header { padding: 30px; border-bottom: 1px solid #1a1a1a; display: flex; justify-content: space-between; align-items: center; }
+        .approval-header .brand { font-weight: 800; letter-spacing: -0.02em; font-size: 1.1rem; }
+        .approval-header .brand span { color: var(--os-primary); }
+        
+        .approval-content { padding: 40px; }
+        .exec-summary { background: rgba(0, 204, 255, 0.03); border-left: 2px solid var(--os-primary); padding: 20px; margin-bottom: 30px; }
+        .exec-summary h3 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--os-primary); margin-bottom: 10px; }
+        .exec-summary p { font-size: 1rem; line-height: 1.6; opacity: 0.9; }
+
+        .preview-area { background: #000; border: 1px solid #1a1a1a; border-radius: 4px; min-height: 300px; margin-bottom: 30px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .preview-area img { max-width: 100%; max-height: 600px; }
+
+        .action-bar { padding: 30px; background: #0d0d0d; border-top: 1px solid #1a1a1a; display: flex; gap: 15px; }
+        .btn-approve { flex: 2; background: var(--os-primary); color: #fff; border: none; padding: 18px; font-weight: 800; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; }
+        .btn-change { flex: 1; background: transparent; border: 1px solid #333; color: #fff; padding: 18px; font-weight: 600; border-radius: 4px; cursor: pointer; }
+        .btn-reject { flex: 0.5; background: transparent; border: 1px solid #333; color: var(--os-danger); padding: 18px; font-weight: 600; border-radius: 4px; cursor: pointer; opacity: 0.5; }
+
+        /* FORM DE ALTERAÇÃO */
+        #change-form { display: none; margin-top: 30px; border-top: 1px solid #1a1a1a; padding-top: 30px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.65rem; text-transform: uppercase; color: #666; margin-bottom: 5px; font-weight: 700; }
+        .form-control { width: 100%; padding: 12px; background: #000; border: 1px solid #1a1a1a; color: #fff; border-radius: 4px; font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+    <div class="approval-container" id="app-container" style="display: none;">
+        <header class="approval-header">
+            <div class="brand">FLUXAI <span>OS™</span></div>
+            <div id="project-tag" style="font-size: 0.75rem; color: #666;">CLIENTE: [CARREGANDO]</div>
+        </header>
+
+        <div class="approval-content">
+            <div class="exec-summary">
+                <h3 id="item-type">Resumo Executivo</h3>
+                <p id="item-description">Carregando detalhes estratégicos para sua revisão...</p>
+            </div>
+
+            <div class="preview-area" id="preview-area">
+                <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem; opacity: 0.2;"></i>
+            </div>
+
+            <!-- FORMULÁRIO DE ALTERAÇÃO -->
+            <div id="change-form">
+                <h4 style="margin-bottom: 20px;">O que deve ser alterado?</h4>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Elemento</label>
+                        <select class="form-control" id="change-element">
+                            <option>Conteúdo/Texto</option>
+                            <option>Imagem/Design</option>
+                            <option>Fonte/Tipografia</option>
+                            <option>CTA/Botão</option>
+                            <option>Frequência</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Página/Slide</label>
+                        <input type="text" class="form-control" id="change-page" placeholder="Ex: Página 2" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Descreva a alteração</label>
+                    <textarea class="form-control" id="change-desc" style="height: 100px;" placeholder="Seja específico para acelerarmos a entrega..."></textarea>
+                </div>
+                <button class="btn-approve" style="margin-top: 20px;" id="btn-submit-change">ENVIAR SOLICITAÇÃO</button>
+            </div>
+        </div>
+
+        <div class="action-bar" id="action-bar">
+            <button class="btn-approve" id="btn-approve-all">✔ APROVAR AGORA</button>
+            <button class="btn-change" id="btn-request-change">⚠ SOLICITAR ALTERAÇÃO</button>
+            <button class="btn-reject" id="btn-reject-all">✖ REPROVAR</button>
+        </div>
+    </div>
+
+    <div id="loading-state">
+        <i class="fa-solid fa-cube fa-spin" style="font-size: 3rem; color: var(--os-primary);"></i>
+    </div>
+
+    <script type="module" src="./js/approval.js"></script>
+</body>
+</html>

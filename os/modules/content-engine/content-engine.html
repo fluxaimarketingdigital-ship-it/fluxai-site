@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FluxAI OS™ | Content Engine</title>
+    <title>FluxAI OS™ | Motor de Conteúdo</title>
     <link rel="stylesheet" href="../../styles/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -16,9 +16,58 @@
         .os-badge { background: var(--os-primary); color: #fff; padding: 2px 8px; border-radius: 2px; font-size: 0.7rem; }
         .os-priority-crítica { color: var(--os-danger); font-weight: 700; }
         .os-priority-alta { color: var(--os-warning); }
+
+        /* MODAL DE PUBLICAÇÃO */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .pub-modal { background: #0a0a0a; border: 1px solid var(--os-border); width: 100%; max-width: 500px; border-radius: 8px; padding: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .pub-header { margin-bottom: 25px; border-bottom: 1px solid var(--os-border); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .pub-header h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--os-primary); }
+        .pub-step { background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); padding: 15px; border-radius: 4px; margin-bottom: 15px; }
+        .pub-step label { display: block; font-size: 0.6rem; text-transform: uppercase; color: var(--os-text-muted); margin-bottom: 8px; font-weight: 700; }
+        .pub-action { display: flex; gap: 10px; align-items: center; }
+        .pub-action input { flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 8px; font-size: 0.8rem; border-radius: 2px; }
+        .btn-pub { background: var(--os-primary); color: #fff; border: none; padding: 8px 12px; border-radius: 2px; cursor: pointer; font-size: 0.75rem; font-weight: 600; }
+        .btn-pub-outline { background: transparent; border: 1px solid var(--os-border); color: #fff; padding: 8px 12px; border-radius: 2px; cursor: pointer; font-size: 0.75rem; }
+        .pub-checklist { margin-top: 20px; }
+        .check-item { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; margin-bottom: 8px; color: var(--os-text-muted); }
     </style>
 </head>
 <body class="os-mode">
+
+    <!-- MODAL DE PUBLICAÇÃO ASSISTIDA -->
+    <div class="modal-overlay" id="pub-modal-overlay">
+        <div class="pub-modal">
+            <div class="pub-header">
+                <h3>🚀 Ponte de Publicação</h3>
+                <button class="btn-pub-outline" id="close-pub-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="pub-step">
+                <label>1. Legenda do Post (Copiada automaticamente)</label>
+                <div class="pub-action">
+                    <input type="text" id="pub-caption-preview" readonly />
+                    <button class="btn-pub" id="btn-copy-caption">COPIAR</button>
+                </div>
+            </div>
+
+            <div class="pub-step">
+                <label>2. Abrir Canal e Arquivo</label>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-pub-outline" style="flex: 1;" id="btn-open-account"><i class="fa-brands fa-instagram"></i> ABRIR CONTA</button>
+                    <button class="btn-pub-outline" style="flex: 1;" id="btn-open-assets"><i class="fa-solid fa-folder-open"></i> ABRIR DRIVE/CANVA</button>
+                </div>
+            </div>
+
+            <div class="pub-checklist">
+                <label>Checklist de Qualidade</label>
+                <div class="check-item"><input type="checkbox" /> Legenda validada e revisada</div>
+                <div class="check-item"><input type="checkbox" /> CTA e Link da Bio conferidos</div>
+                <div class="check-item"><input type="checkbox" /> Horário recomendado respeitado</div>
+            </div>
+
+            <button class="btn-save" style="margin-top: 25px; width: 100%;" id="btn-confirm-pub">MARCAR COMO PUBLICADO</button>
+        </div>
+    </div>
 
     <div class="os-shell">
         <aside class="os-sidebar"></aside>

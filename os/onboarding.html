@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Onboarding Estratégico</title>
+    <link rel="stylesheet" href="/src/styles/os/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        .onboarding-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        .form-section { background: var(--os-card); border: 1px solid var(--os-border); padding: 30px; border-radius: 4px; }
+        .form-section h3 { font-size: 1rem; margin-bottom: 25px; color: var(--os-primary); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
+        .form-section h3 i { font-size: 0.9rem; opacity: 0.8; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.7rem; text-transform: uppercase; color: var(--os-text-muted); margin-bottom: 8px; font-weight: 700; }
+        .form-control { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); border-radius: 4px; color: #fff; font-size: 0.9rem; transition: border-color 0.2s; }
+        .form-control:focus { outline: none; border-color: var(--os-primary); }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--os-text-muted); cursor: pointer; }
+        .btn-save { background: var(--os-primary); color: #fff; border: none; padding: 15px 40px; font-weight: 800; border-radius: 4px; cursor: pointer; font-size: 0.9rem; letter-spacing: 1px; transition: all 0.2s; margin-top: 30px; width: 100%; }
+        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 204, 255, 0.2); }
+        textarea.form-control { resize: none; height: 100px; }
+    </style>
+</head>
+<body class="os-mode">
+
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+
+        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-title">
+                    <h1>Onboarding Estratégico</h1>
+                    <p>Alimentando a memória operacional e contexto estratégico do novo ecossistema.</p>
+                </div>
+
+                <form id="onboardingForm">
+                    <div class="onboarding-grid">
+                        <!-- COLUNA 1: IDENTIDADE E ESCOPO -->
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            <div class="form-section">
+                                <h3><i class="fa-solid fa-id-card"></i> Identidade do Cliente</h3>
+                                <div class="form-group">
+                                    <label>Nome do Cliente / Responsável</label>
+                                    <input type="text" name="client_name" class="form-control" placeholder="Ex: João Silva" required />
+                                </div>
+                                <div class="form-group">
+                                    <label>Empresa / Marca</label>
+                                    <input type="text" name="company_name" class="form-control" placeholder="Ex: FluxAI Labs" required />
+                                </div>
+                                <div class="form-group">
+                                    <label>Segmento de Atuação</label>
+                                    <input type="text" name="segment" class="form-control" placeholder="Ex: Tecnologia, Saúde, Varejo" />
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="fa-solid fa-briefcase"></i> Escopo do Serviço</h3>
+                                <div class="checkbox-group">
+                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="conteudo" /> Conteúdo Social</label>
+                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="site" /> Estruturação Site</label>
+                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="trafego" /> Gestão Tráfego</label>
+                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="branding" /> Branding</label>
+                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="automacao" /> Automação</label>
+                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="dashboard" /> Dashboards</label>
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="fa-solid fa-file-contract"></i> Detalhes do Contrato</h3>
+                                <div class="form-group">
+                                    <label>Entregas Mensais (Cotas)</label>
+                                    <input type="text" name="deliverables" class="form-control" placeholder="Ex: 8 posts, 2 vídeos, 1 dashboard" />
+                                </div>
+                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                    <div class="form-group">
+                                        <label>Valor Mensal (R$)</label>
+                                        <input type="number" name="contract_value" class="form-control" placeholder="0.00" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Dia do Vencimento</label>
+                                        <input type="number" name="due_day" class="form-control" placeholder="05" min="1" max="31" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- COLUNA 2: CONTEXTO E LINKS -->
+                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                            <div class="form-section">
+                                <h3><i class="fa-solid fa-brain"></i> Contexto Estratégico (Memória IA)</h3>
+                                <div class="form-group">
+                                    <label>ICP (Perfil do Cliente Ideal)</label>
+                                    <textarea name="icp" class="form-control" placeholder="Descreva quem é o público final deste cliente..."></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Objetivos Principais</label>
+                                    <textarea name="objectives" class="form-control" placeholder="O que o cliente quer alcançar? (Vendas, Autoridade, Leads)"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tom de Voz e Posicionamento</label>
+                                    <input type="text" name="tone" class="form-control" placeholder="Ex: Sério, Disruptivo, Educativo" />
+                                </div>
+                            </div>
+
+                            <div class="form-section">
+                                <h3><i class="fa-solid fa-link"></i> Pontes Operacionais (Links)</h3>
+                                <div class="form-group">
+                                    <label>Instagram / Redes Sociais</label>
+                                    <input type="url" name="link_social" class="form-control" placeholder="https://instagram.com/perfil" />
+                                </div>
+                                <div class="form-group">
+                                    <label>Canva / Drive do Projeto</label>
+                                    <input type="url" name="link_assets" class="form-control" placeholder="Link da pasta de arquivos" />
+                                </div>
+                                <div class="form-group">
+                                    <label>WhatsApp do Responsável</label>
+                                    <input type="text" name="whatsapp" class="form-control" placeholder="+55..." />
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-save">
+                                <i class="fa-solid fa-cloud-arrow-up"></i> ATIVAR ECOSSISTEMA
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <script type="module" src="./js/onboarding.js"></script>
+</body>
+</html>

@@ -16,11 +16,14 @@ export const OS_UI = {
      */
     renderSidebar: (activeModule, userRole = 'CLIENT') => {
         const navItems = [
-            { id: 'command-center', label: 'Command Center', icon: 'fa-gauge-high', group: 'Núcleo Estratégico', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'content-engine', label: 'Content Engine', icon: 'fa-pen-nib', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR', 'CLIENT'] },
-            { id: 'crm-intelligence', label: 'CRM Intelligence', icon: 'fa-users-gear', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'automation-hub', label: 'Automation Hub', icon: 'fa-robot', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'analytics', label: 'Analytics', icon: 'fa-chart-line', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR', 'CLIENT'] },
+            { id: 'command-center', label: 'Centro de Comando', icon: 'fa-gauge-high', group: 'Núcleo Estratégico', roles: ['ADMIN', 'OPERATOR'] },
+            { id: 'onboarding', label: 'Onboarding Estratégico', icon: 'fa-address-card', group: 'Núcleo Estratégico', roles: ['ADMIN'] },
+            { id: 'content-engine', label: 'Motor de Conteúdo', icon: 'fa-pen-nib', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
+            { id: 'crm-intelligence', label: 'Inteligência de CRM', icon: 'fa-users-gear', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
+            { id: 'automation-hub', label: 'Central de Automação', icon: 'fa-robot', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
+            { id: 'analytics', label: 'Análise de Dados', icon: 'fa-chart-line', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
+            { id: 'client-workspace', label: 'Workspace do Cliente', icon: 'fa-briefcase', group: 'Interface de Valor', roles: ['ADMIN', 'CLIENT'] },
+            { id: 'contracts-finance', label: 'Contratos & Financeiro', icon: 'fa-file-invoice-dollar', group: 'Governança', roles: ['ADMIN'] },
             { id: 'governance', label: 'Governança', icon: 'fa-user-shield', group: 'Governança', roles: ['ADMIN'] },
             { id: 'governance-users', label: 'Gestão de Usuários', icon: 'fa-users-cog', group: 'Governança', roles: ['ADMIN'] },
             { id: 'govos', label: 'GovOS', icon: 'fa-shield-halved', group: 'Governança', roles: ['ADMIN'] }

@@ -63,56 +63,61 @@
                     <div class="project-meta" id="project-meta"></div>
                     <div class="progress-box">
                         <div class="progress-bar"><div class="progress-fill"></div></div>
-                        <div class="progress-text"><span>Progresso Geral</span><span id="progress-val">0%</span></div>
+                        <div class="progress-text"><span>Evolução do Projeto</span><span id="progress-val">0%</span></div>
                     </div>
                 </div>
 
                 <div class="os-widget-grid">
+                    <!-- RESULTADOS RESUMIDOS -->
+                    <div class="os-widget" style="grid-column: span 12;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Resultados Estratégicos (Visão Geral)</span>
+                        </div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-top: 10px;" id="results-container">
+                            <!-- Injetado via data -->
+                        </div>
+                    </div>
+
                     <!-- APROVAÇÕES -->
-                    <div class="os-widget" style="grid-column: span 6;">
+                    <div class="os-widget" style="grid-column: span 7;">
                         <div class="os-widget-header">
-                            <span class="os-widget-label">Aprovações Pendentes</span>
+                            <span class="os-widget-label">Aprovações e Decisões Pendentes</span>
                         </div>
-                        <div id="approvals-container"></div>
+                        <div id="approvals-container" style="margin-top: 10px;"></div>
                     </div>
 
-                    <!-- INSIGHTS -->
-                    <div class="os-widget" style="grid-column: span 6;">
+                    <!-- INSIGHTS EXECUTIVOS -->
+                    <div class="os-widget" style="grid-column: span 5;">
                         <div class="os-widget-header">
-                            <span class="os-widget-label">Insights Resumidos (Leitura OS)</span>
+                            <span class="os-widget-label">Insights do Board (Inteligência OS)</span>
                         </div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;" id="insights-container"></div>
+                        <div id="insights-container" style="margin-top: 10px;"></div>
                     </div>
 
-                    <!-- TIMELINE -->
+                    <!-- TIMELINE EXECUTIVA -->
                     <div class="os-widget" style="grid-column: span 4;">
                         <div class="os-widget-header">
-                            <span class="os-widget-label">Timeline Operacional</span>
+                            <span class="os-widget-label">Linha do Tempo (Status Operacional)</span>
                         </div>
-                        <div class="timeline-container" id="timeline-container"></div>
+                        <div class="timeline-container" id="timeline-container" style="margin-top: 20px;"></div>
                     </div>
 
-                    <!-- ENTREGÁVEIS -->
+                    <!-- HISTÓRICO DE ENTREGAS -->
                     <div class="os-widget" style="grid-column: span 8;">
                         <div class="os-widget-header">
-                            <span class="os-widget-label">Status de Entregas & Histórico</span>
+                            <span class="os-widget-label">Entregas e Materiais</span>
                         </div>
                         <table class="os-table">
                             <thead>
                                 <tr>
-                                    <th>Item</th>
+                                    <th>Item de Valor</th>
                                     <th>Versão</th>
                                     <th>Status</th>
-                                    <th>Última Alteração</th>
+                                    <th>Data</th>
                                 </tr>
                             </thead>
                             <tbody id="deliverable-body"></tbody>
                         </table>
-
-                        <div class="os-widget-header" style="margin-top: 30px; border-bottom: 1px solid var(--os-border); padding-bottom: 10px;">
-                            <span class="os-widget-label">Próximos Passos</span>
-                        </div>
-                        <div id="steps-container"></div>
                     </div>
                 </div>
             </main>
