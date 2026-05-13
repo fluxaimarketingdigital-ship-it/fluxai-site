@@ -270,4 +270,9 @@ document.getElementById('close-pub-modal').onclick = () => {
     document.getElementById('pub-modal-overlay').style.display = 'none';
 };
 
+window.openWorkspace = () => {
+    if (!currentProject) return alert('Selecione um projeto primeiro para ver o calendário!');
+    window.open(`/os/workspace.html?project=${currentProject}`, '_blank');
+};
+
 init();
