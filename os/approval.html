@@ -76,32 +76,48 @@
         <p>Obrigado! Já estamos preparando tudo para a publicação.</p>
     </div>
 
-    <script type="module">
-        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-        // Mesma conexão direta para evitar erros de fetch
-        const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
-        const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-        const supabase = createClient(supabaseUrl, supabaseKey);
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
         async function load() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
-            if (!id) return;
-
-            const { data: c, error } = await supabase.from('content_assets').select('*').eq('id', id).single();
+            console.log('[DEBUG] Carregando aprovação para ID:', id);
             
-            if (c) {
+            if (!id) {
+                document.getElementById('loading-state').innerHTML = 'Erro: Link inválido.';
+                return;
+            }
+
+            try {
+                const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
+                const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
+                const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+                const { data: c, error } = await supabase
+                    .from('content_assets')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+                
+                if (error) throw error;
+                if (!c) throw new Error('Conteúdo não encontrado.');
+
+                console.log('[DEBUG] Conteúdo carregado:', c);
+
                 document.getElementById('asset-preview').src = c.media_url || 'https://images.unsplash.com/photo-1493612276216-ee3925520721?w=800';
                 document.getElementById('asset-caption').innerText = c.caption || 'Sem legenda.';
+                
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('content-data').style.display = 'block';
 
-                // Actions
+                // Configurar botões
                 document.getElementById('btn-approve-action').onclick = async () => {
-                    await supabase.from('content_assets').update({ status: 'PRONTO' }).eq('id', id);
-                    document.getElementById('main-ui').style.display = 'none';
-                    document.getElementById('success-ui').style.display = 'block';
+                    const { error: upError } = await supabase.from('content_assets').update({ status: 'PRONTO' }).eq('id', id);
+                    if (upError) alert('Erro ao aprovar: ' + upError.message);
+                    else {
+                        document.getElementById('main-ui').style.display = 'none';
+                        document.getElementById('success-ui').style.display = 'block';
+                    }
                 };
 
                 document.getElementById('btn-reject-action').onclick = () => {
@@ -118,11 +134,16 @@
                     }).eq('id', id);
                     
                     alert('Feedback enviado com sucesso! Vamos trabalhar nos ajustes.');
-                    window.close();
+                    window.location.reload();
                 };
+
+            } catch (err) {
+                console.error('[DEBUG] Erro fatal:', err);
+                document.getElementById('loading-state').innerHTML = 'Erro ao carregar conteúdo: ' + err.message;
             }
         }
-        load();
+        
+        window.onload = load;
     </script>
 </body>
 </html>
