@@ -43,33 +43,42 @@ async function init() {
 
 async function generateSampleContent(projectId) {
     const supabase = getSupabase();
-    console.log('[DEBUG] Gerando conteúdo de teste para:', projectId);
+    console.log('[DEBUG] Gerando Planejamento Mensal para:', projectId);
 
-    const samples = [
-        {
+    // 1. Buscar estratégia e contrato
+    const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
+    
+    if (!project) return alert('Projeto não encontrado!');
+
+    // 2. Definir volume de posts (Média de 2 por semana se não especificado)
+    const postsPerMonth = 8; 
+    const samples = [];
+    const startDate = new Date();
+    
+    // Sugestões de temas baseados nos objetivos do contrato
+    const themes = project.objectives ? project.objectives.split('\n').filter(t => t.trim()) : ['Post Institucional', 'Conteúdo de Valor', 'Prova Social', 'Diferenciação'];
+
+    for (let i = 0; i < postsPerMonth; i++) {
+        const scheduledDate = new Date();
+        scheduledDate.setDate(startDate.getDate() + (i * 4)); // Um post a cada 4 dias
+        scheduledDate.setHours(18, 0, 0); // Horário padrão 18h
+
+        samples.push({
             project_id: projectId,
-            title: 'Post 01: Nutrição Real vs Fake',
-            status: 'APROVAÇÃO',
-            priority: 'ALTA',
-            platform: 'INSTAGRAM',
-            caption: 'Chega de perfeccionismo artificial! 🍎 No perfil da Maria, a gente foca na vida real. \n\n#NutriçãoHumanizada #BrandingInteligente',
-            media_url: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800'
-        },
-        {
-            project_id: projectId,
-            title: 'Reels: Bastidores do Consultório',
-            status: 'PRODUÇÃO',
+            title: themes[i % themes.length] || `Conteúdo Estratégico #${i+1}`,
+            status: 'PAUTA',
             priority: 'MÉDIA',
-            platform: 'REELS',
-            caption: 'Um dia na vida de uma nutricionista que entende a sua rotina. 🩺✨',
-            media_url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800'
-        }
-    ];
+            platform: i % 2 === 0 ? 'INSTAGRAM' : 'REELS',
+            caption: 'Conteúdo gerado via Planejamento IA baseado no DNA da Marca.',
+            scheduled_at: scheduledDate.toISOString(),
+            media_url: 'https://images.unsplash.com/photo-1493612276216-ee3925520721?w=800'
+        });
+    }
 
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro ao gerar: ' + error.message);
     else {
-        alert('Planejamento IA Gerado! 🚀 2 novos conteúdos adicionados.');
+        alert(`Planejamento Mensal Gerado! 🚀 ${postsPerMonth} conteúdos agendados estrategicamente.`);
         loadContent();
     }
 }
@@ -97,7 +106,7 @@ async function loadContent() {
         query = query.eq('project_id', currentProject);
     }
 
-    const { data: contents, error } = await query.order('created_at', { ascending: false });
+    const { data: contents, error } = await query.order('scheduled_at', { ascending: true });
 
     if (error) {
         console.error('Erro ao carregar conteúdos:', error);
@@ -112,11 +121,14 @@ function renderContentTable(contents) {
     const body = document.getElementById('pipeline-table-body');
     
     if (!contents || contents.length === 0) {
-        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;">Nenhum conteúdo encontrado para este filtro.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 40px;">Nenhum conteúdo encontrado para este filtro.</td></tr>`;
         return;
     }
 
-    body.innerHTML = contents.map(c => `
+    body.innerHTML = contents.map(c => {
+        const dateStr = c.scheduled_at ? new Date(c.scheduled_at).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '---';
+        
+        return `
         <tr>
             <td>
                 <div style="font-weight: 700;">${c.title}</div>
@@ -136,6 +148,7 @@ function renderContentTable(contents) {
             </td>
             <td><span class="os-priority-${c.priority.toLowerCase()}">${c.priority}</span></td>
             <td><i class="fa-brands fa-${c.platform.toLowerCase()}"></i> ${c.platform}</td>
+            <td style="font-family:'JetBrains Mono'; font-size:0.75rem; color:var(--os-primary)">${dateStr}</td>
             <td>
                 ${c.status === 'APROVAÇÃO' || c.status === 'AJUSTE' ? `
                     <button class="btn-mini" style="background:#6b7a45; color:white" title="Gerar Link de Aprovação" onclick="window.generateApprovalLink('${c.id}')">
@@ -154,7 +167,7 @@ function renderContentTable(contents) {
                 </div>
             </td>
         </tr>
-    `).join('');
+    `}).join('');
 }
 
 function getStatusColor(status) {

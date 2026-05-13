@@ -64,8 +64,15 @@
             </div>
 
             <div class="feedback-area" id="feedback-ui">
-                <textarea id="feedback-text" placeholder="O que você gostaria de mudar neste conteúdo?"></textarea>
-                <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR SOLICITAÇÃO</button>
+                <h3 style="font-size:0.8rem; color:var(--os-primary); margin-bottom:15px;">O que precisamos ajustar?</h3>
+                <select id="feedback-category" style="width: 100%; background: #000; border: 1px solid var(--os-border); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
+                    <option value="ARTE">Ajustar a Arte / Imagem</option>
+                    <option value="LEGENDA">Ajustar o Texto / Legenda</option>
+                    <option value="ESTRATEGIA">Mudar a Estratégia / Tema</option>
+                    <option value="OUTRO">Outros Detalhes</option>
+                </select>
+                <textarea id="feedback-text" rows="4" placeholder="Descreva com detalhes o que você gostaria de mudar..."></textarea>
+                <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR SOLICITAÇÃO DE AJUSTE</button>
             </div>
         </div>
     </div>
@@ -125,12 +132,15 @@
                 };
 
                 document.getElementById('btn-submit-feedback').onclick = async () => {
+                    const category = document.getElementById('feedback-category').value;
                     const feedback = document.getElementById('feedback-text').value;
                     if (!feedback) return alert('Por favor, descreva o que precisa de ajuste.');
                     
+                    const fullNote = `CATEGORIA: ${category} | DETALHES: ${feedback}`;
+                    
                     await supabase.from('content_assets').update({ 
                         status: 'AJUSTE',
-                        internal_notes: 'Feedback do Cliente: ' + feedback 
+                        internal_notes: fullNote 
                     }).eq('id', id);
                     
                     alert('Feedback enviado com sucesso! Vamos trabalhar nos ajustes.');
