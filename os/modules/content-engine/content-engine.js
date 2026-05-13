@@ -271,8 +271,13 @@ document.getElementById('close-pub-modal').onclick = () => {
 };
 
 window.runAiPlanner = async () => {
-    if (!currentProject) return alert('Selecione um projeto primeiro!');
-    await generateSampleContent(currentProject);
+    const filter = document.getElementById('project-filter');
+    const selectedId = filter.value || currentProject;
+    
+    if (!selectedId) return alert('Selecione um projeto primeiro!');
+    
+    currentProject = selectedId; // Sincroniza a variável
+    await generateSampleContent(selectedId);
 };
 
 window.openNewContentEditor = () => {
