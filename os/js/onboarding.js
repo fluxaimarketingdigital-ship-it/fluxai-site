@@ -2,44 +2,52 @@ import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
 import { getSupabase } from '/os/services/supabase-client.js';
 
 async function init() {
-    // 1. Validar Acesso (Apenas ADMIN pode fazer onboarding)
-    const user = await OS_AUTH.check('ADMIN');
-    if (!user) return;
+    console.log('[ONBOARDING] Iniciando módulo...');
+    
+    // 1. Renderizar Sidebar Imediatamente (Garante a interface visível)
+    // Se o usuário não estiver logado, a sidebar será atualizada depois pelo check de auth
+    OS_UI.renderSidebar('onboarding', 'ADMIN'); 
+    OS_UI.renderTopbar();
 
-    // 2. Renderizar Base
-    OS_UI.renderSidebar('onboarding', user.role);
-    await OS_UI.renderTopbar();
+    // 2. Validar Acesso em Background
+    const user = await OS_AUTH.check('ADMIN');
+    if (!user) {
+        console.error('[ONBOARDING] Acesso negado ou não autenticado.');
+        return;
+    }
 
     // 3. Listener do Formulário
     const form = document.getElementById('onboardingForm');
-    form.addEventListener('submit', handleOnboarding);
+    if (form) {
+        form.addEventListener('submit', handleOnboarding);
+        console.log('[ONBOARDING] Listener de formulário ativado.');
+    }
 }
 
 async function handleOnboarding(e) {
     e.preventDefault();
+    console.log('[ONBOARDING] Processando envio...');
+
     const btn = e.target.querySelector('.btn-save');
     const originalContent = btn.innerHTML;
 
-    // Feedback Visual
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ATIVANDO...';
     btn.disabled = true;
 
     const formData = new FormData(e.target);
     const data = Object.fromEntries(formData.entries());
-    
-    // Pegar checkboxes de escopo
     const scope = Array.from(formData.getAll('scope'));
 
     const supabase = getSupabase();
     if (!supabase) {
-        alert('Erro: Supabase não configurado.');
+        alert('Erro: Conexão com banco de dados falhou.');
         btn.innerHTML = originalContent;
         btn.disabled = false;
         return;
     }
 
     try {
-        // 1. Criar Projeto (Memória Estratégica)
+        // 1. Criar Projeto
         const { data: project, error: pError } = await supabase
             .from('projects')
             .insert([{
@@ -56,12 +64,11 @@ async function handleOnboarding(e) {
                 },
                 status: 'ATIVO'
             }])
-            .select()
-            .single();
+            .select().single();
 
         if (pError) throw pError;
 
-        // 2. Criar Contrato (Financeiro)
+        // 2. Criar Contrato
         const { data: contract, error: cError } = await supabase
             .from('contracts')
             .insert([{
@@ -74,20 +81,16 @@ async function handleOnboarding(e) {
                 status: 'ATIVO',
                 start_date: new Date().toISOString()
             }])
-            .select()
-            .single();
+            .select().single();
 
         if (cError) throw cError;
 
-        // 3. Gerar Primeira Parcela Financeira (Automação)
+        // 3. Gerar Financeiro
         const today = new Date();
         const dueDate = new Date(today.getFullYear(), today.getMonth(), data.due_day || 5);
-        
-        if (dueDate < today) {
-            dueDate.setMonth(dueDate.getMonth() + 1);
-        }
+        if (dueDate < today) dueDate.setMonth(dueDate.getMonth() + 1);
 
-        const { error: pError } = await supabase
+        const { error: payError } = await supabase
             .from('payments')
             .insert([{
                 contract_id: contract.id,
@@ -96,22 +99,23 @@ async function handleOnboarding(e) {
                 status: 'AGUARDANDO'
             }]);
 
-        if (pError) throw pError;
+        if (payError) throw payError;
 
-        // Sucesso
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> ATIVADO COM SUCESSO!';
+        // Sucesso Total
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> SUCESSO! REDIRECIONANDO...';
         btn.style.background = 'var(--os-success)';
         
         setTimeout(() => {
-            window.location.href = 'command-center.html';
-        }, 2000);
+            window.location.href = '/os/contracts-finance.html';
+        }, 1500);
 
     } catch (error) {
-        console.error('Erro no Onboarding:', error);
-        alert('Erro ao salvar dados: ' + error.message);
+        console.error('[ONBOARDING ERROR]', error);
+        alert('Erro ao ativar ecossistema: ' + error.message);
         btn.innerHTML = originalContent;
         btn.disabled = false;
     }
 }
 
+// Iniciar
 init();
