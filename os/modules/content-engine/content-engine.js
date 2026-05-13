@@ -345,7 +345,7 @@ window.openWorkspace = () => {
     if (!selectedId) return alert('Selecione um projeto primeiro para ver o calendário!');
     
     currentProject = selectedId;
-    window.open(`/os/workspace.html?project=${selectedId}`, '_blank');
+    window.open(`/os/flux-calendar.html?project=${selectedId}`, '_blank');
 };
 
 init();
