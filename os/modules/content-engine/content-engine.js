@@ -42,43 +42,43 @@ async function init() {
 }
 
 async function generateSampleContent(projectId) {
-    const supabase = getSupabase();
-    console.log('[DEBUG] Gerando Planejamento Mensal para:', projectId);
+    const briefing = prompt("O que o cliente quer abordar este mês? (Ex: Promoção de Maio, Inauguração, Dicas de Nutrição)");
+    if (!briefing) return;
 
-    // 1. Buscar estratégia e contrato
+    const supabase = getSupabase();
+    console.log('[DEBUG] Gerando Planejamento Mensal Estratégico para:', projectId);
+
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
-    
     if (!project) return alert('Projeto não encontrado!');
 
-    // 2. Definir volume de posts (Média de 2 por semana se não especificado)
-    const postsPerMonth = 8; 
+    const postsPerMonth = 12; // Padrão High-Ticket
     const samples = [];
-    const startDate = new Date();
     
-    // Sugestões de temas baseados nos objetivos do contrato
-    const themes = project.objectives ? project.objectives.split('\n').filter(t => t.trim()) : ['Post Institucional', 'Conteúdo de Valor', 'Prova Social', 'Diferenciação'];
-
+    // Calcular Início do Próximo Mês
+    const now = new Date();
+    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    
     for (let i = 0; i < postsPerMonth; i++) {
-        const scheduledDate = new Date();
-        scheduledDate.setDate(startDate.getDate() + (i * 4)); // Um post a cada 4 dias
-        scheduledDate.setHours(18, 0, 0); // Horário padrão 18h
+        const scheduledDate = new Date(nextMonth);
+        scheduledDate.setDate(nextMonth.getDate() + (i * 2.5)); // Distribuir no mês
+        scheduledDate.setHours(18, 0, 0);
 
         samples.push({
             project_id: projectId,
-            title: themes[i % themes.length] || `Conteúdo Estratégico #${i+1}`,
+            title: `[ESTRATÉGIA] ${briefing} #${i+1}`,
             status: 'PAUTA',
             priority: 'MÉDIA',
-            platform: i % 2 === 0 ? 'INSTAGRAM' : 'REELS',
-            caption: 'Conteúdo gerado via Planejamento IA baseado no DNA da Marca.',
+            platform: i % 3 === 0 ? 'REELS' : 'INSTAGRAM',
+            caption: `Baseado no briefing: ${briefing}. \n\nDesenvolver narrativa de autoridade focada em conversão.`,
             scheduled_at: scheduledDate.toISOString(),
-            media_url: 'https://images.unsplash.com/photo-1493612276216-ee3925520721?w=800'
+            media_url: null // Sem imagem na fase de pauta
         });
     }
 
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro ao gerar: ' + error.message);
     else {
-        alert(`Planejamento Mensal Gerado! 🚀 ${postsPerMonth} conteúdos agendados estrategicamente.`);
+        alert(`Planejamento Mensal para o PRÓXIMO MÊS Gerado! 🚀 Enviar para o cliente até o dia 28.`);
         loadContent();
     }
 }

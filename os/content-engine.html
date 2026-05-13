@@ -80,12 +80,19 @@
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <div class="os-page-header">
-                    <div class="os-page-title">
-                        <h1>Motor de Conteúdo</h1>
-                        <p>Orquestração estratégica e produção de ativos de autoridade.</p>
-                    </div>
-                    <div class="os-page-actions">
+                <header class="os-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <div>
+                <h1>Motor de Conteúdo</h1>
+                <p>Orquestração estratégica e produção de ativos de autoridade.</p>
+            </div>
+            <div id="deadline-notice" style="background:rgba(168,85,247,0.1); border:1px solid var(--os-primary); padding:10px 20px; border-radius:8px; display:flex; align-items:center; gap:12px;">
+                <i class="fa-solid fa-calendar-check" style="color:var(--os-primary); font-size:1.2rem;"></i>
+                <div>
+                    <div style="font-size:0.7rem; text-transform:uppercase; letter-spacing:1px; opacity:0.7;">Deadline de Planejamento</div>
+                    <div style="font-weight:700; color:var(--os-primary);">TODO DIA 28 <span style="font-weight:400; font-size:0.8rem; color:#fff; opacity:0.6;">(Envio Obrigatório)</span></div>
+                </div>
+            </div>
+            <div class="header-actions" style="display: flex; gap: 10px; align-items: center;">
                         <select id="project-filter" class="os-select">
                             <option value="">Todos os Projetos</option>
                         </select>
