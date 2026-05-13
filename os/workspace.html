@@ -55,21 +55,26 @@
             console.log('[WORKSPACE] Iniciando para Projeto:', projectId);
             
             if (!projectId) {
-                document.getElementById('client-name').innerText = 'Link de Acesso Inválido';
+                document.getElementById('client-name').innerText = 'ID do Projeto não encontrado';
                 return;
             }
 
+            // 1. Tentar Buscar Projeto (Opcional)
             try {
-                // 1. Buscar Projeto
-                const { data: project, error: pError } = await supabase.from('projects').select('*').eq('id', projectId).single();
-                if (pError) throw pError;
-
+                const { data: project } = await supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle();
                 if (project) {
                     document.getElementById('client-name').innerText = project.company_name;
                     document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
+                } else {
+                    document.getElementById('client-name').innerText = 'Workspace Estratégico';
                 }
+            } catch (pErr) {
+                console.warn('[WORKSPACE] Falha ao carregar nome do projeto:', pErr);
+                document.getElementById('client-name').innerText = 'Workspace Estratégico';
+            }
 
-                // 2. Buscar Conteúdos
+            // 2. Buscar Conteúdos (Principal)
+            try {
                 const { data: contents, error: cError } = await supabase.from('content_assets')
                     .select('*')
                     .eq('project_id', projectId)
@@ -83,8 +88,9 @@
                 updateStats(contents || []);
                 
             } catch (err) {
-                console.error('[WORKSPACE] Erro crítico:', err);
-                document.getElementById('client-name').innerText = 'Erro ao carregar dados.';
+                console.error('[WORKSPACE] Erro crítico ao carregar posts:', err);
+                document.getElementById('client-name').innerText = 'Erro ao carregar planejamento.';
+                renderCalendar([]); // Mostra calendário vazio pelo menos
             }
         }
 
