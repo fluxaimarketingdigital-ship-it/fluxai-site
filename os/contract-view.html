@@ -124,7 +124,12 @@
             const params = new URLSearchParams(window.location.search);
             const contractId = params.get('id');
 
-            if (!contractId) return;
+            console.log('[CONTRACT VIEW] Buscando ID:', contractId);
+
+            if (!contractId) {
+                alert('ID do contrato não fornecido.');
+                return;
+            }
 
             const supabase = getSupabase();
             const { data: c, error } = await supabase
@@ -133,17 +138,24 @@
                 .eq('id', contractId)
                 .single();
 
+            if (error) {
+                console.error('[CONTRACT VIEW ERROR]', error);
+                document.getElementById('deliverables').innerHTML = `<p style="color:red">Erro ao carregar dados: ${error.message}</p>`;
+                return;
+            }
+
             if (c) {
-                document.getElementById('company-name').innerText = c.company_name;
-                document.getElementById('client-name').innerText = c.client_name;
-                document.getElementById('segment').innerText = c.projects.segment || 'N/A';
-                document.getElementById('deliverables').innerText = c.deliverables;
-                document.getElementById('contract-value').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c.contract_value);
-                document.getElementById('due-day').innerText = `Todo dia ${c.due_day}`;
-                document.getElementById('status').innerText = c.status;
-                document.getElementById('start-date').innerText = new Date(c.start_date).toLocaleDateString('pt-BR');
-                document.getElementById('icp').innerText = c.projects.icp || 'Não definido';
-                document.getElementById('objectives').innerText = c.projects.objectives || 'Não definido';
+                console.log('[CONTRACT VIEW] Dados carregados:', c);
+                document.getElementById('company-name').innerText = c.company_name || '---';
+                document.getElementById('client-name').innerText = c.client_name || '---';
+                document.getElementById('segment').innerText = c.projects?.segment || 'N/A';
+                document.getElementById('deliverables').innerText = c.deliverables || 'Nenhum escopo definido.';
+                document.getElementById('contract-value').innerText = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(c.contract_value || 0);
+                document.getElementById('due-day').innerText = `Todo dia ${c.due_day || '--'}`;
+                document.getElementById('status').innerText = c.status || '---';
+                document.getElementById('start-date').innerText = c.start_date ? new Date(c.start_date).toLocaleDateString('pt-BR') : '---';
+                document.getElementById('icp').innerText = c.projects?.icp || 'Contexto não definido.';
+                document.getElementById('objectives').innerText = c.projects?.objectives || 'Objetivos não definidos.';
             }
         }
 
