@@ -1,4 +1,4 @@
-import { getSupabase } from './services/supabase-client.js';
+import { getSupabase } from '../services/supabase-client.js';
 
 async function init() {
     const params = new URLSearchParams(window.location.search);

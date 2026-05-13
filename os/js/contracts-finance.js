@@ -1,5 +1,5 @@
 import { OS_UI, OS_AUTH } from './os-core.js';
-import { getSupabase } from './services/supabase-client.js';
+import { getSupabase } from '../services/supabase-client.js';
 
 async function init() {
     const user = await OS_AUTH.check('ADMIN');
