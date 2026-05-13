@@ -84,14 +84,42 @@ function renderContracts(contracts) {
             <td><span class="status-badge" style="background: rgba(255,255,255,0.05); color: #fff;">${c.status}</span></td>
             <td>
                 <div class="action-btns">
-                    <button class="btn-mini" title="Gerar Contrato" onclick="window.generateContractDoc('${c.id}')">
+                    <button class="btn-mini" title="Visualizar Contrato" onclick="window.generateContractDoc('${c.id}')">
                         <i class="fa-solid fa-file-pdf"></i>
+                    </button>
+                    <button class="btn-mini" title="Editar Contrato" onclick="window.editContract('${c.id}')">
+                        <i class="fa-solid fa-pen-to-square"></i>
                     </button>
                 </div>
             </td>
         </tr>
     `).join('');
 }
+
+window.editContract = async (contractId) => {
+    const supabase = getSupabase();
+    const { data: c } = await supabase.from('contracts').select('*').eq('id', contractId).single();
+    if (!c) return;
+
+    const newValue = prompt('Novo Valor Mensal (R$):', c.contract_value);
+    const newDeliverables = prompt('Novas Entregas (Escopo):', c.deliverables);
+    const newDueDay = prompt('Novo Dia de Vencimento:', c.due_day);
+
+    if (newValue && newDeliverables && newDueDay) {
+        const { error } = await supabase.from('contracts').update({
+            contract_value: newValue,
+            deliverables: newDeliverables,
+            due_day: newDueDay
+        }).eq('id', contractId);
+
+        if (error) {
+            alert('Erro ao atualizar: ' + error.message);
+        } else {
+            alert('Contrato atualizado com sucesso!');
+            loadFinanceData();
+        }
+    }
+};
 
 window.sendWhatsAppBilling = async (paymentId) => {
     const supabase = getSupabase();
