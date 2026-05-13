@@ -42,43 +42,49 @@ async function init() {
 }
 
 async function generateSampleContent(projectId) {
-    const briefing = prompt("O que o cliente quer abordar este mês? (Ex: Promoção de Maio, Inauguração, Dicas de Nutrição)");
-    if (!briefing) return;
-
     const supabase = getSupabase();
-    console.log('[DEBUG] Gerando Planejamento Mensal Estratégico para:', projectId);
+    console.log('[DEBUG] Gerando Planejamento Mensal Autônomo para:', projectId);
 
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    const postsPerMonth = 12; // Padrão High-Ticket
-    const samples = [];
+    // Temas baseados na Estratégia de Autoridade da FluxAI
+    const defaultThemes = [
+        'Educação de Audiência', 'Quebra de Objeções', 'Prova Social / Case', 
+        'Bastidores de Autoridade', 'Diferenciação de Mercado', 'Tendência do Setor',
+        'Humanização Estratégica', 'Narrativa de Venda Indireta'
+    ];
     
-    // Calcular Início do Próximo Mês
+    const themes = project.objectives ? project.objectives.split('\n').filter(t => t.trim()) : defaultThemes;
+
+    const postsPerMonth = 12;
+    const samples = [];
     const now = new Date();
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
     
     for (let i = 0; i < postsPerMonth; i++) {
         const scheduledDate = new Date(nextMonth);
-        scheduledDate.setDate(nextMonth.getDate() + (i * 2.5)); // Distribuir no mês
+        scheduledDate.setDate(nextMonth.getDate() + (i * 2.5));
         scheduledDate.setHours(18, 0, 0);
+
+        const theme = themes[i % themes.length];
 
         samples.push({
             project_id: projectId,
-            title: `[ESTRATÉGIA] ${briefing} #${i+1}`,
+            title: `[ESTRATÉGIA] ${theme}`,
             status: 'PAUTA',
             priority: 'MÉDIA',
             platform: i % 3 === 0 ? 'REELS' : 'INSTAGRAM',
-            caption: `Baseado no briefing: ${briefing}. \n\nDesenvolver narrativa de autoridade focada em conversão.`,
+            caption: `Conteúdo estratégico focado em ${theme.toLowerCase()}, gerado via IA baseada no DNA da marca e objetivos contratuais.`,
             scheduled_at: scheduledDate.toISOString(),
-            media_url: null // Sem imagem na fase de pauta
+            media_url: null
         });
     }
 
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro ao gerar: ' + error.message);
     else {
-        alert(`Planejamento Mensal para o PRÓXIMO MÊS Gerado! 🚀 Enviar para o cliente até o dia 28.`);
+        alert(`Planejamento Estratégico Autônomo Gerado! 🚀 12 novos conteúdos criados.`);
         loadContent();
     }
 }
