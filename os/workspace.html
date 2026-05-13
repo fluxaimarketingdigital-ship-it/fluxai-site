@@ -52,51 +52,76 @@
         async function initWorkspace() {
             const params = new URLSearchParams(window.location.search);
             const projectId = params.get('project');
-            if (!projectId) return alert('Link inválido. Solicite um novo link ao seu gestor.');
-
-            // 1. Buscar Projeto
-            const { data: project } = await supabase.from('projects').select('*').eq('id', projectId).single();
-            if (project) {
-                document.getElementById('client-name').innerText = project.company_name;
-                document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
+            console.log('[WORKSPACE] Iniciando para Projeto:', projectId);
+            
+            if (!projectId) {
+                document.getElementById('client-name').innerText = 'Link de Acesso Inválido';
+                return;
             }
 
-            // 2. Buscar Conteúdos do Mês
-            const { data: contents } = await supabase.from('content_assets')
-                .select('*')
-                .eq('project_id', projectId)
-                .order('scheduled_at', { ascending: true });
+            try {
+                // 1. Buscar Projeto
+                const { data: project, error: pError } = await supabase.from('projects').select('*').eq('id', projectId).single();
+                if (pError) throw pError;
 
-            renderCalendar(contents);
-            updateStats(contents);
+                if (project) {
+                    document.getElementById('client-name').innerText = project.company_name;
+                    document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
+                }
+
+                // 2. Buscar Conteúdos
+                const { data: contents, error: cError } = await supabase.from('content_assets')
+                    .select('*')
+                    .eq('project_id', projectId)
+                    .order('scheduled_at', { ascending: true });
+
+                if (cError) throw cError;
+
+                console.log('[WORKSPACE] Conteúdos carregados:', contents?.length);
+                
+                renderCalendar(contents || []);
+                updateStats(contents || []);
+                
+            } catch (err) {
+                console.error('[WORKSPACE] Erro crítico:', err);
+                document.getElementById('client-name').innerText = 'Erro ao carregar dados.';
+            }
         }
 
         function renderCalendar(contents) {
             const container = document.getElementById('calendar-body');
             container.innerHTML = '';
             
-            // Gerar calendário para o próximo mês (ou mês atual conforme agendado)
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = today.getMonth() + 1; // Focado no próximo mês
+            // Usar o mês do primeiro post agendado ou o mês atual
+            let targetDate = new Date();
+            if (contents.length > 0 && contents[0].scheduled_at) {
+                targetDate = new Date(contents[0].scheduled_at);
+            }
             
+            const year = targetDate.getFullYear();
+            const month = targetDate.getMonth();
+            
+            // Atualizar título do período
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            document.getElementById('workspace-period').innerText = `Planejamento Estratégico | ${monthNames[month]} ${year}`;
+
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            // Espaços vazios antes do dia 1
+            // Espaços vazios
             for (let i = 0; i < firstDay; i++) {
                 container.innerHTML += `<div class="calendar-day empty"></div>`;
             }
 
-            // Dias do mês
             for (let day = 1; day <= daysInMonth; day++) {
-                const dayDate = new Date(year, month, day).toISOString().split('T')[0];
-                const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayDate));
+                const dayDate = new Date(year, month, day);
+                const dayStr = dayDate.toISOString().split('T')[0];
+                const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
                 
                 let eventsHtml = dayContents.map(c => `
-                    <div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}')">
+                    <div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')" title="${c.title}">
                         <span class="event-status" style="background:${getStatusColor(c.status)}"></span>
-                        ${c.title}
+                        ${c.title.substring(0, 20)}...
                     </div>
                 `).join('');
 
