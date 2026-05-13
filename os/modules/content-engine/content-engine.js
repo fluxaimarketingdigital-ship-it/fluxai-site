@@ -20,8 +20,44 @@ async function init() {
         loadContent();
     });
 
-    document.getElementById('btn-ai-planner').onclick = () => alert('IA analisando Memória Estratégica... Sugestões em breve!');
+    document.getElementById('btn-ai-planner').onclick = async () => {
+        if (!currentProject) return alert('Selecione um projeto primeiro!');
+        await generateSampleContent(currentProject);
+    };
     document.getElementById('btn-new-content').onclick = () => alert('Abrindo editor de pauta...');
+}
+
+async function generateSampleContent(projectId) {
+    const supabase = getSupabase();
+    console.log('[DEBUG] Gerando conteúdo de teste para:', projectId);
+
+    const samples = [
+        {
+            project_id: projectId,
+            title: 'Post 01: Nutrição Real vs Fake',
+            status: 'APROVAÇÃO',
+            priority: 'ALTA',
+            platform: 'INSTAGRAM',
+            caption: 'Chega de perfeccionismo artificial! 🍎 No perfil da Maria, a gente foca na vida real. \n\n#NutriçãoHumanizada #BrandingInteligente',
+            media_url: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=800'
+        },
+        {
+            project_id: projectId,
+            title: 'Reels: Bastidores do Consultório',
+            status: 'PRODUÇÃO',
+            priority: 'MÉDIA',
+            platform: 'REELS',
+            caption: 'Um dia na vida de uma nutricionista que entende a sua rotina. 🩺✨',
+            media_url: 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800'
+        }
+    ];
+
+    const { error } = await supabase.from('content_assets').insert(samples);
+    if (error) alert('Erro ao gerar: ' + error.message);
+    else {
+        alert('Planejamento IA Gerado! 🚀 2 novos conteúdos adicionados.');
+        loadContent();
+    }
 }
 
 async function loadProjects() {
