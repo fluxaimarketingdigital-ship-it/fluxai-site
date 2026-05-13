@@ -62,7 +62,7 @@ async function handleOnboarding(e) {
         if (pError) throw pError;
 
         // 2. Criar Contrato (Financeiro)
-        const { error: cError } = await supabase
+        const { data: contract, error: cError } = await supabase
             .from('contracts')
             .insert([{
                 project_id: project.id,
@@ -73,7 +73,9 @@ async function handleOnboarding(e) {
                 due_day: data.due_day,
                 status: 'ATIVO',
                 start_date: new Date().toISOString()
-            }]);
+            }])
+            .select()
+            .single();
 
         if (cError) throw cError;
 
@@ -81,7 +83,6 @@ async function handleOnboarding(e) {
         const today = new Date();
         const dueDate = new Date(today.getFullYear(), today.getMonth(), data.due_day || 5);
         
-        // Se o dia de vencimento já passou este mês, joga para o próximo
         if (dueDate < today) {
             dueDate.setMonth(dueDate.getMonth() + 1);
         }
