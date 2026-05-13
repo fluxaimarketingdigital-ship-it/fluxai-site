@@ -81,11 +81,9 @@
     </div>
 
     <script type="module">
-        // Importação direta e absoluta para evitar erros de caminho
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
         
         async function load() {
-            console.log('[DEBUG] Iniciando carga do contrato...');
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
             
@@ -95,14 +93,11 @@
             }
 
             try {
-                // Configuração direta para esta página (Soberania de Conexão)
-                // Usando as mesmas credenciais do seu sistema
-                const supabaseUrl = 'https://mufgwetfhfhmhmowbhjj.supabase.co';
-                const supabaseKey = (await fetch('/os/services/supabase-client.js').then(r => r.text())).match(/'([^']+)'/g)[1].replace(/'/g, '');
+                // Configuração Direta e Infalível
+                const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
+                const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
                 
                 const supabase = createClient(supabaseUrl, supabaseKey);
-
-                console.log('[DEBUG] Conectado ao Supabase, buscando dados...');
 
                 const { data: c, error } = await supabase
                     .from('contracts')
@@ -113,8 +108,6 @@
                 if (error) throw error;
                 if (!c) throw new Error('Contrato não encontrado.');
 
-                console.log('[DEBUG] Dados recebidos:', c);
-                
                 document.getElementById('company-name').innerText = c.company_name;
                 document.getElementById('client-name').innerText = c.client_name;
                 document.getElementById('segment').innerText = c.projects?.segment || 'N/A';
