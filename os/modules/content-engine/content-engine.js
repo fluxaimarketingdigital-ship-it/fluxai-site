@@ -1,88 +1,147 @@
-import { OS_UI, OS_AUTH } from '../../js/os-core.js';
-import { getSupabase } from '../../services/supabase-client.js';
+import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
+import { getSupabase } from '/os/services/supabase-client.js';
+
+let currentProject = null;
 
 async function init() {
-    const user = await OS_AUTH.check('ADMIN');
+    console.log('[CONTENT ENGINE] Iniciando...');
+    const user = await OS_AUTH.check();
     if (!user) return;
 
     OS_UI.renderSidebar('content-engine', user.role);
-    await OS_UI.renderTopbar();
+    OS_UI.renderTopbar();
 
-    await loadPipeline();
-    bindEvents();
+    await loadProjects();
+    await loadContent();
+
+    // Listeners
+    document.getElementById('project-filter').addEventListener('change', (e) => {
+        currentProject = e.target.value;
+        loadContent();
+    });
+
+    document.getElementById('btn-ai-planner').onclick = () => alert('IA analisando Memória Estratégica... Sugestões em breve!');
+    document.getElementById('btn-new-content').onclick = () => alert('Abrindo editor de pauta...');
 }
 
-async function loadPipeline() {
-    // Simulação de carregamento do banco
-    // Em produção: const { data } = await supabase.from('content_assets').select('*');
-    const mockPipeline = [
-        { id: 'AST-001', title: 'Manual de Identidade v2', stage: 'Aprovado', priority: 'alta', owner: 'Design Team', due: '15/05' },
-        { id: 'AST-002', title: 'Post: Lançamento FluxAI', stage: 'Aprovado', priority: 'crítica', owner: 'Copywriter', due: 'Hoje' },
-        { id: 'AST-003', title: 'Roteiro Vídeo VSL', stage: 'Produção', priority: 'média', owner: 'Video Editor', due: '20/05' }
-    ];
+async function loadProjects() {
+    const supabase = getSupabase();
+    const { data: projects } = await supabase.from('projects').select('id, company_name').eq('status', 'ATIVO');
+    
+    if (projects) {
+        const select = document.getElementById('project-filter');
+        projects.forEach(p => {
+            const opt = document.createElement('option');
+            opt.value = p.id;
+            opt.innerText = p.company_name;
+            select.appendChild(opt);
+        });
+    }
+}
 
+async function loadContent() {
+    const supabase = getSupabase();
+    let query = supabase.from('content_assets').select('*, projects(company_name, links)');
+    
+    if (currentProject) {
+        query = query.eq('project_id', currentProject);
+    }
+
+    const { data: contents, error } = await query.order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Erro ao carregar conteúdos:', error);
+        return;
+    }
+
+    renderContentTable(contents);
+    renderMetrics(contents);
+}
+
+function renderContentTable(contents) {
     const body = document.getElementById('pipeline-table-body');
-    body.innerHTML = mockPipeline.map(item => `
+    
+    if (!contents || contents.length === 0) {
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;">Nenhum conteúdo encontrado para este filtro.</td></tr>`;
+        return;
+    }
+
+    body.innerHTML = contents.map(c => `
         <tr>
-            <td><code style="font-size: 0.7rem;">${item.id}</code></td>
-            <td><strong>${item.title}</strong></td>
-            <td><span class="os-badge">${item.stage}</span></td>
-            <td><span class="os-priority-${item.priority.toLowerCase()}">${item.priority}</span></td>
-            <td>${item.owner}</td>
-            <td>${item.due}</td>
             <td>
-                ${item.stage === 'Aprovado' ? `<button class="btn-pub" onclick="window.openPublicationBridge('${item.id}', '${item.title}')">PUBLICAR</button>` : ''}
+                <div style="font-weight: 700;">${c.title}</div>
+                <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.projects?.company_name || 'N/A'}</div>
+            </td>
+            <td><span class="status-badge status-${c.status.toLowerCase()}">${c.status}</span></td>
+            <td><span class="os-priority-${c.priority.toLowerCase()}">${c.priority}</span></td>
+            <td><i class="fa-brands fa-${c.platform.toLowerCase()}"></i> ${c.platform}</td>
+            <td>
+                ${c.status === 'APROVAÇÃO' ? `
+                    <button class="btn-mini" title="Gerar Link de Aprovação" onclick="window.generateApprovalLink('${c.id}')">
+                        <i class="fa-solid fa-link"></i> LINK
+                    </button>
+                ` : `<span style="font-size: 0.7rem; opacity: 0.5;">${c.status === 'PRONTO' ? '✔ APROVADO' : '---'}</span>`}
+            </td>
+            <td>
+                <div class="action-btns">
+                    <button class="btn-mini" onclick="window.openPublicationBridge('${c.id}')" title="Publicar">
+                        <i class="fa-solid fa-rocket"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     `).join('');
 }
 
-window.openPublicationBridge = (id, title) => {
-    const modal = document.getElementById('pub-modal-overlay');
-    const captionInput = document.getElementById('pub-caption-preview');
+function renderMetrics(contents) {
+    const metrics = {
+        total: contents.length,
+        approval: contents.filter(c => c.status === 'APROVAÇÃO').length,
+        production: contents.filter(c => c.status === 'PRODUÇÃO').length,
+        ready: contents.filter(c => c.status === 'PRONTO').length
+    };
+
+    OS_UI.renderMetric('metric-assets', { label: 'Ativos Totais', value: metrics.total, trend: '+12%', meta: 'este mês' });
+    OS_UI.renderMetric('metric-approval', { label: 'Em Aprovação', value: metrics.approval, trend: '-2', meta: 'crítico' });
+    OS_UI.renderMetric('metric-production', { label: 'Em Produção', value: metrics.production, trend: 'stable', meta: 'equipe' });
+    OS_UI.renderMetric('metric-schedule', { label: 'Prontos / Agendados', value: metrics.ready, trend: '+5', meta: 'workflow' });
+}
+
+// JANELA DE PUBLICAÇÃO
+window.openPublicationBridge = async (id) => {
+    const supabase = getSupabase();
+    const { data: c } = await supabase.from('content_assets').select('*, projects(*)').eq('id', id).single();
     
-    // Mock de legenda gerada pela IA
-    const mockCaption = `🚀 ${title}\n\nConheça a nova era da gestão operacional com a FluxAI OS™.\n\n#FluxAI #Sistemas #Gestão #B2B`;
-    captionInput.value = mockCaption;
+    if (c) {
+        document.getElementById('pub-caption-preview').value = c.caption || '';
+        document.getElementById('pub-modal-overlay').style.display = 'flex';
+        
+        // Configurar botões da ponte
+        document.getElementById('btn-copy-caption').onclick = () => {
+            navigator.clipboard.writeText(c.caption);
+            alert('Legenda copiada!');
+        };
 
-    modal.style.display = 'flex';
-
-    // Auto-copy legenda
-    navigator.clipboard.writeText(mockCaption).then(() => {
-        console.log('Legenda copiada automaticamente.');
-    });
+        document.getElementById('btn-open-account').onclick = () => window.open(c.projects.links.social, '_blank');
+        document.getElementById('btn-open-assets').onclick = () => window.open(c.projects.links.assets, '_blank');
+        
+        document.getElementById('btn-confirm-pub').onclick = async () => {
+            await supabase.from('content_assets').update({ status: 'PUBLICADO' }).eq('id', id);
+            document.getElementById('pub-modal-overlay').style.display = 'none';
+            loadContent();
+        };
+    }
 };
 
-function bindEvents() {
-    const modal = document.getElementById('pub-modal-overlay');
-    
-    document.getElementById('close-pub-modal').onclick = () => modal.style.display = 'none';
+window.generateApprovalLink = (id) => {
+    const token = btoa(id + Date.now()).substring(0, 12); // Token simples para MVP
+    const link = `${window.location.origin}/os/approval.html?id=${id}&token=${token}`;
+    navigator.clipboard.writeText(link);
+    alert('Link de aprovação gerado e copiado para o clipboard!\n\nEnvie para o cliente pelo WhatsApp.');
+};
 
-    document.getElementById('btn-copy-caption').onclick = () => {
-        const cap = document.getElementById('pub-caption-preview').value;
-        navigator.clipboard.writeText(cap);
-        alert('Legenda copiada para o clipboard!');
-    };
-
-    document.getElementById('btn-open-account').onclick = () => {
-        // Em produção, pegamos o link salvo no projeto do cliente
-        window.open('https://www.instagram.com/creator_studio/', '_blank');
-    };
-
-    document.getElementById('btn-open-assets').onclick = () => {
-        window.open('https://www.canva.com/', '_blank');
-    };
-
-    document.getElementById('btn-confirm-pub').onclick = async () => {
-        if (!confirm('Confirmar publicação manual deste ativo?')) return;
-        
-        // Em produção: await supabase.from('publication_logs').insert([...]);
-        // await supabase.from('content_assets').update({ status: 'PUBLICADO' }).eq('id', id);
-        
-        alert('Ativo marcado como PUBLICADO com sucesso!');
-        modal.style.display = 'none';
-        loadPipeline();
-    };
-}
+document.getElementById('close-pub-modal').onclick = () => {
+    document.getElementById('pub-modal-overlay').style.display = 'none';
+};
 
 init();

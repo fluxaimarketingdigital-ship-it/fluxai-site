@@ -76,33 +76,53 @@
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <div class="os-page-title">
-                    <h1>Motor de Conteúdo</h1>
-                    <p>Gestão de ativos editoriais e autoridade técnica.</p>
+                <div class="os-page-header">
+                    <div class="os-page-title">
+                        <h1>Motor de Conteúdo</h1>
+                        <p>Orquestração estratégica e produção de ativos de autoridade.</p>
+                    </div>
+                    <div class="os-page-actions">
+                        <select id="project-filter" class="os-select">
+                            <option value="">Todos os Projetos</option>
+                        </select>
+                        <button class="btn-pub" id="btn-ai-planner" style="background: var(--os-accent);">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> PLANEJAMENTO IA
+                        </button>
+                        <button class="btn-pub" id="btn-new-content">
+                            <i class="fa-solid fa-plus"></i> NOVO CONTEÚDO
+                        </button>
+                    </div>
                 </div>
 
                 <div class="os-widget-grid">
+                    <!-- Métricas Rápidas -->
                     <div class="os-widget" id="metric-assets" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-completion" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-quality" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-reach" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-approval" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-production" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-schedule" style="grid-column: span 3;"></div>
 
                     <div class="os-widget" style="grid-column: span 12;">
                         <div class="os-widget-header">
-                            <span class="os-widget-label">Pipeline de Produção de Ativos</span>
+                            <span class="os-widget-label">Esteira de Produção & Aprovação</span>
                         </div>
                         <table class="os-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Título do Ativo</th>
-                                    <th>Estágio</th>
+                                    <th>Conteúdo / Título</th>
+                                    <th>Status</th>
                                     <th>Prioridade</th>
-                                    <th>Responsável</th>
-                                    <th>Prazo</th>
+                                    <th>Plataforma</th>
+                                    <th>Aprovação</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="pipeline-table-body"></tbody>
+                            <tbody id="pipeline-table-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 40px; color: var(--os-text-muted);">
+                                        <i class="fa-solid fa-spinner fa-spin"></i> Sincronizando esteira operacional...
+                                    </td>
+                                </tr>
+                            </tbody>
                         </table>
                     </div>
                 </div>
@@ -110,6 +130,6 @@
         </div>
     </div>
 
-    <script type="module" src="./content-engine.js"></script>
+    <script type="module" src="/os/modules/content-engine/content-engine.js"></script>
 </body>
 </html>
