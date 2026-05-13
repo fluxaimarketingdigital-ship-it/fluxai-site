@@ -107,13 +107,31 @@ window.sendWhatsAppBilling = async (paymentId) => {
 };
 
 window.markAsPaid = async (paymentId, amount) => {
-    if (!confirm('Deseja confirmar o recebimento?')) return;
+    const method = prompt('Forma de Pagamento (Pix, Cartão, Boleto, etc):', 'Pix');
+    if (!method) return;
+
+    const receipt = prompt('Link do Comprovante (opcional):', '');
+
     const supabase = getSupabase();
-    await supabase.from('payments').update({ status: 'PAGO', amount_paid: amount, paid_at: new Date().toISOString() }).eq('id', paymentId);
-    loadFinanceData();
+    const { error } = await supabase.from('payments').update({
+        status: 'PAGO',
+        amount_paid: amount,
+        payment_method: method,
+        receipt_url: receipt,
+        paid_at: new Date().toISOString()
+    }).eq('id', paymentId);
+
+    if (error) {
+        alert('Erro ao registrar pagamento: ' + error.message);
+    } else {
+        await logAction(`Pagamento registrado via ${method}`, paymentId);
+        loadFinanceData();
+    }
 };
 
-window.generateContractDoc = (id) => alert('Gerador de contrato em configuração.');
+window.generateContractDoc = (id) => {
+    window.open(`/os/contract-view.html?id=${id}`, '_blank');
+};
 
 function formatCurrency(val) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
