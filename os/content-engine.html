@@ -4,27 +4,75 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FluxAI OS™ | Motor de Conteúdo</title>
-    <link rel="stylesheet" href="/src/styles/os/interface.css" />
+    <link rel="stylesheet" href="/src/styles/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
-        .pipeline-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .pipeline-table th { text-align: left; padding: 15px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--os-text-muted); border-bottom: 1px solid var(--os-border); }
-        .pipeline-table td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid var(--os-border); color: var(--os-text-main); }
-        .badge { padding: 4px 8px; border-radius: 2px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .badge-priority-alta { background: rgba(255, 77, 77, 0.1); color: var(--os-danger); }
-        .badge-priority-critica { background: var(--os-danger); color: #fff; }
-        .badge-status-revisao { background: rgba(255, 204, 0, 0.1); color: var(--os-warning); }
-        .badge-status-producao { background: rgba(77, 148, 255, 0.1); color: var(--os-info); }
-        .badge-status-analise { background: rgba(0, 204, 102, 0.1); color: var(--os-success); }
-        .approval-dots { display: flex; gap: 6px; }
-        .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--os-border); }
-        .dot.approved { background: var(--os-success); }
+        .os-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .os-table th, .os-table td { text-align: left; padding: 12px; border-bottom: 1px solid var(--os-border); font-size: 0.85rem; }
+        .os-table th { color: var(--os-text-muted); text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; }
+        .os-badge { background: var(--os-primary); color: #fff; padding: 2px 8px; border-radius: 2px; font-size: 0.7rem; }
+        .os-priority-crítica { color: var(--os-danger); font-weight: 700; }
+        .os-priority-alta { color: var(--os-warning); }
+        .os-priority-média { color: var(--os-primary); }
+        
+        .os-page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .os-page-actions { display: flex; gap: 10px; align-items: center; }
+        .os-select { background: #000; border: 1px solid var(--os-border); color: #fff; padding: 8px 12px; border-radius: 4px; font-size: 0.8rem; }
+
+        /* MODAL DE PUBLICAÇÃO */
+        .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .pub-modal { background: #0a0a0a; border: 1px solid var(--os-border); width: 100%; max-width: 500px; border-radius: 8px; padding: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.5); }
+        .pub-header { margin-bottom: 25px; border-bottom: 1px solid var(--os-border); padding-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .pub-header h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; color: var(--os-primary); }
+        .pub-step { background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); padding: 15px; border-radius: 4px; margin-bottom: 15px; }
+        .pub-step label { display: block; font-size: 0.6rem; text-transform: uppercase; color: var(--os-text-muted); margin-bottom: 8px; font-weight: 700; }
+        .pub-action { display: flex; gap: 10px; align-items: center; }
+        .pub-action input { flex: 1; background: #000; border: 1px solid #333; color: #fff; padding: 8px; font-size: 0.8rem; border-radius: 2px; }
+        .btn-pub { background: var(--os-primary); color: #fff; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .btn-pub-outline { background: transparent; border: 1px solid var(--os-border); color: #fff; padding: 8px 12px; border-radius: 2px; cursor: pointer; font-size: 0.75rem; }
+        .pub-checklist { margin-top: 20px; }
+        .check-item { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; margin-bottom: 8px; color: var(--os-text-muted); }
     </style>
 </head>
 <body class="os-mode">
+
+    <!-- MODAL DE PUBLICAÇÃO ASSISTIDA -->
+    <div class="modal-overlay" id="pub-modal-overlay">
+        <div class="pub-modal">
+            <div class="pub-header">
+                <h3>🚀 Ponte de Publicação</h3>
+                <button class="btn-pub-outline" id="close-pub-modal"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="pub-step">
+                <label>1. Legenda do Post (Copiada automaticamente)</label>
+                <div class="pub-action">
+                    <input type="text" id="pub-caption-preview" readonly />
+                    <button class="btn-pub" id="btn-copy-caption">COPIAR</button>
+                </div>
+            </div>
+
+            <div class="pub-step">
+                <label>2. Abrir Canal e Arquivo</label>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-pub-outline" style="flex: 1;" id="btn-open-account"><i class="fa-brands fa-instagram"></i> ABRIR CONTA</button>
+                    <button class="btn-pub-outline" style="flex: 1;" id="btn-open-assets"><i class="fa-solid fa-folder-open"></i> ABRIR DRIVE/CANVA</button>
+                </div>
+            </div>
+
+            <div class="pub-checklist">
+                <label>Checklist de Qualidade</label>
+                <div class="check-item"><input type="checkbox" /> Legenda validada e revisada</div>
+                <div class="check-item"><input type="checkbox" /> CTA e Link da Bio conferidos</div>
+                <div class="check-item"><input type="checkbox" /> Horário recomendado respeitado</div>
+            </div>
+
+            <button class="btn-save" style="margin-top: 25px; width: 100%; background: var(--os-primary); color: #fff; border: none; padding: 15px; border-radius: 4px; font-weight: 700; cursor: pointer;" id="btn-confirm-pub">MARCAR COMO PUBLICADO</button>
+        </div>
+    </div>
 
     <div class="os-shell">
         <aside class="os-sidebar"></aside>
@@ -33,139 +81,59 @@
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
-                    <div>
+                <div class="os-page-header">
+                    <div class="os-page-title">
                         <h1>Motor de Conteúdo</h1>
-                        <p>Gestão de ativos editoriais e infraestrutura de retenção.</p>
+                        <p>Orquestração estratégica e produção de ativos de autoridade.</p>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-os" style="background: var(--os-card); border: 1px solid var(--os-border); color: #fff; padding: 10px 20px; font-size: 0.8rem; border-radius: 4px; cursor: pointer;">
-                            <i class="fa-solid fa-brain"></i> Consultar GPT Editorial
+                    <div class="os-page-actions">
+                        <select id="project-filter" class="os-select">
+                            <option value="">Todos os Projetos</option>
+                        </select>
+                        <button class="btn-pub" id="btn-ai-planner" style="background: #a855f7;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> PLANEJAMENTO IA
                         </button>
-                        <button class="btn-os" style="background: var(--os-primary); border: none; color: #fff; padding: 10px 20px; font-size: 0.8rem; font-weight: 700; border-radius: 4px; cursor: pointer;">
-                            <i class="fa-solid fa-plus"></i> Novo Ativo
+                        <button class="btn-pub" id="btn-new-content">
+                            <i class="fa-solid fa-plus"></i> NOVO CONTEÚDO
                         </button>
                     </div>
                 </div>
 
                 <div class="os-widget-grid">
-                    <!-- MÉTRICAS EDITORIAIS -->
                     <div class="os-widget" id="metric-assets" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-quality" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-time" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-reach" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-approval" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-production" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-schedule" style="grid-column: span 3;"></div>
 
-                    <!-- PIPELINE VIVO -->
                     <div class="os-widget" style="grid-column: span 12;">
                         <div class="os-widget-header">
-                            <span class="os-widget-label">Pipeline Editorial Operational (Fluxo de Aprovação)</span>
+                            <span class="os-widget-label">Esteira de Produção & Aprovação</span>
                         </div>
-                        <table class="pipeline-table">
+                        <table class="os-table">
                             <thead>
                                 <tr>
-                                    <th>ID</th>
-                                    <th>Título do Ativo</th>
-                                    <th>Estado</th>
+                                    <th>Conteúdo / Título</th>
+                                    <th>Status</th>
                                     <th>Prioridade</th>
                                     <th>Plataforma</th>
-                                    <th>Impacto</th>
-                                    <th>Aprovações (I/S/C)</th>
-                                    <th>Prazo</th>
+                                    <th>Aprovação</th>
+                                    <th>Ações</th>
                                 </tr>
                             </thead>
-                            <tbody id="content-pipeline-body">
-                                <!-- Injetado via data -->
+                            <tbody id="pipeline-table-body">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 40px; color: var(--os-text-muted);">
+                                        <i class="fa-solid fa-spinner fa-spin"></i> Sincronizando esteira operacional...
+                                    </td>
+                                </tr>
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- MATRIZ DE GOVERNANÇA IA -->
-                    <div class="os-widget" style="grid-column: span 6;">
-                        <div class="os-widget-header">
-                            <span class="os-widget-label">Governança Editorial IA</span>
-                        </div>
-                        <div style="font-size: 0.85rem; line-height: 1.6; color: var(--os-text-muted);">
-                            <p style="margin-bottom: 20px;">Toda geração de conteúdo via GPTs consome automaticamente os seguintes contextos da FluxAI OS™:</p>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px solid var(--os-border);">
-                                    <strong style="color: var(--os-primary); display: block; margin-bottom: 5px;">DNA da Marca</strong>
-                                    Tom de voz soberano e técnico.
-                                </div>
-                                <div style="background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px solid var(--os-border);">
-                                    <strong style="color: var(--os-primary); display: block; margin-bottom: 5px;">Histórico de Performance</strong>
-                                    Dados de retenção de ativos anteriores.
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- FEEDBACK LOOP -->
-                    <div class="os-widget" style="grid-column: span 6;">
-                        <div class="os-widget-header">
-                            <span class="os-widget-label">Feedback Loop & Aprendizado</span>
-                        </div>
-                        <div class="os-activity-log" id="feedback-log">
-                            <div class="log-entry">
-                                <span class="log-time">[HÁ 2D]</span>
-                                <span class="log-user">ANALYTICS:</span>
-                                <span class="log-msg">Ativo CONT-003 superou meta de retenção em 15%.</span>
-                            </div>
-                            <div class="log-entry">
-                                <span class="log-time">[HÁ 5D]</span>
-                                <span class="log-user">GPT_LEARN:</span>
-                                <span class="log-msg">Ajustado tom de voz para C-Level após análise de rejeição.</span>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </main>
         </div>
     </div>
 
-    <script type="module">
-        import { OS_UI, OS_AUTH } from './js/os-core.js';
-        import { contentPipelineData, editorialMetrics } from './data/content.js';
-        
-        async function init() {
-            // 1. Validar Acesso Real (ADMIN, OPERATOR ou CLIENT)
-            const user = await OS_AUTH.check('CLIENT');
-            if (!user) return;
-
-            // 2. Renderizar Base Global
-            OS_UI.renderSidebar('content-engine', user.role);
-            await OS_UI.renderTopbar();
-
-            // 3. Render Metrics
-            OS_UI.renderMetric('metric-assets', { label: 'Ativos Ativos', value: editorialMetrics.activeAssets, trend: '+4', meta: 'em produção' });
-            OS_UI.renderMetric('metric-quality', { label: 'Score de Qualidade', value: editorialMetrics.qualityScore, trend: '+0.2', meta: 'Meta: 9.0' });
-            OS_UI.renderMetric('metric-time', { label: 'Prazo Médio', value: editorialMetrics.avgCompletionTime, trend: '-0.5d', meta: 'Eficiência' });
-            OS_UI.renderMetric('metric-reach', { label: 'Alcance Estimado', value: editorialMetrics.distributionReach, trend: '+15%', meta: 'Total Acumulado' });
-
-            // 4. Render Pipeline Table
-            const pipelineBody = document.getElementById('content-pipeline-body');
-            contentPipelineData.forEach(item => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td style="font-family: var(--os-font-mono); font-size: 0.75rem;">${item.id}</td>
-                    <td style="font-weight: 600;">${item.title}</td>
-                    <td><span class="badge badge-status-${item.stage}">${item.stage}</span></td>
-                    <td><span class="badge badge-priority-${item.priority}">${item.priority}</span></td>
-                    <td style="font-size: 0.8rem; color: var(--os-text-muted);">${item.platform}</td>
-                    <td><span style="font-size: 0.75rem; border-left: 2px solid var(--os-primary); padding-left: 8px;">${item.impact}</span></td>
-                    <td>
-                        <div class="approval-dots">
-                            <div class="dot ${item.approvals.internal ? 'approved' : ''}" title="Interna"></div>
-                            <div class="dot ${item.approvals.strategic ? 'approved' : ''}" title="Estratégica"></div>
-                            <div class="dot ${item.approvals.client ? 'approved' : ''}" title="Cliente"></div>
-                        </div>
-                    </td>
-                    <td style="font-family: var(--os-font-mono); font-size: 0.75rem;">${item.deadline}</td>
-                `;
-                pipelineBody.appendChild(row);
-            });
-        }
-
-        init();
-    </script>
+    <script type="module" src="/os/modules/content-engine/content-engine.js"></script>
 </body>
 </html>
