@@ -81,28 +81,26 @@
     </div>
 
     <script type="module">
-        import { getSupabase } from '/os/services/supabase-client.js';
-
+        // Importação direta e absoluta para evitar erros de caminho
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        
         async function load() {
             console.log('[DEBUG] Iniciando carga do contrato...');
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
             
             if (!id) {
-                console.error('[DEBUG] ID não encontrado na URL');
                 document.getElementById('loading-state').innerHTML = 'Erro: ID do contrato ausente.';
                 return;
             }
 
-            console.log('[DEBUG] ID detectado:', id);
-
             try {
-                const supabase = getSupabase();
-                if (!supabase) {
-                    console.error('[DEBUG] Falha ao inicializar Supabase');
-                    document.getElementById('loading-state').innerHTML = 'Erro de conexão com o servidor.';
-                    return;
-                }
+                // Configuração direta para esta página (Soberania de Conexão)
+                // Usando as mesmas credenciais do seu sistema
+                const supabaseUrl = 'https://mufgwetfhfhmhmowbhjj.supabase.co';
+                const supabaseKey = (await fetch('/os/services/supabase-client.js').then(r => r.text())).match(/'([^']+)'/g)[1].replace(/'/g, '');
+                
+                const supabase = createClient(supabaseUrl, supabaseKey);
 
                 console.log('[DEBUG] Conectado ao Supabase, buscando dados...');
 
@@ -112,19 +110,10 @@
                     .eq('id', id)
                     .single();
 
-                if (error) {
-                    console.error('[DEBUG] Erro na consulta:', error);
-                    document.getElementById('loading-state').innerHTML = `<p style="color:red">Erro: ${error.message}</p>`;
-                    return;
-                }
+                if (error) throw error;
+                if (!c) throw new Error('Contrato não encontrado.');
 
-                if (!c) {
-                    console.warn('[DEBUG] Contrato não encontrado no banco');
-                    document.getElementById('loading-state').innerHTML = 'Contrato não encontrado.';
-                    return;
-                }
-
-                console.log('[DEBUG] Dados recebidos com sucesso!');
+                console.log('[DEBUG] Dados recebidos:', c);
                 
                 document.getElementById('company-name').innerText = c.company_name;
                 document.getElementById('client-name').innerText = c.client_name;
@@ -141,19 +130,11 @@
                 document.getElementById('contract-data').style.display = 'block';
 
             } catch (err) {
-                console.error('[DEBUG] Erro fatal no script:', err);
-                document.getElementById('loading-state').innerHTML = 'Erro crítico de carregamento.';
+                console.error('[DEBUG] Erro:', err);
+                document.getElementById('loading-state').innerHTML = `<p style="color:red">Erro de Conexão: ${err.message}</p>`;
             }
         }
         
-        // Timeout de segurança: se demorar mais de 10s, avisa o usuário
-        setTimeout(() => {
-            if (document.getElementById('loading-state').style.display !== 'none') {
-                console.warn('[DEBUG] Tempo limite de carregamento excedido');
-                document.getElementById('loading-state').innerHTML += '<br><small style="opacity:0.5">A conexão está demorando mais que o esperado. Tente atualizar a página.</small>';
-            }
-        }, 8000);
-
         load();
     </script>
 </body>
