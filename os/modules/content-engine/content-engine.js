@@ -410,17 +410,24 @@ window.saveAssetEdit = async () => {
     const caption = document.getElementById('edit-asset-caption').value;
     const ref = document.getElementById('edit-asset-ref').value;
 
-    const supabase = getSupabase();
-    const { error } = await supabase.from('content_assets').update({
-        title,
-        caption,
-        metadata: { reference_url: ref }
-    }).eq('id', editingAssetId);
+    try {
+        const supabase = getSupabase();
+        
+        // Atualizar Ativo e VOLTAR PARA PAUTA para re-envio
+        const { error } = await supabase.from('content_assets').update({
+            title,
+            caption,
+            status: 'PAUTA', // Volta para pauta para poder ser enviado novamente
+            internal_notes: ref ? `LINK DE REFERÊNCIA: ${ref}` : ''
+        }).eq('id', editingAssetId);
 
-    if (error) alert('Erro ao salvar: ' + error.message);
-    else {
-        window.closeEditModal();
+        if (error) throw error;
+
+        sLog('Alterações Salvas. Ativo retornou para PAUTA.');
+        closeEditModal();
         loadContent();
+    } catch (e) {
+        alert('Erro ao salvar: ' + e.message);
     }
 };
 
