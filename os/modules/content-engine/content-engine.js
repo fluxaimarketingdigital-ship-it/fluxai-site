@@ -41,14 +41,13 @@ async function init() {
     }
 }
 
-async function generateSampleContent(projectId) {
+async function generateSampleContent(projectId, count = 12) {
     const supabase = getSupabase();
-    console.log('[DEBUG] Gerando Planejamento Mensal Autônomo para:', projectId);
+    console.log(`[DEBUG] Gerando ${count} conteúdos para completar contrato:`, projectId);
 
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    // Temas baseados na Estratégia de Autoridade da FluxAI
     const defaultThemes = [
         'Educação de Audiência', 'Quebra de Objeções', 'Prova Social / Case', 
         'Bastidores de Autoridade', 'Diferenciação de Mercado', 'Tendência do Setor',
@@ -57,12 +56,11 @@ async function generateSampleContent(projectId) {
     
     const themes = project.objectives ? project.objectives.split('\n').filter(t => t.trim()) : defaultThemes;
 
-    const postsPerMonth = 12;
     const samples = [];
     const now = new Date();
     const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
     
-    for (let i = 0; i < postsPerMonth; i++) {
+    for (let i = 0; i < count; i++) {
         const scheduledDate = new Date(nextMonth);
         scheduledDate.setDate(nextMonth.getDate() + (i * 2.5));
         scheduledDate.setHours(18, 0, 0);
@@ -83,7 +81,7 @@ async function generateSampleContent(projectId) {
 
         caption += `📝 LEGENDA: [IA gerando narrativa de alta conversão para ${theme}...]\n\n`;
         caption += `#FluxAI #EstrategiaDigital #Autoridade #MarketingDeConteudo\n\n`;
-        caption += `[TOOL: Antigravity AI Engine]`; // Invisível para o cliente
+        caption += `[TOOL: Antigravity AI Engine]`;
 
         samples.push({
             project_id: projectId,
@@ -100,7 +98,7 @@ async function generateSampleContent(projectId) {
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro ao gerar: ' + error.message);
     else {
-        alert(`Planejamento Estratégico Autônomo Gerado! 🚀 12 novos conteúdos criados.`);
+        alert(`Sucesso! Geramos ${count} novos conteúdos para completar seu contrato de 12 posts.`);
         loadContent();
     }
 }
@@ -321,17 +319,23 @@ window.runAiPlanner = async () => {
     if (!selectedId) return alert('Selecione um projeto primeiro!');
 
     const supabase = getSupabase();
-    const { data: existing } = await supabase.from('content_assets')
-        .select('id')
-        .eq('project_id', selectedId)
-        .eq('status', 'PAUTA');
+    
+    // Contar TODOS os conteúdos existentes do projeto
+    const { count: totalExisting } = await supabase.from('content_assets')
+        .select('*', { count: 'exact', head: true })
+        .eq('project_id', selectedId);
 
-    if (existing && existing.length > 0) {
-        return alert('Ação Bloqueada! Você já tem conteúdos em PAUTA. \n\nExclua as pautas que não serão usadas antes de gerar um novo planejamento. Curadoria é obrigatória.');
+    const contractLimit = 12;
+    const needed = contractLimit - (totalExisting || 0);
+
+    if (needed <= 0) {
+        return alert(`Contrato Completo! Este cliente já possui ${totalExisting} conteúdos. \n\nExclua algum conteúdo se desejar gerar uma nova ideia para este lugar.`);
     }
 
+    if (!confirm(`O cliente possui ${totalExisting} conteúdos. \n\nDeseja gerar ${needed} novos posts para completar o contrato de 12 posts mensais?`)) return;
+
     currentProject = selectedId;
-    await generateSampleContent(selectedId);
+    await generateSampleContent(selectedId, needed);
 };
 
 window.openNewContentEditor = () => {
