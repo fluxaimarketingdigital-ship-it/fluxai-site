@@ -27,17 +27,18 @@
     <script>
         const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
         const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-
+        
         function updateStep(id, status) {
             const el = document.getElementById('step-' + id);
+            if (!el) return;
             el.className = 'loading-step ' + status;
-            if (status === 'active') el.innerHTML += ' ⏳';
-            if (status === 'done') el.innerHTML += ' ✅';
-            if (status === 'error') el.innerHTML += ' ❌';
+            if (status === 'active') el.innerHTML = el.innerText.split(' ')[0] + ' ' + el.innerText.split(' ').slice(1).join(' ') + ' ⏳';
+            if (status === 'done') el.innerHTML = el.innerText.split(' ')[0] + ' ' + el.innerText.split(' ').slice(1).join(' ') + ' ✅';
+            if (status === 'error') el.innerHTML = el.innerText.split(' ')[0] + ' ' + el.innerText.split(' ').slice(1).join(' ') + ' ❌';
         }
 
-        window.onload = async () => {
+        async function startDiagnostic() {
+            console.log('[DEBUG] Iniciando diagnóstico...');
             updateStep(1, 'done');
             updateStep(2, 'active');
 
@@ -50,7 +51,15 @@
                 return;
             }
 
+            if (!window.supabase) {
+                updateStep(2, 'error');
+                document.getElementById('debug-status').innerHTML += `<p style="color:red">Erro: Biblioteca Supabase não carregou!</p>`;
+                return;
+            }
+
             try {
+                const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                
                 // Teste de conexão simples
                 const { data: test, error: err } = await supabase.from('projects').select('id').limit(1);
                 if (err) throw err;
@@ -61,15 +70,23 @@
                 updateStep(3, 'done');
 
                 updateStep(4, 'active');
-                document.getElementById('calendar-container').innerHTML = `<h2>Sucesso! ${contents.length} posts encontrados.</h2>`;
-                // Se chegar aqui, vou redirecionar para a versão bonita ou renderizar aqui mesmo.
+                document.getElementById('calendar-container').innerHTML = `
+                    <div style="border:1px solid #10b981; padding:20px; border-radius:8px;">
+                        <h2 style="color:#10b981">Conexão Estabelecida!</h2>
+                        <p>Encontramos ${contents?.length || 0} posts para este projeto.</p>
+                        <button onclick="location.reload()" style="padding:10px 20px; background:#a855f7; border:none; color:white; border-radius:5px; cursor:pointer">Tentar abrir versão final</button>
+                    </div>
+                `;
                 updateStep(4, 'done');
             } catch (e) {
                 console.error(e);
                 updateStep(2, 'error');
-                document.getElementById('debug-status').innerHTML += `<p style="color:red">Erro: ${e.message}</p>`;
+                document.getElementById('debug-status').innerHTML += `<p style="color:red">Erro na Conexão: ${e.message}</p>`;
             }
-        };
+        }
+
+        // Disparo imediato
+        document.addEventListener('DOMContentLoaded', startDiagnostic);
     </script>
 </body>
 </html>
