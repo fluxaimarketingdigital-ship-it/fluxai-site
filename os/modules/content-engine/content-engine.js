@@ -43,62 +43,74 @@ async function init() {
 
 async function generateSampleContent(projectId, count = 12) {
     const supabase = getSupabase();
-    console.log(`[DEBUG] Gerando ${count} conteúdos para completar contrato:`, projectId);
-
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    const defaultThemes = [
-        'Educação de Audiência', 'Quebra de Objeções', 'Prova Social / Case', 
-        'Bastidores de Autoridade', 'Diferenciação de Mercado', 'Tendência do Setor',
-        'Humanização Estratégica', 'Narrativa de Venda Indireta'
-    ];
+    // Pilares Estratégicos FluxAI
+    const objectives = ['AUTORIDADE', 'VENDAS', 'RETENÇÃO', 'EDUCAÇÃO', 'ALCANCE'];
+    const types = ['DIAGNÓSTICO', 'STORYTELLING', 'PROVOCAÇÃO', 'CASE', 'ERRO COMUM'];
     
-    const themes = project.objectives ? project.objectives.split('\n').filter(t => t.trim()) : defaultThemes;
-
     const samples = [];
-    const now = new Date();
-    const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
-    
-    for (let i = 0; i < count; i++) {
-        const scheduledDate = new Date(nextMonth);
-        scheduledDate.setDate(nextMonth.getDate() + (i * 2.5));
-        scheduledDate.setHours(18, 0, 0);
+    const nextMonth = new Date();
+    nextMonth.setMonth(nextMonth.getMonth() + 1);
+    nextMonth.setDate(1);
 
-        const theme = themes[i % themes.length];
-        const isReels = i % 3 === 0;
-        const isCarousel = i % 3 === 1;
+    for (let i = 0; i < count; i++) {
+        const obj = objectives[i % objectives.length];
+        const type = types[i % types.length];
+        const isReels = i % 2 === 0; // 50% Reels para alta performance
         
-        let caption = `🎯 ESTRATÉGIA: ${theme}\n\n`;
+        let contentBody = "";
         
         if (isReels) {
-            caption += `🎬 ROTEIRO REELS:\n- Gancho: [IA detectou tendência de ${theme}]\n- Meio: Conteúdo focado em autoridade.\n- CTA: Link na Bio.\n\n`;
-        } else if (isCarousel) {
-            caption += `🖼️ ESTRUTURA CARROSSEL:\n- Slide 1: Capa Impactante\n- Slide 2: Problema/Dor\n- Slide 3: Solução FluxAI\n- Slide 4: CTA\n\n`;
-        } else {
-            caption += `📸 POST ÚNICO: Foco em impacto visual e legenda profunda.\n\n`;
-        }
+            contentBody = `
+⚡ DIRETRIZ ESTRATÉGICA (REELS)
+----------------------------------
+🎯 OBJETIVO: ${obj}
+🧠 TIPO: ${type}
+📈 PADRÃO: Vídeo rápido + Hook técnico (Alta Retenção)
+🎬 LIMITES: Gravação Simples (Celular / Sem Captação)
 
-        caption += `📝 LEGENDA: [IA gerando narrativa de alta conversão para ${theme}...]\n\n`;
-        caption += `#FluxAI #EstrategiaDigital #Autoridade #MarketingDeConteudo\n\n`;
-        caption += `[TOOL: Antigravity AI Engine]`;
+🪝 HOOK (GANCHO): [IA criou gancho focado em ${obj} para o segmento ${project.company_name}]
+🎥 ESTRUTURA:
+- 0-3s: Gancho Visual + Texto de Impacto
+- 3-25s: Desenvolvimento em ${type} (Foco em Autoridade)
+- 25-35s: CTA Contextual para ${obj}
+
+⏱️ DURAÇÃO: 35s | 🥁 RITMO: Dinâmico
+📝 LEGENDA ESTRATÉGICA: [IA gerando narrativa contextualizada...]
+🏷️ HASHTAGS: #FluxAI #Estrategia #AutoridadeDigital
+
+🛠️ OBS. OPERACIONAIS: Focar em iluminação natural e fala direta.
+            `;
+        } else {
+            contentBody = `
+🎨 DIRETRIZ ESTRATÉGICA (CARROSSEL/POST)
+----------------------------------
+🎯 OBJETIVO: ${obj}
+🧠 TIPO: ${type}
+🖼️ ESTRUTURA: Slide 1 (Capa Curiosidade), Slide 2 (O Problema), Slide 3-7 (A Solução/Autoridade), Slide 8 (CTA)
+
+📝 LEGENDA: [IA gerando conteúdo profundo baseado no DNA do cliente...]
+[TOOL: FluxAI Strategy Engine]
+            `;
+        }
 
         samples.push({
             project_id: projectId,
-            title: isReels ? `🎥 REELS: ${theme}` : (isCarousel ? `🎠 CARROSSEL: ${theme}` : `🖼️ POST: ${theme}`),
+            title: isReels ? `🎥 REELS: ${obj} (${type})` : `🎠 CARROSSEL: ${obj}`,
             status: 'PAUTA',
-            priority: 'MÉDIA',
+            priority: 'ALTA',
             platform: isReels ? 'REELS' : 'INSTAGRAM',
-            caption: caption,
-            scheduled_at: scheduledDate.toISOString(),
-            media_url: null
+            caption: contentBody,
+            scheduled_at: new Date(nextMonth.getTime() + (i * 2 * 24 * 60 * 60 * 1000)).toISOString()
         });
     }
 
     const { error } = await supabase.from('content_assets').insert(samples);
-    if (error) alert('Erro ao gerar: ' + error.message);
+    if (error) alert('Erro: ' + error.message);
     else {
-        alert(`Sucesso! Geramos ${count} novos conteúdos para completar seu contrato de 12 posts.`);
+        alert(`Estratégia FluxAI Gerada! 🚀 ${count} roteiros contextuais e operacionais criados.`);
         loadContent();
     }
 }
