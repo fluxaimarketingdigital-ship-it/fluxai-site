@@ -1,6 +1,7 @@
 import { OS_UI, OS_AUTH } from '../../js/os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
 
+let currentProject = null;
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
 
