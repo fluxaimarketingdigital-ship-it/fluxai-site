@@ -464,7 +464,7 @@ window.sendCompleteCalendar = async () => {
         return alert('Não há novos planejamentos pendentes para enviar.');
     }
 
-    if (confirm(`Deseja enviar todo o calendário (${pendentes.length} ativos) para aprovação do cliente?`)) {
+    if (confirm(`Deseja enviar os novos planejamentos e ajustes pendentes (${pendentes.length} ativos) para aprovação do cliente?`)) {
         const { error } = await supabase.from('content_assets')
             .update({ status: 'APROVAÇÃO' })
             .eq('project_id', currentProject)
