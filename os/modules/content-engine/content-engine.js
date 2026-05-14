@@ -1,30 +1,40 @@
-import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
-import { getSupabase } from '/os/services/supabase-client.js';
+import { OS_UI, OS_AUTH } from '../../js/os-core.js';
+import { getSupabase } from '../../services/supabase-client.js';
+
+function screenLog(msg) {
+    const logBox = document.getElementById('debug-log-box') || (() => {
+        const div = document.createElement('div');
+        div.id = 'debug-log-box';
+        div.style = 'position:fixed; top:10px; right:10px; background:rgba(0,0,0,0.9); color:#0f0; padding:10px; font-family:monospace; font-size:10px; z-index:9999; border:1px solid #0f0; max-width:300px;';
+        document.body.appendChild(div);
+        return div;
+    })();
+    logBox.innerHTML += `<div>> ${msg}</div>`;
+}
 
 let currentProject = null;
 
 async function init() {
-    console.log('[DEBUG] 1. Iniciando Init...');
+    screenLog('Iniciando Init...');
     
     try {
+        await loadProjects();
+        screenLog('Projetos carregados.');
+        await loadContent();
+        screenLog('Conteúdo carregado.');
+
         OS_UI.renderSidebar('content-engine', 'ADMIN');
         OS_UI.renderTopbar();
-        console.log('[DEBUG] 2. UI Renderizada.');
+        screenLog('UI Renderizada.');
 
         const user = await OS_AUTH.check();
-        console.log('[DEBUG] 3. Auth OK:', user?.email);
+        screenLog('Auth OK: ' + (user?.email || 'Nenhum'));
         
         if (!user) {
             alert('Erro: Sessão expirada. Faça login novamente.');
             return;
         }
 
-        console.log('[DEBUG] 4. Carregando Projetos...');
-        await loadProjects();
-        
-        console.log('[DEBUG] 5. Carregando Conteúdo...');
-        await loadContent();
-        
         console.log('[DEBUG] 6. Sistema Pronto.');
 
         // Listeners
@@ -38,6 +48,7 @@ async function init() {
         };
 
     } catch (err) {
+        screenLog('ERRO CRÍTICO: ' + err.message);
         console.error('[DEBUG] ERRO CRÍTICO NO INIT:', err);
         alert('ERRO DE INICIALIZAÇÃO: ' + err.message);
     }
