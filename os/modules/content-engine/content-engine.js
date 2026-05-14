@@ -57,7 +57,7 @@ async function init() {
     }
 }
 
-// MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI v6.0 (DIREÇÃO OPERACIONAL)
+// MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI v7.0 (FLUXO MESTRE)
 const STRATEGIC_MATRIX = {
     'REELS': { 
         name: 'Direção Operacional Audiovisual', 
@@ -69,12 +69,14 @@ const STRATEGIC_MATRIX = {
 ⏱️ TEMPO ESTIMADO: 60 segundos
 📅 DATA SUGERIDA: Terça • 19h
 
-🪝 HOOK (GANCHO): "A maioria das pessoas não perde o controle por falta de disciplina."
-⏸️ PAUSA: [Silêncio de 2s] "Elas perdem porque vivem tentando compensar culpa alimentar."
-📝 DESENVOLVIMENTO: Explicar como restrições extremas aumentam episódios compulsivos. Tom humano e técnico.
-👁️ DIREÇÃO: Olhar direto para câmera. Postura empática. Pausas após frases-chave.
+🪝 HOOK (GANCHO): "A maioria das pessoas não perde o controle por falta de disciplina alimentar."
+⏸️ PAUSA: [Silêncio de 2s] "Elas perdem porque vivem alternando entre restrição extrema e culpa."
+📝 DESENVOLVIMENTO: Explicar como o cérebro reage ao radicalismo. Citar comportamento alimentar e saciedade.
+👁️ DIREÇÃO DE CENA: Ambiente clínico/minimalista. Iluminação natural. Olhar direto para a lente. 
+🎬 RITMO: Dinâmico, com cortes secos em frases de impacto.
+🖼️ APOIO VISUAL: Inserir texto: "Restrição extrema gera descontrole."
 ✨ CTA: "Nutrição eficiente precisa funcionar na vida real."
-📝 LEGENDA: [IA gerando narrativa focada em autoridade...]
+📝 LEGENDA: [IA gerando narrativa de autoridade clínica para ${p.company_name}...]
         `
     },
     'CARROSSEL': { 
@@ -84,16 +86,16 @@ const STRATEGIC_MATRIX = {
         generate: (p, obj) => `
 🎯 OBJETIVO: ${obj}
 🎬 FORMATO: Carrossel (1080x1350)
-🗂️ QUANTIDADE: 6 slides
 📅 DATA SUGERIDA: Quinta • 18h
 
-🖼️ ESTRUTURA NARRATIVA:
-- Slide 01: [Provocação] "Você provavelmente está dificultando sua alimentação sem perceber."
-- Slide 02: [Tensão] Explicar excesso de radicalismo alimentar.
-- Slide 03: [Quebra] Mostrar a consequência emocional da restrição.
-- Slide 04: [Solução] Apresentar o caminho sustentável FluxAI.
-- Slide 05: [Aprofundamento] Resultados reais do método.
-- Slide 06: [CTA] Direcionamento para conversa estratégica.
+🖼️ ESTRUTURA NARRATIVA (Slide a Slide):
+- Slide 01: [Hook/Tensão] "Você provavelmente está dificultando sua alimentação sem perceber."
+- Slide 02: [Conceito] Explicar o perigo do excesso de radicalismo.
+- Slide 03: [Quebra de Objeção] Por que "comer pouco" nem sempre emagrece.
+- Slide 04: [Aprofundamento] A lógica da constância vs. intensidade.
+- Slide 05: [Metodologia] Como a FluxAI e ${p.company_name} resolvem isso.
+- Slide 06: [CTA] Direcionamento para Conversa Estratégica.
+📝 LEGENDA: Narrativa focada em retenção e autoridade técnica.
         `
     },
     'CARD': { 
@@ -102,12 +104,9 @@ const STRATEGIC_MATRIX = {
         platform: 'INSTAGRAM',
         generate: (p, obj) => `
 🎯 OBJETIVO: ${obj}
-🎬 FORMATO: Card Estático
-📅 DATA SUGERIDA: Segunda • 12h
-
 💡 HEADLINE: "Consistência vale mais que perfeição."
-🎨 PROPOSTA VISUAL: Ambiente clean, minimalista e humano.
-📐 HIERARQUIA: Foco total na frase central. Percepção Premium.
+🎨 CONCEITO VISUAL: Ambiente clean e humano. Silêncio visual.
+📐 HIERARQUIA: Foco total na autoridade da frase central.
 ✨ CTA: Estratégia alimentar sustentável.
         `
     },
@@ -116,23 +115,45 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'SITE', 
         platform: 'WEB',
         generate: (p, obj) => `
-🎯 OBJETIVO: ${obj}
-🌐 ARQUITETURA: Landing Page / Institucional
-👤 JORNADA: Previsibilidade → Confiança → Conversão
+🎯 OBJETIVO: Autoridade e Conversão
+🌐 ARQUITETURA UX: Foco em Jornada de Confiança
 
 🏗️ SEÇÕES ESTRATÉGICAS:
-- HOME: Diagnóstico do Problema.
-- SEÇÃO 01: Autoridade Clínica de ${p.company_name}.
-- SEÇÃO 02: Estrutura de Atendimento e Tecnologia.
-- SEÇÃO 03: Provas, Resultados e Cases.
-- CTA: Fluxo de conversão para agendamento.
+- HOME: Headline de impacto + Problema Crítico.
+- SEÇÃO 01: Diagnóstico de Mercado e Diferenciais de ${p.company_name}.
+- SEÇÃO 02: Estrutura Institucional e Atendimento.
+- SEÇÃO 03: Provas Sociais e Resultados Auditados.
+- CTA: Arquitetura de conversão direta para agendamento.
+🚀 SEO: Estruturação de palavras-chave para descoberta orgânica.
         `
     },
-    'BRANDING': { name: 'Arquitetura de Posicionamento', clientPrefix: 'BRANDING', platform: 'BRAND' },
+    'STORIES': { 
+        name: 'Fluxo Estratégico de Stories', 
+        clientPrefix: 'STORIES', 
+        platform: 'INSTAGRAM',
+        generate: (p, obj) => `
+🎯 SEQUÊNCIA DE RETENÇÃO (5 Stories):
+- S01: Enquete provocativa sobre dor comum do ICP.
+- S02: Exposição técnica de um erro recorrente.
+- S03: Quebra de crença limitante.
+- S04: Bastidor operacional ou Prova de Valor.
+- S05: CTA com Caixa de Perguntas ou Link Direto.
+        `
+    },
+    'BRANDING': { 
+        name: 'Arquitetura de Posicionamento', 
+        clientPrefix: 'BRANDING', 
+        platform: 'BRAND',
+        generate: (p, obj) => `
+💎 PERCEPÇÃO DESEJADA: Autoridade de Elite e Confiança Técnica.
+📝 NARRATIVA: Posicionar ${p.company_name} como a solução para quem busca performance real.
+🎨 COMPORTAMENTO VISUAL: Minimalismo executivo. Uso de tipografia imponente.
+        `
+    },
     'TRAFEGO': { name: 'Estratégia de Aquisição', clientPrefix: 'AQUISIÇÃO', platform: 'ADS' },
-    'AUTOMACAO': { name: 'Arquitetura Operacional', clientPrefix: 'AUTOMAÇÃO', platform: 'SYSTEM' },
     'CRM': { name: 'Estrutura de Relacionamento', clientPrefix: 'CRM', platform: 'CRM' },
-    'IA': { name: 'Inteligência Operacional', clientPrefix: 'IA', platform: 'AI' }
+    'AUTOMACAO': { name: 'Arquitetura Operacional', clientPrefix: 'AUTOMAÇÃO', platform: 'SYSTEM' },
+    'CONSULTORIA': { name: 'Diagnóstico Estratégico', clientPrefix: 'DIAGNÓSTICO', platform: 'CONSULTING' }
 };
 
 async function generateSampleContent(projectId, count = 12) {
@@ -140,7 +161,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    const activeSystems = project.active_systems || ['REELS', 'CARROSSEL', 'CARD', 'SITE', 'BRANDING'];
+    const activeSystems = project.active_systems || ['REELS', 'CARROSSEL', 'CARD', 'SITE', 'STORIES'];
     const objectives = ['AUTORIDADE', 'PERCEPÇÃO PREMIUM', 'CONVERSÃO', 'DIAGNÓSTICO', 'POSICIONAMENTO'];
     
     const samples = [];
@@ -154,12 +175,12 @@ async function generateSampleContent(projectId, count = 12) {
         const obj = objectives[i % objectives.length];
         
         const internalTitle = `${sys.name}: ${obj}`;
-        const body = sys.generate ? sys.generate(project, obj) : `🎯 OBJETIVO: ${obj}\n[Direção Estratégica para ${sys.name}]`;
+        const body = sys.generate ? sys.generate(project, obj) : `🎯 OBJETIVO: ${obj}\n[Direção Estratégica Completa para ${sys.name}]`;
 
         samples.push({
             project_id: projectId,
             title: internalTitle, 
-            status: 'APROVAÇÃO', // Começa direto em aprovação no calendário 1
+            status: 'PAUTA', // Nasce como PAUTA no fluxo mestre
             priority: 'ALTA',
             platform: sys.platform,
             caption: body,
@@ -171,7 +192,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro: ' + error.message);
     else {
-        alert(`Planejamento Estratégico Gerado! 🚀 ${count} Ativos em V1 aguardando aprovação.`);
+        alert(`Planejamento Estratégico Gerado! 🚀 ${count} Ativos em V1 (Status: PAUTA).`);
         loadContent();
     }
 }
@@ -205,15 +226,17 @@ async function loadContent() {
 
     if (error) {
         console.error('Erro ao carregar conteúdos:', error);
+        document.getElementById('pipeline-table-body').innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--os-danger);">Erro ao sincronizar dados.</td></tr>`;
         return;
     }
 
-    renderMetrics(contents);
+    const safeContents = contents || [];
+    renderMetrics(safeContents);
 
     if (!currentProject) {
-        renderMacroSummary(contents);
+        renderMacroSummary(safeContents);
     } else {
-        renderContentTable(contents);
+        renderContentTable(safeContents);
     }
 }
 

@@ -161,10 +161,14 @@
                 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
                 const { data: c, error } = await supabase.from('content_assets').select('*').eq('id', id).single();
-                if (error || !c) {
-                    console.error('[APPROVAL] Supabase fetch error:', error);
-                    throw new Error('Falha ao buscar dados.');
+                
+                if (error) {
+                    console.error('[APPROVAL] Supabase error:', error);
+                    alert('Erro de Conexão: ' + error.message + '\n\nVerifique se o post ainda existe ou se há restrição de acesso.');
+                    throw new Error(error.message);
                 }
+                
+                if (!c) throw new Error('Conteúdo não encontrado.');
 
                 // Proteção contra dados malformados
                 let prefix = 'POST', obj = 'Estratégia', meta = { time: '---', date: '---' };
@@ -184,7 +188,7 @@
                 document.getElementById('asset-caption').innerText = c.caption || 'Sem descrição disponível.';
                 
                 const badge = document.getElementById('status-badge-container');
-                if (c.status === 'APROVAÇÃO') {
+                if (c.status === 'APROVAÇÃO' || c.status === 'PAUTA') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 AGUARDANDO APROVAÇÃO</span>`;
                 } else if (c.status === 'AJUSTE') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🟡 EM REVISÃO</span>`;
