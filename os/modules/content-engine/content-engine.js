@@ -551,6 +551,19 @@ window.openEditModal = async (id) => {
         document.getElementById('edit-asset-deadline').value = c.metadata?.approval_deadline || '';
         document.getElementById('edit-asset-risk').checked = c.metadata?.risk || false;
         
+        // TRAVA DE GOVERNANÇA: Bloquear campos técnicos durante o Planejamento
+        const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVAÇÃO ESTRATÉGICA';
+        const fieldsToLock = ['edit-asset-responsible', 'edit-asset-version', 'edit-asset-deadline'];
+        
+        fieldsToLock.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.disabled = isPlanning;
+                el.style.opacity = isPlanning ? '0.5' : '1';
+                el.style.cursor = isPlanning ? 'not-allowed' : 'default';
+            }
+        });
+
         // MOSTRAR FEEDBACK SE HOUVER AJUSTE
         const feedbackContainer = document.getElementById('edit-asset-feedback-container');
         if (c.status === 'AJUSTE' && c.internal_notes) {
