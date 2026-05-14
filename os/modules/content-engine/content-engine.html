@@ -143,6 +143,46 @@
         </div>
     </div>
 
-    <script type="module" src="/os/modules/content-engine/content-engine.js"></script>
+    <script type="module">
+        import { OS_UI, OS_AUTH } from '../../js/os-core.js';
+        import { getSupabase } from '../../services/supabase-client.js';
+
+        function screenLog(msg) {
+            const logBox = document.getElementById('debug-log-box') || (() => {
+                const div = document.createElement('div');
+                div.id = 'debug-log-box';
+                div.style = 'position:fixed; top:10px; right:10px; background:rgba(0,0,0,0.9); color:#0f0; padding:10px; font-family:monospace; font-size:10px; z-index:9999; border:1px solid #0f0; max-width:300px;';
+                document.body.appendChild(div);
+                return div;
+            })();
+            logBox.innerHTML += `<div>> ${msg}</div>`;
+        }
+
+        window.screenLog = screenLog; // Tornar global para o arquivo JS externo se precisar
+
+        async function start() {
+            screenLog('Iniciando Boot do Sistema...');
+            try {
+                OS_UI.renderSidebar('content-engine', 'ADMIN');
+                OS_UI.renderTopbar();
+                screenLog('UI Base: OK');
+
+                const user = await OS_AUTH.check();
+                screenLog('Usuário: ' + (user ? user.email : 'Visitante'));
+
+                // Tentar carregar o script principal agora que a UI está pronta
+                const script = document.createElement('script');
+                script.type = 'module';
+                script.src = './content-engine.js?v=' + Date.now();
+                document.body.appendChild(script);
+                screenLog('Script Principal Injetado.');
+
+            } catch (e) {
+                screenLog('Erro no Boot: ' + e.message);
+            }
+        }
+
+        start();
+    </script>
 </body>
 </html>
