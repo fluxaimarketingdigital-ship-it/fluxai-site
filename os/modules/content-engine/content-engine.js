@@ -256,17 +256,33 @@ async function loadContent() {
 }
 
 function renderMetrics(contents) {
+    const now = new Date();
     const metrics = {
         total: contents.length,
-        approval: contents.filter(c => c.status === 'APROVAÇÃO' || c.status === 'PAUTA').length,
-        production: contents.filter(c => c.status === 'PRODUÇÃO' || c.status === 'DESIGN').length,
+        approval: contents.filter(c => c.status.includes('APROVAÇÃO')).length,
+        atrasado: contents.filter(c => {
+            if (c.status === 'PUBLICADO') return false;
+            const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
+            return deadline && deadline < now && c.status !== 'PRONTO';
+        }).length,
         ready: contents.filter(c => c.status === 'PRONTO').length
     };
 
-    OS_UI.renderMetric('metric-assets', { label: 'Ativos Totais', value: metrics.total, trend: 'v1.0', meta: 'Escopo' });
-    OS_UI.renderMetric('metric-approval', { label: 'Em Aprovação', value: metrics.approval, trend: '!', meta: 'Atenção' });
-    OS_UI.renderMetric('metric-production', { label: 'Em Produção', value: metrics.production, trend: 'stable', meta: 'Designer' });
-    OS_UI.renderMetric('metric-schedule', { label: 'Prontos', value: metrics.ready, trend: '✔', meta: 'Publicação' });
+    OS_UI.renderMetric('metric-assets', { label: 'Logística Total', value: metrics.total, trend: 'v1.0', meta: 'Escopo' });
+    OS_UI.renderMetric('metric-approval', { label: 'Aguardando Cliente', value: metrics.approval, trend: '!', meta: 'Atenção' });
+    OS_UI.renderMetric('metric-production', { label: 'Atraso Operacional', value: metrics.atrasado, trend: 'down', meta: 'Crítico' });
+    OS_UI.renderMetric('metric-schedule', { label: 'Prontos para Postar', value: metrics.ready, trend: '✔', meta: 'Publicação' });
+
+    // Atualizar status para ATRASADO via código se necessário (Lógica em tempo real)
+    contents.forEach(async c => {
+        if (c.status !== 'ATRASADO' && c.status !== 'PUBLICADO' && c.status !== 'PRONTO') {
+            const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
+            if (deadline && deadline < now) {
+                // Sincronizar com DB (Opcional - pode ser apenas visual no dashboard)
+                console.warn(`[LOGÍSTICA] Ativo ${c.title} está ATRASADO por prazo de aprovação.`);
+            }
+        }
+    });
 }
 
 function renderContentTable(contents) {
@@ -379,7 +395,7 @@ function renderCalendar(containerId, contents, mode) {
 
 function getStatusBg(status) {
     if (status === 'PLANEJAMENTO') return '#6366f1'; 
-    if (status === 'REVISÃO INTERNA') return '#ec4899'; // Rosa
+    if (status === 'REVISÃO INTERNA') return '#ec4899';
     if (status === 'APROVAÇÃO ESTRATÉGICA') return '#f59e0b'; 
     if (status === 'AJUSTE') return '#ef4444'; 
     if (status === 'PRODUÇÃO') return '#06b6d4'; 
@@ -387,6 +403,7 @@ function getStatusBg(status) {
     if (status === 'APROVAÇÃO FINAL') return '#8b5cf6'; 
     if (status === 'PRONTO') return '#10b981'; 
     if (status === 'PUBLICADO') return '#059669'; 
+    if (status === 'ATRASADO') return '#7f1d1d'; // Vermelho Escuro/Vinho
     return '#444';
 }
 

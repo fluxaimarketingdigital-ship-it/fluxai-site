@@ -76,17 +76,28 @@ export const AIPlanner = {
                 daysOffset++;
             }
 
+            // CÁLCULO AUTOMÁTICO DE SLA (LOGÍSTICA DE MÍDIA)
+            const scheduledAt = date;
+            const strategicDeadline = new Date(scheduledAt.getTime() - (5 * 24 * 60 * 60 * 1000)); // 5 dias antes
+            strategicDeadline.setHours(18, 0, 0, 0);
+
             contents.push({
                 project_id: projectId,
                 title: `${service.name} • Estratégico`,
-                status: 'PAUTA',
+                status: 'PLANEJAMENTO',
                 priority: 'ALTA',
                 platform: service.platform,
-                scheduled_at: date.toISOString(),
+                scheduled_at: scheduledAt.toISOString(),
                 caption: service.template
                     .replace('[OBJ]', onboarding.objectives)
                     .replace(/\[IA\]/g, 'Gerado conforme o tom ' + onboarding.tone + ' para atingir o ICP: ' + onboarding.icp),
-                internal_notes: `GERAÇÃO ESPECÍFICA: ${service.name}.`
+                metadata: {
+                    responsible: service.platform === 'INSTAGRAM' ? 'Design' : 'Social Media',
+                    version: 'V1',
+                    approval_deadline: strategicDeadline.toISOString(),
+                    risk: false
+                },
+                internal_notes: `LOGÍSTICA DE MÍDIA: Prazo estratégico calculado automaticamente.`
             });
         });
 
