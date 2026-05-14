@@ -170,13 +170,17 @@
 
                 const { data: c, error } = await supabase.from('content_assets').select('*').eq('id', id).single();
                 
-                if (error) {
-                    console.error('[APPROVAL] Supabase error:', error);
-                    alert('Erro de Conexão: ' + error.message + '\n\nVerifique se o post ainda existe ou se há restrição de acesso.');
-                    throw new Error(error.message);
+                if (error || !c) throw new Error('Conteúdo não encontrado.');
+
+                // BLOQUEIO DE ACESSO PÓS-APROVAÇÃO (SEGURANÇA OPERACIONAL)
+                const allowedStatus = ['APROVAÇÃO', 'PAUTA', 'AJUSTE'];
+                if (!allowedStatus.includes(c.status)) {
+                    document.getElementById('main-ui').style.display = 'none';
+                    document.getElementById('success-title').innerText = 'Acesso Encerrado';
+                    document.getElementById('success-message').innerText = 'Este planejamento já foi validado e seguiu para a Etapa de Produção Operacional. Você pode acompanhar o progresso no seu Calendário.';
+                    document.getElementById('success-ui').style.display = 'block';
+                    return;
                 }
-                
-                if (!c) throw new Error('Conteúdo não encontrado.');
 
                 // Proteção contra dados malformados
                 let prefix = 'POST', obj = 'Estratégia', meta = { time: '---', date: '---' };
@@ -193,7 +197,9 @@
                 document.getElementById('meta-date').innerText = meta.date || '---';
                 document.getElementById('meta-version').innerText = c.internal_notes || 'V1';
                 
-                document.getElementById('asset-caption').innerText = c.caption || 'Diretriz criada a partir das informações estratégicas do cliente. Revise tema, objetivo, abordagem e CTA antes da aprovação.';
+                // MOSTRAR APENAS O ROTEIRO (SEM LEGENDA/HASHTAGS NA ETAPA 1)
+                const roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
+                document.getElementById('asset-caption').innerText = roadmap;
                 
                 const badge = document.getElementById('status-badge-container');
                 if (c.status === 'APROVAÇÃO' || c.status === 'PAUTA') {
@@ -215,7 +221,7 @@
                 document.getElementById('content-data').style.display = 'block';
 
                 document.getElementById('btn-approve-action').onclick = async () => {
-                    await supabase.from('content_assets').update({ status: 'PRONTO' }).eq('id', id);
+                    await supabase.from('content_assets').update({ status: 'PRODUÇÃO' }).eq('id', id);
                     document.getElementById('main-ui').style.display = 'none';
                     document.getElementById('success-ui').style.display = 'block';
                 };
@@ -227,12 +233,12 @@
                 document.getElementById('btn-submit-feedback').onclick = async () => {
                     const selected = Array.from(document.querySelectorAll('#adjustment-checks input:checked')).map(i => i.value);
                     const note = document.getElementById('feedback-text').value;
-                    const fullNote = `ITENS: ${selected.join(', ')} | OBS: ${note}`;
+                    const fullNote = `SOLICITAÇÃO DE REVISÃO | ITENS: ${selected.join(', ')} | OBS: ${note}`;
                     
                     await supabase.from('content_assets').update({ status: 'AJUSTE', internal_notes: fullNote }).eq('id', id);
                     document.getElementById('main-ui').style.display = 'none';
-                    document.getElementById('success-title').innerText = 'Ajustes Solicitados!';
-                    document.getElementById('success-message').innerText = 'Recebemos suas observações. Vamos refinar a pauta agora mesmo.';
+                    document.getElementById('success-title').innerText = 'Solicitação Enviada!';
+                    document.getElementById('success-message').innerText = 'Recebemos seus apontamentos estratégicos. Vamos ajustar o planejamento conforme as diretrizes enviadas.';
                     document.getElementById('success-ui').style.display = 'block';
                 };
 

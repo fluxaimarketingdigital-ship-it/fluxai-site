@@ -63,7 +63,8 @@
 
                 <div class="os-tabs" style="display: flex; gap: 10px; margin-bottom: 30px;">
                     <button class="os-tab-btn active" onclick="window.switchTab('esteira')"><i class="fa-solid fa-list-check"></i> Esteira Operacional</button>
-                    <button class="os-tab-btn" onclick="window.switchTab('calendario')"><i class="fa-solid fa-calendar-days"></i> Calendário Estratégico</button>
+                    <button class="os-tab-btn" onclick="window.switchTab('calendario-estrategico')"><i class="fa-solid fa-calendar-days"></i> Calendário Estratégico</button>
+                    <button class="os-tab-btn" onclick="window.switchTab('calendario-operacional')"><i class="fa-solid fa-clapperboard"></i> Calendário Operacional</button>
                 </div>
 
                 <div id="tab-esteira" class="os-widget" style="padding: 0; background: transparent; border: none;">
@@ -84,10 +85,12 @@
                     </table>
                 </div>
 
-                <div id="tab-calendario" style="display: none;">
-                    <div class="calendar-grid" id="calendar-body">
-                        <!-- Preenchido via JS -->
-                    </div>
+                <div id="tab-calendario-estrategico" style="display: none;">
+                    <div class="calendar-grid" id="calendar-strategic-body"></div>
+                </div>
+
+                <div id="tab-calendario-operacional" style="display: none;">
+                    <div class="calendar-grid" id="calendar-operational-body"></div>
                 </div>
             </main>
         </div>

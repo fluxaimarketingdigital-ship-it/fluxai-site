@@ -262,8 +262,8 @@ function renderContentTable(contents) {
     }).join('');
 }
 
-function renderCalendar(contents) {
-    const container = document.getElementById('calendar-body');
+function renderCalendar(containerId, contents, mode) {
+    const container = document.getElementById(containerId);
     if (!container) return;
     container.innerHTML = '';
     
@@ -275,22 +275,34 @@ function renderCalendar(contents) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     for (let i = 0; i < firstDay; i++) {
-        container.innerHTML += `<div class="calendar-day" style="opacity:0.2;"></div>`;
+        container.innerHTML += `<div class="calendar-day" style="opacity:0.05;"></div>`;
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
         const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
         
-        let eventsHtml = dayContents.map(c => `
-            <div class="calendar-event" onclick="window.openApproval('${c.id}')" title="${c.title}">
-                ${c.title.substring(0, 20)}...
-            </div>
-        `).join('');
+        let eventsHtml = dayContents.map(c => {
+            const isStrategic = mode === 'STRATEGIC';
+            const statusColor = getStatusBg(c.status);
+            
+            // Filtro de visibilidade por modo
+            if (isStrategic && !['PAUTA', 'APROVAÇÃO', 'AJUSTE', 'PRODUÇÃO'].includes(c.status)) return '';
+            if (!isStrategic && !['PRODUÇÃO', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
+
+            return `
+                <div class="calendar-event" onclick="window.openApproval('${c.id}')" 
+                     style="border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px;">
+                    <div style="font-weight: 800; color: #fff;">${c.title.substring(0, 15)}</div>
+                    <div style="font-size: 0.55rem; color: ${statusColor}; font-weight: 700;">${c.status}</div>
+                    ${!isStrategic && c.status === 'PRONTO' ? '<i class="fa-solid fa-paperclip" style="font-size:0.5rem; margin-top:2px;"></i>' : ''}
+                </div>
+            `;
+        }).join('');
 
         container.innerHTML += `
-            <div class="calendar-day">
-                <div class="day-number">${day}</div>
+            <div class="calendar-day" style="min-height: 100px;">
+                <div class="day-number" style="font-size: 0.65rem; font-weight: 800; margin-bottom: 8px;">${day}</div>
                 ${eventsHtml}
             </div>
         `;
@@ -298,9 +310,12 @@ function renderCalendar(contents) {
 }
 
 function getStatusBg(status) {
-    if (status === 'PAUTA') return '#6366f1';
-    if (status === 'APROVAÇÃO') return '#f59e0b';
-    if (status === 'PRONTO') return '#10b981';
+    if (status === 'PAUTA') return '#6366f1'; // Azul
+    if (status === 'APROVAÇÃO') return '#f59e0b'; // Laranja
+    if (status === 'AJUSTE') return '#ef4444'; // Vermelho
+    if (status === 'PRODUÇÃO') return '#06b6d4'; // Ciano
+    if (status === 'PRONTO') return '#10b981'; // Verde
+    if (status === 'PUBLICADO') return '#059669'; // Verde Escuro
     return '#444';
 }
 
