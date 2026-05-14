@@ -252,7 +252,10 @@ function renderContentTable(contents) {
                 </td>
                 <td>
                     <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                        <button class="btn-mini" title="Ver Planejamento" onclick="window.openApproval('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
+                        <button class="btn-mini" title="Refinar Pauta" onclick="window.openEditModal('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                        <button class="btn-mini" title="Ver Planejamento" onclick="window.openApproval('${c.id}')">
                             <i class="fa-solid fa-eye"></i>
                         </button>
                         <button class="btn-mini" title="Excluir" onclick="window.deleteAsset('${c.id}')">
@@ -326,6 +329,42 @@ window.openApproval = (id) => {
     window.open(`/os/approval.html?id=${id}`, '_blank');
 };
 
+let editingAssetId = null;
+window.openEditModal = async (id) => {
+    editingAssetId = id;
+    const supabase = getSupabase();
+    const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
+    if (c) {
+        document.getElementById('edit-asset-title').value = c.title;
+        document.getElementById('edit-asset-caption').value = c.caption;
+        document.getElementById('edit-asset-ref').value = c.metadata?.reference_url || '';
+        document.getElementById('modal-edit-asset').style.display = 'flex';
+    }
+};
+
+window.closeEditModal = () => {
+    document.getElementById('modal-edit-asset').style.display = 'none';
+};
+
+window.saveAssetEdit = async () => {
+    const title = document.getElementById('edit-asset-title').value;
+    const caption = document.getElementById('edit-asset-caption').value;
+    const ref = document.getElementById('edit-asset-ref').value;
+
+    const supabase = getSupabase();
+    const { error } = await supabase.from('content_assets').update({
+        title,
+        caption,
+        metadata: { reference_url: ref }
+    }).eq('id', editingAssetId);
+
+    if (error) alert('Erro ao salvar: ' + error.message);
+    else {
+        window.closeEditModal();
+        loadContent();
+    }
+};
+
 window.runAiPlanner = async () => {
     const user = await OS_AUTH.check();
     if (user?.role !== 'ADMIN' && user?.role !== 'MANAGER') return alert('Acesso negado.');
@@ -334,15 +373,32 @@ window.runAiPlanner = async () => {
     const selectedId = filter.value || currentProject;
     if (!selectedId) return alert('Selecione um projeto para gerar planejamento estratégico!');
 
-    sLog('Iniciando Motor Estratégico para Projeto: ' + selectedId);
+    const supabase = getSupabase();
+    
+    // VERIFICAÇÃO DE COTA (CONTRATO)
+    const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', selectedId).single();
+    const { count } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('project_id', selectedId);
+    
+    // Tentar extrair número da cota do 'content_scope' ou default 12
+    const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
+    const quota = quotaMatch ? parseInt(quotaMatch[0]) : 12;
+
+    if (count >= quota) {
+        return alert(`Limite de Cota Atingido (${count}/${quota}).\n\nApague ativos antigos ou solicite upgrade de contrato para gerar novos planejamentos.`);
+    }
+
+    sLog(`Iniciando Motor Estratégico (Cota: ${count}/${quota})`);
     
     try {
         const { AIPlanner } = await import('../../services/ai-planner.js');
         const contents = await AIPlanner.generatePlan(selectedId);
         
-        if (confirm(`Gerar Planejamento Estratégico (12 Ativos em PAUTA)?`)) {
-            const supabase = getSupabase();
-            const { error } = await supabase.from('content_assets').insert(contents);
+        // Filtrar apenas o que cabe na cota
+        const remaining = quota - count;
+        const toInsert = contents.slice(0, remaining);
+
+        if (confirm(`Gerar Planejamento Estratégico (${toInsert.length} novos ativos)?`)) {
+            const { error } = await supabase.from('content_assets').insert(toInsert);
             if (error) throw error;
             
             sLog('Planejamento Gerado com Sucesso.');

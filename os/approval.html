@@ -83,6 +83,8 @@
                     <span class="meta-value" id="meta-version">V1</span>
                 </div>
             </div>
+            
+            <div id="ref-link-container"></div>
 
             <div class="content-body">
                 <h2>Roteiro Estratégico</h2>
@@ -208,13 +210,21 @@
                 const roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
                 document.getElementById('asset-caption').innerText = roadmap;
                 
+                // LINK DE REFERÊNCIA
+                const refBtn = document.getElementById('ref-link-container');
+                if (c.metadata?.reference_url) {
+                    refBtn.innerHTML = `
+                        <a href="${c.metadata.reference_url}" target="_blank" class="btn" style="background:rgba(255,255,255,0.05); border:1px solid #444; width:100%; margin-top:15px; display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; color:var(--os-primary); font-size:0.7rem; font-weight:800; border-radius:4px; padding:12px;">
+                            <i class="fa-solid fa-link"></i> VER REFERÊNCIA ESTRATÉGICA
+                        </a>
+                    `;
+                }
+
                 const badge = document.getElementById('status-badge-container');
                 if (c.status === 'APROVAÇÃO' || c.status === 'PAUTA') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 AGUARDANDO APROVAÇÃO</span>`;
                 } else if (c.status === 'AJUSTE') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🟡 EM REVISÃO</span>`;
-                } else {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.2);">STATUS: ${c.status}</span>`;
                 }
 
                 const checks = ADJUSTMENT_CHECKS[prefix] || ADJUSTMENT_CHECKS['DEFAULT'];
@@ -228,7 +238,11 @@
                 document.getElementById('content-data').style.display = 'block';
 
                 document.getElementById('btn-approve-action').onclick = async () => {
-                    await supabase.from('content_assets').update({ status: 'PRODUÇÃO' }).eq('id', id);
+                    const now = new Date().toLocaleDateString('pt-BR');
+                    await supabase.from('content_assets').update({ 
+                        status: 'PRODUÇÃO',
+                        internal_notes: `APROVADO PELO CLIENTE EM ${now}`
+                    }).eq('id', id);
                     document.getElementById('main-ui').style.display = 'none';
                     document.getElementById('success-ui').style.display = 'block';
                 };

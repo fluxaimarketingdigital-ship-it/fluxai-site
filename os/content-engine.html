@@ -96,6 +96,33 @@
         </div>
     </div>
 
+    <!-- MODAL DE EDIÇÃO ESTRATÉGICA (EXCLUSIVO PLANNER) -->
+    <div id="modal-edit-asset" class="os-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; display:flex; align-items:center; justify-content:center;">
+        <div class="os-widget" style="width: 100%; max-width: 600px; padding: 30px; border: 1px solid var(--os-border);">
+            <h2 style="margin-bottom: 20px; color: var(--os-primary); font-size: 1.2rem;">Refinamento Estratégico</h2>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px;">Título do Ativo</label>
+                <input type="text" id="edit-asset-title" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px;">Roteiro Estratégico (Pauta)</label>
+                <textarea id="edit-asset-caption" rows="10" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px; font-family: monospace; font-size:0.8rem;"></textarea>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px;">Link de Referência (Opcional)</label>
+                <input type="url" id="edit-asset-ref" placeholder="https://..." style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end;">
+                <button class="btn-mini" onclick="window.closeEditModal()" style="padding:10px 20px;">Cancelar</button>
+                <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
         import { getSupabase } from '/os/services/supabase-client.js';
