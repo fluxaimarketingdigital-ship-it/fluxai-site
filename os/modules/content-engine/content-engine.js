@@ -336,7 +336,7 @@ function renderContentTable(contents) {
                 </td>
                 <td style="font-size: 0.75rem; font-weight: 600;">${c.platform}</td>
                 <td>
-                    <div style="font-size: 0.65rem; color: ${c.metadata?.approval_deadline ? 'var(--os-warning)' : 'var(--os-text-muted)'};">
+                    <div style="font-size: 0.65rem; color: ${c.metadata?.approval_deadline ? '#60a5fa' : 'var(--os-text-muted)'};">
                         ${c.metadata?.approval_deadline ? '<i class="fa-solid fa-clock"></i> ' + new Date(c.metadata.approval_deadline).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '---'}
                     </div>
                 </td>
