@@ -46,8 +46,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    const objectives = ['AUTORIDADE', 'PERCEPÇÃO PREMIUM', 'QUEBRA DE CRENÇA', 'GERAÇÃO DE LEADS', 'DIAGNÓSTICO'];
-    const assetTypes = ['REELS', 'CARROSSEL', 'STATIC'];
+    const assetTypes = ['REELS', 'CARROSSEL', 'STATIC', 'SITE'];
     
     const samples = [];
     const nextMonth = new Date();
@@ -76,7 +75,6 @@ async function generateSampleContent(projectId, count = 12) {
 🎥 ESTRUTURA: 0-3s (Gancho Visual), 3-25s (Autoridade), 25-35s (CTA)
 ⏱️ DURAÇÃO: 35s | 🥁 RITMO: Dinâmico
 📝 LEGENDA: [Narrativa de conversão...]
-🛠️ OBS: Focar em fala direta e iluminação controlada.
             `;
         } else if (type === 'CARROSSEL') {
             title = `🎠 ESTRUTURA NARRATIVA: ${obj}`;
@@ -87,9 +85,6 @@ async function generateSampleContent(projectId, count = 12) {
 🔥 TENSÃO DE RETENÇÃO: Alta (Provocação Técnica)
 🧩 INTENÇÃO ESTRATÉGICA: [IA definiu como ${obj} no segmento ${project.company_name}]
 
-🎨 DIREÇÃO VISUAL: Capa Minimalista | Contraste de Retenção
-📊 PADRÃO: Baixa densidade textual por slide (Foco em Título)
-
 🖼️ ORDEM NARRATIVA DOS SLIDES:
 - Slide 01: PROVOCAÇÃO: [Título de impacto para ${obj}]
 - Slide 02: TENSÃO: Expor o erro comum do mercado
@@ -97,8 +92,25 @@ async function generateSampleContent(projectId, count = 12) {
 - Slide 04-05: EXPLICAÇÃO: Detalhes técnicos e autoridade
 - Slide 06: APROFUNDAMENTO: Case / Resultado / Prova
 - Slide 07: CTA ESTRATÉGICO: "Estrutura precede escala."
+            `;
+        } else if (type === 'SITE') {
+            title = `🌐 ARQUITETURA ESTRATÉGICA DIGITAL: ${obj}`;
+            platform = "WEB";
+            contentBody = `
+🌐 ARQUITETURA ESTRATÉGICA DIGITAL
+----------------------------------
+🎯 OBJETIVO: ${obj}
+🏗️ ESTRUTURA: [IA sugeriu site ${obj} para ${project.company_name}]
+👤 JORNADA DO USUÁRIO: Foco em Previsibilidade -> Confiança -> Conversão
 
-📝 LEGENDA: [Hierarquia textual focada em salvamentos...]
+📐 WIREFRAME LÓGICO:
+- HOME: Foco em Posicionamento Imediato
+- SEÇÃO 01: Diagnóstico do Problema / Dor do ICP
+- SEÇÃO 02: Estrutura Operacional e Diferenciais
+- SEÇÃO 03: Provas Sociais e Autoridade Técnica
+- CTA: Agendamento Estratégico / Lead Magnet
+
+🛠️ PRIORIDADES OPERACIONAIS: Performance, Silêncio Visual e UX Premium.
             `;
         } else {
             title = `🖼️ DIREÇÃO VISUAL: ${obj}`;
@@ -106,12 +118,11 @@ async function generateSampleContent(projectId, count = 12) {
 🖼️ DIREÇÃO ESTRATÉGICA VISUAL (ESTÁTICO)
 ----------------------------------
 🎯 OBJETIVO: ${obj}
-🎨 DIREÇÃO CRIATIVA: Design de Alto Impacto | Fundo Claro
+🎨 DIREÇÃO CRIATIVA: Design de Alto Impacto
 📐 HIERARQUIA TEXTUAL: Título Curto + Subtítulo Técnico
 
 🧠 TENSÃO NARRATIVA: [IA focando em quebra de objeção para ${obj}]
 📝 LEGENDA: Foco em percepção premium e autoridade imediata.
-🛠️ OBS: Evitar excesso de texto no card.
             `;
         }
 
@@ -129,7 +140,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro: ' + error.message);
     else {
-        alert(`Ativos Estratégicos Gerados! 🚀 ${count} jornadas de retenção criadas.`);
+        alert(`Ativos Estratégicos Gerados! 🚀 Incluindo Arquitetura Digital.`);
         loadContent();
     }
 }
