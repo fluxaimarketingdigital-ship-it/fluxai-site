@@ -352,6 +352,11 @@ function renderContentTable(contents) {
                                 <i class="fa-solid fa-file-image"></i>
                             </a>
                         ` : ''}
+                        ${['PRODUÇÃO', 'REVISÃO INTERNA FINAL', 'APROVAÇÃO FINAL'].includes(c.status) ? `
+                            <button class="btn-mini" title="Concluir Manualmente (Pular Aprovação)" onclick="window.forceConclusion('${c.id}')" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: #10b981;">
+                                <i class="fa-solid fa-check-double"></i>
+                            </button>
+                        ` : ''}
                         <button class="btn-mini" title="Editar/Refinar" onclick="window.openEditModal('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
@@ -750,11 +755,33 @@ window.runAiPlanner = async () => {
     }
 };
 
+window.forceConclusion = async (id) => {
+    if (!confirm('Deseja concluir este ativo manualmente? O status mudará para PRONTO imediatamente, pulando a aprovação do cliente.')) return;
+    
+    try {
+        const supabase = getSupabase();
+        const { error } = await supabase.from('content_assets').update({ 
+            status: 'PRONTO',
+            internal_notes: `CONCLUÍDO MANUALMENTE PELO GESTOR EM ${new Date().toLocaleDateString('pt-BR')}`
+        }).eq('id', id);
+        
+        if (error) throw error;
+        sLog('Ativo concluído com sucesso.');
+        loadContent();
+    } catch (e) {
+        sLog('Erro ao concluir: ' + e.message);
+    }
+};
+
 window.deleteAsset = async (id) => {
     if (!confirm('Deseja excluir este ativo da esteira?')) return;
     const supabase = getSupabase();
     await supabase.from('content_assets').delete().eq('id', id);
     loadContent();
+};
+
+window.openApproval = (id) => {
+    window.open(`/os/approval.html?id=${id}`, '_blank');
 };
 
 initEngine();
