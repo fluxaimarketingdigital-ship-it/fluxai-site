@@ -46,9 +46,8 @@ async function generateSampleContent(projectId, count = 12) {
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    // Pilares Estratégicos FluxAI
-    const objectives = ['AUTORIDADE', 'VENDAS', 'RETENÇÃO', 'EDUCAÇÃO', 'ALCANCE'];
-    const types = ['DIAGNÓSTICO', 'STORYTELLING', 'PROVOCAÇÃO', 'CASE', 'ERRO COMUM'];
+    const objectives = ['AUTORIDADE', 'PERCEPÇÃO PREMIUM', 'CONVERSÃO', 'DIAGNÓSTICO', 'POSICIONAMENTO'];
+    const assetTypes = ['REELS', 'CARROSSEL', 'STATIC'];
     
     const samples = [];
     const nextMonth = new Date();
@@ -57,51 +56,67 @@ async function generateSampleContent(projectId, count = 12) {
 
     for (let i = 0; i < count; i++) {
         const obj = objectives[i % objectives.length];
-        const type = types[i % types.length];
-        const isReels = i % 2 === 0; // 50% Reels para alta performance
+        const type = assetTypes[i % assetTypes.length];
         
         let contentBody = "";
-        
-        if (isReels) {
+        let title = "";
+        let platform = "INSTAGRAM";
+
+        if (type === 'REELS') {
+            title = `🎬 DIRECIONAMENTO AUDIOVISUAL: ${obj}`;
+            platform = "REELS";
             contentBody = `
-⚡ DIRETRIZ ESTRATÉGICA (REELS)
+🎥 DIREÇÃO ESTRATÉGICA AUDIOVISUAL
 ----------------------------------
 🎯 OBJETIVO: ${obj}
-🧠 TIPO: ${type}
-📈 PADRÃO: Vídeo rápido + Hook técnico (Alta Retenção)
-🎬 LIMITES: Gravação Simples (Celular / Sem Captação)
+📈 PADRÃO: Vídeo rápido + Hook técnico
+🎬 LIMITES: Operação de Celular (Simples)
 
-🪝 HOOK (GANCHO): [IA criou gancho focado em ${obj} para o segmento ${project.company_name}]
-🎥 ESTRUTURA:
-- 0-3s: Gancho Visual + Texto de Impacto
-- 3-25s: Desenvolvimento em ${type} (Foco em Autoridade)
-- 25-35s: CTA Contextual para ${obj}
-
+🪝 HOOK (GANCHO): [IA detectou ângulo de ${obj} para ${project.company_name}]
+🎥 ESTRUTURA: 0-3s (Gancho Visual), 3-25s (Autoridade), 25-35s (CTA)
 ⏱️ DURAÇÃO: 35s | 🥁 RITMO: Dinâmico
-📝 LEGENDA ESTRATÉGICA: [IA gerando narrativa contextualizada...]
-🏷️ HASHTAGS: #FluxAI #Estrategia #AutoridadeDigital
+📝 LEGENDA: [Narrativa de conversão...]
+🛠️ OBS: Focar em fala direta e iluminação controlada.
+            `;
+        } else if (type === 'CARROSSEL') {
+            title = `🎠 ESTRUTURA NARRATIVA: ${obj}`;
+            contentBody = `
+🎠 ESTRUTURA NARRATIVA DE CARROSSEL
+----------------------------------
+🎯 OBJETIVO: ${obj}
+🎨 DIREÇÃO CRIATIVA: Capa Minimalista + Contraste Alto (Retenção)
+📊 PADRÃO VISUAL: Títulos curtos e impacto visual por slide
 
-🛠️ OBS. OPERACIONAIS: Focar em iluminação natural e fala direta.
+🖼️ ESTRUTURA DOS SLIDES:
+- Slide 01: [Capa Provocativa baseada em ${obj}]
+- Slide 02: Exposição do Problema Estrutural
+- Slide 03-06: Desenvolvimento da Autoridade FluxAI
+- Slide 07: Prova de Conceito
+- Slide 08: CTA: "Estrutura precede escala."
+
+📝 LEGENDA: [IA gerando hierarquia textual profunda...]
             `;
         } else {
+            title = `🖼️ DIREÇÃO VISUAL: ${obj}`;
             contentBody = `
-🎨 DIRETRIZ ESTRATÉGICA (CARROSSEL/POST)
+🖼️ DIREÇÃO ESTRATÉGICA VISUAL (ESTÁTICO)
 ----------------------------------
 🎯 OBJETIVO: ${obj}
-🧠 TIPO: ${type}
-🖼️ ESTRUTURA: Slide 1 (Capa Curiosidade), Slide 2 (O Problema), Slide 3-7 (A Solução/Autoridade), Slide 8 (CTA)
+🎨 DIREÇÃO CRIATIVA: Design de Alto Impacto | Fundo Claro (Conversão)
+📐 HIERARQUIA TEXTUAL: Título Curto (Máx 5 palavras) + Subtítulo Técnico
 
-📝 LEGENDA: [IA gerando conteúdo profundo baseado no DNA do cliente...]
-[TOOL: FluxAI Strategy Engine]
+🧠 TENSÃO NARRATIVA: [IA focando em quebra de objeção para ${obj}]
+📝 LEGENDA: Foco em percepção premium e autoridade imediata.
+🛠️ OBS: Evitar excesso de texto no card. Deixar a profundidade para a legenda.
             `;
         }
 
         samples.push({
             project_id: projectId,
-            title: isReels ? `🎥 REELS: ${obj} (${type})` : `🎠 CARROSSEL: ${obj}`,
+            title: title,
             status: 'PAUTA',
             priority: 'ALTA',
-            platform: isReels ? 'REELS' : 'INSTAGRAM',
+            platform: platform,
             caption: contentBody,
             scheduled_at: new Date(nextMonth.getTime() + (i * 2 * 24 * 60 * 60 * 1000)).toISOString()
         });
@@ -110,7 +125,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro: ' + error.message);
     else {
-        alert(`Estratégia FluxAI Gerada! 🚀 ${count} roteiros contextuais e operacionais criados.`);
+        alert(`Ativos Estratégicos Gerados! 🚀 ${count} estruturas contextuais criadas.`);
         loadContent();
     }
 }
