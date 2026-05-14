@@ -667,18 +667,17 @@ window.runAiPlanner = async () => {
     sLog(`Iniciando Motor Estratégico (Cota: ${count}/${quota})`);
     
     try {
-        const serviceType = document.getElementById('ai-planner-service')?.value || 'ALL';
         const { AIPlanner } = await import('../../services/ai-planner.js');
-        const contents = await AIPlanner.generatePlan(selectedId, serviceType);
-        
-        const toInsert = contents.slice(0, remaining);
-
-        if (confirm(`Gerar Planejamento (${toInsert.length} ativos - Tipo: ${serviceType})?`)) {
-            const { error } = await supabase.from('content_assets').insert(toInsert);
-            if (error) throw error;
+        if (confirm(`Gerar novo planejamento estratégico para o projeto?`)) {
+            const type = document.getElementById('ai-planner-service').value;
+            const newAssets = await AIPlanner.generatePlan(currentProject, type);
             
-            sLog('Planejamento Gerado com Sucesso.');
-            loadContent();
+            if (newAssets && newAssets.length > 0) {
+                const { error } = await supabase.from('content_assets').insert(newAssets);
+                if (error) throw error;
+                sLog(`${newAssets.length} Ativos de Logística Gerados.`);
+                loadContent();
+            }
         }
     } catch (err) {
         alert('Erro ao gerar plano: ' + err.message);

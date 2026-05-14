@@ -28,6 +28,8 @@
         .btn-approve { background: var(--os-primary); color: #fff; box-shadow: 0 10px 20px rgba(107,122,69,0.3); }
         .btn-reject { background: transparent; border: 1px solid rgba(255,68,68,0.5); color: #ff4444; }
         .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #444; }
+        .btn-secondary:hover { background: rgba(255,255,255,0.15); border-color: #666; }
 
         .feedback-area { display: none; margin-top: 30px; animation: fadeIn 0.4s ease; }
         .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
@@ -115,7 +117,9 @@
         <i class="fa-solid fa-circle-check"></i>
         <h2 id="success-title">Planejamento Aprovado!</h2>
         <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
-        <button class="btn" onclick="window.history.back()" style="background:transparent; border:1px solid #444; margin-top:20px; width:auto; padding:10px 30px; display:inline-block;">VOLTAR PARA O CALENDÁRIO</button>
+        <button class="btn btn-secondary" style="margin: 0 auto; width: auto; padding: 12px 25px; font-size: 0.7rem; background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #444;" onclick="window.close()">
+            <i class="fa-solid fa-arrow-left"></i> VOLTAR PARA O CALENDÁRIO
+        </button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -240,7 +244,7 @@
                             <i class="fa-solid fa-file-circle-check" style="font-size: 3rem; color: #8b5cf6; margin-bottom: 15px;"></i>
                             <h3 style="color: #fff; margin-bottom: 10px;">A Arte Final está pronta!</h3>
                             <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px;">Clique no botão abaixo para visualizar o arquivo final em alta resolução.</p>
-                            <a href="${c.metadata.final_asset_url}" target="_blank" class="btn" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; padding: 12px 30px;">
+                            <a href="${c.metadata.final_asset_url}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; padding: 12px 30px;">
                                 <i class="fa-solid fa-eye"></i> VISUALIZAR ARTE FINAL
                             </a>
                         </div>
