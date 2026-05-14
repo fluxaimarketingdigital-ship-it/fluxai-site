@@ -600,6 +600,7 @@ window.saveAssetEdit = async () => {
             } else if (confirm('Pular revisão e enviar direto para APROVAÇÃO FINAL do cliente?')) {
                 updatePayload.status = 'APROVAÇÃO FINAL';
             }
+        }
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', editingAssetId);
         if (error) throw error;
 
@@ -763,11 +764,10 @@ window.runAiPlanner = async () => {
                 sLog(`${newAssets.length} Ativos de Logística Gerados.`);
                 loadContent();
             }
+        } catch (err) {
+            alert('Erro ao gerar plano: ' + err.message);
         }
-    } catch (err) {
-        alert('Erro ao gerar plano: ' + err.message);
-    }
-};
+    };
 
 window.deleteAsset = async (id) => {
     if (!confirm('Deseja excluir este ativo da esteira?')) return;
