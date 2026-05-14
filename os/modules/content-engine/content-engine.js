@@ -133,14 +133,20 @@ const STRATEGIC_MATRIX = {
 };
 
 const RESPONSIBLE_MAP = {
+    'AUDIOVISUAL': 'Audiovisual',
     'REELS': 'Audiovisual',
+    'NARRATIVA': 'Estrategista',
+    'DIREÇÃO': 'Estrategista',
+    'ARQUITETURA': 'Design',
     'CARROSSEL': 'Design',
     'CARD': 'Design',
     'SITE': 'Desenvolvimento Web',
     'TRAFEGO': 'Gestor de Tráfego',
+    'ADS': 'Gestor de Tráfego',
     'BRANDING': 'Estrategista',
     'CRM': 'Estrategista',
-    'AUTOMAÇÃO': 'Sistemas'
+    'AUTOMAÇÃO': 'Sistemas',
+    'DIAGNÓSTICO': 'Estrategista'
 };
 
 export async function initEngine() {
@@ -782,12 +788,17 @@ window.runAiPlanner = async () => {
             if (newAssets && newAssets.length > 0) {
                 // APLICAR INTELIGÊNCIA DE PRAZO (48H) E RESPONSÁVEL
                 const processedAssets = newAssets.map(asset => {
-                    const type = Object.keys(RESPONSIBLE_MAP).find(k => asset.title.includes(k)) || 'CARD';
+                    const titleUpper = asset.title.toUpperCase();
+                    const type = Object.keys(RESPONSIBLE_MAP).find(k => titleUpper.includes(k)) || 'CARD';
                     const deadline = new Date();
                     deadline.setHours(deadline.getHours() + 48);
                     
+                    // Prioridade Automática: Tráfego e Estratégia = ALTA, o resto MÉDIA
+                    const priority = (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('ESTRATÉGICO')) ? 'ALTA' : 'MÉDIA';
+
                     return {
                         ...asset,
+                        priority: priority,
                         metadata: {
                             ...asset.metadata,
                             responsible: RESPONSIBLE_MAP[type] || 'Design',
