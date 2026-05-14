@@ -32,10 +32,26 @@
         .login-form { text-align: left; }
         .form-group { margin-bottom: 25px; }
         .form-group label { display: block; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--os-text-muted); margin-bottom: 10px; }
-        .form-control { width: 100%; padding: 15px; background: var(--os-bg); border: 1px solid var(--os-border); border-radius: 4px; color: #fff; font-size: 0.9rem; }
-        .form-control:focus { outline: none; border-color: var(--os-primary); }
-        .btn-login { width: 100%; padding: 15px; background: var(--os-primary); border: none; color: #fff; font-weight: 700; border-radius: 4px; cursor: pointer; transition: all 0.2s; }
-        .btn-login:hover { opacity: 0.9; transform: translateY(-2px); }
+        .form-control { width: 100%; padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid var(--os-border); border-radius: 4px; color: #fff; font-size: 0.9rem; transition: all 0.3s; }
+        .form-control:focus { outline: none; border-color: var(--os-primary); background: rgba(255,255,255,0.05); }
+        .btn-login { 
+            width: 100%; 
+            padding: 15px; 
+            background: var(--os-primary); 
+            border: none; 
+            color: #000; 
+            font-weight: 800; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            transition: all 0.2s; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-login:hover { opacity: 0.9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(168, 85, 247, 0.4); }
         .login-footer { margin-top: 30px; font-size: 0.8rem; color: var(--os-text-muted); }
     </style>
 </head>

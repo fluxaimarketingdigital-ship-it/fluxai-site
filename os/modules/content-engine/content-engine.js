@@ -361,7 +361,7 @@ function renderContentTable(contents) {
                     </div>
                 </td>
                 <td>
-                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                    <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
                         ${c.status === 'PRONTO' ? `
                             <button class="btn-mini" title="Ponte de Publicação" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
                                 <i class="fa-solid fa-rocket"></i>
