@@ -249,13 +249,22 @@
                 document.getElementById('content-data').style.display = 'block';
 
                 document.getElementById('btn-approve-action').onclick = async () => {
-                    const now = new Date().toLocaleDateString('pt-BR');
-                    await supabase.from('content_assets').update({ 
-                        status: 'PRODUÇÃO',
-                        internal_notes: `APROVADO PELO CLIENTE EM ${now}`
-                    }).eq('id', id);
-                    document.getElementById('main-ui').style.display = 'none';
-                    document.getElementById('success-ui').style.display = 'block';
+                    try {
+                        const now = new Date().toLocaleDateString('pt-BR');
+                        const { error } = await supabase.from('content_assets').update({ 
+                            status: 'PRODUÇÃO',
+                            internal_notes: `APROVADO PELO CLIENTE EM ${now}`
+                        }).eq('id', id);
+                        
+                        if (error) throw error;
+                        
+                        document.getElementById('main-ui').style.display = 'none';
+                        document.getElementById('success-ui').style.display = 'block';
+                        // Forçar recarregamento após 2s para garantir o bloqueio
+                        setTimeout(() => window.location.reload(), 2000);
+                    } catch (err) {
+                        alert('Erro ao processar aprovação: ' + err.message);
+                    }
                 };
 
                 document.getElementById('btn-reject-action').onclick = () => {
@@ -263,22 +272,27 @@
                 };
 
                 document.getElementById('btn-submit-feedback').onclick = async () => {
-                    const selected = Array.from(document.querySelectorAll('#adjustment-checks input:checked')).map(i => i.value);
-                    const note = document.getElementById('feedback-text').value;
-                    const fullNote = `SOLICITAÇÃO DE REVISÃO | ITENS: ${selected.join(', ')} | OBS: ${note}`;
-                    
-                    const newMetadata = { ...c.metadata, adjustment_count: (c.metadata?.adjustment_count || 0) + 1 };
+                    try {
+                        const selected = Array.from(document.querySelectorAll('#adjustment-checks input:checked')).map(i => i.value);
+                        const note = document.getElementById('feedback-text').value;
+                        const fullNote = `REVISÃO SOLICITADA | ITENS: ${selected.join(', ')} | OBS: ${note}`;
+                        
+                        const { error } = await supabase.from('content_assets').update({ 
+                            status: 'AJUSTE', 
+                            internal_notes: fullNote
+                        }).eq('id', id);
+                        
+                        if (error) throw error;
 
-                    await supabase.from('content_assets').update({ 
-                        status: 'AJUSTE', 
-                        internal_notes: fullNote,
-                        metadata: newMetadata
-                    }).eq('id', id);
-                    
-                    document.getElementById('main-ui').style.display = 'none';
-                    document.getElementById('success-title').innerText = 'Solicitação Enviada!';
-                    document.getElementById('success-message').innerText = 'Recebemos seus apontamentos estratégicos. Vamos ajustar o planejamento conforme as diretrizes enviadas.';
-                    document.getElementById('success-ui').style.display = 'block';
+                        document.getElementById('main-ui').style.display = 'none';
+                        document.getElementById('success-title').innerText = 'Solicitação Enviada!';
+                        document.getElementById('success-message').innerText = 'Recebemos seus apontamentos estratégicos. Vamos ajustar o planejamento conforme as diretrizes enviadas.';
+                        document.getElementById('success-ui').style.display = 'block';
+                        // Forçar recarregamento após 2s para garantir o bloqueio
+                        setTimeout(() => window.location.reload(), 2000);
+                    } catch (err) {
+                        alert('Erro ao enviar solicitação: ' + err.message);
+                    }
                 };
 
             } catch (err) {
