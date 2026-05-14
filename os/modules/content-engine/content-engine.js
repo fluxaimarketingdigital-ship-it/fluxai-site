@@ -86,13 +86,24 @@ async function generateSampleContent(projectId, count = 12) {
         
         const internalTitle = `${sys.name}: ${obj}`;
         
+        // Lógica de Geração de Estratégia Real (Simulada com DNA do Cliente)
+        const strategicDirectives = {
+            'AUTORIDADE': `Elevar o posicionamento de ${project.company_name} como referência técnica absoluta no setor, utilizando dados e diferenciais competitivos.`,
+            'PERCEPÇÃO PREMIUM': `Construir uma narrativa de exclusividade e sofisticação, focando no alto valor agregado e na experiência única do cliente.`,
+            'CONVERSÃO': `Direcionar a audiência para uma tomada de decisão imediata, baseada em urgência estratégica e solução de problemas críticos.`,
+            'DIAGNÓSTICO': `Expor falhas comuns do mercado para apresentar a metodologia de ${project.company_name} como a solução definitiva.`,
+            'POSICIONAMENTO': `Diferenciar a marca da concorrência através de uma narrativa de valores e visão de mercado singular.`
+        };
+
+        const directive = strategicDirectives[obj] || strategicDirectives['AUTORIDADE'];
+
         let contentBody = `
 🎯 DIRETRIZ: ${obj}
-📝 ESTRUTURA: [IA desenhando narrativa de alto impacto para ${project.company_name}]
+📝 ESTRUTURA: ${directive}
 
-💎 POSICIONAMENTO: Foco em percepção premium e autoridade de mercado.
-🚀 JORNADA: Sequência lógica desenhada para máxima retenção e conversão.
-✨ CTA: Chamada estratégica voltada para ${obj}.
+💎 POSICIONAMENTO: Reforçar o DNA de ${project.company_name} através de elementos visuais de alto contraste e silêncio visual.
+🚀 JORNADA: Sequência narrativa desenhada para capturar a atenção nos primeiros 3 segundos e conduzir ao desejo de solução.
+✨ CTA: Direcionamento focado em ${obj} (Agendamento Estratégico / Link na Bio).
 
 [TOOL: FluxAI OS™ Strategic Engine]
         `;
