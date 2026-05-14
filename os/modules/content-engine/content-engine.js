@@ -11,16 +11,6 @@ window.changeMonth = (delta) => {
     loadContent();
 };
 
-let currentMonth = new Date().getMonth();
-let currentYear = new Date().getFullYear();
-
-window.changeMonth = (delta) => {
-    currentMonth += delta;
-    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
-    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
-    loadContent();
-};
-
 const sLog = (msg) => { if (window.screenLog) window.screenLog(msg); console.log('[ENGINE]', msg); };
 
 // MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI v7.0 (FLUXO MESTRE)
