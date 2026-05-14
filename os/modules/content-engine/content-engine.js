@@ -298,9 +298,11 @@ function renderMetrics(contents) {
         total: contents.length,
         approval: contents.filter(c => c.status.includes('APROVAÇÃO')).length,
         atrasado: contents.filter(c => {
-            if (c.status === 'PUBLICADO') return false;
+            if (c.status === 'PUBLICADO' || c.status === 'PRONTO') return false;
             const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
-            return deadline && deadline < now && c.status !== 'PRONTO';
+            const scheduled = new Date(c.scheduled_at);
+            // Atraso se passou do prazo de aprovação OU se está em produção e passou da data de postagem
+            return (deadline && deadline < now) || (c.status === 'PRODUÇÃO' && scheduled < now);
         }).length,
         ready: contents.filter(c => c.status === 'PRONTO').length
     };
@@ -516,8 +518,21 @@ window.openEditModal = async (id) => {
             document.getElementById('edit-asset-art-final').parentElement.after(metaFields);
         }
         
-        document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || 'Design';
+        document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || (c.status === 'PRODUÇÃO' ? 'Design' : 'Social Media');
         document.getElementById('edit-asset-version').value = c.metadata?.version || 'V1';
+        
+        // Atualizar Ações do Rodapé
+        const footerActions = document.getElementById('edit-asset-footer-actions');
+        if (footerActions) {
+            footerActions.innerHTML = `
+                ${c.status === 'PRODUÇÃO' ? `
+                    <button class="btn-mini" onclick="window.finalizeProduction('${c.id}')" style="padding:10px 20px; background:#8b5cf6; color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+                        <i class="fa-solid fa-paper-plane"></i> Finalizar e Enviar
+                    </button>
+                ` : ''}
+                <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
+            `;
+        }
         document.getElementById('edit-asset-deadline').value = c.metadata?.approval_deadline || '';
         document.getElementById('edit-asset-risk').checked = c.metadata?.risk || false;
         
@@ -585,16 +600,45 @@ window.saveAssetEdit = async () => {
             } else if (confirm('Pular revisão e enviar direto para APROVAÇÃO FINAL do cliente?')) {
                 updatePayload.status = 'APROVAÇÃO FINAL';
             }
-        }
-
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', editingAssetId);
         if (error) throw error;
 
-        sLog('Ativo Sincronizado.');
+        sLog('Alterações salvas com sucesso.');
         closeEditModal();
         loadContent();
     } catch (e) {
-        alert('Erro ao salvar: ' + e.message);
+        sLog('Erro ao salvar: ' + e.message);
+    }
+}
+
+window.finalizeProduction = async (id) => {
+    const artLink = document.getElementById('edit-asset-art-final').value;
+    if (!artLink) return alert('Por favor, insira o link da arte final antes de enviar!');
+    
+    if (!confirm('Deseja finalizar a produção e enviar para aprovação do cliente agora?')) return;
+
+    try {
+        const supabase = getSupabase();
+        const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
+        
+        const updatePayload = {
+            status: 'APROVAÇÃO FINAL',
+            metadata: {
+                ...c.metadata,
+                final_asset_url: artLink,
+                responsible: document.getElementById('edit-asset-responsible').value,
+                version: 'FINAL'
+            }
+        };
+
+        const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', id);
+        if (error) throw error;
+
+        sLog('Produção finalizada e enviada ao cliente.');
+        closeEditModal();
+        loadContent();
+    } catch (e) {
+        sLog('Erro ao finalizar: ' + e.message);
     }
 };
 

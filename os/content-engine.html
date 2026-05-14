@@ -152,13 +152,19 @@
             </div>
 
             <div style="margin-bottom: 20px;">
-                <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px;">Link de Referência (Opcional)</label>
-                <input type="url" id="edit-asset-ref" placeholder="https://..." style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+                <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px;">LINK DA ARTE FINAL (PARA VALIDAÇÃO)</label>
+                <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive / Vídeo..." style="width:100%; padding:10px; background:#000; border:1px solid var(--os-primary); color:#fff; border-radius:4px;">
             </div>
 
-            <div style="display:flex; gap:10px; justify-content:flex-end;">
+            <div id="edit-asset-meta-fields" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:20px;">
+                <!-- Preenchido via JS -->
+            </div>
+
+            <div style="display:flex; gap:10px; justify-content:flex-end; align-items:center;">
                 <button class="btn-mini" onclick="window.closeEditModal()" style="padding:10px 20px;">Cancelar</button>
-                <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
+                <div id="edit-asset-footer-actions" style="display:flex; gap:10px;">
+                    <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
+                </div>
             </div>
         </div>
     </div>
