@@ -38,7 +38,10 @@ async function init() {
 
     } catch (err) {
         console.error('[CONTENT ENGINE] Erro crítico no INIT:', err);
-  // MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI (DUPLA CAMADA: INTERNO vs CLIENTE)
+    }
+}
+
+// MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI (DUPLA CAMADA: INTERNO vs CLIENTE)
 const STRATEGIC_MATRIX = {
     'REELS': { name: 'Direção Estratégica Audiovisual', clientPrefix: 'REELS', platform: 'REELS' },
     'CARD': { name: 'Direção Estratégica Visual', clientPrefix: 'POST', platform: 'INSTAGRAM' },
