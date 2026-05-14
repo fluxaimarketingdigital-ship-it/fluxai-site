@@ -41,12 +41,38 @@ async function init() {
     }
 }
 
+// MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI
+const STRATEGIC_MATRIX = {
+    'REELS': { name: 'Direção Estratégica Audiovisual', platform: 'REELS' },
+    'CARD': { name: 'Direção Estratégica Visual', platform: 'INSTAGRAM' },
+    'CARROSSEL': { name: 'Estrutura Narrativa de Carrossel', platform: 'INSTAGRAM' },
+    'SITE': { name: 'Arquitetura Estratégica Digital', platform: 'WEB' },
+    'BRANDING': { name: 'Arquitetura de Posicionamento', platform: 'BRAND' },
+    'TRAFEGO': { name: 'Estratégia de Aquisição', platform: 'ADS' },
+    'AUTOMACAO': { name: 'Arquitetura Operacional', platform: 'SYSTEM' },
+    'CRM': { name: 'Estrutura de Relacionamento', platform: 'CRM' },
+    'DASHBOARD': { name: 'Infraestrutura Analítica', platform: 'DATA' },
+    'IA': { name: 'Inteligência Operacional', platform: 'AI' },
+    'CAPTACAO': { name: 'Direção de Produção', platform: 'PRODUCTION' },
+    'CONSULTORIA': { name: 'Diagnóstico Estratégico', platform: 'CONSULTING' },
+    'LP': { name: 'Estrutura de Conversão', platform: 'WEB' },
+    'COPY': { name: 'Engenharia Narrativa', platform: 'COPY' },
+    'APRESENTACAO': { name: 'Estrutura Institucional', platform: 'DOC' },
+    'IDV': { name: 'Sistema de Identidade', platform: 'DESIGN' },
+    'FUNIL': { name: 'Arquitetura de Conversão', platform: 'SALES' },
+    'SEO': { name: 'Estrutura de Descoberta', platform: 'WEB' },
+    'WHATSAPP': { name: 'Fluxo Conversacional', platform: 'CHAT' },
+    'GOVOS': { name: 'Infraestrutura Pública Digital', platform: 'GOV' }
+};
+
 async function generateSampleContent(projectId, count = 12) {
     const supabase = getSupabase();
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    const assetTypes = ['REELS', 'CARROSSEL', 'STATIC', 'SITE'];
+    // Leitura de Escopo (Sistemas Ativos no Contrato)
+    const activeSystems = project.active_systems || ['REELS', 'CARROSSEL', 'CARD', 'TRAFEGO', 'BRANDING'];
+    const objectives = ['AUTORIDADE', 'PERCEPÇÃO PREMIUM', 'CONVERSÃO', 'DIAGNÓSTICO', 'POSICIONAMENTO'];
     
     const samples = [];
     const nextMonth = new Date();
@@ -54,84 +80,30 @@ async function generateSampleContent(projectId, count = 12) {
     nextMonth.setDate(1);
 
     for (let i = 0; i < count; i++) {
+        const sysKey = activeSystems[i % activeSystems.length];
+        const sys = STRATEGIC_MATRIX[sysKey] || STRATEGIC_MATRIX['CARD'];
         const obj = objectives[i % objectives.length];
-        const type = assetTypes[i % assetTypes.length];
         
-        let contentBody = "";
-        let title = "";
-        let platform = "INSTAGRAM";
-
-        if (type === 'REELS') {
-            title = `🎬 DIRECIONAMENTO AUDIOVISUAL: ${obj}`;
-            platform = "REELS";
-            contentBody = `
-🎥 DIREÇÃO ESTRATÉGICA AUDIOVISUAL
+        let contentBody = `
+🚀 ${sys.name.toUpperCase()}
 ----------------------------------
 🎯 OBJETIVO: ${obj}
-📈 PADRÃO: Vídeo rápido + Hook técnico
-🎬 LIMITES: Operação de Celular (Simples)
+🧠 CONTEXTO: Operação estratégica para ${project.company_name}
 
-🪝 HOOK (GANCHO): [IA detectou ângulo de ${obj} para ${project.company_name}]
-🎥 ESTRUTURA: 0-3s (Gancho Visual), 3-25s (Autoridade), 25-35s (CTA)
-⏱️ DURAÇÃO: 35s | 🥁 RITMO: Dinâmico
-📝 LEGENDA: [Narrativa de conversão...]
-            `;
-        } else if (type === 'CARROSSEL') {
-            title = `🎠 ESTRUTURA NARRATIVA: ${obj}`;
-            contentBody = `
-🎠 ESTRUTURA NARRATIVA DE CARROSSEL
-----------------------------------
-🎯 OBJETIVO: ${obj}
-🔥 TENSÃO DE RETENÇÃO: Alta (Provocação Técnica)
-🧩 INTENÇÃO ESTRATÉGICA: [IA definiu como ${obj} no segmento ${project.company_name}]
+[IA gerando estrutura específica para ${sys.name}...]
+- Arquitetura de Hierarquia e Fluxo
+- Gatilhos de Percepção e Posicionamento
+- Chamada para Ação Operacional (CTA)
 
-🖼️ ORDEM NARRATIVA DOS SLIDES:
-- Slide 01: PROVOCAÇÃO: [Título de impacto para ${obj}]
-- Slide 02: TENSÃO: Expor o erro comum do mercado
-- Slide 03: QUEBRA: Mostrar a lógica FluxAI (Inovação)
-- Slide 04-05: EXPLICAÇÃO: Detalhes técnicos e autoridade
-- Slide 06: APROFUNDAMENTO: Case / Resultado / Prova
-- Slide 07: CTA ESTRATÉGICO: "Estrutura precede escala."
-            `;
-        } else if (type === 'SITE') {
-            title = `🌐 ARQUITETURA ESTRATÉGICA DIGITAL: ${obj}`;
-            platform = "WEB";
-            contentBody = `
-🌐 ARQUITETURA ESTRATÉGICA DIGITAL
-----------------------------------
-🎯 OBJETIVO: ${obj}
-🏗️ ESTRUTURA: [IA sugeriu site ${obj} para ${project.company_name}]
-👤 JORNADA DO USUÁRIO: Foco em Previsibilidade -> Confiança -> Conversão
-
-📐 WIREFRAME LÓGICO:
-- HOME: Foco em Posicionamento Imediato
-- SEÇÃO 01: Diagnóstico do Problema / Dor do ICP
-- SEÇÃO 02: Estrutura Operacional e Diferenciais
-- SEÇÃO 03: Provas Sociais e Autoridade Técnica
-- CTA: Agendamento Estratégico / Lead Magnet
-
-🛠️ PRIORIDADES OPERACIONAIS: Performance, Silêncio Visual e UX Premium.
-            `;
-        } else {
-            title = `🖼️ DIREÇÃO VISUAL: ${obj}`;
-            contentBody = `
-🖼️ DIREÇÃO ESTRATÉGICA VISUAL (ESTÁTICO)
-----------------------------------
-🎯 OBJETIVO: ${obj}
-🎨 DIREÇÃO CRIATIVA: Design de Alto Impacto
-📐 HIERARQUIA TEXTUAL: Título Curto + Subtítulo Técnico
-
-🧠 TENSÃO NARRATIVA: [IA focando em quebra de objeção para ${obj}]
-📝 LEGENDA: Foco em percepção premium e autoridade imediata.
-            `;
-        }
+🛠️ PRIORIDADES: [IA detectou gargalo operacional e ajustou a entrega conforme maturidade do cliente]
+        `;
 
         samples.push({
             project_id: projectId,
-            title: title,
+            title: `${sys.name}: ${obj}`,
             status: 'PAUTA',
             priority: 'ALTA',
-            platform: platform,
+            platform: sys.platform,
             caption: contentBody,
             scheduled_at: new Date(nextMonth.getTime() + (i * 2 * 24 * 60 * 60 * 1000)).toISOString()
         });
@@ -140,7 +112,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro: ' + error.message);
     else {
-        alert(`Ativos Estratégicos Gerados! 🚀 Incluindo Arquitetura Digital.`);
+        alert(`Ativos de Alta Performance Gerados! 🚀 ${count} demandas coordenadas via Matriz Operacional.`);
         loadContent();
     }
 }
