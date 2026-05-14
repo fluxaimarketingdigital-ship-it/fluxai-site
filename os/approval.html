@@ -193,11 +193,27 @@
                     }
                     
                     document.getElementById('success-ui').style.display = 'block';
+                    
+                    // Configurar Botão de Voltar (mesmo se bloqueado)
+                    const backBtn = document.querySelector('#success-ui button');
+                    if (backBtn && c.project_id) {
+                        backBtn.onclick = () => {
+                            window.location.href = `/os/client-portal.html?project_id=${c.project_id}`;
+                        };
+                    }
                     return;
                 }
 
                 // ACESSO PERMITIDO - MOSTRAR UI
                 document.getElementById('main-ui').style.display = 'block';
+
+                // Configurar Botão de Voltar para o Portal
+                const backBtn = document.querySelector('#success-ui button');
+                if (backBtn && c.project_id) {
+                    backBtn.onclick = () => {
+                        window.location.href = `/os/client-portal.html?project_id=${c.project_id}`;
+                    };
+                }
 
                 // Proteção contra dados malformados
                 let prefix = 'POST', obj = 'Estratégia', meta = { time: '---', date: '---' };
