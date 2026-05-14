@@ -223,6 +223,9 @@ async function loadContent() {
     
     const sendBtn = document.getElementById('btn-send-calendar');
     if (sendBtn) sendBtn.style.display = 'flex';
+    
+    const copyBtn = document.getElementById('btn-copy-portal');
+    if (copyBtn) copyBtn.style.display = 'flex';
 
     // Mostrar a aba ativa
     const activeTabBtn = document.querySelector('.os-tab-btn.active');
@@ -424,6 +427,24 @@ window.saveAssetEdit = async () => {
     }
 };
 
+window.copyPortalLink = () => {
+    if (!currentProject) return alert('Selecione um projeto!');
+    const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${currentProject}`;
+    
+    navigator.clipboard.writeText(portalLink).then(() => {
+        const btn = document.getElementById('btn-copy-portal');
+        const originalHtml = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIADO!';
+        btn.style.borderColor = 'var(--os-primary)';
+        setTimeout(() => {
+            btn.innerHTML = originalHtml;
+            btn.style.borderColor = '#444';
+        }, 2000);
+    }).catch(err => {
+        alert('Erro ao copiar: ' + err.message);
+    });
+};
+
 window.sendCompleteCalendar = async () => {
     if (!currentProject) return alert('Selecione um projeto!');
     
@@ -449,8 +470,8 @@ window.sendCompleteCalendar = async () => {
         else {
             sLog('Calendário Enviado para o Cliente.');
             loadContent();
-            const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${currentProject}`;
-            prompt('Calendário enviado com sucesso! Copie o link abaixo para enviar via WhatsApp para o cliente:', portalLink);
+            window.copyPortalLink(); // Copiar automaticamente após enviar
+            alert('Calendário enviado com sucesso! O link do portal foi copiado para sua área de transferência para envio via WhatsApp.');
         }
     }
 };
