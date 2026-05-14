@@ -140,14 +140,21 @@
             screenLog('Iniciando Boot do Arquivo Raiz...');
             
             try {
+                // Pequeno delay para garantir que os containers no HTML foram processados
+                await new Promise(r => setTimeout(r, 100));
+
                 // Injetar funções globais para que o content-engine.js as veja
                 window.getSupabase = getSupabase;
                 window.OS_UI = OS_UI;
                 window.OS_AUTH = OS_AUTH;
 
-                OS_UI.renderSidebar('content-engine', 'ADMIN');
-                OS_UI.renderTopbar();
-                screenLog('Interface Renderizada: OK');
+                if (document.getElementById('os-sidebar-container')) {
+                    OS_UI.renderSidebar('content-engine', 'ADMIN');
+                    OS_UI.renderTopbar();
+                    screenLog('Interface Renderizada: OK');
+                } else {
+                    screenLog('Aviso: Containers de UI não encontrados.');
+                }
 
                 const user = await OS_AUTH.check();
                 screenLog('Usuário: ' + (user ? user.email : 'Nenhum'));
