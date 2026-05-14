@@ -182,6 +182,8 @@ async function loadProjects() {
     
     if (projects) {
         const select = document.getElementById('project-filter');
+        select.innerHTML = '<option value="">Todos os Projetos</option>'; // Limpa duplicatas
+        
         projects.forEach(p => {
             const opt = document.createElement('option');
             opt.value = p.id;
@@ -206,10 +208,51 @@ async function loadContent() {
         return;
     }
 
-    renderContentTable(contents);
     renderMetrics(contents);
+
+    if (!currentProject) {
+        renderMacroSummary(contents);
+    } else {
+        renderContentTable(contents);
+    }
 }
 
+function renderMacroSummary(contents) {
+    const body = document.getElementById('pipeline-table-body');
+    const stats = {
+        'PAUTA': 0,
+        'DESIGN': 0,
+        'APROVAÇÃO': 0,
+        'AJUSTE': 0,
+        'PRONTO': 0,
+        'PUBLICADO': 0
+    };
+
+    contents.forEach(c => { if (stats[c.status] !== undefined) stats[c.status]++; });
+
+    body.innerHTML = `
+        <tr>
+            <td colspan="6" style="padding: 40px;">
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                    <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--os-border); text-align: center;">
+                        <div style="font-size: 0.6rem; color: var(--os-text-muted); text-transform: uppercase;">Aguardando Aprovação</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--os-primary);">${stats['APROVAÇÃO']}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--os-border); text-align: center;">
+                        <div style="font-size: 0.6rem; color: var(--os-text-muted); text-transform: uppercase;">Em Produção / Design</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: #fff;">${stats['DESIGN'] + stats['PAUTA']}</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--os-border); text-align: center;">
+                        <div style="font-size: 0.6rem; color: var(--os-text-muted); text-transform: uppercase;">Ajustes Solicitados</div>
+                        <div style="font-size: 2rem; font-weight: 800; color: var(--os-danger);">${stats['AJUSTE']}</div>
+                    </div>
+                </div>
+                <p style="text-align: center; margin-top: 30px; font-size: 0.8rem; opacity: 0.5;">
+                    <i class="fa-solid fa-circle-info"></i> Selecione um cliente específico para ver a esteira de posts detalhada.
+                </p>
+            </td>
+        </tr>
+    `;
 function renderContentTable(contents) {
     const body = document.getElementById('pipeline-table-body');
     
