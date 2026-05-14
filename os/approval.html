@@ -274,14 +274,18 @@
                 document.getElementById('btn-approve-action').onclick = async () => {
                     try {
                         const now = new Date().toLocaleDateString('pt-BR');
+                        const targetStatus = isArtValidation ? 'PRONTO' : 'PRODUÇÃO';
+                        
                         const { error } = await supabase.from('content_assets').update({ 
-                            status: 'PRODUÇÃO',
+                            status: targetStatus,
                             internal_notes: `APROVADO PELO CLIENTE EM ${now}`
                         }).eq('id', id);
                         
                         if (error) throw error;
                         
                         document.getElementById('main-ui').style.display = 'none';
+                        document.getElementById('success-title').innerText = isArtValidation ? 'Tudo Pronto!' : 'Planejamento Aprovado!';
+                        document.getElementById('success-message').innerText = isArtValidation ? 'A arte final foi validada com sucesso e já está disponível para publicação.' : 'Excelente. Esta pauta foi enviada para a Execução Operacional.';
                         document.getElementById('success-ui').style.display = 'block';
                         // Forçar recarregamento após 2s para garantir o bloqueio
                         setTimeout(() => window.location.reload(), 2000);

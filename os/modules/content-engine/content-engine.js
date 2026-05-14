@@ -346,16 +346,15 @@ function renderContentTable(contents) {
                             <button class="btn-mini" title="Ponte de Publicação" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
                                 <i class="fa-solid fa-rocket"></i>
                             </button>
-                        ` : ''}
+                        ` : `
+                            <button class="btn-mini" title="Forçar Conclusão (Pular Aprovação)" onclick="window.forceReady('${c.id}')" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </button>
+                        `}
                         ${c.metadata?.final_asset_url ? `
                             <a href="${c.metadata.final_asset_url}" target="_blank" class="btn-mini" title="Ver Arte Final" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa; border-color: #8b5cf6;">
                                 <i class="fa-solid fa-file-image"></i>
                             </a>
-                        ` : ''}
-                        ${['PRODUÇÃO', 'REVISÃO INTERNA FINAL', 'APROVAÇÃO FINAL'].includes(c.status) ? `
-                            <button class="btn-mini" title="Concluir Manualmente (Pular Aprovação)" onclick="window.forceConclusion('${c.id}')" style="background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: #10b981;">
-                                <i class="fa-solid fa-check-double"></i>
-                            </button>
                         ` : ''}
                         <button class="btn-mini" title="Editar/Refinar" onclick="window.openEditModal('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
                             <i class="fa-solid fa-pen-to-square"></i>
@@ -755,21 +754,16 @@ window.runAiPlanner = async () => {
     }
 };
 
-window.forceConclusion = async (id) => {
-    if (!confirm('Deseja concluir este ativo manualmente? O status mudará para PRONTO imediatamente, pulando a aprovação do cliente.')) return;
-    
+window.forceReady = async (id) => {
+    if (!confirm('Deseja pular as etapas de aprovação e marcar este ativo como PRONTO para publicação?')) return;
     try {
         const supabase = getSupabase();
-        const { error } = await supabase.from('content_assets').update({ 
-            status: 'PRONTO',
-            internal_notes: `CONCLUÍDO MANUALMENTE PELO GESTOR EM ${new Date().toLocaleDateString('pt-BR')}`
-        }).eq('id', id);
-        
+        const { error } = await supabase.from('content_assets').update({ status: 'PRONTO' }).eq('id', id);
         if (error) throw error;
-        sLog('Ativo concluído com sucesso.');
+        sLog('Ativo forçado para o status PRONTO.');
         loadContent();
     } catch (e) {
-        sLog('Erro ao concluir: ' + e.message);
+        alert('Erro ao forçar conclusão: ' + e.message);
     }
 };
 
@@ -778,10 +772,6 @@ window.deleteAsset = async (id) => {
     const supabase = getSupabase();
     await supabase.from('content_assets').delete().eq('id', id);
     loadContent();
-};
-
-window.openApproval = (id) => {
-    window.open(`/os/approval.html?id=${id}`, '_blank');
 };
 
 initEngine();
