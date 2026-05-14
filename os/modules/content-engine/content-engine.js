@@ -163,7 +163,7 @@ async function generateSampleContent(projectId, count = 12) {
             priority: 'ALTA',
             platform: sys.platform,
             caption: body,
-            version: 'V1',
+            internal_notes: 'V1',
             scheduled_at: new Date(nextMonth.getTime() + (i * 2 * 24 * 60 * 60 * 1000)).toISOString()
         });
     }
