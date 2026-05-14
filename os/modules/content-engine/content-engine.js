@@ -4,56 +4,42 @@ import { getSupabase } from '/os/services/supabase-client.js';
 let currentProject = null;
 
 async function init() {
-    console.log('[CONTENT ENGINE] Iniciando sistema...');
+    console.log('[DEBUG] 1. Iniciando Init...');
     
     try {
-        // 1. Forçar UI Imediata (para o menu não sumir)
-        OS_UI.renderSidebar('content-engine', 'ADMIN'); // Default para admin para garantir
+        OS_UI.renderSidebar('content-engine', 'ADMIN');
         OS_UI.renderTopbar();
-        console.log('[CONTENT ENGINE] UI Renderizada.');
+        console.log('[DEBUG] 2. UI Renderizada.');
 
-        // 2. Verificar Autenticação
         const user = await OS_AUTH.check();
+        console.log('[DEBUG] 3. Auth OK:', user?.email);
+        
         if (!user) {
-            console.error('[CONTENT ENGINE] Usuário não autenticado.');
+            alert('Erro: Sessão expirada. Faça login novamente.');
             return;
         }
 
-        // 3. Carregar Dados
-        // Listener para Workflow Dinâmico
-        const projectFilter = document.getElementById('project-filter');
-        projectFilter.onchange = (e) => {
+        console.log('[DEBUG] 4. Carregando Projetos...');
+        await loadProjects();
+        
+        console.log('[DEBUG] 5. Carregando Conteúdo...');
+        await loadContent();
+        
+        console.log('[DEBUG] 6. Sistema Pronto.');
+
+        // Listeners
+        document.getElementById('project-filter').onchange = (e) => {
             currentProject = e.target.value;
-            
-            // Simulação de Workflow Dinâmico por Cliente
-            // No futuro, isso virá de project.contract_deadline
-            const deadlineMap = {
-                'maria-aparecida': 'TODO DIA 10', // Exemplo
-                'fluxai': 'TODO DIA 28',
-                'nutricao-clinica': 'TODO DIA 05'
-            };
-            
-            const deadlineEl = document.getElementById('workflow-deadline');
-            if (deadlineEl) {
-                deadlineEl.innerText = `DEADLINE: ${deadlineMap[currentProject] || 'TODO DIA 28'}`;
-            }
-            
             loadContent();
         };
 
-        await loadProjects();
-        await loadContent();
-        console.log('[CONTENT ENGINE] Dados carregados com sucesso.');
-
-        // 4. Listeners
         document.getElementById('btn-ai-planner').onclick = async () => {
-            if (!currentProject) return alert('Selecione um projeto primeiro!');
-            await generateSampleContent(currentProject);
+            await runAiPlanner();
         };
-        document.getElementById('btn-new-content').onclick = () => alert('Abrindo editor de pauta...');
 
     } catch (err) {
-        console.error('[CONTENT ENGINE] Erro crítico no INIT:', err);
+        console.error('[DEBUG] ERRO CRÍTICO NO INIT:', err);
+        alert('ERRO DE INICIALIZAÇÃO: ' + err.message);
     }
 }
 
@@ -198,45 +184,60 @@ async function generateSampleContent(projectId, count = 12) {
 }
 
 async function loadProjects() {
-    const supabase = getSupabase();
-    const { data: projects } = await supabase.from('projects').select('id, company_name').eq('status', 'ATIVO');
-    
-    if (projects) {
-        const select = document.getElementById('project-filter');
-        select.innerHTML = '<option value="">Todos os Projetos</option>'; // Limpa duplicatas
+    console.log('[DEBUG] -> Iniciando loadProjects');
+    try {
+        const supabase = getSupabase();
+        const { data: projects, error } = await supabase.from('projects').select('id, company_name').eq('status', 'ATIVO');
         
-        projects.forEach(p => {
-            const opt = document.createElement('option');
-            opt.value = p.id;
-            opt.innerText = p.company_name;
-            select.appendChild(opt);
-        });
+        if (error) throw error;
+
+        if (projects) {
+            const select = document.getElementById('project-filter');
+            select.innerHTML = '<option value="">Todos os Projetos</option>'; // Limpa duplicatas
+            
+            projects.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = p.company_name;
+                select.appendChild(opt);
+            });
+        }
+        console.log('[DEBUG] <- loadProjects Finalizado');
+    } catch (e) {
+        console.error('[DEBUG] Erro em loadProjects:', e);
+        alert('Erro ao carregar projetos: ' + e.message);
     }
 }
 
 async function loadContent() {
-    const supabase = getSupabase();
-    let query = supabase.from('content_assets').select('*, projects(company_name, links)');
-    
-    if (currentProject) {
-        query = query.eq('project_id', currentProject);
-    }
+    console.log('[DEBUG] -> Iniciando loadContent');
+    try {
+        const supabase = getSupabase();
+        // Query simplificada para isolar o problema
+        let query = supabase.from('content_assets').select('*');
+        
+        if (currentProject) {
+            query = query.eq('project_id', currentProject);
+        }
 
-    const { data: contents, error } = await query.order('scheduled_at', { ascending: true });
+        const { data: contents, error } = await query.order('scheduled_at', { ascending: true });
 
-    if (error) {
-        console.error('Erro ao carregar conteúdos:', error);
-        document.getElementById('pipeline-table-body').innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px; color: var(--os-danger);">Erro ao sincronizar dados.</td></tr>`;
-        return;
-    }
+        if (error) throw error;
 
-    const safeContents = contents || [];
-    renderMetrics(safeContents);
+        const safeContents = contents || [];
+        console.log('[DEBUG] Conteúdos baixados:', safeContents.length);
 
-    if (!currentProject) {
-        renderMacroSummary(safeContents);
-    } else {
-        renderContentTable(safeContents);
+        renderMetrics(safeContents);
+
+        if (!currentProject) {
+            renderMacroSummary(safeContents);
+        } else {
+            renderContentTable(safeContents);
+        }
+        console.log('[DEBUG] <- loadContent Finalizado');
+    } catch (e) {
+        console.error('[DEBUG] Erro em loadContent:', e);
+        alert('Erro ao carregar conteúdos: ' + e.message);
     }
 }
 
