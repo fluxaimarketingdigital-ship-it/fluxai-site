@@ -1,71 +1,55 @@
-/**
- * FLUXAI OS™ AI STRATEGIC PLANNER
- * Motor de Inteligência para Geração de Planejamento Operacional
- */
-
 export const AIPlanner = {
     /**
-     * Gera o planejamento estratégico mensal baseado no contexto do cliente
-     * @param {Object} context - Dados do briefing, analytics e histórico
+     * Matriz Estratégica por Tipo de Serviço
      */
-    generatePlan: async (context) => {
-        const { briefing, analytics, history, goals, contract } = context;
-
-        const prompt = `
-            VOCÊ É O ESTRATEGISTA CHEFE DA FLUXAI LABS.
-            SEU OBJETIVO É CRIAR UM PLANEJAMENTO OPERACIONAL DE ALTA PERFORMANCE.
-
-            CONTEXTO DO CLIENTE:
-            - Empresa: ${briefing.company_name}
-            - ICP: ${briefing.icp}
-            - Objetivos: ${briefing.objectives}
-            - Tom de Voz: ${briefing.tone}
-            - Contrato: ${contract.deliverables}
-
-            DADOS DE PERFORMANCE (ÚLTIMOS 90 DIAS):
-            ${JSON.stringify(analytics)}
-
-            HISTÓRICO OPERACIONAL:
-            ${JSON.stringify(history)}
-
-            SAÍDA ESPERADA (FORMATO JSON ESTRUTURADO):
-            1. Planejamento Mensal (Resumo)
-            2. Calendário Sugerido (Dias e Horários)
-            3. Pautas e Temas Prioritários
-            4. Formatos Recomendados (Vídeo, Carrossel, Estático)
-            5. Direcionamento Estratégico (O que focar este mês)
-            6. Checklist de Publicação
-
-            REGRAS:
-            - Tom executivo, direto e sóbrio.
-            - Foco em redução de atrito e aumento de autoridade.
-            - Não prometa resultados milagrosos, foque em consistência técnica.
-        `;
-
-        try {
-            // Aqui faremos a chamada para a OpenAI API
-            // Por enquanto, simulamos a inteligência para validação da interface
-            return await AIPlanner.mockAIResponse(context);
-        } catch (error) {
-            console.error('Erro na IA Planner:', error);
-            throw new Error('Falha ao gerar planejamento estratégico.');
-        }
+    STRATEGIC_MATRIX: {
+        'REELS': { name: 'REELS', platform: 'INSTAGRAM', template: '🎯 OBJETIVO: [OBJ]\n🎬 HOOK: [IA]\n💬 FALAS: [IA]\n👁️ DIREÇÃO: [IA]\n✨ CTA: [IA]\n🧠 GATILHO: [IA]\n⏳ TEMPO: 45s' },
+        'CARROSSEL': { name: 'CARROSSEL', platform: 'INSTAGRAM', template: '🎯 OBJETIVO: [OBJ]\n📚 ESTRUTURA: Slide 1-10 [IA]\n🎨 HIERARQUIA: [IA]\n✨ CTA: [IA]\n🧲 TENSÃO: [IA]' },
+        'SITE': { name: 'SITE', platform: 'WEB', template: '🎯 OBJETIVO: Conversão\n🏗️ ARQUITETURA: Seções [IA]\n🖱️ FLUXO UX: [IA]\n📝 COPY BASE: [IA]\n🔍 SEO: [IA]' },
+        'BRANDING': { name: 'BRANDING', platform: 'ESTRATÉGIA', template: '🎯 OBJETIVO: Posicionamento\n🗣️ NARRATIVA: [IA]\n🎨 PALETA/TOM: [IA]\n💎 DIFERENCIAÇÃO: [IA]' },
+        'TRAFEGO': { name: 'TRÁFEGO PAGO', platform: 'META/GOOGLE', template: '🎯 OBJETIVO: Aquisição\n📈 CAMPANHAS: [IA]\n🖼️ CRIATIVOS: [IA]\n🎯 PÚBLICO: [IA]\n💰 DISTRIBUIÇÃO: [IA]' },
+        'CRM': { name: 'CRM', platform: 'OPERACIONAL', template: '🎯 OBJETIVO: Relacionamento\n⛓️ PIPELINE: Etapas [IA]\n🤖 AUTOMAÇÃO: [IA]\n🌡️ HEALTH SCORE: [IA]' },
+        'AUTOMACAO': { name: 'AUTOMAÇÃO', platform: 'SISTEMA', template: '🎯 OBJETIVO: Eficiência\n⚙️ FLUXO LÓGICO: [IA]\n🔗 INTEGRAÇÕES: [IA]\n⚡ GATILHOS: [IA]' },
+        'DASHBOARD': { name: 'DASHBOARD', platform: 'ANALYTICS', template: '🎯 OBJETIVO: Inteligência\n📊 KPIs: [IA]\n🧐 LEITURA: [IA]\n📌 PRIORIDADES: [IA]' },
+        'CONSULTORIA': { name: 'CONSULTORIA', platform: 'ESTRATÉGICO', template: '🎯 OBJETIVO: Diagnóstico\n⚠️ GARGALOS: [IA]\n🚀 OPORTUNIDADES: [IA]\n📍 DIRECIONAMENTO: [IA]' }
     },
 
-    mockAIResponse: async (context) => {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    summary: "Foco total em autoridade técnica e conversão de leads via conteúdos de fundo de funil.",
-                    calendar: [
-                        { day: "Segunda", time: "18:00", topic: "Bastidores da Operação", format: "Story/Reels" },
-                        { day: "Quarta", time: "11:00", topic: "Prova Social / Caso de Sucesso", format: "Carrossel" },
-                        { day: "Sexta", time: "20:00", topic: "Insight de Mercado", format: "Estático/Texto" }
-                    ],
-                    strategy: "Aumentar a frequência de vídeos curtos para melhorar a retenção média que caiu 5% no último mês.",
-                    checklists: ["Revisar CTA de saída", "Validar legenda com IA", "Verificar link da bio"]
-                });
-            }, 2500);
+    /**
+     * Gera o planejamento estratégico operacional completo
+     */
+    generatePlan: async (projectId) => {
+        const supabase = window.getSupabase();
+        const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
+        
+        const onboarding = project.metadata?.onboarding || {
+            icp: "Público High-Ticket, busca exclusividade",
+            tone: "Soberano, técnico",
+            objectives: "Escala e Autoridade"
+        };
+
+        const contents = [];
+        const now = new Date();
+        const services = Object.keys(AIPlanner.STRATEGIC_MATRIX);
+
+        // Gerar 1 item de cada serviço para demonstrar a abrangência do Plano Mestre
+        services.forEach((sKey, index) => {
+            const service = AIPlanner.STRATEGIC_MATRIX[sKey];
+            const date = new Date(now.getTime() + (index * 24 * 60 * 60 * 1000));
+            
+            contents.push({
+                project_id: projectId,
+                title: `${service.name} • Estratégico`,
+                status: 'PAUTA',
+                priority: 'ALTA',
+                platform: service.platform,
+                scheduled_at: date.toISOString(),
+                caption: service.template
+                    .replace('[OBJ]', onboarding.objectives)
+                    .replace(/\[IA\]/g, 'Gerado conforme o tom ' + onboarding.tone + ' para atingir o ICP: ' + onboarding.icp),
+                internal_notes: `PLANO MESTRE V7: Focado em ${onboarding.objectives}.`
+            });
         });
+
+        return contents;
     }
 };

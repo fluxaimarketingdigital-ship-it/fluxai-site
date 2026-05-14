@@ -154,6 +154,68 @@ async function loadProjects() {
     }
 }
 
+export async function init() {
+    sLog('Iniciando Motor de Conteúdo v7.0...');
+    try {
+        // Expor funções globais para a UI
+        window.switchTab = switchTab;
+        
+        await loadProjects();
+        await loadContent();
+        sLog('Carga Inicial: OK');
+
+        // Listeners
+        const filter = document.getElementById('project-filter');
+        if (filter) {
+            filter.onchange = (e) => {
+                currentProject = e.target.value;
+                loadContent();
+            };
+        }
+
+        const btnAi = document.getElementById('btn-ai-planner');
+        if (btnAi) {
+            btnAi.onclick = async () => {
+                await runAiPlanner();
+            };
+        }
+
+    } catch (err) {
+        sLog('ERRO NO MOTOR: ' + err.message);
+        console.error(err);
+    }
+}
+
+function switchTab(tab) {
+    const tabs = ['esteira', 'calendario'];
+    tabs.forEach(t => {
+        document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
+        const btn = document.querySelector(`.os-tab-btn[onclick*="${t}"]`);
+        if (btn) btn.classList.toggle('active', t === tab);
+    });
+}
+
+async function loadProjects() {
+    try {
+        const supabase = getSupabase();
+        const { data: projects, error } = await supabase.from('projects').select('id, company_name').eq('status', 'ATIVO');
+        if (error) throw error;
+
+        const select = document.getElementById('project-filter');
+        if (select && projects) {
+            select.innerHTML = '<option value="">Todos os Projetos</option>';
+            projects.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = p.company_name;
+                select.appendChild(opt);
+            });
+        }
+    } catch (e) {
+        sLog('Erro Projetos: ' + e.message);
+    }
+}
+
 async function loadContent() {
     try {
         const supabase = getSupabase();
@@ -165,12 +227,9 @@ async function loadContent() {
 
         const safeContents = contents || [];
         renderMetrics(safeContents);
-
-        if (!currentProject) {
-            renderMacroSummary(safeContents);
-        } else {
-            renderContentTable(safeContents);
-        }
+        renderContentTable(safeContents);
+        renderCalendar(safeContents);
+        
     } catch (e) {
         sLog('Erro Conteúdo: ' + e.message);
     }
@@ -190,33 +249,6 @@ function renderMetrics(contents) {
     OS_UI.renderMetric('metric-schedule', { label: 'Prontos', value: metrics.ready, trend: '✔', meta: 'Publicação' });
 }
 
-function renderMacroSummary(contents) {
-    const body = document.getElementById('pipeline-table-body');
-    const stats = { 'PAUTA': 0, 'DESIGN': 0, 'APROVAÇÃO': 0, 'AJUSTE': 0, 'PRONTO': 0 };
-    contents.forEach(c => { if (stats[c.status] !== undefined) stats[c.status]++; });
-
-    body.innerHTML = `
-        <tr>
-            <td colspan="6" style="padding: 40px;">
-                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
-                    <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--os-border); text-align: center;">
-                        <div style="font-size: 0.6rem; color: var(--os-text-muted); text-transform: uppercase;">Aguardando Aprovação</div>
-                        <div style="font-size: 2rem; font-weight: 800; color: var(--os-primary);">${stats['APROVAÇÃO'] + stats['PAUTA']}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--os-border); text-align: center;">
-                        <div style="font-size: 0.6rem; color: var(--os-text-muted); text-transform: uppercase;">Em Produção</div>
-                        <div style="font-size: 2rem; font-weight: 800; color: #fff;">${stats['DESIGN']}</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--os-border); text-align: center;">
-                        <div style="font-size: 0.6rem; color: var(--os-text-muted); text-transform: uppercase;">Ajustes Solicitados</div>
-                        <div style="font-size: 2rem; font-weight: 800; color: var(--os-danger);">${stats['AJUSTE']}</div>
-                    </div>
-                </div>
-            </td>
-        </tr>
-    `;
-}
-
 function renderContentTable(contents) {
     const body = document.getElementById('pipeline-table-body');
     if (!contents || contents.length === 0) {
@@ -225,23 +257,72 @@ function renderContentTable(contents) {
     }
 
     body.innerHTML = contents.map(c => `
-        <tr>
+        <tr onclick="window.openApproval('${c.id}')" style="cursor:pointer;">
             <td>
                 <div style="font-weight: 700;">${c.title}</div>
                 <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.internal_notes || 'V1'}</div>
             </td>
-            <td><span class="status-badge" style="background:rgba(255,255,255,0.1);">${c.status}</span></td>
+            <td><span class="status-badge" style="background:${getStatusBg(c.status)}; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem;">${c.status}</span></td>
             <td>${c.priority}</td>
             <td>${c.platform}</td>
             <td>
-                <button class="btn-mini" onclick="window.generateApprovalLink('${c.id}')">LINK</button>
+                <div style="display:flex; gap:4px;">
+                    <div style="width:8px; height:8px; border-radius:50%; background:#10b981;"></div>
+                    <div style="width:8px; height:8px; border-radius:50%; background:#444;"></div>
+                </div>
             </td>
             <td>
-                <button class="btn-mini" onclick="window.deleteAsset('${c.id}')"><i class="fa-solid fa-trash"></i></button>
+                <button class="btn-mini" onclick="event.stopPropagation(); window.deleteAsset('${c.id}')"><i class="fa-solid fa-trash"></i></button>
             </td>
         </tr>
     `).join('');
 }
+
+function renderCalendar(contents) {
+    const container = document.getElementById('calendar-body');
+    if (!container) return;
+    container.innerHTML = '';
+    
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = now.getMonth();
+    
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+        container.innerHTML += `<div class="calendar-day" style="opacity:0.2;"></div>`;
+    }
+
+    for (let day = 1; day <= daysInMonth; day++) {
+        const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
+        
+        let eventsHtml = dayContents.map(c => `
+            <div class="calendar-event" onclick="window.openApproval('${c.id}')" title="${c.title}">
+                ${c.title.substring(0, 20)}...
+            </div>
+        `).join('');
+
+        container.innerHTML += `
+            <div class="calendar-day">
+                <div class="day-number">${day}</div>
+                ${eventsHtml}
+            </div>
+        `;
+    }
+}
+
+function getStatusBg(status) {
+    if (status === 'PAUTA') return '#6366f1';
+    if (status === 'APROVAÇÃO') return '#f59e0b';
+    if (status === 'PRONTO') return '#10b981';
+    return '#444';
+}
+
+window.openApproval = (id) => {
+    window.open(`/os/approval.html?id=${id}`, '_blank');
+};
 
 window.runAiPlanner = async () => {
     const user = await OS_AUTH.check();
@@ -249,55 +330,29 @@ window.runAiPlanner = async () => {
 
     const filter = document.getElementById('project-filter');
     const selectedId = filter.value || currentProject;
-    if (!selectedId) return alert('Selecione um projeto!');
+    if (!selectedId) return alert('Selecione um projeto para gerar planejamento estratégico!');
 
-    const supabase = getSupabase();
-    const { count } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('project_id', selectedId);
+    sLog('Iniciando Motor Estratégico para Projeto: ' + selectedId);
     
-    const needed = 12 - (count || 0);
-    if (needed <= 0) return alert('Contrato completo!');
-
-    if (confirm(`Gerar ${needed} novos conteúdos?`)) {
-        await generateSampleContent(selectedId, needed);
+    try {
+        const { AIPlanner } = await import('../../services/ai-planner.js');
+        const contents = await AIPlanner.generatePlan(selectedId);
+        
+        if (confirm(`Gerar Planejamento Estratégico (12 Ativos em PAUTA)?`)) {
+            const supabase = getSupabase();
+            const { error } = await supabase.from('content_assets').insert(contents);
+            if (error) throw error;
+            
+            sLog('Planejamento Gerado com Sucesso.');
+            loadContent();
+        }
+    } catch (err) {
+        alert('Erro ao gerar plano: ' + err.message);
     }
-};
-
-async function generateSampleContent(projectId, count) {
-    const supabase = getSupabase();
-    const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
-    
-    const activeSystems = ['REELS', 'CARROSSEL', 'CARD', 'SITE', 'STORIES'];
-    const samples = [];
-    const now = new Date();
-
-    for (let i = 0; i < count; i++) {
-        const sysKey = activeSystems[i % activeSystems.length];
-        const sys = STRATEGIC_MATRIX[sysKey];
-        samples.push({
-            project_id: projectId,
-            title: `${sys.name}: AUTORIDADE`,
-            status: 'PAUTA',
-            priority: 'ALTA',
-            platform: sys.platform,
-            caption: sys.generate(project, 'AUTORIDADE'),
-            internal_notes: 'V1',
-            scheduled_at: new Date(now.getTime() + (i * 24 * 60 * 60 * 1000)).toISOString()
-        });
-    }
-
-    const { error } = await supabase.from('content_assets').insert(samples);
-    if (error) alert(error.message);
-    else loadContent();
-}
-
-window.generateApprovalLink = (id) => {
-    const link = `${window.location.origin}/os/approval.html?id=${id}`;
-    navigator.clipboard.writeText(link);
-    alert('Link copiado!');
 };
 
 window.deleteAsset = async (id) => {
-    if (!confirm('Excluir?')) return;
+    if (!confirm('Deseja excluir este ativo da esteira?')) return;
     const supabase = getSupabase();
     await supabase.from('content_assets').delete().eq('id', id);
     loadContent();

@@ -3,27 +3,54 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FluxAI OS™ | Onboarding Estratégico</title>
+    <title>FluxAI OS™ | Ativação Estratégica</title>
     <link rel="stylesheet" href="/src/styles/os/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .onboarding-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .form-section { background: var(--os-card); border: 1px solid var(--os-border); padding: 30px; border-radius: 4px; }
-        .form-section h3 { font-size: 1rem; margin-bottom: 25px; color: var(--os-primary); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
-        .form-section h3 i { font-size: 0.9rem; opacity: 0.8; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-size: 0.7rem; text-transform: uppercase; color: var(--os-text-muted); margin-bottom: 8px; font-weight: 700; }
-        .form-control { width: 100%; padding: 12px; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); border-radius: 4px; color: #fff; font-size: 0.9rem; transition: border-color 0.2s; }
-        .form-control:focus { outline: none; border-color: var(--os-primary); }
-        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .checkbox-item { display: flex; align-items: center; gap: 8px; font-size: 0.85rem; color: var(--os-text-muted); cursor: pointer; }
-        .btn-save { background: var(--os-primary); color: #fff; border: none; padding: 15px 40px; font-weight: 800; border-radius: 4px; cursor: pointer; font-size: 0.9rem; letter-spacing: 1px; transition: all 0.2s; margin-top: 30px; width: 100%; }
-        .btn-save:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0, 204, 255, 0.2); }
-        textarea.form-control { resize: none; height: 100px; }
+        :root { --os-step-active: var(--os-primary); --os-step-inactive: rgba(255,255,255,0.1); }
+        .wizard-container { max-width: 900px; margin: 0 auto; padding-bottom: 100px; }
+        .step-indicator { display: flex; justify-content: space-between; margin-bottom: 50px; position: relative; padding: 0 20px; }
+        .step-indicator::before { content: ''; position: absolute; top: 15px; left: 40px; right: 40px; height: 2px; background: var(--os-step-inactive); z-index: 0; }
+        .step-item { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
+        .step-dot { width: 32px; height: 32px; border-radius: 50%; background: var(--os-bg); border: 2px solid var(--os-step-inactive); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 800; transition: 0.3s; color: var(--os-text-muted); }
+        .step-item.active .step-dot { border-color: var(--os-step-active); background: var(--os-step-active); color: #fff; box-shadow: 0 0 15px var(--os-primary); }
+        .step-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 800; color: var(--os-text-muted); }
+        .step-item.active .step-label { color: var(--os-step-active); }
+
+        .onboarding-step { display: none; animation: fadeIn 0.4s ease; }
+        .onboarding-step.active { display: block; }
+        
+        .form-section { background: var(--os-surface); border: 1px solid var(--os-border); padding: 40px; border-radius: 12px; margin-bottom: 30px; position: relative; overflow: hidden; }
+        .form-section::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--os-primary); opacity: 0.5; }
+        .form-section h2 { font-size: 1.2rem; margin: 0 0 10px 0; font-weight: 900; letter-spacing: -0.5px; }
+        .form-section p { font-size: 0.8rem; color: var(--os-text-muted); margin-bottom: 30px; }
+
+        .form-group { margin-bottom: 24px; }
+        .form-group label { display: block; font-size: 0.7rem; text-transform: uppercase; color: var(--os-primary); margin-bottom: 10px; font-weight: 800; letter-spacing: 1px; }
+        .form-control { width: 100%; padding: 14px 20px; background: rgba(0,0,0,0.4); border: 1px solid var(--os-border); border-radius: 8px; color: #fff; font-size: 0.9rem; transition: 0.2s; box-sizing: border-box; }
+        .form-control:focus { outline: none; border-color: var(--os-primary); box-shadow: 0 0 0 3px rgba(107,122,69,0.1); }
+        select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 15px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .checkbox-card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; }
+        .checkbox-card { background: rgba(255,255,255,0.03); border: 1px solid var(--os-border); padding: 15px; border-radius: 10px; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 12px; font-size: 0.85rem; font-weight: 600; }
+        .checkbox-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
+        .checkbox-card input { accent-color: var(--os-primary); width: 18px; height: 18px; }
+        .checkbox-card.active { border-color: var(--os-primary); background: rgba(107,122,69,0.1); }
+
+        .wizard-footer { position: fixed; bottom: 0; left: 260px; right: 0; background: rgba(10,10,10,0.8); backdrop-filter: blur(10px); border-top: 1px solid var(--os-border); padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
+        .btn-wizard { padding: 14px 28px; border-radius: 8px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; transition: 0.2s; border: none; }
+        .btn-prev { background: transparent; color: var(--os-text-muted); }
+        .btn-next { background: var(--os-primary); color: #fff; }
+        .btn-prev:hover { color: #fff; }
+        .btn-next:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(107,122,69,0.3); }
+
+        .sub-fields { margin-top: 15px; padding-left: 20px; border-left: 2px solid var(--os-primary); display: none; }
+        .badge-priority { padding: 4px 10px; border-radius: 4px; font-size: 0.6rem; font-weight: 800; background: var(--os-primary); margin-left: 10px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="os-mode">
@@ -31,110 +58,283 @@
     <div class="os-shell">
         <aside class="os-sidebar"></aside>
 
-        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+        <div class="os-viewport-wrapper">
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <div class="os-page-title">
-                    <h1>Onboarding Estratégico</h1>
-                    <p>Alimentando a memória operacional e contexto estratégico do novo ecossistema.</p>
-                </div>
+                <div class="wizard-container">
+                    
+                    <div class="step-indicator">
+                        <div class="step-item active" data-step="1">
+                            <div class="step-dot">1</div>
+                            <span class="step-label">Identidade</span>
+                        </div>
+                        <div class="step-item" data-step="2">
+                            <div class="step-dot">2</div>
+                            <span class="step-label">Diagnóstico</span>
+                        </div>
+                        <div class="step-item" data-step="3">
+                            <div class="step-dot">3</div>
+                            <span class="step-label">Estratégia</span>
+                        </div>
+                        <div class="step-item" data-step="4">
+                            <div class="step-dot">4</div>
+                            <span class="step-label">Escopo</span>
+                        </div>
+                        <div class="step-item" data-step="5">
+                            <div class="step-dot">5</div>
+                            <span class="step-label">Contrato</span>
+                        </div>
+                        <div class="step-item" data-step="6">
+                            <div class="step-dot">6</div>
+                            <span class="step-label">Operação</span>
+                        </div>
+                        <div class="step-item" data-step="7">
+                            <div class="step-dot">7</div>
+                            <span class="step-label">Ativação</span>
+                        </div>
+                    </div>
 
-                <form id="onboardingForm" onsubmit="return false;">
-                    <div class="onboarding-grid">
-                        <!-- COLUNA 1: IDENTIDADE E ESCOPO -->
-                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                    <form id="onboardingForm">
+                        <!-- ETAPA 1: IDENTIDADE -->
+                        <div class="onboarding-step active" id="step-1">
                             <div class="form-section">
-                                <h3><i class="fa-solid fa-id-card"></i> Identidade do Cliente</h3>
-                                <div class="form-group">
-                                    <label>Nome do Cliente / Responsável</label>
-                                    <input type="text" name="client_name" class="form-control" placeholder="Ex: João Silva" required />
-                                </div>
-                                <div class="form-group">
-                                    <label>Empresa / Marca</label>
-                                    <input type="text" name="company_name" class="form-control" placeholder="Ex: FluxAI Labs" required />
-                                </div>
-                                <div class="form-group">
-                                    <label>Segmento de Atuação</label>
-                                    <input type="text" name="segment" class="form-control" placeholder="Ex: Tecnologia, Saúde, Varejo" />
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <h3><i class="fa-solid fa-briefcase"></i> Escopo do Serviço</h3>
-                                <div class="checkbox-group">
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="conteudo" /> Conteúdo Social</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="site" /> Estruturação Site</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="seo" /> SEO Estratégico</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="copy" /> Copywriting</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="trafego" /> Gestão Tráfego</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="branding" /> Branding</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="automacao" /> Automação Hub</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="captacao" /> Captação Imagem</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="govos" /> GovOS Intelligence</label>
-                                    <label class="checkbox-item"><input type="checkbox" name="scope" value="comercial" /> Estrutura Comercial</label>
-                                </div>
-                            </div>
-
-                            <div class="form-section">
-                                <h3><i class="fa-solid fa-file-contract"></i> Detalhes do Contrato</h3>
-                                <div class="form-group">
-                                    <label>Entregas Mensais (Cotas)</label>
-                                    <input type="text" name="deliverables" class="form-control" placeholder="Ex: 8 posts, 2 vídeos, 1 dashboard" />
-                                </div>
-                                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <h2><i class="fa-solid fa-id-card"></i> Identidade do Cliente</h2>
+                                <p>Dados institucionais e administrativos do novo ativo FluxAI.</p>
+                                
+                                <div class="grid-2">
                                     <div class="form-group">
-                                        <label>Valor Mensal (R$)</label>
-                                        <input type="number" name="contract_value" class="form-control" placeholder="0.00" />
+                                        <label>Nome do Responsável</label>
+                                        <input type="text" name="responsible_name" class="form-control" placeholder="Responsável Principal" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Empresa / Marca</label>
+                                        <input type="text" name="company_name" class="form-control" placeholder="Nome Fantasia" required />
+                                    </div>
+                                </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Segmento de Atuação</label>
+                                        <select name="segment" class="form-control">
+                                            <option value="">Selecione...</option>
+                                            <option value="SAUDE">Saúde / Profissionais Especializados</option>
+                                            <option value="GASTRONOMIA">Gastronomia / Eventos</option>
+                                            <option value="CONSTRUCAO">Construção Civil / Imóveis</option>
+                                            <option value="LOCAL_PREMIUM">Serviços Locais Premium</option>
+                                            <option value="EDUCACAO">Educação / Cursos</option>
+                                            <option value="CONSULTORIA">Consultoria / B2B</option>
+                                            <option value="TECNOLOGIA">Tecnologia / SaaS</option>
+                                            <option value="GOVERNO">Governo / Setor Público</option>
+                                            <option value="OUTRO">Outro Segmento</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Área de Atendimento</label>
+                                        <select name="service_area" class="form-control">
+                                            <option value="LOCAL">Local / Cidade</option>
+                                            <option value="REGIONAL">Regional / Estado</option>
+                                            <option value="NACIONAL">Nacional</option>
+                                            <option value="ONLINE">Digital / Online</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Descrição Breve da Atuação</label>
+                                    <textarea name="business_description" class="form-control" placeholder="O que a marca faz exatamente?"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ETAPA 2: DIAGNÓSTICO -->
+                        <div class="onboarding-step" id="step-2">
+                            <div class="form-section">
+                                <h2><i class="fa-solid fa-stethoscope"></i> Diagnóstico de Maturidade</h2>
+                                <p>Entendendo o momento atual para evitar erros operacionais.</p>
+
+                                <div class="form-group">
+                                    <label>Maturidade Digital Atual</label>
+                                    <select name="digital_maturity" class="form-control">
+                                        <option value="START">Iniciando presença digital agora</option>
+                                        <option value="NO_STRATEGY">Já vende, mas sem estrutura estratégica</option>
+                                        <option value="NO_CONVERSION">Tem audiência, mas baixa conversão</option>
+                                        <option value="WEAK_POSITION">Tem operação, mas posicionamento fraco</option>
+                                        <option value="SCALING">Consolidada e precisa escalar</option>
+                                        <option value="REPOSITIONING">Precisa de reposicionamento completo</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Pontos de Atenção / Sensibilidade</label>
+                                    <div class="checkbox-card-grid">
+                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="urgency" /> Urgência Alta</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="bad_history" /> Histórico Ruim c/ Agências</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="rigorous_approval" /> Aprovação Rigorosa</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="legal_restriction" /> Restrições Legais/Éticas</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="commercial_issue" /> Problema Comercial Interno</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Qual problema precisa ser resolvido primeiro?</label>
+                                    <textarea name="primary_pain" class="form-control" placeholder="A dor latente que motivou a contratação..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ETAPA 3: ESTRATÉGIA -->
+                        <div class="onboarding-step" id="step-3">
+                            <div class="form-section">
+                                <h2><i class="fa-solid fa-brain"></i> Memória IA & Contexto</h2>
+                                <p>Alimentando a inteligência central com o DNA da marca.</p>
+
+                                <div class="form-group">
+                                    <label>ICP (Perfil do Cliente Ideal)</label>
+                                    <textarea name="icp_details" class="form-control" placeholder="Ex: Mulheres 30-45, classe A, buscam agilidade e status..."></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Objetivos Estratégicos (90 Dias)</label>
+                                    <div class="checkbox-card-grid">
+                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="authority" /> Aumentar Autoridade</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="leads" /> Gerar Leads Qualificados</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="premium_perc" /> Percepção Premium</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="sales" /> Vender Consultoria/Serviços</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="ops_org" /> Organizar Operação Digital</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Tom de Voz Desejado</label>
+                                    <input type="text" name="voice_tone" class="form-control" placeholder="Ex: Soberano, Técnico, Acolhedor, Disruptivo" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ETAPA 4: ESCOPO -->
+                        <div class="onboarding-step" id="step-4">
+                            <div class="form-section">
+                                <h2><i class="fa-solid fa-layer-group"></i> Escopo Contratado</h2>
+                                <p>Módulos de infraestrutura ativados para este cliente.</p>
+
+                                <div class="checkbox-card-grid">
+                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="conteudo" /> Engenharia de Conteúdo</label>
+                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="branding" /> Posicionamento & ID</label>
+                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="trafego" /> Aquisição Paga</label>
+                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="site" /> Arquitetura de Site</label>
+                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="crm" /> CRM & Comercial</label>
+                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="automacao" /> Automação & Fluxos</label>
+                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="govos" /> GovOS™ Intelligence</label>
+                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="seo" /> Presença Orgânica & SEO</label>
+                                </div>
+
+                                <div id="dynamic-module-fields" style="margin-top: 30px;">
+                                    <!-- Campos dinâmicos aparecerão aqui -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ETAPA 5: CONTRATO -->
+                        <div class="onboarding-step" id="step-5">
+                            <div class="form-section">
+                                <h2><i class="fa-solid fa-file-invoice-dollar"></i> Governança Financeira</h2>
+                                <p>Dados de contrato e prazos operacionais.</p>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Valor Mensal (Recorrência)</label>
+                                        <input type="number" name="monthly_fee" class="form-control" placeholder="0.00" />
                                     </div>
                                     <div class="form-group">
                                         <label>Dia do Vencimento</label>
-                                        <input type="number" name="due_day" class="form-control" placeholder="05" min="1" max="31" />
+                                        <input type="number" name="payment_day" class="form-control" placeholder="05" />
                                     </div>
                                 </div>
+
+                                <div class="form-group">
+                                    <label>Entregas Mensais Acordadas</label>
+                                    <textarea name="contract_deliverables" class="form-control" placeholder="Ex: 12 Ativos de Conteúdo, Gestão de R$ 5k em Ads..."></textarea>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- COLUNA 2: CONTEXTO E LINKS -->
-                        <div style="display: flex; flex-direction: column; gap: 30px;">
+                        <!-- ETAPA 6: OPERAÇÃO -->
+                        <div class="onboarding-step" id="step-6">
                             <div class="form-section">
-                                <h3><i class="fa-solid fa-brain"></i> Contexto Estratégico (Memória IA)</h3>
-                                <div class="form-group">
-                                    <label>ICP (Perfil do Cliente Ideal)</label>
-                                    <textarea name="icp" class="form-control" placeholder="Descreva quem é o público final deste cliente..."></textarea>
+                                <h2><i class="fa-solid fa-gears"></i> Pontes Operacionais</h2>
+                                <p>Acessos, links e fluxos de aprovação.</p>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>WhatsApp do Decisor</label>
+                                        <input type="text" name="whatsapp_decisor" class="form-control" placeholder="+55..." />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Quem aprova as entregas?</label>
+                                        <input type="text" name="approval_responsible" class="form-control" placeholder="Nome do aprovador" />
+                                    </div>
                                 </div>
+
                                 <div class="form-group">
-                                    <label>Objetivos Principais</label>
-                                    <textarea name="objectives" class="form-control" placeholder="O que o cliente quer alcançar? (Vendas, Autoridade, Leads)"></textarea>
+                                    <label>Instagram do Cliente</label>
+                                    <input type="url" name="client_instagram" class="form-control" placeholder="https://..." />
                                 </div>
+
                                 <div class="form-group">
-                                    <label>Tom de Voz e Posicionamento</label>
-                                    <input type="text" name="tone" class="form-control" placeholder="Ex: Sério, Disruptivo, Educativo" />
+                                    <label>Pasta de Arquivos (Drive/Canva)</label>
+                                    <input type="url" name="assets_link" class="form-control" placeholder="https://..." />
                                 </div>
                             </div>
-
-                            <div class="form-section">
-                                <h3><i class="fa-solid fa-link"></i> Pontes Operacionais (Links)</h3>
-                                <div class="form-group">
-                                    <label>Instagram / Redes Sociais</label>
-                                    <input type="url" name="link_social" class="form-control" placeholder="https://instagram.com/perfil" />
-                                </div>
-                                <div class="form-group">
-                                    <label>Canva / Drive do Projeto</label>
-                                    <input type="url" name="link_assets" class="form-control" placeholder="Link da pasta de arquivos" />
-                                </div>
-                                <div class="form-group">
-                                    <label>WhatsApp do Responsável</label>
-                                    <input type="text" name="whatsapp" class="form-control" placeholder="+55..." />
-                                </div>
-                            </div>
-
-                            <button type="submit" class="btn-save">
-                                <i class="fa-solid fa-cloud-arrow-up"></i> ATIVAR ECOSSISTEMA
-                            </button>
                         </div>
+
+                        <!-- ETAPA 7: ATIVAÇÃO -->
+                        <div class="onboarding-step" id="step-7">
+                            <div class="form-section">
+                                <h2><i class="fa-solid fa-bolt"></i> Ativação do Ecossistema</h2>
+                                <p>Definições finais para o disparo da operação.</p>
+
+                                <div class="form-group">
+                                    <label>Prioridade dos Primeiros 30 Dias</label>
+                                    <select name="priority_30d" class="form-control">
+                                        <option value="POSITIONING">Organizar Posicionamento</option>
+                                        <option value="ACQUISITION">Melhorar Aquisição de Leads</option>
+                                        <option value="CONTENT">Estruturar Conteúdo</option>
+                                        <option value="AUTOMATION">Automatizar Atendimento</option>
+                                        <option value="CRM">Criar Base de CRM</option>
+                                        <option value="SITE">Estruturar Site / Presença Digital</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Primeira Entrega de Impacto</label>
+                                    <textarea name="first_delivery" class="form-control" placeholder="O que será entregue nos primeiros 7 dias?"></textarea>
+                                </div>
+
+                                <div style="background: rgba(107,122,69,0.1); padding: 25px; border-radius: 12px; border: 1px dashed var(--os-primary); text-align: center;">
+                                    <h3 style="color: var(--os-primary); margin-top: 0;">Pronto para Ativar?</h3>
+                                    <p style="margin-bottom: 20px;">Ao clicar, o sistema irá criar o workspace, alimentar a memória da IA e notificar a equipe.</p>
+                                    <button type="submit" class="btn-save" style="max-width: 300px; margin: 0 auto;">
+                                        ATIVAR ECOSSISTEMA
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="wizard-footer">
+                        <button class="btn-wizard btn-prev" id="btn-prev" style="visibility: hidden;">
+                            <i class="fa-solid fa-arrow-left"></i> Anterior
+                        </button>
+                        <div style="font-size: 0.7rem; color: var(--os-text-muted); font-weight: 800; letter-spacing: 1px;">
+                            ETAPA <span id="current-step-display">1</span> DE 7
+                        </div>
+                        <button class="btn-wizard btn-next" id="btn-next">
+                            Próximo <i class="fa-solid fa-arrow-right"></i>
+                        </button>
                     </div>
-                </form>
+
+                </div>
             </main>
         </div>
     </div>
@@ -142,3 +342,4 @@
     <script type="module" src="/os/js/onboarding.js"></script>
 </body>
 </html>
+

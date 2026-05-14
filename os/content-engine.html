@@ -34,6 +34,16 @@
         .metric-card:hover { border-color: rgba(168, 85, 247, 0.4); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .metric-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--os-accent-gradient); opacity: 0.3; }
         .btn-ai:hover { filter: brightness(1.1); box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+        
+        .os-tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid var(--os-border); padding-bottom: 15px; }
+        .os-tab-btn { background: transparent; border: none; color: var(--os-text-muted); padding: 10px 20px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: 0.2s; font-size: 0.9rem; }
+        .os-tab-btn.active { background: rgba(168, 85, 247, 0.1); color: var(--os-primary); }
+        
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; display: none; }
+        .calendar-day { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 12px; min-height: 120px; padding: 12px; position: relative; }
+        .day-number { font-size: 0.75rem; font-weight: 800; color: var(--os-text-muted); margin-bottom: 8px; }
+        .calendar-event { background: rgba(168, 85, 247, 0.1); border-left: 3px solid var(--os-primary); padding: 6px; border-radius: 4px; font-size: 0.65rem; margin-bottom: 5px; cursor: pointer; color: #eee; }
+
         .os-btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid var(--os-border); color: white; padding: 14px 24px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; }
         .os-btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
         .metric-label { font-size: 0.65rem; color: var(--os-text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; margin-bottom: 8px; }
@@ -103,10 +113,16 @@
                 <div id="metric-schedule" class="metric-card"></div>
             </div>
 
+            <!-- SISTEMA DE ABAS -->
+            <div class="os-tabs">
+                <button class="os-tab-btn active" onclick="window.switchTab('esteira')"><i class="fa-solid fa-list-check"></i> Esteira Operacional</button>
+                <button class="os-tab-btn" onclick="window.switchTab('calendario')"><i class="fa-solid fa-calendar-days"></i> Calendário Estratégico</button>
+            </div>
+
             <!-- ESTEIRA -->
-            <div style="margin-top: 20px;">
+            <div id="tab-esteira">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800;">Esteira Operacional</h3>
+                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800;">Esteira de Produção</h3>
                     <div id="workflow-deadline" style="font-size: 0.7rem; color: var(--os-text-muted); font-weight: 800; background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 8px; border: 1px solid var(--os-border);">
                         <i class="fa-solid fa-calendar-check" style="color: var(--os-primary); margin-right: 5px;"></i> DEADLINE: DIA 28
                     </div>
@@ -126,6 +142,13 @@
                         <tr><td colspan="6" style="text-align:center; padding:100px; color:#444;">Aguardando dados...</td></tr>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- CALENDÁRIO -->
+            <div id="tab-calendario" style="display: none;">
+                <div class="calendar-grid" id="calendar-body" style="display: grid;">
+                    <!-- Preenchido via JS -->
+                </div>
             </div>
         </div>
     </main>
