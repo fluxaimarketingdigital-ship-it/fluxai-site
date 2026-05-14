@@ -1,6 +1,6 @@
 import { getSupabase } from '../services/supabase-client.js';
 
-async function init() {
+async function initApproval() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
@@ -101,4 +101,4 @@ function showError(msg) {
     document.getElementById('loading-state').innerHTML = `<p style="color: var(--os-danger); font-weight: 700;">${msg}</p>`;
 }
 
-init();
+initApproval();

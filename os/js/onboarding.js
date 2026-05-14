@@ -4,7 +4,7 @@ import { getSupabase } from '/os/services/supabase-client.js';
 let currentStep = 1;
 const totalSteps = 7;
 
-async function init() {
+async function initOnboarding() {
     OS_UI.renderSidebar('onboarding', 'ADMIN'); 
     OS_UI.renderTopbar();
 
@@ -173,5 +173,5 @@ async function handleOnboarding(e) {
     }
 }
 
-init();
+initOnboarding();
 

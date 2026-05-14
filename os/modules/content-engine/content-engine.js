@@ -104,57 +104,7 @@ const STRATEGIC_MATRIX = {
     'CONSULTORIA': { name: 'Diagnóstico Estratégico', clientPrefix: 'DIAGNÓSTICO', platform: 'CONSULTING' }
 };
 
-export async function init() {
-    sLog('Iniciando Motor de Conteúdo...');
-    try {
-        await loadProjects();
-        await loadContent();
-        sLog('Carga Inicial: OK');
-
-        // Listeners
-        const filter = document.getElementById('project-filter');
-        if (filter) {
-            filter.onchange = (e) => {
-                currentProject = e.target.value;
-                loadContent();
-            };
-        }
-
-        const btnAi = document.getElementById('btn-ai-planner');
-        if (btnAi) {
-            btnAi.onclick = async () => {
-                await runAiPlanner();
-            };
-        }
-
-    } catch (err) {
-        sLog('ERRO NO MOTOR: ' + err.message);
-        console.error(err);
-    }
-}
-
-async function loadProjects() {
-    try {
-        const supabase = getSupabase();
-        const { data: projects, error } = await supabase.from('projects').select('id, company_name').eq('status', 'ATIVO');
-        if (error) throw error;
-
-        const select = document.getElementById('project-filter');
-        if (select && projects) {
-            select.innerHTML = '<option value="">Todos os Projetos</option>';
-            projects.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.innerText = p.company_name;
-                select.appendChild(opt);
-            });
-        }
-    } catch (e) {
-        sLog('Erro Projetos: ' + e.message);
-    }
-}
-
-export async function init() {
+export async function initEngine() {
     sLog('Iniciando Motor de Conteúdo v7.0...');
     try {
         // Expor funções globais para a UI
@@ -189,7 +139,8 @@ export async function init() {
 function switchTab(tab) {
     const tabs = ['esteira', 'calendario'];
     tabs.forEach(t => {
-        document.getElementById(`tab-${t}`).style.display = t === tab ? 'block' : 'none';
+        const el = document.getElementById(`tab-${t}`);
+        if (el) el.style.display = t === tab ? 'block' : 'none';
         const btn = document.querySelector(`.os-tab-btn[onclick*="${t}"]`);
         if (btn) btn.classList.toggle('active', t === tab);
     });
@@ -358,4 +309,4 @@ window.deleteAsset = async (id) => {
     loadContent();
 };
 
-init();
+initEngine();

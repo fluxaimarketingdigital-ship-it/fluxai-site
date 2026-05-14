@@ -88,7 +88,7 @@
         import { approvalQueue, auditLog, governanceMetrics } from './data/governance.js';
         import { getSupabase } from './services/supabase-client.js';
         
-        async function init() {
+        async function initPage() {
             // 1. Validar Acesso Real (Apenas ADMIN pode acessar Governança)
             const user = await OS_AUTH.check('ADMIN');
             if (!user) return;
@@ -107,7 +107,7 @@
             await renderGovernanceData();
         }
 
-        const renderGovernanceData = async () => {
+        initPage(); let renderGovernanceData = async () => {
             const queueContainer = document.getElementById('approval-queue-container');
             const auditContainer = document.getElementById('audit-log-container');
             const supabase = getSupabase();
@@ -204,7 +204,7 @@
             }
         };
 
-        init();
+        initPage();
     </script>
 </body>
 </html>

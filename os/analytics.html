@@ -110,7 +110,7 @@
         import { decisionalMetrics, operationalInsights, behavioralData, socialSignals } from './data/analytics.js';
         import { getSupabase } from './services/supabase-client.js';
         
-        async function init() {
+        async function initPage() {
             // 1. Validar Acesso Real (Acesso permitido para ADMIN, OPERATOR e CLIENT)
             const user = await OS_AUTH.check('CLIENT');
             if (!user) return;
@@ -172,7 +172,7 @@
             insightsBody.appendChild(card);
         });
 
-        init();
+        initPage();
     </script>
 </body>
 </html>

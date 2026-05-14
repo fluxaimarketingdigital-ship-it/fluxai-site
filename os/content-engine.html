@@ -157,7 +157,8 @@
         import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
         import { getSupabase } from '/os/services/supabase-client.js';
 
-        async function init() {
+        async function bootContentEngine() {
+            console.log('[BOOT] content-engine.html started');
             try {
                 // Injetar globais
                 window.getSupabase = getSupabase;
@@ -180,7 +181,7 @@
             }
         }
 
-        init();
+        bootContentEngine();
     </script>
 </body>
 </html>

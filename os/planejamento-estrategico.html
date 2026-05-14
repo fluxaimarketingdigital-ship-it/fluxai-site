@@ -81,7 +81,7 @@
             return title;
         }
 
-        async function init() {
+        async function initStrategic() {
             const statusEl = document.getElementById('client-name');
             const params = new URLSearchParams(window.location.search);
             const projectId = params.get('project');
@@ -140,7 +140,7 @@
             document.getElementById('stat-approved').innerText = `${approved} Aprovados`;
         }
 
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', initStrategic);
     </script>
 </body>
 </html>

@@ -58,7 +58,7 @@
         const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function init() {
+        async function initCalendar() {
             const statusEl = document.getElementById('client-name');
             const params = new URLSearchParams(window.location.search);
             const projectId = params.get('project');
@@ -156,7 +156,7 @@
             document.getElementById('stat-approved').innerText = `${approved} Aprovados`;
         }
 
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', initCalendar);
     </script>
 </body>
 </html>

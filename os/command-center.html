@@ -74,7 +74,7 @@
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { getSupabase } from './services/supabase-client.js';
         
-        async function init() {
+        async function initPage() {
             // 1. Validar Acesso Real (ADMIN ou OPERATOR)
             const user = await OS_AUTH.check('OPERATOR');
             if (!user) return;
@@ -135,7 +135,7 @@
             `;
         };
  
-        init();
+        initPage();
     </script>
 </body>
 </html>

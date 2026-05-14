@@ -1,7 +1,7 @@
 import { OS_UI, OS_AUTH } from '../../js/os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
 
-async function init() {
+async function initFinanceModule() {
     // 1. Validar Acesso (Apenas ADMIN)
     const user = await OS_AUTH.check('ADMIN');
     if (!user) return;
@@ -156,4 +156,4 @@ function formatCurrency(val) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 }
 
-init();
+initFinanceModule();

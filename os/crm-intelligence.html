@@ -108,24 +108,6 @@
         import { crmLeadsData, crmMetrics } from './data/crm.js';
         import { getSupabase } from './services/supabase-client.js';
         
-        async function init() {
-            // 1. Validar Acesso Real (ADMIN ou OPERATOR)
-            const user = await OS_AUTH.check('OPERATOR');
-            if (!user) return;
-
-            // 2. Renderizar Base Global
-            OS_UI.renderSidebar('crm-intelligence', user.role);
-            await OS_UI.renderTopbar();
-
-            // 3. Render Metrics
-            OS_UI.renderMetric('metric-value', { label: 'Valor em Pipeline', value: crmMetrics.pipelineValue, trend: '+15%', meta: 'Projetado' });
-            OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: crmMetrics.retentionRate, trend: '+0.5%', meta: 'Meta: 98%' });
-            OS_UI.renderMetric('metric-cycle', { label: 'Ciclo Médio', value: crmMetrics.avgSalesCycle, trend: '-2d', meta: 'Eficiência' });
-            OS_UI.renderMetric('metric-opps', { label: 'Oportunidades Ativas', value: crmMetrics.activeOpportunities, trend: '+3', meta: 'Em negociação' });
-
-            // 4. Render CRM Table from Supabase
-            await renderLeads();
-        }
 
         const renderLeads = async () => {
             const crmBody = document.getElementById('crm-leads-body');
@@ -142,12 +124,10 @@
 
             crmBody.innerHTML = ''; // Limpa antes de renderizar
             leads.forEach(item => {
-                // Mapeamento resiliente: tenta campo real, se não houver, tenta campo do mock
                 const companyName = item.company || item.name || 'Empresa n/a';
                 const contactName = item.company ? item.name : (item.contact || 'Contato n/a');
                 const leadValue = item.value || item.impact || '0';
                 
-                // Saúde: real usa OPTIMAL/STABLE/CRITICAL, mock usa healthScore
                 let healthVal = 0;
                 if (item.health) {
                     healthVal = item.health === 'OPTIMAL' ? 95 : (item.health === 'STABLE' ? 70 : 40);
@@ -178,7 +158,30 @@
             });
         };
 
-        init();
+        async function initPage() {
+            try {
+                // 1. Validar Acesso Real (ADMIN ou OPERATOR)
+                const user = await OS_AUTH.check('OPERATOR');
+                if (!user) return;
+
+                // 2. Renderizar Base Global
+                OS_UI.renderSidebar('crm-intelligence', user.role);
+                await OS_UI.renderTopbar();
+
+                // 3. Render Metrics
+                OS_UI.renderMetric('metric-value', { label: 'Valor em Pipeline', value: crmMetrics.pipelineValue, trend: '+15%', meta: 'Projetado' });
+                OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: crmMetrics.retentionRate, trend: '+0.5%', meta: 'Meta: 98%' });
+                OS_UI.renderMetric('metric-cycle', { label: 'Ciclo Médio', value: crmMetrics.avgSalesCycle, trend: '-2d', meta: 'Eficiência' });
+                OS_UI.renderMetric('metric-opps', { label: 'Oportunidades Ativas', value: crmMetrics.activeOpportunities, trend: '+3', meta: 'Em negociação' });
+
+                // 4. Render CRM Table from Supabase
+                await renderLeads();
+            } catch (err) {
+                console.error('Erro de Boot CRM:', err);
+            }
+        }
+
+        initPage();
     </script>
 </body>
 </html>

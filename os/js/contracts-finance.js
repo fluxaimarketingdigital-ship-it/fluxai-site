@@ -1,7 +1,7 @@
 import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
 import { getSupabase } from '/os/services/supabase-client.js';
 
-async function init() {
+async function initFinance() {
     const user = await OS_AUTH.check('ADMIN');
     if (!user) return;
 
@@ -19,13 +19,18 @@ async function loadFinanceData() {
 
     try {
         const { data: contracts, error: cErr } = await supabase.from('contracts').select('*').order('created_at', { ascending: false });
-        const { data: payments, error: pErr } = await supabase.from('payments').select('*, contracts(client_name, company_name)').order('due_date', { ascending: true });
+        const { data: payments, error: pErr } = await supabase.from('payments').select('*, contracts(client_name, company_name, project_id)').order('due_date', { ascending: true });
 
         if (cErr || pErr) throw cErr || pErr;
 
-        renderStats(contracts, payments);
-        renderPayments(payments);
-        renderContracts(contracts);
+        const activeContracts = contracts || [];
+        const activePayments = payments || [];
+
+        renderStats(activeContracts, activePayments);
+        renderPayments(activePayments);
+        renderContracts(activeContracts);
+        renderContractHealth(activeContracts, activePayments);
+        renderOperationalAlerts(activeContracts, activePayments);
 
     } catch (error) {
         console.error('Erro ao carregar financeiro:', error);
@@ -33,49 +38,94 @@ async function loadFinanceData() {
 }
 
 function renderStats(contracts, payments) {
-    // Totais Gerais (Pipeline Completo)
+    const now = new Date();
+    const sevenDaysFromNow = new Date();
+    sevenDaysFromNow.setDate(now.getDate() + 7);
+
     const totalExpected = payments.reduce((acc, p) => acc + Number(p.amount_due), 0);
     const totalPaid = payments.reduce((acc, p) => acc + Number(p.amount_paid), 0);
     const totalPending = totalExpected - totalPaid;
+    
+    const activeCount = contracts.filter(c => c.status === 'ATIVO').length;
+    const avgTicket = activeCount > 0 ? (contracts.reduce((acc, c) => acc + Number(c.contract_value), 0) / activeCount) : 0;
+    
+    const nextDue = payments.filter(p => {
+        const d = new Date(p.due_date);
+        return p.status !== 'PAGO' && d >= now && d <= sevenDaysFromNow;
+    }).length;
+
+    const riskRevenue = payments.reduce((acc, p) => {
+        const d = new Date(p.due_date);
+        const diff = (now - d) / (1000 * 60 * 60 * 24);
+        return (p.status !== 'PAGO' && diff > 5) ? acc + Number(p.amount_due) : acc;
+    }, 0);
 
     document.getElementById('total-expected').innerText = formatCurrency(totalExpected);
     document.getElementById('total-paid').innerText = formatCurrency(totalPaid);
     document.getElementById('total-pending').innerText = formatCurrency(totalPending);
-    document.getElementById('active-contracts-count').innerText = contracts.filter(c => c.status === 'ATIVO').length;
-    
-    console.log('[FINANCE] Dashboard atualizado com pipeline total.');
+    document.getElementById('active-contracts-count').innerText = activeCount;
+    document.getElementById('avg-ticket').innerText = formatCurrency(avgTicket);
+    document.getElementById('next-due-count').innerText = nextDue;
+    document.getElementById('revenue-at-risk').innerText = formatCurrency(riskRevenue);
 }
 
 function renderPayments(payments) {
     const body = document.getElementById('payments-body');
+    const now = new Date();
+    
     body.innerHTML = payments.map(p => {
+        const dueDate = new Date(p.due_date);
+        const diffDays = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
         const isPaid = p.status === 'PAGO';
-        const receiptHtml = p.receipt_url ? `<a href="${p.receipt_url}" target="_blank" title="Ver Comprovante" style="color: var(--os-primary); margin-left: 8px;"><i class="fa-solid fa-paperclip"></i></a>` : '';
         
+        let delayText = '';
+        let delayClass = '';
+        
+        if (isPaid) {
+            delayText = 'Liquidado';
+            delayClass = 'color: var(--os-success); font-weight: 700;';
+        } else if (diffDays < 0) {
+            delayText = `${Math.abs(diffDays)}d atraso`;
+            delayClass = 'color: var(--os-danger); font-weight: 700;';
+        } else if (diffDays === 0) {
+            delayText = 'Vence Hoje';
+            delayClass = 'color: var(--os-info); font-weight: 800;';
+        } else {
+            delayText = `em ${diffDays} dias`;
+            delayClass = 'color: var(--os-text-muted);';
+        }
+
+        const statusClass = p.status === 'PAGO' ? 'status-pago' : (diffDays < 0 ? 'status-atrasado' : 'status-pendente');
+
         return `
             <tr>
                 <td>
                     <div style="font-weight: 700;">${p.contracts?.client_name || 'Desconhecido'}</div>
-                    <div style="font-size: 0.7rem; color: var(--os-text-muted);">${p.contracts?.company_name || ''} ${receiptHtml}</div>
+                    <div style="font-size: 0.7rem; color: var(--os-text-muted);">${p.contracts?.company_name || ''}</div>
                 </td>
                 <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(p.amount_due)}</td>
-                <td>${new Date(p.due_date).toLocaleDateString('pt-BR')}</td>
-                <td><span class="status-badge status-${p.status.toLowerCase()}">${p.status}</span></td>
+                <td>${dueDate.toLocaleDateString('pt-BR')}</td>
+                <td style="font-size: 0.7rem; text-transform: uppercase;">${p.payment_method || 'Pix'}</td>
+                <td><span class="status-badge ${statusClass}">${p.status}</span></td>
+                <td style="${delayClass} font-size: 0.75rem;">${delayText}</td>
                 <td>
-                    <div class="action-btns">
+                    <div class="action-btns" style="justify-content: flex-end;">
                         ${!isPaid ? `
-                            <button class="btn-mini btn-whatsapp" title="Gerar Cobrança WhatsApp" onclick="window.sendWhatsAppBilling('${p.id}')">
+                            <button class="btn-mini btn-whatsapp" title="Lembrar WhatsApp" onclick="window.sendWhatsAppBilling('${p.id}')">
                                 <i class="fa-brands fa-whatsapp"></i>
                             </button>
-                            <button class="btn-mini" title="Anexar Comprovante" onclick="window.attachReceipt('${p.id}')">
-                                <i class="fa-solid fa-paperclip"></i>
-                            </button>
-                            <button class="btn-mini" title="Marcar como Pago" onclick="window.markAsPaid('${p.id}', ${p.amount_due})">
+                            <button class="btn-mini" title="Marcar Recebido" onclick="window.markAsPaid('${p.id}', ${p.amount_due})">
                                 <i class="fa-solid fa-check"></i>
                             </button>
                         ` : `
-                            <span style="font-size: 0.6rem; color: var(--os-success); font-weight: 700;"><i class="fa-solid fa-circle-check"></i> RECEBIDO</span>
+                             <button class="btn-mini" title="Gerar Recibo"><i class="fa-solid fa-file-invoice"></i></button>
                         `}
+                        <button class="btn-mini" title="Abrir Contrato" onclick="window.generateContractDoc('${p.contract_id}')">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </button>
+                        <button class="btn-mini" title="Abrir Workspace" onclick="window.open('/os/content-engine.html?project=${p.contracts?.project_id}', '_blank')">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -100,30 +150,35 @@ window.attachReceipt = async (paymentId) => {
 
 function renderContracts(contracts) {
     const body = document.getElementById('contracts-body');
-    body.innerHTML = contracts.map(c => `
-        <tr>
-            <td>
-                <div style="font-weight: 700;">${c.company_name}</div>
-                <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.client_name}</div>
-            </td>
-            <td>
-                <div style="font-size: 0.8rem; max-width: 200px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;" title="${c.deliverables}">
-                    ${c.deliverables || 'Nenhum escopo definido'}
-                </div>
-            </td>
-            <td><span class="status-badge" style="background: rgba(255,255,255,0.05); color: #fff;">${c.status}</span></td>
-            <td>
-                <div class="action-btns">
-                    <button class="btn-mini" title="Visualizar Contrato" onclick="window.generateContractDoc('${c.id}')">
-                        <i class="fa-solid fa-file-pdf"></i>
-                    </button>
-                    <button class="btn-mini" title="Editar Contrato" onclick="window.editContract('${c.id}')">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                </div>
-            </td>
-        </tr>
-    `).join('');
+    body.innerHTML = contracts.map(c => {
+        const startDate = new Date(c.created_at).toLocaleDateString('pt-BR');
+        const renewalDate = new Date(new Date(c.created_at).setMonth(new Date(c.created_at).getMonth() + 6)).toLocaleDateString('pt-BR');
+
+        return `
+            <tr>
+                <td>
+                    <div style="font-weight: 700;">${c.company_name}</div>
+                    <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.client_name}</div>
+                </td>
+                <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">CONTEÚDO</td>
+                <td style="font-size: 0.75rem;">${c.deliverables || 'N/A'}</td>
+                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(c.contract_value)}</td>
+                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">${c.status}</span></td>
+                <td>${startDate}</td>
+                <td>${renewalDate}</td>
+                <td>
+                    <div class="action-btns" style="justify-content: flex-end;">
+                        <button class="btn-mini" title="Abrir Contrato" onclick="window.generateContractDoc('${c.id}')">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </button>
+                        <button class="btn-mini" title="Editar" onclick="window.editContract('${c.id}')">
+                            <i class="fa-solid fa-pen-to-square"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 window.editContract = async (contractId) => {
@@ -195,4 +250,116 @@ function formatCurrency(val) {
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
 }
 
-init();
+function renderContractHealth(contracts, payments) {
+    const body = document.getElementById('health-body');
+    if (!body) return;
+    const now = new Date();
+
+    body.innerHTML = contracts.map(c => {
+        const cPayments = payments.filter(p => p.contract_id === c.id);
+        const hasLate = cPayments.some(p => p.status !== 'PAGO' && new Date(p.due_date) < now);
+        
+        let health = 'Saudável';
+        let healthClass = 'health-saudavel';
+        let finRisk = 'Nulo';
+        let opRisk = 'Baixo';
+        let nextAction = 'Manter Entrega';
+
+        if (hasLate) {
+            health = 'Atenção';
+            healthClass = 'health-atencao';
+            finRisk = 'Moderado';
+            nextAction = 'Notificar Financeiro';
+        }
+
+        if (c.status !== 'ATIVO') {
+            health = 'Encerrado';
+            healthClass = 'health-atencao';
+            nextAction = 'N/A';
+        }
+
+        return `
+            <tr>
+                <td>${c.client_name}</td>
+                <td><span class="health-pill ${healthClass}">${health}</span></td>
+                <td style="font-size: 0.7rem; color: ${finRisk === 'Nulo' ? 'var(--os-success)' : 'var(--os-warning)'};">${finRisk}</td>
+                <td style="font-size: 0.7rem; color: var(--os-success);">${opRisk}</td>
+                <td style="font-size: 0.7rem; color: var(--os-success);">Em Conformidade</td>
+                <td style="font-size: 0.75rem; font-weight: 700; color: var(--os-primary);">${nextAction}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function renderOperationalAlerts(contracts, payments) {
+    const container = document.getElementById('alerts-container');
+    if (!container) return;
+    const now = new Date();
+    const alerts = [];
+
+    payments.forEach(p => {
+        const d = new Date(p.due_date);
+        const diff = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+        
+        if (p.status !== 'PAGO') {
+            if (diff === 1) {
+                alerts.push({
+                    type: 'warning',
+                    title: `Vencimento Próximo: ${p.contracts?.client_name}`,
+                    desc: `Pagamento vence amanhã (${d.toLocaleDateString('pt-BR')}). Cobrança automática agendada.`
+                });
+            } else if (diff < 0) {
+                alerts.push({
+                    type: 'critical',
+                    title: `Pagamento Atrasado: ${p.contracts?.client_name}`,
+                    desc: `Atraso de ${Math.abs(diff)} dias detectado. Necessário contato direto.`
+                });
+            }
+        }
+    });
+
+    contracts.forEach(c => {
+        const renewalDate = new Date(new Date(c.created_at).setMonth(new Date(c.created_at).getMonth() + 6));
+        const diff = Math.ceil((renewalDate - now) / (1000 * 60 * 60 * 24));
+        
+        if (diff > 0 && diff < 30) {
+            alerts.push({
+                type: 'warning',
+                title: `Renovação de Contrato: ${c.company_name}`,
+                desc: `Vínculo expira em ${diff} dias (${renewalDate.toLocaleDateString('pt-BR')}). Preparar proposta.`
+            });
+        }
+    });
+
+    if (alerts.length === 0) {
+        container.innerHTML = '<p style="font-size: 0.8rem; color: var(--os-text-muted); opacity: 0.5;">Nenhum alerta crítico pendente.</p>';
+        return;
+    }
+
+    container.innerHTML = alerts.map(a => `
+        <div class="alert-item ${a.type}">
+            <div class="alert-icon" style="color: ${a.type === 'critical' ? 'var(--os-danger)' : 'var(--os-warning)'};">
+                <i class="fa-solid ${a.type === 'critical' ? 'fa-triangle-exclamation' : 'fa-circle-info'}"></i>
+            </div>
+            <div class="alert-content">
+                <h4>${a.title}</h4>
+                <p>${a.desc}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+async function logAction(action, targetId) {
+    const supabase = getSupabase();
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session) return;
+    
+    await supabase.from('audit_logs').insert([{
+        user_id: session.user.id,
+        action: action,
+        module: 'finance',
+        target_id: targetId
+    }]);
+}
+
+initFinance();
