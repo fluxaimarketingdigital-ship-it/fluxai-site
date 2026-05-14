@@ -59,33 +59,46 @@
         const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         async function init() {
+            const statusEl = document.getElementById('client-name');
             const params = new URLSearchParams(window.location.search);
             const projectId = params.get('project');
-            const statusEl = document.getElementById('client-name');
 
             if (!projectId) {
-                statusEl.innerText = "Link Inválido";
+                statusEl.innerText = "Link de Acesso Inválido";
                 return;
             }
 
             try {
-                // 1. Carregar Dados em Paralelo
-                const [projectRes, contentRes] = await Promise.all([
-                    supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle(),
-                    supabase.from('content_assets').select('*').eq('project_id', projectId).order('scheduled_at', { ascending: true })
-                ]);
-
-                if (projectRes.data) {
-                    statusEl.innerText = projectRes.data.company_name;
-                    document.getElementById('client-initials').innerText = projectRes.data.company_name.substring(0, 2).toUpperCase();
+                statusEl.innerText = "🔌 Conectando ao FluxAI Engine...";
+                
+                // 1. Buscar Projeto
+                const { data: project, error: pErr } = await supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle();
+                
+                if (project) {
+                    statusEl.innerText = project.company_name;
+                    document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
                 }
 
-                renderCalendar(contentRes.data || []);
-                updateStats(contentRes.data || []);
+                statusEl.innerText = "📅 Sincronizando Calendário...";
+
+                // 2. Buscar Conteúdos
+                const { data: contents, error: cErr } = await supabase.from('content_assets')
+                    .select('*')
+                    .eq('project_id', projectId)
+                    .order('scheduled_at', { ascending: true });
+
+                if (cErr) throw cErr;
+
+                statusEl.innerText = project ? project.company_name : "Planejamento Estratégico";
+                
+                renderCalendar(contents || []);
+                updateStats(contents || []);
 
             } catch (err) {
-                console.error(err);
-                statusEl.innerText = "Erro ao carregar planejamento.";
+                console.error('[CRITICAL] Falha no Workspace:', err);
+                statusEl.innerText = "Erro na conexão. Clique para tentar novamente.";
+                statusEl.style.cursor = "pointer";
+                statusEl.onclick = () => location.reload();
             }
         }
 
