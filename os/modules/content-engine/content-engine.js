@@ -85,25 +85,21 @@ async function generateSampleContent(projectId, count = 12) {
         const obj = objectives[i % objectives.length];
         
         const internalTitle = `${sys.name}: ${obj}`;
-        const clientTitle = `${sys.clientPrefix} • ${obj}`;
         
         let contentBody = `
-🚀 ${sys.name.toUpperCase()}
-----------------------------------
-🎯 OBJETIVO: ${obj}
-🧠 CONTEXTO: Operação estratégica para ${project.company_name}
+🎯 DIRETRIZ: ${obj}
+📝 ESTRUTURA: [IA desenhando narrativa de alto impacto para ${project.company_name}]
 
-[IA gerando estrutura específica para ${sys.name}...]
-- Arquitetura de Hierarquia e Fluxo
-- Gatilhos de Percepção e Posicionamento
-- Chamada para Ação Operacional (CTA)
+💎 POSICIONAMENTO: Foco em percepção premium e autoridade de mercado.
+🚀 JORNADA: Sequência lógica desenhada para máxima retenção e conversão.
+✨ CTA: Chamada estratégica voltada para ${obj}.
 
-🛠️ PRIORIDADES: [IA detectou gargalo operacional e ajustou a entrega conforme maturidade do cliente]
+[TOOL: FluxAI OS™ Strategic Engine]
         `;
 
         samples.push({
             project_id: projectId,
-            title: internalTitle, // Salvamos o técnico no banco para controle interno
+            title: internalTitle, 
             status: 'PAUTA',
             priority: 'ALTA',
             platform: sys.platform,
