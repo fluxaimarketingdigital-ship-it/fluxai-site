@@ -125,6 +125,7 @@ async function handleOnboarding(e) {
                     priority: raw.priority_30d,
                     first_delivery: raw.first_delivery
                 },
+                next_cycle_day: raw.next_cycle_day,
                 // Dados dinâmicos capturados
                 module_details: {
                     posts: raw.count_posts,

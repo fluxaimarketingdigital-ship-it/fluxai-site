@@ -1,7 +1,25 @@
 import { OS_UI, OS_AUTH } from '../../js/os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
 
-let currentProject = null;
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
+window.changeMonth = (delta) => {
+    currentMonth += delta;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    loadContent();
+};
+
+let currentMonth = new Date().getMonth();
+let currentYear = new Date().getFullYear();
+
+window.changeMonth = (delta) => {
+    currentMonth += delta;
+    if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+    if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+    loadContent();
+};
 
 const sLog = (msg) => { if (window.screenLog) window.screenLog(msg); console.log('[ENGINE]', msg); };
 
@@ -250,9 +268,37 @@ async function loadContent() {
         renderCalendar('calendar-strategic-body', safeContents, 'STRATEGIC');
         renderCalendar('calendar-operational-body', safeContents, 'OPERATIONAL');
         
+        // NOVO: Verificar Alerta de Ciclo
+        checkLogisticsCycle();
+        
     } catch (e) {
         sLog('Erro Conteúdo: ' + e.message);
     }
+}
+
+async function checkLogisticsCycle() {
+    if (!currentProject) return;
+    try {
+        const supabase = getSupabase();
+        const { data: p } = await supabase.from('projects').select('metadata').eq('id', currentProject).single();
+        
+        const banner = document.getElementById('cycle-alert-banner');
+        const dateEl = document.getElementById('cycle-alert-date');
+        
+        if (p?.metadata?.onboarding?.next_cycle_day && banner && dateEl) {
+            const now = new Date();
+            const nextMonthIndex = now.getMonth() + 1;
+            const targetMonth = nextMonthIndex > 11 ? 0 : nextMonthIndex;
+            
+            const monthNames = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+            const targetMonthName = monthNames[targetMonth];
+            
+            dateEl.innerText = `${String(p.metadata.onboarding.next_cycle_day).padStart(2, '0')}/${targetMonthName}`;
+            banner.style.display = 'block';
+        } else if (banner) {
+            banner.style.display = 'none';
+        }
+    } catch (e) { console.error('[LOGÍSTICA] Erro ao verificar ciclo:', e); }
 }
 
 function renderMetrics(contents) {
@@ -351,9 +397,13 @@ function renderCalendar(containerId, contents, mode) {
     if (!container) return;
     container.innerHTML = '';
     
-    const now = new Date();
-    const year = now.getFullYear();
-    const month = now.getMonth();
+    // Atualizar Label do Mês
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    const label = document.getElementById('calendar-month-label');
+    if (label) label.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+
+    const year = currentYear;
+    const month = currentMonth;
     
     const firstDay = new Date(year, month, 1).getDay();
     const daysInMonth = new Date(year, month + 1, 0).getDate();
