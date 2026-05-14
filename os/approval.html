@@ -28,8 +28,8 @@
         .btn-approve { background: var(--os-primary); color: #fff; box-shadow: 0 10px 20px rgba(107,122,69,0.3); }
         .btn-reject { background: transparent; border: 1px solid rgba(255,68,68,0.5); color: #ff4444; }
         .btn:hover { transform: translateY(-2px); opacity: 0.9; }
-        .btn-secondary { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #444; }
-        .btn-secondary:hover { background: rgba(255,255,255,0.15); border-color: #666; }
+        .btn-secondary { background: var(--os-primary); color: #000; font-weight: 800; border: none; box-shadow: 0 5px 15px rgba(107, 122, 69, 0.4); }
+        .btn-secondary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(107, 122, 69, 0.6); }
 
         .feedback-area { display: none; margin-top: 30px; animation: fadeIn 0.4s ease; }
         .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
@@ -78,7 +78,7 @@
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Prazo p/ Aprovação</span>
-                    <span class="meta-value" id="meta-date" style="color:var(--os-primary); font-weight:800;">---</span>
+                    <span class="meta-value" id="meta-date" style="color:#60a5fa; font-weight:800;">---</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Versão</span>
@@ -117,8 +117,8 @@
         <i class="fa-solid fa-circle-check"></i>
         <h2 id="success-title">Planejamento Aprovado!</h2>
         <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
-        <button class="btn btn-secondary" style="margin: 20px auto; width: auto; padding: 12px 25px; font-size: 0.7rem; background: var(--os-primary); color: #000; font-weight: 800; border: none;" onclick="window.history.back()">
-            <i class="fa-solid fa-arrow-left"></i> VOLTAR PARA O CALENDÁRIO
+        <button class="btn btn-secondary" style="margin: 20px auto; width: auto; padding: 15px 35px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;" onclick="window.history.back()">
+            <i class="fa-solid fa-calendar-days"></i> VOLTAR PARA O CALENDÁRIO
         </button>
     </div>
 
@@ -253,10 +253,12 @@
                 const badge = document.getElementById('status-badge-container');
                 if (c.status === 'APROVAÇÃO FINAL') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">🟣 AGUARDANDO APROVAÇÃO FINAL</span>`;
+                } else if (c.status === 'PRODUÇÃO') {
+                    badge.innerHTML = `<span class="status-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🟡 EM PRODUÇÃO</span>`;
                 } else if (c.status === 'APROVAÇÃO ESTRATÉGICA' || c.status === 'PLANEJAMENTO') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 AGUARDANDO APROVAÇÃO</span>`;
                 } else if (c.status === 'AJUSTE') {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🟡 EM REVISÃO</span>`;
+                    badge.innerHTML = `<span class="status-badge" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid #ef4444;">🔴 EM REVISÃO</span>`;
                 }
 
                 const checks = ADJUSTMENT_CHECKS[prefix] || ADJUSTMENT_CHECKS['DEFAULT'];

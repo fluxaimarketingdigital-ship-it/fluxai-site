@@ -200,41 +200,21 @@ async function loadContent() {
     const projectFilter = document.getElementById('project-filter');
     
     if (!currentProject) {
-        if (dashboard) {
-            let placeholder = document.getElementById('project-placeholder');
-            if (!placeholder) {
-                placeholder = document.createElement('div');
-                placeholder.id = 'project-placeholder';
-                placeholder.innerHTML = `
-                    <div style="text-align:center; padding:60px; background:rgba(255,255,255,0.01); border:1px dashed #222; border-radius:12px; margin-top:20px;">
-                        <i class="fa-solid fa-hand-pointer" style="font-size:2rem; color:var(--os-primary); margin-bottom:15px; opacity:0.3;"></i>
-                        <h2 style="color:#666; font-size: 1rem;">Selecione um Projeto</h2>
-                        <p style="color:var(--os-text-muted); font-size: 0.7rem;">Escolha um cliente no menu superior para visualizar os ativos.</p>
-                    </div>
-                `;
-                dashboard.appendChild(placeholder);
-            }
-            
-            // NÃO ocultar métricas e abas, apenas zerar dados
-            const sections = dashboard.querySelectorAll('.os-metric-grid, .os-tabs');
-            sections.forEach(s => s.style.display = 'flex');
-            placeholder.style.display = 'block';
-
-            renderMetrics([]);
-            renderContentTable([]);
-            return;
-        }
+        // Se não tem projeto, vamos carregar TUDO (Requisito do Usuário)
+        const placeholder = document.getElementById('project-placeholder');
+        if (placeholder) placeholder.style.display = 'none'; // Esconder o aviso de "selecione"
+    } else {
+        const placeholder = document.getElementById('project-placeholder');
+        if (placeholder) placeholder.style.display = 'none';
+        
+        const copyBtn = document.getElementById('btn-copy-portal');
+        if (copyBtn) copyBtn.style.display = 'flex';
+        
+        const sendBtn = document.getElementById('btn-send-approval');
+        if (sendBtn) sendBtn.style.display = 'flex';
     }
 
-    // Se tem projeto, mostrar tudo
-    const placeholder = document.getElementById('project-placeholder');
-    if (placeholder) placeholder.style.display = 'none';
-    
-    const copyBtn = document.getElementById('btn-copy-portal');
-    if (copyBtn) copyBtn.style.display = 'flex';
-    
-    const sendBtn = document.getElementById('btn-send-approval');
-    if (sendBtn) sendBtn.style.display = 'flex';
+    // (Removido o bloco redundante)
 
     // Mostrar a aba ativa
     const activeTabBtn = document.querySelector('.os-tab-btn.active');
@@ -441,12 +421,12 @@ function getStatusBg(status) {
     if (status === 'REVISÃO INTERNA') return '#ec4899';
     if (status === 'APROVAÇÃO ESTRATÉGICA') return '#f59e0b'; 
     if (status === 'AJUSTE') return '#ef4444'; 
-    if (status === 'PRODUÇÃO') return '#06b6d4'; 
+    if (status === 'PRODUÇÃO') return '#f59e0b'; // Amarelo (Aprovado p/ Produção)
     if (status === 'REVISÃO INTERNA FINAL') return '#ec4899';
     if (status === 'APROVAÇÃO FINAL') return '#8b5cf6'; 
     if (status === 'PRONTO') return '#10b981'; 
     if (status === 'PUBLICADO') return '#059669'; 
-    if (status === 'ATRASADO') return '#7f1d1d'; // Vermelho Escuro/Vinho
+    if (status === 'ATRASADO') return '#7f1d1d'; 
     return '#444';
 }
 

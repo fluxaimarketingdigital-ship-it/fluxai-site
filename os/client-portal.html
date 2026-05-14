@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal do Cliente | FluxAI OS™</title>
-    <link rel="stylesheet" href="/os/css/os-style.css">
+    <link rel="stylesheet" href="/os/styles/interface.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -51,7 +51,7 @@
         
         .status-aprovacao { background: rgba(107, 122, 69, 0.1); color: var(--os-primary); border: 1px solid rgba(107, 122, 69, 0.3); }
         .status-ajuste { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .status-producao { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .status-producao { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
         .status-pronto { background: var(--os-primary); color: #000; border: 1px solid var(--os-primary); }
         .status-planejamento { background: rgba(255, 255, 255, 0.05); color: #888; border: 1px solid rgba(255, 255, 255, 0.1); }
         .status-publicado { background: #000; color: var(--os-primary); border: 1px solid var(--os-primary); }
@@ -101,11 +101,17 @@
             const grid = document.getElementById('calendar-body');
             grid.innerHTML = '';
 
-            for (let i = 1; i <= 30; i++) {
-                const dayAssets = contents.filter(c => {
-                    const d = new Date(c.scheduled_at);
-                    return d.getDate() === i;
-                });
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = now.getMonth();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const monthName = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][month];
+            
+            document.querySelector('.portal-header h1').innerText = `Fluxo Estratégico: ${monthName}`;
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+                const dayAssets = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
 
                 const dayHtml = `
                     <div class="calendar-day">
