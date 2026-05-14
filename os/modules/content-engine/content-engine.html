@@ -143,46 +143,62 @@
         </div>
     </div>
 
-    <script type="module">
-        import { OS_UI, OS_AUTH } from '../../js/os-core.js';
-        import { getSupabase } from '../../services/supabase-client.js';
-
+    <!-- RASTREADOR DE EMERGÊNCIA (INFALÍVEL) -->
+    <script>
         function screenLog(msg) {
-            const logBox = document.getElementById('debug-log-box') || (() => {
-                const div = document.createElement('div');
-                div.id = 'debug-log-box';
-                div.style = 'position:fixed; top:10px; right:10px; background:rgba(0,0,0,0.9); color:#0f0; padding:10px; font-family:monospace; font-size:10px; z-index:9999; border:1px solid #0f0; max-width:300px;';
-                document.body.appendChild(div);
-                return div;
-            })();
-            logBox.innerHTML += `<div>> ${msg}</div>`;
+            console.log('[SCREEN LOG]', msg);
+            let logBox = document.getElementById('debug-log-box');
+            if (!logBox) {
+                logBox = document.createElement('div');
+                logBox.id = 'debug-log-box';
+                logBox.style = 'position:fixed; top:10px; right:10px; background:#000; color:#0f0; padding:15px; font-family:monospace; font-size:11px; z-index:99999; border:2px solid #0f0; max-width:320px; box-shadow:0 0 20px rgba(0,255,0,0.3);';
+                document.body.appendChild(logBox);
+                logBox.innerHTML = '<div style="border-bottom:1px solid #0f0; margin-bottom:10px; font-weight:bold;">FLUXAI OS™ BOOT DIAGNOSTIC</div>';
+            }
+            const line = document.createElement('div');
+            line.innerHTML = `> ${msg}`;
+            logBox.appendChild(line);
         }
+        window.screenLog = screenLog;
+        screenLog('Gerador de Emergência Ativado.');
+    </script>
 
-        window.screenLog = screenLog; // Tornar global para o arquivo JS externo se precisar
-
-        async function start() {
-            screenLog('Iniciando Boot do Sistema...');
+    <script type="module">
+        async function boot() {
+            screenLog('Iniciando Boot Inteligente...');
+            
             try {
+                screenLog('Carregando dependências de núcleo...');
+                const core = await import('/os/js/os-core.js').catch(e => { throw new Error('Falha ao carregar os-core.js: ' + e.message); });
+                const db = await import('/os/services/supabase-client.js').catch(e => { throw new Error('Falha ao carregar supabase-client.js: ' + e.message); });
+                
+                screenLog('Núcleo Carregado: OK');
+                
+                const { OS_UI, OS_AUTH } = core;
                 OS_UI.renderSidebar('content-engine', 'ADMIN');
                 OS_UI.renderTopbar();
-                screenLog('UI Base: OK');
+                screenLog('Interface Renderizada: OK');
 
+                screenLog('Verificando Sessão...');
                 const user = await OS_AUTH.check();
-                screenLog('Usuário: ' + (user ? user.email : 'Visitante'));
+                screenLog('Usuário: ' + (user ? user.email : 'Nenhum'));
 
-                // Tentar carregar o script principal agora que a UI está pronta
-                const script = document.createElement('script');
-                script.type = 'module';
-                script.src = './content-engine.js?v=' + Date.now();
-                document.body.appendChild(script);
-                screenLog('Script Principal Injetado.');
+                screenLog('Chamando Motor de Conteúdo...');
+                const engine = await import('./content-engine.js?v=' + Date.now()).catch(e => { throw new Error('Falha ao carregar engine: ' + e.message); });
+                screenLog('Motor Sincronizado: OK');
 
-            } catch (e) {
-                screenLog('Erro no Boot: ' + e.message);
+            } catch (err) {
+                screenLog('<span style="color:#ff4444; font-weight:bold;">ERRO CRÍTICO: ' + err.message + '</span>');
+                console.error(err);
             }
         }
 
-        start();
+        // Aguarda o DOM estar pronto
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', boot);
+        } else {
+            boot();
+        }
     </script>
 </body>
 </html>
