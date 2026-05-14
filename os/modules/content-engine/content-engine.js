@@ -412,8 +412,8 @@ function renderCalendar(containerId, contents, mode) {
             const statusColor = getStatusBg(c.status);
             
             // Filtro de visibilidade por modo
-            if (isStrategic && !['PAUTA', 'APROVAÇÃO', 'AJUSTE', 'PRODUÇÃO'].includes(c.status)) return '';
-            if (!isStrategic && !['PRODUÇÃO', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
+            if (isStrategic && !['PLANEJAMENTO', 'APROVAÇÃO ESTRATÉGICA', 'AJUSTE', 'PRODUÇÃO'].includes(c.status)) return '';
+            if (!isStrategic && !['PRODUÇÃO', 'REVISÃO INTERNA FINAL', 'APROVAÇÃO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
 
             return `
                 <div class="calendar-event" onclick="window.openApproval('${c.id}')" 
