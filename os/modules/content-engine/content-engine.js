@@ -223,9 +223,6 @@ async function loadContent() {
     
     const sendBtn = document.getElementById('btn-send-calendar');
     if (sendBtn) sendBtn.style.display = 'flex';
-    
-    const copyBtn = document.getElementById('btn-copy-portal');
-    if (copyBtn) copyBtn.style.display = 'flex';
 
     // Mostrar a aba ativa
     const activeTabBtn = document.querySelector('.os-tab-btn.active');
@@ -432,7 +429,7 @@ window.copyPortalLink = () => {
     const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${currentProject}`;
     
     navigator.clipboard.writeText(portalLink).then(() => {
-        const btn = document.getElementById('btn-copy-portal');
+        const btn = document.getElementById('btn-send-calendar');
         const originalHtml = btn.innerHTML;
         btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIADO!';
         btn.style.borderColor = 'var(--os-primary)';
