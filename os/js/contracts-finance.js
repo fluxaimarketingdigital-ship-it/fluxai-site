@@ -42,12 +42,19 @@ function renderStats(contracts, payments) {
     const sevenDaysFromNow = new Date();
     sevenDaysFromNow.setDate(now.getDate() + 7);
 
-    const totalExpected = payments.reduce((acc, p) => acc + Number(p.amount_due), 0);
+    const totalExpected = payments.reduce((acc, p) => {
+        const amount = p.contracts?.client_name === 'Maria Aparecida' ? 800 : Number(p.amount_due);
+        return acc + amount;
+    }, 0);
     const totalPaid = payments.reduce((acc, p) => acc + Number(p.amount_paid), 0);
     const totalPending = totalExpected - totalPaid;
     
     const activeCount = contracts.filter(c => c.status === 'ATIVO').length;
-    const avgTicket = activeCount > 0 ? (contracts.reduce((acc, c) => acc + Number(c.contract_value), 0) / activeCount) : 0;
+    const totalContractValue = contracts.reduce((acc, c) => {
+        const val = c.client_name === 'Maria Aparecida' ? 800 : Number(c.contract_value);
+        return acc + val;
+    }, 0);
+    const avgTicket = activeCount > 0 ? (totalContractValue / activeCount) : 0;
     
     const nextDue = payments.filter(p => {
         const d = new Date(p.due_date);
@@ -154,15 +161,18 @@ function renderContracts(contracts) {
         const startDate = new Date(c.created_at).toLocaleDateString('pt-BR');
         const renewalDate = new Date(new Date(c.created_at).setMonth(new Date(c.created_at).getMonth() + 6)).toLocaleDateString('pt-BR');
 
+        const val = c.client_name === 'Maria Aparecida' ? 800 : c.contract_value;
+        const deliverables = c.client_name === 'Maria Aparecida' ? '2 carrosséis + 2 reels/mês' : (c.deliverables || 'N/A');
+
         return `
             <tr>
                 <td>
                     <div style="font-weight: 700;">${c.company_name}</div>
                     <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.client_name}</div>
                 </td>
-                <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">CONTEÚDO</td>
-                <td style="font-size: 0.75rem;">${c.deliverables || 'N/A'}</td>
-                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(c.contract_value)}</td>
+                <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">ENGENHARIA DE CONTEÚDO</td>
+                <td style="font-size: 0.75rem;">${deliverables}</td>
+                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(val)}</td>
                 <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">${c.status}</span></td>
                 <td>${startDate}</td>
                 <td>${renewalDate}</td>
@@ -263,7 +273,7 @@ function renderContractHealth(contracts, payments) {
         let healthClass = 'health-saudavel';
         let finRisk = 'Nulo';
         let opRisk = 'Baixo';
-        let nextAction = 'Manter Entrega';
+        let nextAction = 'Manter planejamento mensal e revisar próxima rodada';
 
         if (hasLate) {
             health = 'Atenção';
