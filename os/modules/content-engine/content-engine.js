@@ -548,7 +548,15 @@ window.openEditModal = async (id) => {
                 <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
             `;
         }
-        document.getElementById('edit-asset-deadline').value = c.metadata?.approval_deadline || '';
+        // Formatar data para o input datetime-local (exige YYYY-MM-DDTHH:MM)
+        let formattedDeadline = '';
+        if (c.metadata?.approval_deadline) {
+            try {
+                const d = new Date(c.metadata.approval_deadline);
+                formattedDeadline = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            } catch (e) { console.error('Erro formatar data:', e); }
+        }
+        document.getElementById('edit-asset-deadline').value = formattedDeadline;
         document.getElementById('edit-asset-risk').checked = c.metadata?.risk || false;
         
         // TRAVA DE GOVERNANÇA: Bloquear campos técnicos durante o Planejamento
