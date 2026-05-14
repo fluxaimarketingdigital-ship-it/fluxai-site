@@ -192,36 +192,39 @@ async function loadContent() {
     
     if (!currentProject) {
         if (dashboard) {
-            // Criar ou mostrar placeholder de seleção
             let placeholder = document.getElementById('project-placeholder');
             if (!placeholder) {
                 placeholder = document.createElement('div');
                 placeholder.id = 'project-placeholder';
                 placeholder.innerHTML = `
-                    <div style="text-align:center; padding:100px; background:rgba(255,255,255,0.02); border:1px dashed #333; border-radius:12px; margin-top:20px;">
-                        <i class="fa-solid fa-hand-pointer" style="font-size:3rem; color:var(--os-primary); margin-bottom:20px; opacity:0.5;"></i>
-                        <h2 style="color:#fff;">Selecione um Projeto</h2>
-                        <p style="color:var(--os-text-muted);">Escolha um cliente no menu superior para gerenciar o Motor de Conteúdo.</p>
+                    <div style="text-align:center; padding:60px; background:rgba(255,255,255,0.01); border:1px dashed #222; border-radius:12px; margin-top:20px;">
+                        <i class="fa-solid fa-hand-pointer" style="font-size:2rem; color:var(--os-primary); margin-bottom:15px; opacity:0.3;"></i>
+                        <h2 style="color:#666; font-size: 1rem;">Selecione um Projeto</h2>
+                        <p style="color:var(--os-text-muted); font-size: 0.7rem;">Escolha um cliente no menu superior para visualizar os ativos.</p>
                     </div>
                 `;
                 dashboard.appendChild(placeholder);
             }
             
-            // Ocultar elementos reais
-            const sections = dashboard.querySelectorAll('.os-metric-grid, .os-tabs, #tab-esteira, #tab-calendario-estrategico, #tab-calendario-operacional');
-            sections.forEach(s => s.style.display = 'none');
+            // NÃO ocultar métricas e abas, apenas zerar dados
+            const sections = dashboard.querySelectorAll('.os-metric-grid, .os-tabs');
+            sections.forEach(s => s.style.display = 'flex');
             placeholder.style.display = 'block';
+
+            renderMetrics([]);
+            renderContentTable([]);
+            return;
         }
-        return;
     }
 
     // Se tem projeto, mostrar tudo
     const placeholder = document.getElementById('project-placeholder');
     if (placeholder) placeholder.style.display = 'none';
-    const sections = dashboard.querySelectorAll('.os-metric-grid, .os-tabs');
-    sections.forEach(s => s.style.display = 'flex');
     
-    const sendBtn = document.getElementById('btn-send-calendar');
+    const copyBtn = document.getElementById('btn-copy-portal');
+    if (copyBtn) copyBtn.style.display = 'flex';
+    
+    const sendBtn = document.getElementById('btn-send-approval');
     if (sendBtn) sendBtn.style.display = 'flex';
 
     // Mostrar a aba ativa
@@ -301,11 +304,23 @@ function renderContentTable(contents) {
                 </td>
                 <td>
                     <div style="display: flex; gap: 8px; justify-content: flex-end;">
-                        <button class="btn-mini" title="Refinar Pauta" onclick="window.openEditModal('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
+                        ${c.status === 'PRONTO' ? `
+                            <button class="btn-mini" title="Ponte de Publicação" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
+                                <i class="fa-solid fa-rocket"></i>
+                            </button>
+                        ` : ''}
+                        ${c.metadata?.final_asset_url ? `
+                            <a href="${c.metadata.final_asset_url}" target="_blank" class="btn-mini" title="Ver Arte Final" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa; border-color: #8b5cf6;">
+                                <i class="fa-solid fa-file-image"></i>
+                            </a>
+                        ` : ''}
+                        ${c.metadata?.reference_url ? `
+                            <a href="${c.metadata.reference_url}" target="_blank" class="btn-mini" title="Ver Referência (Produção)" style="background: rgba(255,255,255,0.05); color: var(--os-primary);">
+                                <i class="fa-solid fa-link"></i>
+                            </a>
+                        ` : ''}
+                        <button class="btn-mini" title="Editar/Refinar" onclick="window.openEditModal('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
                             <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="btn-mini" title="Ver Planejamento" onclick="window.openApproval('${c.id}')">
-                            <i class="fa-solid fa-eye"></i>
                         </button>
                         <button class="btn-mini" title="Excluir" onclick="window.deleteAsset('${c.id}')">
                             <i class="fa-solid fa-trash"></i>
@@ -369,6 +384,7 @@ function getStatusBg(status) {
     if (status === 'APROVAÇÃO') return '#f59e0b'; // Laranja
     if (status === 'AJUSTE') return '#ef4444'; // Vermelho
     if (status === 'PRODUÇÃO') return '#06b6d4'; // Ciano
+    if (status === 'VALIDAÇÃO') return '#8b5cf6'; // Roxo (Nova Etapa)
     if (status === 'PRONTO') return '#10b981'; // Verde
     if (status === 'PUBLICADO') return '#059669'; // Verde Escuro
     return '#444';
@@ -388,6 +404,21 @@ window.openEditModal = async (id) => {
         document.getElementById('edit-asset-caption').value = c.caption;
         document.getElementById('edit-asset-ref').value = c.metadata?.reference_url || '';
         
+        // NOVO CAMPO: ARTE FINAL
+        let artField = document.getElementById('edit-asset-art-final');
+        if (!artField) {
+            const container = document.getElementById('edit-asset-ref').parentElement;
+            const newField = document.createElement('div');
+            newField.style = "margin-top: 15px;";
+            newField.innerHTML = `
+                <label style="display:block; font-size:0.7rem; color:var(--os-primary); margin-bottom:5px; font-weight:800;">LINK DA ARTE FINAL (PARA VALIDAÇÃO)</label>
+                <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive / Vídeo..." style="width:100%; padding:10px; background:#000; border:1px solid var(--os-primary); color:#fff; border-radius:4px; font-size:0.8rem;">
+            `;
+            container.after(newField);
+            artField = document.getElementById('edit-asset-art-final');
+        }
+        artField.value = c.metadata?.final_asset_url || '';
+        
         // MOSTRAR FEEDBACK SE HOUVER AJUSTE
         const feedbackContainer = document.getElementById('edit-asset-feedback-container');
         if (c.status === 'AJUSTE' && c.internal_notes) {
@@ -405,25 +436,39 @@ window.closeEditModal = () => {
     document.getElementById('modal-edit-asset').style.display = 'none';
 };
 
-window.saveAssetEdit = async () => {
-    const title = document.getElementById('edit-asset-title').value;
-    const caption = document.getElementById('edit-asset-caption').value;
-    const ref = document.getElementById('edit-asset-ref').value;
-
     try {
+        const title = document.getElementById('edit-asset-title').value;
+        const caption = document.getElementById('edit-asset-caption').value;
+        const ref = document.getElementById('edit-asset-ref').value;
+        const artFinal = document.getElementById('edit-asset-art-final')?.value;
+
         const supabase = getSupabase();
+        const { data: currentAsset } = await supabase.from('content_assets').select('status, metadata').eq('id', editingAssetId).single();
         
-        // Atualizar Ativo e VOLTAR PARA PAUTA para re-envio
-        const { error } = await supabase.from('content_assets').update({
+        const newMetadata = currentAsset.metadata || {};
+        newMetadata.reference_url = ref;
+        newMetadata.final_asset_url = artFinal;
+
+        let updatePayload = {
             title,
             caption,
-            status: 'PAUTA', // Volta para pauta para poder ser enviado novamente
-            internal_notes: ref ? `LINK DE REFERÊNCIA: ${ref}` : ''
-        }).eq('id', editingAssetId);
+            metadata: newMetadata
+        };
 
+        // LÓGICA DE TRANSIÇÃO DE STATUS
+        if (currentAsset.status === 'AJUSTE') {
+            updatePayload.status = 'PAUTA';
+        } else if (currentAsset.status === 'PRODUÇÃO' && artFinal) {
+            // Se o designer colocou a arte final, move para validação do cliente
+            if (confirm('Link de Arte Final detectado. Enviar este ativo para VALIDAÇÃO FINAL do cliente?')) {
+                updatePayload.status = 'VALIDAÇÃO';
+            }
+        }
+
+        const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', editingAssetId);
         if (error) throw error;
 
-        sLog('Alterações Salvas. Ativo retornou para PAUTA.');
+        sLog('Ativo Sincronizado.');
         closeEditModal();
         loadContent();
     } catch (e) {
@@ -431,14 +476,53 @@ window.saveAssetEdit = async () => {
     }
 };
 
+window.openPublishBridge = async (id) => {
+    const supabase = getSupabase();
+    const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
+    if (!c) return;
+
+    const modal = document.getElementById('pub-modal-overlay');
+    if (!modal) return alert('Modal de Publicação não encontrado no HTML.');
+
+    document.getElementById('pub-caption-preview').value = c.caption;
+    
+    // Configurar botões
+    document.getElementById('btn-copy-caption').onclick = () => {
+        navigator.clipboard.writeText(c.caption);
+        alert('Legenda copiada para a área de transferência!');
+    };
+
+    document.getElementById('btn-open-assets').onclick = () => {
+        if (c.metadata?.final_asset_url) window.open(c.metadata.final_asset_url, '_blank');
+        else alert('Nenhum arquivo final encontrado.');
+    };
+
+    document.getElementById('btn-open-account').onclick = () => {
+        window.open('https://business.facebook.com/latest/composer', '_blank');
+    };
+
+    document.getElementById('btn-confirm-pub').onclick = async () => {
+        if (confirm('Confirmar que este conteúdo foi publicado com sucesso?')) {
+            await supabase.from('content_assets').update({ status: 'PUBLICADO' }).eq('id', id);
+            modal.style.display = 'none';
+            loadContent();
+        }
+    };
+
+    // Fechar modal
+    document.getElementById('close-pub-modal').onclick = () => modal.style.display = 'none';
+
+    modal.style.display = 'flex';
+};
+
 window.copyPortalLink = () => {
     if (!currentProject) return alert('Selecione um projeto!');
     const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${currentProject}`;
     
     navigator.clipboard.writeText(portalLink).then(() => {
-        const btn = document.getElementById('btn-send-calendar');
+        const btn = document.getElementById('btn-copy-portal');
         const originalHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIADO!';
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIADO';
         btn.style.borderColor = 'var(--os-primary)';
         setTimeout(() => {
             btn.innerHTML = originalHtml;
@@ -449,33 +533,30 @@ window.copyPortalLink = () => {
     });
 };
 
-window.sendCompleteCalendar = async () => {
+window.approvePendingAssets = async () => {
     if (!currentProject) return alert('Selecione um projeto!');
     
     const supabase = getSupabase();
-    
-    // Buscar ativos pendentes (PAUTA ou AJUSTE)
     const { data: pendentes } = await supabase.from('content_assets')
         .select('id')
         .eq('project_id', currentProject)
         .in('status', ['PAUTA', 'AJUSTE']);
 
     if (!pendentes || pendentes.length === 0) {
-        return alert('Não há novos planejamentos pendentes para enviar.');
+        return alert('Nenhuma pauta pendente para enviar.');
     }
 
-    if (confirm(`Deseja enviar os novos planejamentos e ajustes pendentes (${pendentes.length} ativos) para aprovação do cliente?`)) {
+    if (confirm(`Enviar ${pendentes.length} pautas para aprovação do cliente?`)) {
         const { error } = await supabase.from('content_assets')
             .update({ status: 'APROVAÇÃO' })
             .eq('project_id', currentProject)
             .in('status', ['PAUTA', 'AJUSTE']);
 
-        if (error) alert('Erro ao enviar: ' + error.message);
+        if (error) alert('Erro: ' + error.message);
         else {
-            sLog('Calendário Enviado para o Cliente.');
+            sLog('Pautas enviadas para aprovação.');
             loadContent();
-            window.copyPortalLink(); // Copiar automaticamente após enviar
-            alert('Calendário enviado com sucesso! O link do portal foi copiado para sua área de transferência para envio via WhatsApp.');
+            alert('Sucesso! As pautas agora estão visíveis para o cliente no portal.');
         }
     }
 };
@@ -505,14 +586,13 @@ window.runAiPlanner = async () => {
     sLog(`Iniciando Motor Estratégico (Cota: ${count}/${quota})`);
     
     try {
+        const serviceType = document.getElementById('ai-planner-service')?.value || 'ALL';
         const { AIPlanner } = await import('../../services/ai-planner.js');
-        const contents = await AIPlanner.generatePlan(selectedId);
+        const contents = await AIPlanner.generatePlan(selectedId, serviceType);
         
-        // Filtrar apenas o que cabe na cota
-        const remaining = quota - count;
         const toInsert = contents.slice(0, remaining);
 
-        if (confirm(`Gerar Planejamento Estratégico (${toInsert.length} novos ativos)?`)) {
+        if (confirm(`Gerar Planejamento (${toInsert.length} ativos - Tipo: ${serviceType})?`)) {
             const { error } = await supabase.from('content_assets').insert(toInsert);
             if (error) throw error;
             

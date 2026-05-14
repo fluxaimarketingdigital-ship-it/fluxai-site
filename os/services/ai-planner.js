@@ -3,21 +3,22 @@ export const AIPlanner = {
      * Matriz Estratégica por Tipo de Serviço
      */
     STRATEGIC_MATRIX: {
-        'REELS': { name: 'REELS', platform: 'INSTAGRAM', template: '🎯 OBJETIVO: [OBJ]\n🎬 HOOK: [IA]\n💬 FALAS: [IA]\n👁️ DIREÇÃO: [IA]\n✨ CTA: [IA]\n🧠 GATILHO: [IA]\n⏳ TEMPO: 45s' },
-        'CARROSSEL': { name: 'CARROSSEL', platform: 'INSTAGRAM', template: '🎯 OBJETIVO: [OBJ]\n📚 ESTRUTURA: Slide 1-10 [IA]\n🎨 HIERARQUIA: [IA]\n✨ CTA: [IA]\n🧲 TENSÃO: [IA]' },
-        'SITE': { name: 'SITE', platform: 'WEB', template: '🎯 OBJETIVO: Conversão\n🏗️ ARQUITETURA: Seções [IA]\n🖱️ FLUXO UX: [IA]\n📝 COPY BASE: [IA]\n🔍 SEO: [IA]' },
-        'BRANDING': { name: 'BRANDING', platform: 'ESTRATÉGIA', template: '🎯 OBJETIVO: Posicionamento\n🗣️ NARRATIVA: [IA]\n🎨 PALETA/TOM: [IA]\n💎 DIFERENCIAÇÃO: [IA]' },
-        'TRAFEGO': { name: 'TRÁFEGO PAGO', platform: 'META/GOOGLE', template: '🎯 OBJETIVO: Aquisição\n📈 CAMPANHAS: [IA]\n🖼️ CRIATIVOS: [IA]\n🎯 PÚBLICO: [IA]\n💰 DISTRIBUIÇÃO: [IA]' },
-        'CRM': { name: 'CRM', platform: 'OPERACIONAL', template: '🎯 OBJETIVO: Relacionamento\n⛓️ PIPELINE: Etapas [IA]\n🤖 AUTOMAÇÃO: [IA]\n🌡️ HEALTH SCORE: [IA]' },
-        'AUTOMACAO': { name: 'AUTOMAÇÃO', platform: 'SISTEMA', template: '🎯 OBJETIVO: Eficiência\n⚙️ FLUXO LÓGICO: [IA]\n🔗 INTEGRAÇÕES: [IA]\n⚡ GATILHOS: [IA]' },
-        'DASHBOARD': { name: 'DASHBOARD', platform: 'ANALYTICS', template: '🎯 OBJETIVO: Inteligência\n📊 KPIs: [IA]\n🧐 LEITURA: [IA]\n📌 PRIORIDADES: [IA]' },
-        'CONSULTORIA': { name: 'CONSULTORIA', platform: 'ESTRATÉGICO', template: '🎯 OBJETIVO: Diagnóstico\n⚠️ GARGALOS: [IA]\n🚀 OPORTUNIDADES: [IA]\n📍 DIRECIONAMENTO: [IA]' }
+        'REELS': { name: 'Direção Audiovisual', platform: 'INSTAGRAM', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Atração de Leads High-Ticket\n🎬 HOOK: [IA]\n💬 FALAS: [IA]\n✨ CTA: [IA]\n⏳ TEMPO: 45s' },
+        'CARROSSEL': { name: 'Estrutura Narrativa', platform: 'INSTAGRAM', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Autoridade Técnica e Retenção\n📚 ESTRUTURA: Slide 1-10 [IA]\n✨ CTA: [IA]\n🧲 TENSÃO: [IA]' },
+        'SITE': { name: 'Arquitetura Digital', platform: 'WEB', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Conversão de Alta Autoridade\n🏗️ SEÇÕES: [IA]\n🖱️ FLUXO UX: Jornada de Decisão Executiva\n📝 COPY BASE: [IA]' },
+        'DOMINIO': { name: 'Presença Digital (Domínio)', platform: 'INFRA', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Blindagem de Marca e Autoridade Digital\n🌐 DOMÍNIO: Arquitetura de DNS e Segurança SSL\n🔗 LINKAGEM: Integração com Ecossistema FluxAI' },
+        'DATABASE': { name: 'Inteligência de Dados (DB)', platform: 'SISTEMA', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Rastreabilidade e Governança de Dados\n📊 ESTRUTURA: Modelagem de Banco de Dados Escalável\n🔐 SEGURANÇA: Criptografia e Backup Estratégico' },
+        'BRANDING': { name: 'Posicionamento de Elite', platform: 'BRAND', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Percepção de Valor Inquestionável\n🗣️ NARRATIVA: [IA]\n🎨 TOM DE VOZ: [IA]\n💎 DIFERENCIAÇÃO: [IA]' },
+        'TRAFEGO': { name: 'Aquisição Estratégica', platform: 'ADS', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Tração de Leads Qualificados (ICP)\n📈 ESTRATÉGIA: Funil de Conscientização Progressiva\n🖼️ CRIATIVOS: Foco em Dor Latente e Solução Técnica' },
+        'CRM': { name: 'Inteligência de Vendas', platform: 'CRM', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Maximização de LTV e Conversão\n⛓️ PIPELINE: Estágios de Decisão [IA]\n🤖 AUTOMAÇÃO: Réguas de Relacionamento Comportamental' },
+        'AUTOMACAO': { name: 'Eficiência Operacional', platform: 'SISTEMA', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Redução de Ruído e Escala de Processos\n⚙️ FLUXO: Automação de Tarefas Repetitivas\n🔗 INTEGRAÇÕES: Sincronização em Tempo Real' },
+        'CONSULTORIA': { name: 'Diagnóstico de Escala', platform: 'DIAGNÓSTICO', template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: Identificação de Gargalos de Crescimento\n⚠️ ANÁLISE: Pontos de Atrito Operacional\n🚀 ROADMAP: Definição de Marcos para os próximos 12 meses' }
     },
 
     /**
      * Gera o planejamento estratégico operacional completo
      */
-    generatePlan: async (projectId) => {
+    generatePlan: async (projectId, specificService = 'ALL') => {
         const supabase = window.getSupabase();
         const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
         
@@ -39,16 +40,26 @@ export const AIPlanner = {
 
         const contents = [];
         const now = new Date();
-        const services = Object.keys(AIPlanner.STRATEGIC_MATRIX);
+        
+        // Determinar quais serviços gerar
+        let servicesToGenerate = [];
+        if (specificService === 'ALL') {
+            servicesToGenerate = Object.keys(AIPlanner.STRATEGIC_MATRIX);
+        } else {
+            if (AIPlanner.STRATEGIC_MATRIX[specificService]) {
+                servicesToGenerate = [specificService];
+            } else {
+                // Fallback ou erro se o serviço não existir
+                servicesToGenerate = Object.keys(AIPlanner.STRATEGIC_MATRIX);
+            }
+        }
 
-        // Gerar 1 item de cada serviço seguindo uma cadência estratégica (Ter, Qui, Sáb)
         const strategicDays = [2, 4, 6]; // Terça, Quinta, Sábado
         let daysOffset = 0;
 
-        services.forEach((sKey, index) => {
+        servicesToGenerate.forEach((sKey) => {
             const service = AIPlanner.STRATEGIC_MATRIX[sKey];
             
-            // Encontrar próxima data estratégica que NÃO esteja ocupada
             let date;
             let found = false;
             
@@ -60,7 +71,7 @@ export const AIPlanner = {
                 
                 if (strategicDays.includes(date.getDay()) && !occupiedDates.includes(dateKey)) {
                     found = true;
-                    occupiedDates.push(dateKey); // Marcar como ocupada para o próximo item
+                    occupiedDates.push(dateKey);
                 }
                 daysOffset++;
             }
@@ -75,7 +86,7 @@ export const AIPlanner = {
                 caption: service.template
                     .replace('[OBJ]', onboarding.objectives)
                     .replace(/\[IA\]/g, 'Gerado conforme o tom ' + onboarding.tone + ' para atingir o ICP: ' + onboarding.icp),
-                internal_notes: `PLANO MESTRE V7: Focado em ${onboarding.objectives}.`
+                internal_notes: `GERAÇÃO ESPECÍFICA: ${service.name}.`
             });
         });
 

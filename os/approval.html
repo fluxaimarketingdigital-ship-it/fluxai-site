@@ -177,13 +177,13 @@
 
                 // BLOQUEIO DE ACESSO PÓS-APROVAÇÃO OU EM REVISÃO
                 const currentStatus = (c.status || '').toUpperCase();
-                const allowedStatus = ['APROVAÇÃO', 'PAUTA'];
+                const allowedStatus = ['APROVAÇÃO', 'PAUTA', 'VALIDAÇÃO'];
                 
                 if (!allowedStatus.includes(currentStatus)) {
                     document.getElementById('loading-state').style.display = 'none';
                     document.getElementById('main-ui').style.display = 'none';
                     
-                    if (currentStatus === 'AJUSTE') {
+                    if (currentStatus === 'AJUSTE' || (currentStatus === 'PRODUÇÃO' && !c.metadata?.final_asset_url)) {
                         document.getElementById('success-title').innerText = 'Aguardando Revisão';
                         const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Sua Solicitação:</strong><br>${c.internal_notes}</div>` : '';
                         document.getElementById('success-message').innerHTML = `Seus apontamentos já foram enviados para a nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes. ${feedbackMsg}`;
@@ -193,26 +193,18 @@
                     }
                     
                     document.getElementById('success-ui').style.display = 'block';
-                    
-                    // Configurar Botão de Voltar (mesmo se bloqueado)
-                    const backBtn = document.querySelector('#success-ui button');
-                    if (backBtn && c.project_id) {
-                        backBtn.onclick = () => {
-                            window.location.href = `/os/client-portal.html?project_id=${c.project_id}`;
-                        };
-                    }
                     return;
                 }
+
+                // DETECTAR SE É VALIDAÇÃO DE ARTE OU ESTRATÉGIA
+                const isArtValidation = currentStatus === 'VALIDAÇÃO';
 
                 // ACESSO PERMITIDO - MOSTRAR UI
                 document.getElementById('main-ui').style.display = 'block';
 
-                // Configurar Botão de Voltar para o Portal
-                const backBtn = document.querySelector('#success-ui button');
-                if (backBtn && c.project_id) {
-                    backBtn.onclick = () => {
-                        window.location.href = `/os/client-portal.html?project_id=${c.project_id}`;
-                    };
+                if (isArtValidation) {
+                    document.querySelector('h1').innerHTML = 'FluxAI <span>OS™</span>';
+                    document.querySelector('p[style*="font-size:0.7rem"]').innerText = 'VALIDAÇÃO DE ARTE FINAL';
                 }
 
                 // Proteção contra dados malformados
@@ -235,20 +227,36 @@
                 
                 // MOSTRAR APENAS O ROTEIRO (SEM LEGENDA/HASHTAGS NA ETAPA 1)
                 const roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
-                document.getElementById('asset-caption').innerText = roadmap;
                 
-                // LINK DE REFERÊNCIA
-                const refBtn = document.getElementById('ref-link-container');
-                if (c.metadata?.reference_url) {
-                    refBtn.innerHTML = `
-                        <a href="${c.metadata.reference_url}" target="_blank" class="btn" style="background:rgba(255,255,255,0.05); border:1px solid #444; width:100%; margin-top:15px; display:flex; align-items:center; justify-content:center; gap:10px; text-decoration:none; color:var(--os-primary); font-size:0.7rem; font-weight:800; border-radius:4px; padding:12px;">
-                            <i class="fa-solid fa-link"></i> VER REFERÊNCIA ESTRATÉGICA
-                        </a>
+                if (isArtValidation && c.metadata?.final_asset_url) {
+                    document.getElementById('asset-caption').innerHTML = `
+                        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px;">
+                            <i class="fa-solid fa-file-circle-check" style="font-size: 3rem; color: #8b5cf6; margin-bottom: 15px;"></i>
+                            <h3 style="color: #fff; margin-bottom: 10px;">A Arte Final está pronta!</h3>
+                            <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px;">Clique no botão abaixo para visualizar o arquivo final em alta resolução.</p>
+                            <a href="${c.metadata.final_asset_url}" target="_blank" class="btn" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; padding: 12px 30px;">
+                                <i class="fa-solid fa-eye"></i> VISUALIZAR ARTE FINAL
+                            </a>
+                        </div>
+                        <div style="opacity: 0.5; font-size: 0.8rem;">
+                            <strong>Lembrete do Planejamento:</strong><br>
+                            ${roadmap}
+                        </div>
                     `;
+                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE PARA POSTAGEM';
+                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
+                } else {
+                    document.getElementById('asset-caption').innerText = roadmap;
                 }
+                
+                // LINK DE REFERÊNCIA (Oculto para o cliente por segurança operacional)
+                const refBtn = document.getElementById('ref-link-container');
+                if (refBtn) refBtn.innerHTML = '';
 
                 const badge = document.getElementById('status-badge-container');
-                if (c.status === 'APROVAÇÃO' || c.status === 'PAUTA') {
+                if (c.status === 'VALIDAÇÃO') {
+                    badge.innerHTML = `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">🟣 AGUARDANDO VALIDAÇÃO FINAL</span>`;
+                } else if (c.status === 'APROVAÇÃO' || c.status === 'PAUTA') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 AGUARDANDO APROVAÇÃO</span>`;
                 } else if (c.status === 'AJUSTE') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🟡 EM REVISÃO</span>`;
