@@ -172,12 +172,19 @@
                 
                 if (error || !c) throw new Error('Conteúdo não encontrado.');
 
-                // BLOQUEIO DE ACESSO PÓS-APROVAÇÃO (SEGURANÇA OPERACIONAL)
-                const allowedStatus = ['APROVAÇÃO', 'PAUTA', 'AJUSTE'];
+                // BLOQUEIO DE ACESSO PÓS-APROVAÇÃO OU EM REVISÃO
+                const allowedStatus = ['APROVAÇÃO', 'PAUTA'];
                 if (!allowedStatus.includes(c.status)) {
                     document.getElementById('main-ui').style.display = 'none';
-                    document.getElementById('success-title').innerText = 'Acesso Encerrado';
-                    document.getElementById('success-message').innerText = 'Este planejamento já foi validado e seguiu para a Etapa de Produção Operacional. Você pode acompanhar o progresso no seu Calendário.';
+                    
+                    if (c.status === 'AJUSTE') {
+                        document.getElementById('success-title').innerText = 'Aguardando Revisão';
+                        document.getElementById('success-message').innerText = 'Seus apontamentos já foram enviados para a nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes. Você receberá uma notificação assim que a nova versão estiver pronta.';
+                    } else {
+                        document.getElementById('success-title').innerText = 'Acesso Encerrado';
+                        document.getElementById('success-message').innerText = 'Este planejamento já foi validado e seguiu para a Etapa de Produção Operacional. Você pode acompanhar o progresso no seu Calendário.';
+                    }
+                    
                     document.getElementById('success-ui').style.display = 'block';
                     return;
                 }
