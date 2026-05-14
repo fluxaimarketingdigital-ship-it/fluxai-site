@@ -9,178 +9,188 @@
     <style>
         :root { --os-primary: #6b7a45; --os-bg: #0a0a0a; --os-surface: #141414; --os-text: #ffffff; --os-border: rgba(255,255,255,0.1); }
         body { background: var(--os-bg); color: var(--os-text); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .approval-container { width: 100%; max-width: 500px; background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 12px; padding: 30px; box-sizing: border-box; }
-        .header { text-align: center; margin-bottom: 30px; }
-        .header img { width: 120px; margin-bottom: 15px; }
-        .header h1 { font-size: 1.2rem; font-weight: 800; margin: 0; color: var(--os-primary); }
-        .header p { font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-top: 5px; }
+        .approval-container { width: 100%; max-width: 600px; background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 16px; padding: 40px; box-sizing: border-box; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         
-        .content-preview { background: #000; border-radius: 8px; margin-bottom: 25px; overflow: hidden; border: 1px solid var(--os-border); }
-        .asset-img { width: 100%; display: block; }
-        .caption-box { padding: 20px; border-top: 1px solid var(--os-border); }
-        .caption-box h3 { font-size: 0.7rem; text-transform: uppercase; color: var(--os-primary); margin: 0 0 10px 0; letter-spacing: 1px; }
-        .caption-box p { font-size: 0.9rem; line-height: 1.6; margin: 0; color: rgba(255,255,255,0.8); white-space: pre-wrap; }
+        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--os-border); padding-bottom: 25px; }
+        .header h1 { font-size: 1.4rem; font-weight: 900; margin: 0; letter-spacing: -1px; }
+        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        
+        .meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 35px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--os-border); }
+        .meta-item { display: flex; flex-direction: column; gap: 5px; }
+        .meta-label { font-size: 0.65rem; color: var(--os-primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .meta-value { font-size: 0.9rem; font-weight: 600; color: #fff; }
 
-        .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn { border: none; padding: 15px; border-radius: 6px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; }
-        .btn-approve { background: var(--os-primary); color: #fff; }
-        .btn-reject { background: transparent; border: 1px solid #ff4444; color: #ff4444; }
+        .content-body { line-height: 1.8; font-size: 0.95rem; color: rgba(255,255,255,0.9); }
+        .content-body h2 { font-size: 0.8rem; text-transform: uppercase; color: var(--os-primary); margin: 30px 0 15px 0; border-bottom: 1px solid var(--os-primary); display: inline-block; padding-bottom: 2px; }
+
+        .actions { display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; margin-top: 40px; }
+        .btn { border: none; padding: 18px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 0.9rem; transition: 0.3s; }
+        .btn-approve { background: var(--os-primary); color: #fff; box-shadow: 0 10px 20px rgba(107,122,69,0.3); }
+        .btn-reject { background: transparent; border: 1px solid rgba(255,68,68,0.5); color: #ff4444; }
+        .btn:hover { transform: translateY(-2px); opacity: 0.9; }
+
+        .feedback-area { display: none; margin-top: 30px; animation: fadeIn 0.4s ease; }
+        .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .check-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; border: 1px solid transparent; }
+        .check-item input { accent-color: var(--os-primary); }
+        .check-item:hover { border-color: var(--os-primary); }
         
-        .feedback-area { display: none; margin-top: 20px; width: 100%; }
-        .feedback-area textarea { width: 100%; background: #000; border: 1px solid var(--os-border); color: #fff; padding: 15px; border-radius: 6px; box-sizing: border-box; margin-bottom: 15px; }
+        textarea { width: 100%; background: #000; border: 1px solid var(--os-border); color: #fff; padding: 15px; border-radius: 10px; box-sizing: border-box; margin-bottom: 15px; font-family: inherit; }
         
         .success-msg { display: none; text-align: center; padding: 50px 20px; }
         .success-msg i { font-size: 4rem; color: var(--os-primary); margin-bottom: 20px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
     <div class="approval-container" id="main-ui">
         <div class="header">
-            <h1>FluxAI <span>OS™</span></h1>
-            <p>Portal de Aprovação de Conteúdo</p>
+            <div>
+                <h1>FluxAI <span>OS™</span></h1>
+                <p style="font-size:0.7rem; opacity:0.5; margin:5px 0 0 0;">PLANEJAMENTO ESTRATÉGICO</p>
+            </div>
+            <div id="status-badge-container">
+                <!-- Status Badge Injected -->
+            </div>
         </div>
 
         <div id="loading-state" style="text-align: center; padding: 40px; opacity: 0.5;">
-            <i class="fa-solid fa-spinner fa-spin"></i> Carregando conteúdo...
+            <i class="fa-solid fa-spinner fa-spin"></i> Sincronizando diretrizes...
         </div>
 
         <div id="content-data" style="display: none;">
-            <div class="content-preview">
-                <img id="asset-preview" class="asset-img" src="" alt="Preview do Conteúdo" />
-                <div class="caption-box">
-                    <h3>Legenda Sugerida</h3>
-                    <p id="asset-caption"></p>
+            <div class="meta-grid">
+                <div class="meta-item">
+                    <span class="meta-label">Objetivo</span>
+                    <span class="meta-value" id="meta-obj">---</span>
                 </div>
+                <div class="meta-item">
+                    <span class="meta-label">Formato</span>
+                    <span class="meta-value" id="meta-format">---</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Data Sugerida</span>
+                    <span class="meta-value" id="meta-date">---</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Versão</span>
+                    <span class="meta-value" id="meta-version">V1</span>
+                </div>
+            </div>
+
+            <div class="content-body">
+                <h2>Roteiro Estratégico</h2>
+                <div id="asset-caption" style="white-space: pre-wrap;"></div>
             </div>
 
             <div class="actions">
                 <button class="btn btn-reject" id="btn-reject-action">
-                    <i class="fa-solid fa-xmark"></i> AJUSTAR
+                    <i class="fa-solid fa-xmark"></i> SOLICITAR AJUSTE
                 </button>
                 <button class="btn btn-approve" id="btn-approve-action">
-                    <i class="fa-solid fa-check"></i> APROVAR
+                    <i class="fa-solid fa-check"></i> APROVAR DIRETRIZ
                 </button>
             </div>
 
             <div class="feedback-area" id="feedback-ui">
-                <h3 style="font-size:0.8rem; color:var(--os-primary); margin-bottom:15px;">O que precisamos ajustar?</h3>
-                <select id="feedback-category" style="width: 100%; background: #000; border: 1px solid var(--os-border); color: #fff; padding: 12px; border-radius: 6px; margin-bottom: 10px;">
-                    <option value="ARTE">Ajustar a Arte / Imagem</option>
-                    <option value="LEGENDA">Ajustar o Texto / Legenda</option>
-                    <option value="ESTRATEGIA">Mudar a Estratégia / Tema</option>
-                    <option value="OUTRO">Outros Detalhes</option>
-                </select>
-                <textarea id="feedback-text" rows="4" placeholder="Descreva com detalhes o que você gostaria de mudar..."></textarea>
-                <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR SOLICITAÇÃO DE AJUSTE</button>
+                <h3 style="font-size:0.8rem; color:var(--os-primary); margin-bottom:15px;">O que precisamos ajustar nesta pauta?</h3>
+                <div class="check-grid" id="adjustment-checks">
+                    <!-- Checkboxes Injected -->
+                </div>
+                <textarea id="feedback-text" rows="4" placeholder="Outras observações estratégicas..."></textarea>
+                <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR PARA REVISÃO</button>
             </div>
         </div>
     </div>
 
     <div class="success-msg" id="success-ui">
         <i class="fa-solid fa-circle-check"></i>
-        <h2 id="success-title">Solicitação Recebida!</h2>
-        <p id="success-message">Obrigado! Já estamos preparando tudo.</p>
+        <h2 id="success-title">Diretriz Aprovada!</h2>
+        <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const CLIENT_VIEW_MATRIX = {
-            'Direção Estratégica Audiovisual': 'REELS',
+            'Direção Operacional Audiovisual': 'REELS',
             'Direção Estratégica Visual': 'POST',
             'Estrutura Narrativa de Carrossel': 'CARROSSEL',
             'Arquitetura Estratégica Digital': 'SITE',
-            'Arquitetura de Posicionamento': 'POSICIONAMENTO',
-            'Estratégia de Aquisição': 'AQUISIÇÃO',
-            'Arquitetura Operacional': 'AUTOMAÇÃO',
-            'Estrutura de Relacionamento': 'CRM',
-            'Infraestrutura Analítica': 'DASHBOARD',
-            'Inteligência Operacional': 'IA',
-            'Direção de Produção': 'CAPTAÇÃO',
-            'Diagnóstico Estratégico': 'DIAGNÓSTICO',
-            'Estrutura de Conversão': 'LANDING PAGE',
-            'Engenharia Narrativa de Legenda': 'LEGENDA',
-            'Estrutura Institucional': 'APRESENTAÇÃO',
-            'Sistema de Identidade Visual': 'IDENTIDADE',
-            'Arquitetura de Conversão': 'FUNIL',
-            'Estrutura de Descoberta': 'SEO',
-            'Fluxo Conversacional': 'WHATSAPP',
-            'Infraestrutura Pública Digital': 'GOVOS'
+            'Arquitetura de Posicionamento': 'BRANDING'
+        };
+
+        const ADJUSTMENT_CHECKS = {
+            'REELS': ['Tempo do vídeo', 'Tema', 'Gancho (Hook)', 'Call to Action', 'Abordagem/Tom'],
+            'CARROSSEL': ['Tema', 'Quantidade de Slides', 'Estrutura Narrativa', 'Abordagem Visual'],
+            'SITE': ['Arquitetura', 'Caminho do Usuário', 'Textos/Copy', 'Navegação'],
+            'DEFAULT': ['Tema', 'Objetivo', 'Abordagem', 'Frequência']
         };
 
         function formatClientTitle(title) {
-            if (!title) return 'Sem Título';
-            if (title.includes(':')) {
-                const parts = title.split(':');
-                const internalName = parts[0].trim();
-                const objective = parts[1].trim();
-                const clientPrefix = CLIENT_VIEW_MATRIX[internalName] || internalName;
-                return `${clientPrefix} • ${objective}`;
-            }
-            return title;
+            if (!title) return { prefix: 'POST', obj: 'Estratégia' };
+            const parts = title.split(':');
+            const internalName = parts[0].trim();
+            const objective = parts[1] ? parts[1].trim() : 'Estratégia';
+            return { prefix: CLIENT_VIEW_MATRIX[internalName] || 'POST', obj: objective };
         }
 
-        function cleanExecutiveCaption(caption) {
-            if (!caption) return 'Sem descrição.';
-            // Remove linhas de ruído técnico
-            return caption.split('\n')
-                .filter(line => {
-                    const l = line.trim();
-                    return !l.startsWith('🚀') && 
-                           !l.startsWith('---') && 
-                           !l.startsWith('🧠 CONTEXTO') && 
-                           !l.startsWith('[IA') && 
-                           !l.startsWith('🛠️ PRIORIDADES');
-                })
-                .join('\n')
-                .trim();
+        function extractMeta(caption) {
+            const lines = caption.split('\n');
+            const meta = { time: '---', date: '---' };
+            lines.forEach(l => {
+                if (l.includes('TEMPO ESTIMADO:')) meta.time = l.split(':')[1].trim();
+                if (l.includes('DATA SUGERIDA:')) meta.date = l.split(':')[1].trim();
+            });
+            return meta;
         }
 
         async function load() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
-            
-            if (!id) {
-                document.getElementById('loading-state').innerHTML = 'Erro: Link inválido.';
-                return;
-            }
+            if (!id) return;
 
             try {
                 const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
                 const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
                 const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-                const { data: c, error } = await supabase
-                    .from('content_assets')
-                    .select('*')
-                    .eq('id', id)
-                    .single();
-                
-                if (error) throw error;
-                if (!c) throw new Error('Conteúdo não encontrado.');
+                const { data: c, error } = await supabase.from('content_assets').select('*').eq('id', id).single();
+                if (error || !c) throw new Error('Falha ao carregar.');
 
-                document.getElementById('asset-preview').src = c.media_url || 'https://images.unsplash.com/photo-1493612276216-ee3925520721?w=800';
+                const { prefix, obj } = formatClientTitle(c.title);
+                const meta = extractMeta(c.caption);
+
+                document.getElementById('meta-obj').innerText = obj;
+                document.getElementById('meta-format').innerText = prefix;
+                document.getElementById('meta-time').innerText = meta.time;
+                document.getElementById('meta-date').innerText = meta.date;
+                document.getElementById('meta-version').innerText = c.version || 'V1';
                 
-                // Aplicando Camada Executiva
-                const clientTitle = formatClientTitle(c.title);
-                const executiveCaption = cleanExecutiveCaption(c.caption);
+                document.getElementById('asset-caption').innerText = c.caption;
                 
-                document.getElementById('asset-caption').innerHTML = `
-                    <div style="font-size: 1.1rem; font-weight: 800; margin-bottom: 15px; color: #fff;">${clientTitle}</div>
-                    <div style="opacity: 0.9;">${executiveCaption}</div>
-                `;
-                
+                const badge = document.getElementById('status-badge-container');
+                if (c.status === 'APROVAÇÃO') {
+                    badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 AGUARDANDO APROVAÇÃO</span>`;
+                } else if (c.status === 'AJUSTE') {
+                    badge.innerHTML = `<span class="status-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🟡 EM REVISÃO</span>`;
+                }
+
+                const checks = ADJUSTMENT_CHECKS[prefix] || ADJUSTMENT_CHECKS['DEFAULT'];
+                document.getElementById('adjustment-checks').innerHTML = checks.map(check => `
+                    <label class="check-item">
+                        <input type="checkbox" value="${check}"> ${check}
+                    </label>
+                `).join('');
+
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('content-data').style.display = 'block';
 
-                // Configurar botões
                 document.getElementById('btn-approve-action').onclick = async () => {
-                    const { error: upError } = await supabase.from('content_assets').update({ status: 'PRONTO' }).eq('id', id);
-                    if (upError) alert('Erro ao aprovar: ' + upError.message);
-                    else {
-                        document.getElementById('main-ui').style.display = 'none';
-                        document.getElementById('success-ui').style.display = 'block';
-                    }
+                    await supabase.from('content_assets').update({ status: 'PRONTO' }).eq('id', id);
+                    document.getElementById('main-ui').style.display = 'none';
+                    document.getElementById('success-ui').style.display = 'block';
                 };
 
                 document.getElementById('btn-reject-action').onclick = () => {
@@ -188,28 +198,21 @@
                 };
 
                 document.getElementById('btn-submit-feedback').onclick = async () => {
-                    const category = document.getElementById('feedback-category').value;
-                    const feedback = document.getElementById('feedback-text').value;
-                    if (!feedback) return alert('Por favor, descreva o que precisa de ajuste.');
+                    const selected = Array.from(document.querySelectorAll('#adjustment-checks input:checked')).map(i => i.value);
+                    const note = document.getElementById('feedback-text').value;
+                    const fullNote = `ITENS: ${selected.join(', ')} | OBS: ${note}`;
                     
-                    const fullNote = `CATEGORIA: ${category} | DETALHES: ${feedback}`;
-                    
-                    await supabase.from('content_assets').update({ 
-                        status: 'AJUSTE',
-                        internal_notes: fullNote 
-                    }).eq('id', id);
-                    
+                    await supabase.from('content_assets').update({ status: 'AJUSTE', internal_notes: fullNote }).eq('id', id);
                     document.getElementById('main-ui').style.display = 'none';
-                    document.getElementById('success-message').innerText = 'Recebemos seu feedback! Nossa equipe já está trabalhando nos ajustes para garantir sua autoridade.';
+                    document.getElementById('success-title').innerText = 'Ajustes Solicitados!';
+                    document.getElementById('success-message').innerText = 'Recebemos suas observações. Vamos refinar a pauta agora mesmo.';
                     document.getElementById('success-ui').style.display = 'block';
                 };
 
             } catch (err) {
-                console.error('[DEBUG] Erro fatal:', err);
-                document.getElementById('loading-state').innerHTML = 'Erro ao carregar conteúdo: ' + err.message;
+                document.getElementById('loading-state').innerText = 'Erro ao carregar.';
             }
         }
-        
         window.onload = load;
     </script>
 </body>

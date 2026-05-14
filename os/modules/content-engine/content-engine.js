@@ -41,28 +41,82 @@ async function init() {
     }
 }
 
-// MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI (DUPLA CAMADA: INTERNO vs CLIENTE)
+// MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI v6.0 (DIREÇÃO OPERACIONAL)
 const STRATEGIC_MATRIX = {
-    'REELS': { name: 'Direção Estratégica Audiovisual', clientPrefix: 'REELS', platform: 'REELS' },
-    'CARD': { name: 'Direção Estratégica Visual', clientPrefix: 'POST', platform: 'INSTAGRAM' },
-    'CARROSSEL': { name: 'Estrutura Narrativa de Carrossel', clientPrefix: 'CARROSSEL', platform: 'INSTAGRAM' },
-    'SITE': { name: 'Arquitetura Estratégica Digital', clientPrefix: 'SITE', platform: 'WEB' },
-    'BRANDING': { name: 'Arquitetura de Posicionamento', clientPrefix: 'POSICIONAMENTO', platform: 'BRAND' },
+    'REELS': { 
+        name: 'Direção Operacional Audiovisual', 
+        clientPrefix: 'REELS', 
+        platform: 'REELS',
+        generate: (p, obj) => `
+🎯 OBJETIVO: ${obj}
+🎬 FORMATO: Reels (Vertical 9:16)
+⏱️ TEMPO ESTIMADO: 60 segundos
+📅 DATA SUGERIDA: Terça • 19h
+
+🪝 HOOK (GANCHO): "A maioria das pessoas não perde o controle por falta de disciplina."
+⏸️ PAUSA: [Silêncio de 2s] "Elas perdem porque vivem tentando compensar culpa alimentar."
+📝 DESENVOLVIMENTO: Explicar como restrições extremas aumentam episódios compulsivos. Tom humano e técnico.
+👁️ DIREÇÃO: Olhar direto para câmera. Postura empática. Pausas após frases-chave.
+✨ CTA: "Nutrição eficiente precisa funcionar na vida real."
+📝 LEGENDA: [IA gerando narrativa focada em autoridade...]
+        `
+    },
+    'CARROSSEL': { 
+        name: 'Estrutura Narrativa de Carrossel', 
+        clientPrefix: 'CARROSSEL', 
+        platform: 'INSTAGRAM',
+        generate: (p, obj) => `
+🎯 OBJETIVO: ${obj}
+🎬 FORMATO: Carrossel (1080x1350)
+🗂️ QUANTIDADE: 6 slides
+📅 DATA SUGERIDA: Quinta • 18h
+
+🖼️ ESTRUTURA NARRATIVA:
+- Slide 01: [Provocação] "Você provavelmente está dificultando sua alimentação sem perceber."
+- Slide 02: [Tensão] Explicar excesso de radicalismo alimentar.
+- Slide 03: [Quebra] Mostrar a consequência emocional da restrição.
+- Slide 04: [Solução] Apresentar o caminho sustentável FluxAI.
+- Slide 05: [Aprofundamento] Resultados reais do método.
+- Slide 06: [CTA] Direcionamento para conversa estratégica.
+        `
+    },
+    'CARD': { 
+        name: 'Direção Estratégica Visual', 
+        clientPrefix: 'POST', 
+        platform: 'INSTAGRAM',
+        generate: (p, obj) => `
+🎯 OBJETIVO: ${obj}
+🎬 FORMATO: Card Estático
+📅 DATA SUGERIDA: Segunda • 12h
+
+💡 HEADLINE: "Consistência vale mais que perfeição."
+🎨 PROPOSTA VISUAL: Ambiente clean, minimalista e humano.
+📐 HIERARQUIA: Foco total na frase central. Percepção Premium.
+✨ CTA: Estratégia alimentar sustentável.
+        `
+    },
+    'SITE': { 
+        name: 'Arquitetura Estratégica Digital', 
+        clientPrefix: 'SITE', 
+        platform: 'WEB',
+        generate: (p, obj) => `
+🎯 OBJETIVO: ${obj}
+🌐 ARQUITETURA: Landing Page / Institucional
+👤 JORNADA: Previsibilidade → Confiança → Conversão
+
+🏗️ SEÇÕES ESTRATÉGICAS:
+- HOME: Diagnóstico do Problema.
+- SEÇÃO 01: Autoridade Clínica de ${p.company_name}.
+- SEÇÃO 02: Estrutura de Atendimento e Tecnologia.
+- SEÇÃO 03: Provas, Resultados e Cases.
+- CTA: Fluxo de conversão para agendamento.
+        `
+    },
+    'BRANDING': { name: 'Arquitetura de Posicionamento', clientPrefix: 'BRANDING', platform: 'BRAND' },
     'TRAFEGO': { name: 'Estratégia de Aquisição', clientPrefix: 'AQUISIÇÃO', platform: 'ADS' },
     'AUTOMACAO': { name: 'Arquitetura Operacional', clientPrefix: 'AUTOMAÇÃO', platform: 'SYSTEM' },
     'CRM': { name: 'Estrutura de Relacionamento', clientPrefix: 'CRM', platform: 'CRM' },
-    'DASHBOARD': { name: 'Infraestrutura Analítica', clientPrefix: 'DASHBOARD', platform: 'DATA' },
-    'IA': { name: 'Inteligência Operacional', clientPrefix: 'IA', platform: 'AI' },
-    'CAPTACAO': { name: 'Direção de Produção', clientPrefix: 'CAPTAÇÃO', platform: 'PRODUCTION' },
-    'CONSULTORIA': { name: 'Diagnóstico Estratégico', clientPrefix: 'DIAGNÓSTICO', platform: 'CONSULTING' },
-    'LP': { name: 'Estrutura de Conversão', clientPrefix: 'LANDING PAGE', platform: 'WEB' },
-    'COPY': { name: 'Engenharia Narrativa', clientPrefix: 'LEGENDA', platform: 'COPY' },
-    'APRESENTACAO': { name: 'Estrutura Institucional', clientPrefix: 'APRESENTAÇÃO', platform: 'DOC' },
-    'IDV': { name: 'Sistema de Identidade', clientPrefix: 'IDENTIDADE', platform: 'DESIGN' },
-    'FUNIL': { name: 'Arquitetura de Conversão', clientPrefix: 'FUNIL', platform: 'SALES' },
-    'SEO': { name: 'Estrutura de Descoberta', clientPrefix: 'SEO', platform: 'WEB' },
-    'WHATSAPP': { name: 'Fluxo Conversacional', clientPrefix: 'WHATSAPP', platform: 'CHAT' },
-    'GOVOS': { name: 'Infraestrutura Pública Digital', clientPrefix: 'GOVOS', platform: 'GOV' }
+    'IA': { name: 'Inteligência Operacional', clientPrefix: 'IA', platform: 'AI' }
 };
 
 async function generateSampleContent(projectId, count = 12) {
@@ -70,8 +124,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    // Leitura de Escopo (Sistemas Ativos no Contrato)
-    const activeSystems = project.active_systems || ['REELS', 'CARROSSEL', 'CARD', 'TRAFEGO', 'BRANDING'];
+    const activeSystems = project.active_systems || ['REELS', 'CARROSSEL', 'CARD', 'SITE', 'BRANDING'];
     const objectives = ['AUTORIDADE', 'PERCEPÇÃO PREMIUM', 'CONVERSÃO', 'DIAGNÓSTICO', 'POSICIONAMENTO'];
     
     const samples = [];
@@ -85,36 +138,16 @@ async function generateSampleContent(projectId, count = 12) {
         const obj = objectives[i % objectives.length];
         
         const internalTitle = `${sys.name}: ${obj}`;
-        
-        // Lógica de Geração de Estratégia Real (Simulada com DNA do Cliente)
-        const strategicDirectives = {
-            'AUTORIDADE': `Elevar o posicionamento de ${project.company_name} como referência técnica absoluta no setor, utilizando dados e diferenciais competitivos.`,
-            'PERCEPÇÃO PREMIUM': `Construir uma narrativa de exclusividade e sofisticação, focando no alto valor agregado e na experiência única do cliente.`,
-            'CONVERSÃO': `Direcionar a audiência para uma tomada de decisão imediata, baseada em urgência estratégica e solução de problemas críticos.`,
-            'DIAGNÓSTICO': `Expor falhas comuns do mercado para apresentar a metodologia de ${project.company_name} como a solução definitiva.`,
-            'POSICIONAMENTO': `Diferenciar a marca da concorrência através de uma narrativa de valores e visão de mercado singular.`
-        };
-
-        const directive = strategicDirectives[obj] || strategicDirectives['AUTORIDADE'];
-
-        let contentBody = `
-🎯 DIRETRIZ: ${obj}
-📝 ESTRUTURA: ${directive}
-
-💎 POSICIONAMENTO: Reforçar o DNA de ${project.company_name} através de elementos visuais de alto contraste e silêncio visual.
-🚀 JORNADA: Sequência narrativa desenhada para capturar a atenção nos primeiros 3 segundos e conduzir ao desejo de solução.
-✨ CTA: Direcionamento focado em ${obj} (Agendamento Estratégico / Link na Bio).
-
-[TOOL: FluxAI OS™ Strategic Engine]
-        `;
+        const body = sys.generate ? sys.generate(project, obj) : `🎯 OBJETIVO: ${obj}\n[Direção Estratégica para ${sys.name}]`;
 
         samples.push({
             project_id: projectId,
             title: internalTitle, 
-            status: 'PAUTA',
+            status: 'APROVAÇÃO', // Começa direto em aprovação no calendário 1
             priority: 'ALTA',
             platform: sys.platform,
-            caption: contentBody,
+            caption: body,
+            version: 'V1',
             scheduled_at: new Date(nextMonth.getTime() + (i * 2 * 24 * 60 * 60 * 1000)).toISOString()
         });
     }
@@ -122,7 +155,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro: ' + error.message);
     else {
-        alert(`Ativos Gerados! 🚀 (Camada Dupla: Interno + Cliente)`);
+        alert(`Planejamento Estratégico Gerado! 🚀 ${count} Ativos em V1 aguardando aprovação.`);
         loadContent();
     }
 }
