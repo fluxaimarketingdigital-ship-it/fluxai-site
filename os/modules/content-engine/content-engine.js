@@ -220,6 +220,10 @@ async function loadContent() {
     if (placeholder) placeholder.style.display = 'none';
     const sections = dashboard.querySelectorAll('.os-metric-grid, .os-tabs');
     sections.forEach(s => s.style.display = 'flex');
+    
+    const sendBtn = document.getElementById('btn-send-calendar');
+    if (sendBtn) sendBtn.style.display = 'flex';
+
     // Mostrar a aba ativa
     const activeTabBtn = document.querySelector('.os-tab-btn.active');
     if (activeTabBtn) {
@@ -417,6 +421,36 @@ window.saveAssetEdit = async () => {
     else {
         window.closeEditModal();
         loadContent();
+    }
+};
+
+window.sendCompleteCalendar = async () => {
+    if (!currentProject) return alert('Selecione um projeto!');
+    
+    const supabase = getSupabase();
+    
+    // Buscar ativos pendentes (PAUTA ou AJUSTE)
+    const { data: pendentes } = await supabase.from('content_assets')
+        .select('id')
+        .eq('project_id', currentProject)
+        .in('status', ['PAUTA', 'AJUSTE']);
+
+    if (!pendentes || pendentes.length === 0) {
+        return alert('Não há novos planejamentos pendentes para enviar.');
+    }
+
+    if (confirm(`Deseja enviar todo o calendário (${pendentes.length} ativos) para aprovação do cliente?`)) {
+        const { error } = await supabase.from('content_assets')
+            .update({ status: 'APROVAÇÃO' })
+            .eq('project_id', currentProject)
+            .in('status', ['PAUTA', 'AJUSTE']);
+
+        if (error) alert('Erro ao enviar: ' + error.message);
+        else {
+            sLog('Calendário Enviado para o Cliente.');
+            loadContent();
+            alert('Calendário enviado com sucesso! O cliente já pode visualizar e aprovar os itens no portal.');
+        }
     }
 };
 
