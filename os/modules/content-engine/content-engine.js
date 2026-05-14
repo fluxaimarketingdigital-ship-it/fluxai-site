@@ -232,11 +232,16 @@ function renderContentTable(contents) {
     body.innerHTML = contents.map(c => {
         const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Escala Pendente';
         const isAwaitingApproval = c.status === 'APROVAÇÃO' || c.status === 'PAUTA';
+        const revCount = c.metadata?.adjustment_count || 0;
+        const versionLabel = revCount > 0 ? `R${revCount + 1}` : 'V1';
 
         return `
             <tr>
                 <td>
-                    <div style="font-weight: 700; color: #fff;">${c.title}</div>
+                    <div style="display:flex; align-items:center; gap:8px;">
+                        <div style="font-weight: 700; color: #fff;">${c.title}</div>
+                        <span style="font-size: 0.55rem; background: ${revCount > 0 ? 'var(--os-danger)' : '#333'}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800;">${versionLabel}</span>
+                    </div>
                     <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;">
                         <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> ${scheduled}
                     </div>
