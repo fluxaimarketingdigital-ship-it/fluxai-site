@@ -156,7 +156,7 @@ export async function initEngine() {
 }
 
 function switchTab(tab) {
-    const tabs = ['esteira', 'calendario'];
+    const tabs = ['esteira', 'calendario-estrategico', 'calendario-operacional'];
     tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.style.display = t === tab ? 'block' : 'none';
@@ -198,7 +198,10 @@ async function loadContent() {
         const safeContents = contents || [];
         renderMetrics(safeContents);
         renderContentTable(safeContents);
-        renderCalendar(safeContents);
+        
+        // Renderizar Calendários
+        renderCalendar('calendar-strategic-body', safeContents, 'STRATEGIC');
+        renderCalendar('calendar-operational-body', safeContents, 'OPERATIONAL');
         
     } catch (e) {
         sLog('Erro Conteúdo: ' + e.message);
