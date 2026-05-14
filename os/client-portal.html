@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal do Cliente | FluxAI OS™</title>
+    <link rel="stylesheet" href="/os/css/os-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --os-primary: #8e9e68;
+            --os-bg: #050505;
+            --os-widget-bg: #0d0d0d;
+            --os-border: #1a1a1a;
+            --os-text: #ffffff;
+            --os-text-muted: #666666;
+        }
+        body { background: var(--os-bg); color: var(--os-text); font-family: 'Inter', sans-serif; }
+        .portal-header { padding: 40px 20px; text-align: center; border-bottom: 1px solid var(--os-border); margin-bottom: 40px; }
+        .portal-header h1 { font-size: 1.8rem; letter-spacing: -1px; margin-bottom: 10px; }
+        .portal-header p { color: var(--os-text-muted); font-size: 0.9rem; }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .calendar-day {
+            background: var(--os-widget-bg);
+            border: 1px solid var(--os-border);
+            aspect-ratio: 1/1;
+            padding: 10px;
+            border-radius: 4px;
+            position: relative;
+            min-height: 120px;
+        }
+        .day-num { font-size: 0.7rem; color: var(--os-text-muted); margin-bottom: 8px; font-weight: 800; }
+        
+        .asset-card {
+            font-size: 0.65rem;
+            padding: 6px;
+            border-radius: 3px;
+            margin-bottom: 4px;
+            cursor: pointer;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
+        .asset-card:hover { transform: translateY(-2px); border-color: var(--os-primary); }
+        
+        .status-aprovacao { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.2); }
+        .status-ajuste { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.2); }
+        .status-producao { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.2); }
+        
+        @media (max-width: 768px) {
+            .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+    </style>
+</head>
+<body>
+    <header class="portal-header">
+        <div style="color:var(--os-primary); font-weight:900; font-size:0.7rem; letter-spacing:3px; margin-bottom:10px;">FLUXAI OS™</div>
+        <h1>Planejamento Estratégico Mensal</h1>
+        <p id="client-name">Carregando cronograma...</p>
+    </header>
+
+    <div class="calendar-grid" id="calendar-body"></div>
+
+    <script type="module">
+        import { getSupabase } from '/os/services/supabase-client.js';
+
+        const params = new URLSearchParams(window.location.search);
+        const projectId = params.get('project_id');
+
+        async function init() {
+            if (!projectId) return document.body.innerHTML = '<h1>Acesso negado.</h1>';
+
+            const supabase = getSupabase();
+            
+            // Buscar Projeto
+            const { data: project } = await supabase.from('projects').select('*').eq('id', projectId).single();
+            if (project) {
+                document.getElementById('client-name').innerText = `Cronograma de Conteúdo: ${project.company_name || project.name}`;
+            }
+
+            // Buscar Ativos
+            const { data: assets } = await supabase.from('content_assets')
+                .select('*')
+                .eq('project_id', projectId)
+                .order('scheduled_at', { ascending: true });
+
+            renderCalendar(assets || []);
+        }
+
+        function renderCalendar(contents) {
+            const grid = document.getElementById('calendar-body');
+            grid.innerHTML = '';
+
+            for (let i = 1; i <= 30; i++) {
+                const dayAssets = contents.filter(c => {
+                    const d = new Date(c.scheduled_at);
+                    return d.getDate() === i;
+                });
+
+                const dayHtml = `
+                    <div class="calendar-day">
+                        <div class="day-num">${i}</div>
+                        ${dayAssets.map(c => `
+                            <div class="asset-card status-${c.status.toLowerCase()}" onclick="window.openApproval('${c.id}')">
+                                <div style="font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
+                                <div style="font-size:0.5rem; opacity:0.7; margin-top:2px;">${c.status}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+                grid.innerHTML += dayHtml;
+            }
+        }
+
+        window.openApproval = (id) => {
+            window.location.href = `/os/approval.html?id=${id}`;
+        };
+
+        init();
+    </script>
+</body>
+</html>

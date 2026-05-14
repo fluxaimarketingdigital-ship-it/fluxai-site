@@ -449,7 +449,8 @@ window.sendCompleteCalendar = async () => {
         else {
             sLog('Calendário Enviado para o Cliente.');
             loadContent();
-            alert('Calendário enviado com sucesso! O cliente já pode visualizar e aprovar os itens no portal.');
+            const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${currentProject}`;
+            prompt('Calendário enviado com sucesso! Copie o link abaixo para enviar via WhatsApp para o cliente:', portalLink);
         }
     }
 };
