@@ -177,13 +177,13 @@
 
                 // BLOQUEIO DE ACESSO PÓS-APROVAÇÃO OU EM REVISÃO
                 const currentStatus = (c.status || '').toUpperCase();
-                const allowedStatus = ['APROVAÇÃO', 'PAUTA', 'VALIDAÇÃO'];
+                const allowedStatus = ['APROVAÇÃO ESTRATÉGICA', 'APROVAÇÃO FINAL', 'PLANEJAMENTO'];
                 
                 if (!allowedStatus.includes(currentStatus)) {
                     document.getElementById('loading-state').style.display = 'none';
                     document.getElementById('main-ui').style.display = 'none';
                     
-                    if (currentStatus === 'AJUSTE' || (currentStatus === 'PRODUÇÃO' && !c.metadata?.final_asset_url)) {
+                    if (currentStatus === 'AJUSTE' || currentStatus === 'REVISÃO INTERNA' || (currentStatus === 'PRODUÇÃO' && !c.metadata?.final_asset_url)) {
                         document.getElementById('success-title').innerText = 'Aguardando Revisão';
                         const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Sua Solicitação:</strong><br>${c.internal_notes}</div>` : '';
                         document.getElementById('success-message').innerHTML = `Seus apontamentos já foram enviados para a nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes. ${feedbackMsg}`;
@@ -197,14 +197,14 @@
                 }
 
                 // DETECTAR SE É VALIDAÇÃO DE ARTE OU ESTRATÉGIA
-                const isArtValidation = currentStatus === 'VALIDAÇÃO';
+                const isArtValidation = currentStatus === 'APROVAÇÃO FINAL';
 
                 // ACESSO PERMITIDO - MOSTRAR UI
                 document.getElementById('main-ui').style.display = 'block';
 
                 if (isArtValidation) {
                     document.querySelector('h1').innerHTML = 'FluxAI <span>OS™</span>';
-                    document.querySelector('p[style*="font-size:0.7rem"]').innerText = 'VALIDAÇÃO DE ARTE FINAL';
+                    document.querySelector('p[style*="font-size:0.7rem"]').innerText = 'APROVAÇÃO DE ARTE FINAL';
                 }
 
                 // Proteção contra dados malformados
@@ -219,11 +219,17 @@
                 document.getElementById('meta-obj').innerText = obj || 'Estratégia';
                 document.getElementById('meta-format').innerText = prefix || 'POST';
                 document.getElementById('meta-time').innerText = meta.time || '---';
-                document.getElementById('meta-date').innerText = 'Otimizado por Métricas';
                 
-                // CONTADOR DE REVISÕES
-                const revCount = c.metadata?.adjustment_count || 0;
-                document.getElementById('meta-version').innerText = revCount > 0 ? `R${revCount + 1}` : 'V1';
+                // EXIBIÇÃO DE PRAZO
+                if (c.metadata?.approval_deadline) {
+                    const deadline = new Date(c.metadata.approval_deadline);
+                    document.getElementById('meta-date').innerHTML = `<span style="color:var(--os-primary); font-weight:900;">${deadline.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>`;
+                } else {
+                    document.getElementById('meta-date').innerText = 'Otimizado por Métricas';
+                }
+                
+                // EXIBIÇÃO DE VERSÃO
+                document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
                 // MOSTRAR APENAS O ROTEIRO (SEM LEGENDA/HASHTAGS NA ETAPA 1)
                 const roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
@@ -254,9 +260,9 @@
                 if (refBtn) refBtn.innerHTML = '';
 
                 const badge = document.getElementById('status-badge-container');
-                if (c.status === 'VALIDAÇÃO') {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">🟣 AGUARDANDO VALIDAÇÃO FINAL</span>`;
-                } else if (c.status === 'APROVAÇÃO' || c.status === 'PAUTA') {
+                if (c.status === 'APROVAÇÃO FINAL') {
+                    badge.innerHTML = `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">🟣 AGUARDANDO APROVAÇÃO FINAL</span>`;
+                } else if (c.status === 'APROVAÇÃO ESTRATÉGICA' || c.status === 'PLANEJAMENTO') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 AGUARDANDO APROVAÇÃO</span>`;
                 } else if (c.status === 'AJUSTE') {
                     badge.innerHTML = `<span class="status-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🟡 EM REVISÃO</span>`;

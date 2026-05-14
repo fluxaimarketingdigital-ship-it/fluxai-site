@@ -287,19 +287,22 @@ function renderContentTable(contents) {
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
                         <div style="font-weight: 700; color: #fff;">${c.title}</div>
-                        <span style="font-size: 0.55rem; background: ${revCount > 0 ? 'var(--os-danger)' : '#333'}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800;">${versionLabel}</span>
+                        <span style="font-size: 0.5rem; background: ${c.metadata?.version === 'FINAL' ? 'var(--os-primary)' : '#333'}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800;">${c.metadata?.version || 'V1'}</span>
+                        ${c.metadata?.risk ? '<i class="fa-solid fa-triangle-exclamation" title="Risco Operacional: Atraso pode impactar publicação" style="color:var(--os-danger); font-size:0.7rem; animation: pulse 2s infinite;"></i>' : ''}
                     </div>
                     <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;">
                         <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> ${scheduled}
                     </div>
                 </td>
-                <td><span class="status-badge" style="background:${getStatusBg(c.status)}; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem; font-weight: 800;">${c.status}</span></td>
-                <td style="font-size: 0.7rem; font-weight: 800; color: ${c.priority === 'ALTA' ? 'var(--os-danger)' : 'var(--os-text-muted)'};">${c.priority}</td>
+                <td><span class="status-badge" style="background:${getStatusBg(c.status)}; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem; font-weight: 800; white-space: nowrap;">${c.status}</span></td>
+                <td>
+                    <div style="font-size: 0.7rem; font-weight: 800; color: #fff;">${c.metadata?.responsible || '---'}</div>
+                    <div style="font-size: 0.55rem; color: var(--os-text-muted);">${c.priority}</div>
+                </td>
                 <td style="font-size: 0.75rem; font-weight: 600;">${c.platform}</td>
                 <td>
-                    <div style="display:flex; gap:4px;">
-                        <div style="width:8px; height:8px; border-radius:50%; background:${isAwaitingApproval ? '#f59e0b' : '#10b981'};"></div>
-                        <div style="width:8px; height:8px; border-radius:50%; background:#444;"></div>
+                    <div style="font-size: 0.65rem; color: ${c.metadata?.approval_deadline ? 'var(--os-warning)' : 'var(--os-text-muted)'};">
+                        ${c.metadata?.approval_deadline ? '<i class="fa-solid fa-clock"></i> ' + new Date(c.metadata.approval_deadline).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : '---'}
                     </div>
                 </td>
                 <td>
@@ -312,11 +315,6 @@ function renderContentTable(contents) {
                         ${c.metadata?.final_asset_url ? `
                             <a href="${c.metadata.final_asset_url}" target="_blank" class="btn-mini" title="Ver Arte Final" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa; border-color: #8b5cf6;">
                                 <i class="fa-solid fa-file-image"></i>
-                            </a>
-                        ` : ''}
-                        ${c.metadata?.reference_url ? `
-                            <a href="${c.metadata.reference_url}" target="_blank" class="btn-mini" title="Ver Referência (Produção)" style="background: rgba(255,255,255,0.05); color: var(--os-primary);">
-                                <i class="fa-solid fa-link"></i>
                             </a>
                         ` : ''}
                         <button class="btn-mini" title="Editar/Refinar" onclick="window.openEditModal('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
@@ -380,13 +378,15 @@ function renderCalendar(containerId, contents, mode) {
 }
 
 function getStatusBg(status) {
-    if (status === 'PAUTA') return '#6366f1'; // Azul
-    if (status === 'APROVAÇÃO') return '#f59e0b'; // Laranja
-    if (status === 'AJUSTE') return '#ef4444'; // Vermelho
-    if (status === 'PRODUÇÃO') return '#06b6d4'; // Ciano
-    if (status === 'VALIDAÇÃO') return '#8b5cf6'; // Roxo (Nova Etapa)
-    if (status === 'PRONTO') return '#10b981'; // Verde
-    if (status === 'PUBLICADO') return '#059669'; // Verde Escuro
+    if (status === 'PLANEJAMENTO') return '#6366f1'; 
+    if (status === 'REVISÃO INTERNA') return '#ec4899'; // Rosa
+    if (status === 'APROVAÇÃO ESTRATÉGICA') return '#f59e0b'; 
+    if (status === 'AJUSTE') return '#ef4444'; 
+    if (status === 'PRODUÇÃO') return '#06b6d4'; 
+    if (status === 'REVISÃO INTERNA FINAL') return '#ec4899';
+    if (status === 'APROVAÇÃO FINAL') return '#8b5cf6'; 
+    if (status === 'PRONTO') return '#10b981'; 
+    if (status === 'PUBLICADO') return '#059669'; 
     return '#444';
 }
 
@@ -419,6 +419,50 @@ window.openEditModal = async (id) => {
         }
         artField.value = c.metadata?.final_asset_url || '';
         
+        document.getElementById('edit-asset-art-final').value = c.metadata?.final_asset_url || '';
+        
+        // NOVOS CAMPOS: RESPONSÁVEL, PRAZO, VERSÃO, RISCO
+        let metaFields = document.getElementById('edit-asset-meta-group');
+        if (!metaFields) {
+            metaFields = document.createElement('div');
+            metaFields.id = 'edit-asset-meta-group';
+            metaFields.style = "display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 4px; border: 1px solid #222;";
+            metaFields.innerHTML = `
+                <div>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">RESPONSÁVEL</label>
+                    <select id="edit-asset-responsible" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
+                        <option value="Design">Design</option>
+                        <option value="Editor Audiovisual">Editor Audiovisual</option>
+                        <option value="Social Media">Social Media</option>
+                        <option value="Copywriter">Copywriter</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">VERSÃO</label>
+                    <select id="edit-asset-version" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
+                        <option value="V1">V1</option>
+                        <option value="V2">V2</option>
+                        <option value="V3">V3</option>
+                        <option value="FINAL">FINAL</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">PRAZO DE APROVAÇÃO</label>
+                    <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:20px;">
+                    <input type="checkbox" id="edit-asset-risk">
+                    <label style="font-size:0.7rem; color:var(--os-danger); font-weight:800;">RISCO OPERACIONAL</label>
+                </div>
+            `;
+            document.getElementById('edit-asset-art-final').parentElement.after(metaFields);
+        }
+        
+        document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || 'Design';
+        document.getElementById('edit-asset-version').value = c.metadata?.version || 'V1';
+        document.getElementById('edit-asset-deadline').value = c.metadata?.approval_deadline || '';
+        document.getElementById('edit-asset-risk').checked = c.metadata?.risk || false;
+        
         // MOSTRAR FEEDBACK SE HOUVER AJUSTE
         const feedbackContainer = document.getElementById('edit-asset-feedback-container');
         if (c.status === 'AJUSTE' && c.internal_notes) {
@@ -442,6 +486,10 @@ window.saveAssetEdit = async () => {
         const caption = document.getElementById('edit-asset-caption').value;
         const ref = document.getElementById('edit-asset-ref').value;
         const artFinal = document.getElementById('edit-asset-art-final')?.value;
+        const responsible = document.getElementById('edit-asset-responsible')?.value;
+        const version = document.getElementById('edit-asset-version')?.value;
+        const deadline = document.getElementById('edit-asset-deadline')?.value;
+        const risk = document.getElementById('edit-asset-risk')?.checked;
 
         const supabase = getSupabase();
         const { data: currentAsset } = await supabase.from('content_assets').select('status, metadata').eq('id', editingAssetId).single();
@@ -449,6 +497,10 @@ window.saveAssetEdit = async () => {
         const newMetadata = currentAsset.metadata || {};
         newMetadata.reference_url = ref;
         newMetadata.final_asset_url = artFinal;
+        newMetadata.responsible = responsible;
+        newMetadata.version = version;
+        newMetadata.approval_deadline = deadline;
+        newMetadata.risk = risk;
 
         let updatePayload = {
             title,
@@ -457,12 +509,23 @@ window.saveAssetEdit = async () => {
         };
 
         // LÓGICA DE TRANSIÇÃO DE STATUS
+        const statusMap = {
+            'PLANEJAMENTO': 'PLANEJAMENTO',
+            'REVISÃO INTERNA': 'REVISÃO INTERNA',
+            'APROVAÇÃO ESTRATÉGICA': 'APROVAÇÃO ESTRATÉGICA',
+            'AJUSTE': 'PLANEJAMENTO', // Volta para o início do fluxo em caso de ajuste
+            'PRODUÇÃO': 'PRODUÇÃO',
+            'REVISÃO INTERNA FINAL': 'REVISÃO INTERNA FINAL',
+            'APROVAÇÃO FINAL': 'APROVAÇÃO FINAL'
+        };
+
         if (currentAsset.status === 'AJUSTE') {
-            updatePayload.status = 'PAUTA';
+            updatePayload.status = 'PLANEJAMENTO';
         } else if (currentAsset.status === 'PRODUÇÃO' && artFinal) {
-            // Se o designer colocou a arte final, move para validação do cliente
-            if (confirm('Link de Arte Final detectado. Enviar este ativo para VALIDAÇÃO FINAL do cliente?')) {
-                updatePayload.status = 'VALIDAÇÃO';
+            if (confirm('Enviar para REVISÃO INTERNA FINAL antes do cliente?')) {
+                updatePayload.status = 'REVISÃO INTERNA FINAL';
+            } else if (confirm('Pular revisão e enviar direto para APROVAÇÃO FINAL do cliente?')) {
+                updatePayload.status = 'APROVAÇÃO FINAL';
             }
         }
 
@@ -541,23 +604,23 @@ window.approvePendingAssets = async () => {
     const { data: pendentes } = await supabase.from('content_assets')
         .select('id')
         .eq('project_id', currentProject)
-        .in('status', ['PAUTA', 'AJUSTE']);
+        .in('status', ['PLANEJAMENTO', 'REVISÃO INTERNA', 'AJUSTE']);
 
     if (!pendentes || pendentes.length === 0) {
-        return alert('Nenhuma pauta pendente para enviar.');
+        return alert('Nenhuma pauta pronta para envio estratégico.');
     }
 
-    if (confirm(`Enviar ${pendentes.length} pautas para aprovação do cliente?`)) {
+    if (confirm(`Enviar ${pendentes.length} pautas para APROVAÇÃO ESTRATÉGICA do cliente?`)) {
         const { error } = await supabase.from('content_assets')
-            .update({ status: 'APROVAÇÃO' })
+            .update({ status: 'APROVAÇÃO ESTRATÉGICA' })
             .eq('project_id', currentProject)
-            .in('status', ['PAUTA', 'AJUSTE']);
+            .in('status', ['PLANEJAMENTO', 'REVISÃO INTERNA', 'AJUSTE']);
 
         if (error) alert('Erro: ' + error.message);
         else {
-            sLog('Pautas enviadas para aprovação.');
+            sLog('Pautas enviadas para aprovação estratégica.');
             loadContent();
-            alert('Sucesso! As pautas agora estão visíveis para o cliente no portal.');
+            alert('Sucesso! O cliente já pode revisar as estratégias no portal.');
         }
     }
 };
