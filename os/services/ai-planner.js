@@ -27,28 +27,43 @@ export const AIPlanner = {
             objectives: "Escala e Autoridade"
         };
 
+        // Buscar datas já ocupadas para evitar colisões
+        const { data: existing } = await supabase.from('content_assets')
+            .select('scheduled_at')
+            .eq('project_id', projectId);
+        
+        const occupiedDates = (existing || []).map(e => {
+            const d = new Date(e.scheduled_at);
+            return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+        });
+
         const contents = [];
         const now = new Date();
         const services = Object.keys(AIPlanner.STRATEGIC_MATRIX);
 
         // Gerar 1 item de cada serviço seguindo uma cadência estratégica (Ter, Qui, Sáb)
         const strategicDays = [2, 4, 6]; // Terça, Quinta, Sábado
-        let dayCounter = 0;
         let daysOffset = 0;
 
         services.forEach((sKey, index) => {
             const service = AIPlanner.STRATEGIC_MATRIX[sKey];
             
-            // Encontrar próxima data estratégica
-            let date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            date.setDate(date.getDate() + daysOffset);
+            // Encontrar próxima data estratégica que NÃO esteja ocupada
+            let date;
+            let found = false;
             
-            while (!strategicDays.includes(date.getDay())) {
-                daysOffset++;
+            while (!found) {
                 date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 date.setDate(date.getDate() + daysOffset);
+                
+                const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+                
+                if (strategicDays.includes(date.getDay()) && !occupiedDates.includes(dateKey)) {
+                    found = true;
+                    occupiedDates.push(dateKey); // Marcar como ocupada para o próximo item
+                }
+                daysOffset++;
             }
-            daysOffset++; // Próximo item começa do próximo dia
 
             contents.push({
                 project_id: projectId,
