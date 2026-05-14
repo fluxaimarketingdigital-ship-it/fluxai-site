@@ -20,7 +20,7 @@
         
         .workspace-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid var(--os-border); padding-bottom: 20px; }
         .client-info { display: flex; align-items: center; gap: 20px; }
-        .client-logo { width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, var(--os-primary), #8b5cf6); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; color: #fff; box-shadow: 0 4px 15px rgba(168,85,247,0.3); }
+        .client-logo { width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, var(--os-primary), #4c5631); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; color: #fff; box-shadow: 0 4px 15px rgba(107,122,69,0.3); }
         
         .os-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
 
@@ -53,10 +53,8 @@
         </main>
     </div>
 
-    <script>
-        const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
-        const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    <script type="module">
+        import { getSupabase } from '/os/services/supabase-client.js';
 
         async function initCalendar() {
             const statusEl = document.getElementById('client-name');
@@ -65,20 +63,25 @@
 
             if (!projectId) {
                 statusEl.innerText = "Link de Acesso Inválido";
+                document.getElementById('workspace-period').innerText = "Solicite um link válido ao administrador.";
                 return;
             }
 
             try {
+                const supabase = getSupabase();
                 statusEl.innerText = "🔌 Conectando ao FluxAI Engine...";
                 
                 // 1. Buscar Projeto
                 const { data: project, error: pErr } = await supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle();
                 
-                if (project) {
-                    statusEl.innerText = project.company_name;
-                    document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
+                if (pErr) throw pErr;
+                if (!project) {
+                    statusEl.innerText = "Projeto não encontrado.";
+                    return;
                 }
 
+                statusEl.innerText = project.company_name;
+                document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
                 statusEl.innerText = "📅 Sincronizando Calendário...";
 
                 // 2. Buscar Conteúdos
@@ -89,8 +92,7 @@
 
                 if (cErr) throw cErr;
 
-                statusEl.innerText = project ? project.company_name : "Planejamento Estratégico";
-                
+                statusEl.innerText = project.company_name;
                 renderCalendar(contents || []);
                 updateStats(contents || []);
 
@@ -156,7 +158,8 @@
             document.getElementById('stat-approved').innerText = `${approved} Aprovados`;
         }
 
-        document.addEventListener('DOMContentLoaded', initCalendar);
+        // Boot
+        initCalendar();
     </script>
 </body>
 </html>

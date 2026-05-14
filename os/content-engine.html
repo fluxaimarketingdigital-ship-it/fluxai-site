@@ -8,150 +8,91 @@
     <link rel="stylesheet" href="/os/styles/os-theme.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --os-bg: #050505;
-            --os-surface: #0a0a0a;
-            --os-border: rgba(255,255,255,0.1);
-            --os-primary: #a855f7;
-            --os-accent-gradient: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
-            --os-text-muted: #888;
-        }
-
-        body { background: var(--os-bg); color: white; margin: 0; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+    <style>
+        .os-tab-btn { background: transparent; border: 1px solid var(--os-border); color: var(--os-text-muted); padding: 10px 20px; font-weight: 700; cursor: pointer; border-radius: 4px; transition: 0.2s; font-size: 0.8rem; }
+        .os-tab-btn.active { background: rgba(107, 122, 69, 0.1); color: var(--os-primary); border-color: var(--os-primary); }
         
-        /* Sidebar Fixa e Blindada */
-        .os-sidebar { width: 260px; height: 100vh; position: fixed; left: 0; top: 0; background: #000; border-right: 1px solid var(--os-border); padding: 30px 20px; box-sizing: border-box; }
-        .os-logo { font-weight: 900; font-size: 1.2rem; letter-spacing: -1px; margin-bottom: 40px; display: flex; align-items: center; gap: 10px; }
-        .os-logo span { color: var(--os-primary); }
-        .os-nav-item { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: var(--os-text-muted); text-decoration: none; border-radius: 8px; margin-bottom: 5px; font-size: 0.9rem; font-weight: 600; transition: all 0.2s; }
-        .os-nav-item:hover { background: rgba(255,255,255,0.05); color: white; }
-        .os-nav-item.active { background: var(--os-accent-gradient); color: white; }
-
-        .os-main-content { margin-left: 260px; padding: 40px; min-height: 100vh; }
-        
-        .os-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
-        .metric-card { background: var(--os-surface); border: 1px solid var(--os-border); padding: 24px; border-radius: 16px; position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
-        .metric-card:hover { border-color: rgba(168, 85, 247, 0.4); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .metric-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--os-accent-gradient); opacity: 0.3; }
-        .btn-ai:hover { filter: brightness(1.1); box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
-        
-        .os-tabs { display: flex; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid var(--os-border); padding-bottom: 15px; }
-        .os-tab-btn { background: transparent; border: none; color: var(--os-text-muted); padding: 10px 20px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: 0.2s; font-size: 0.9rem; }
-        .os-tab-btn.active { background: rgba(168, 85, 247, 0.1); color: var(--os-primary); }
-        
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; display: none; }
-        .calendar-day { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 12px; min-height: 120px; padding: 12px; position: relative; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .calendar-day { background: var(--os-card); border: 1px solid var(--os-border); border-radius: 4px; min-height: 120px; padding: 12px; position: relative; }
         .day-number { font-size: 0.75rem; font-weight: 800; color: var(--os-text-muted); margin-bottom: 8px; }
-        .calendar-event { background: rgba(168, 85, 247, 0.1); border-left: 3px solid var(--os-primary); padding: 6px; border-radius: 4px; font-size: 0.65rem; margin-bottom: 5px; cursor: pointer; color: #eee; }
+        .calendar-event { background: rgba(107, 122, 69, 0.1); border-left: 3px solid var(--os-primary); padding: 6px; border-radius: 2px; font-size: 0.65rem; margin-bottom: 5px; cursor: pointer; color: #eee; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-        .os-btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid var(--os-border); color: white; padding: 14px 24px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; }
-        .os-btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
-        .metric-label { font-size: 0.65rem; color: var(--os-text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; margin-bottom: 8px; }
-        .metric-value { font-size: 2rem; font-weight: 900; letter-spacing: -1px; }
-
-        .pipeline-table { width: 100%; border-collapse: separate; border-spacing: 0 10px; }
-        .pipeline-table th { text-align: left; padding: 15px; color: var(--os-text-muted); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; }
-        .pipeline-table td { padding: 20px; background: rgba(255,255,255,0.02); border-top: 1px solid var(--os-border); border-bottom: 1px solid var(--os-border); }
-        .pipeline-table tr td:first-child { border-left: 1px solid var(--os-border); border-radius: 12px 0 0 12px; }
-        .pipeline-table tr td:last-child { border-right: 1px solid var(--os-border); border-radius: 0 12px 12px 0; }
+        .pipeline-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .pipeline-table th { text-align: left; padding: 15px; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--os-text-muted); border-bottom: 1px solid var(--os-border); }
+        .pipeline-table td { padding: 15px; font-size: 0.85rem; border-bottom: 1px solid var(--os-border); color: var(--os-text-main); }
         
-        .btn-ai { background: var(--os-accent-gradient); color: white; border: none; padding: 14px 28px; border-radius: 12px; cursor: pointer; font-weight: 800; display: flex; align-items: center; gap: 12px; }
-        .os-select { background: #111; border: 1px solid var(--os-border); color: white; border-radius: 12px; padding: 12px 20px; outline: none; }
+        .btn-ai { background: var(--os-primary); color: white; border: none; padding: 0 20px; border-radius: 4px; cursor: pointer; font-weight: 800; display: flex; align-items: center; gap: 10px; font-size: 0.75rem; height: 40px; }
+        .os-select { background: var(--os-sidebar); border: 1px solid var(--os-border); color: white; border-radius: 4px; padding: 0 15px; outline: none; height: 40px; font-size: 0.85rem; }
 
-        #loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
-        .spinner { width: 30px; height: 30px; border: 2px solid rgba(168, 85, 247, 0.1); border-top-color: var(--os-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        #loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+        .spinner { width: 30px; height: 30px; border: 2px solid rgba(107, 122, 69, 0.1); border-top-color: var(--os-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
-<body>
+<body class="os-mode">
     <div id="loading-overlay">
         <div class="spinner"></div>
-        <p style="color: #444; margin-top: 20px; font-size: 0.7rem; letter-spacing: 2px; font-weight: 800;">BOOTING FLUXAI OS™</p>
+        <p style="color: #444; margin-top: 20px; font-size: 0.6rem; letter-spacing: 3px; font-weight: 800; text-transform: uppercase;">Booting Content Engine™</p>
     </div>
 
-    <!-- SIDEBAR ESTÁTICA (BLINDADA CONTRA ERROS JS) -->
-    <aside class="os-sidebar">
-        <div class="os-logo">FLUXAI <span>OS™</span></div>
-        <nav>
-            <a href="/os/workspace.html" class="os-nav-item"><i class="fa-solid fa-house"></i> Dashboard</a>
-            <a href="/os/content-engine.html" class="os-nav-item active"><i class="fa-solid fa-wand-magic-sparkles"></i> Motor de Conteúdo</a>
-            <a href="/os/crm-intelligence.html" class="os-nav-item"><i class="fa-solid fa-users"></i> CRM Intelligence</a>
-            <a href="/os/analytics.html" class="os-nav-item"><i class="fa-solid fa-chart-line"></i> Analytics</a>
-            <a href="/os/governance.html" class="os-nav-item"><i class="fa-solid fa-shield-halved"></i> Governança</a>
-        </nav>
-    </aside>
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
 
-    <main class="os-main-content">
-        <div style="max-width: 1400px; margin: 0 auto;">
-            <!-- HEADER -->
-            <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 50px; padding-bottom: 30px; border-bottom: 1px solid var(--os-border);">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
-                        <span style="background: var(--os-primary); width: 12px; height: 12px; border-radius: 3px;"></span>
-                        <span style="font-size: 0.7rem; font-weight: 800; color: var(--os-text-muted); text-transform: uppercase; letter-spacing: 2px;">Core Intelligence</span>
+        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h1>Motor de Conteúdo</h1>
+                        <p>Orquestração estratégica para ativos de autoridade institucional.</p>
                     </div>
-                    <h1 style="font-size: 3.2rem; font-weight: 900; margin: 0; letter-spacing: -1.5px; background: linear-gradient(to right, #fff 30%, #555 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Motor de Conteúdo</h1>
-                    <p style="color: var(--os-text-muted); margin-top: 10px; font-size: 1rem;">Orquestração estratégica para ativos de autoridade.</p>
-                </div>
-                
-                <div style="display: flex; align-items: center; gap: 15px;">
-                    <select id="project-filter" class="os-select" style="min-width: 240px; height: 48px;"></select>
-                    <button id="btn-ai-planner" class="btn-ai" style="height: 48px;">
-                        <i class="fa-solid fa-wand-magic-sparkles"></i> PLANEJAMENTO IA
-                    </button>
-                    <button class="os-btn-secondary" style="height: 48px;" onclick="window.location.href='/os/flux-calendar.html'">
-                        <i class="fa-solid fa-calendar-days"></i> CALENDÁRIO
-                    </button>
-                </div>
-            </div>
-
-            <!-- MÉTRICAS -->
-            <div class="os-grid-4">
-                <div id="metric-assets" class="metric-card"></div>
-                <div id="metric-approval" class="metric-card"></div>
-                <div id="metric-production" class="metric-card"></div>
-                <div id="metric-schedule" class="metric-card"></div>
-            </div>
-
-            <!-- SISTEMA DE ABAS -->
-            <div class="os-tabs">
-                <button class="os-tab-btn active" onclick="window.switchTab('esteira')"><i class="fa-solid fa-list-check"></i> Esteira Operacional</button>
-                <button class="os-tab-btn" onclick="window.switchTab('calendario')"><i class="fa-solid fa-calendar-days"></i> Calendário Estratégico</button>
-            </div>
-
-            <!-- ESTEIRA -->
-            <div id="tab-esteira">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800;">Esteira de Produção</h3>
-                    <div id="workflow-deadline" style="font-size: 0.7rem; color: var(--os-text-muted); font-weight: 800; background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 8px; border: 1px solid var(--os-border);">
-                        <i class="fa-solid fa-calendar-check" style="color: var(--os-primary); margin-right: 5px;"></i> DEADLINE: DIA 28
+                    <div style="display: flex; gap: 10px;">
+                        <select id="project-filter" class="os-select"></select>
+                        <button id="btn-ai-planner" class="btn-ai">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> PLANEJAMENTO IA
+                        </button>
                     </div>
                 </div>
-                <table class="pipeline-table">
-                    <thead>
-                        <tr>
-                            <th>Ativo Estratégico</th>
-                            <th>Status</th>
-                            <th>Prioridade</th>
-                            <th>Plataforma</th>
-                            <th>Aprovação</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pipeline-table-body">
-                        <tr><td colspan="6" style="text-align:center; padding:100px; color:#444;">Aguardando dados...</td></tr>
-                    </tbody>
-                </table>
-            </div>
 
-            <!-- CALENDÁRIO -->
-            <div id="tab-calendario" style="display: none;">
-                <div class="calendar-grid" id="calendar-body" style="display: grid;">
-                    <!-- Preenchido via JS -->
+                <div class="os-widget-grid" style="margin-bottom: 40px;">
+                    <div class="os-widget" id="metric-assets" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-approval" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-production" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-schedule" style="grid-column: span 3;"></div>
                 </div>
-            </div>
+
+                <div class="os-tabs" style="display: flex; gap: 10px; margin-bottom: 30px;">
+                    <button class="os-tab-btn active" onclick="window.switchTab('esteira')"><i class="fa-solid fa-list-check"></i> Esteira Operacional</button>
+                    <button class="os-tab-btn" onclick="window.switchTab('calendario')"><i class="fa-solid fa-calendar-days"></i> Calendário Estratégico</button>
+                </div>
+
+                <div id="tab-esteira" class="os-widget" style="padding: 0; background: transparent; border: none;">
+                    <table class="pipeline-table">
+                        <thead>
+                            <tr>
+                                <th>Ativo Estratégico</th>
+                                <th>Status</th>
+                                <th>Prioridade</th>
+                                <th>Plataforma</th>
+                                <th>Aprovação</th>
+                                <th style="text-align: right;">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pipeline-table-body">
+                            <tr><td colspan="6" style="text-align:center; padding:100px; color:#444;">Sincronizando ativos...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="tab-calendario" style="display: none;">
+                    <div class="calendar-grid" id="calendar-body">
+                        <!-- Preenchido via JS -->
+                    </div>
+                </div>
+            </main>
         </div>
-    </main>
+    </div>
 
     <script type="module">
         import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
@@ -160,24 +101,23 @@
         async function bootContentEngine() {
             console.log('[BOOT] content-engine.html started');
             try {
-                // Injetar globais
+                // Injetar globais para o módulo legacy
                 window.getSupabase = getSupabase;
                 window.OS_UI = OS_UI;
                 window.OS_AUTH = OS_AUTH;
 
-                // 1. Verificar Login
-                const user = await OS_AUTH.check();
-                if (!user) { window.location.href = '/os/login.html'; return; }
+                const user = await OS_AUTH.check('OPERATOR');
+                if (!user) return;
 
-                // 2. Carregar Motor Operacional (Onde estão os dados)
+                OS_UI.renderSidebar('content-engine', user.role);
+                await OS_UI.renderTopbar();
+
                 await import(`/os/modules/content-engine/content-engine.js?v=${Date.now()}`);
                 
-                // 3. Remover Overlay
                 document.getElementById('loading-overlay').style.display = 'none';
-
             } catch (err) {
                 console.error('Erro de Boot:', err);
-                document.getElementById('loading-overlay').innerHTML = `<p style="color:red;">Erro: ${err.message}</p>`;
+                document.getElementById('loading-overlay').innerHTML = `<p style="color:var(--os-danger); font-size:0.8rem; font-weight:800;">CRITICAL BOOT ERROR: ${err.message}</p>`;
             }
         }
 
