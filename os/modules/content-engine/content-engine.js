@@ -226,26 +226,40 @@ function renderContentTable(contents) {
         return;
     }
 
-    body.innerHTML = contents.map(c => `
-        <tr onclick="window.openApproval('${c.id}')" style="cursor:pointer;">
-            <td>
-                <div style="font-weight: 700;">${c.title}</div>
-                <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.internal_notes || 'V1'}</div>
-            </td>
-            <td><span class="status-badge" style="background:${getStatusBg(c.status)}; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem;">${c.status}</span></td>
-            <td>${c.priority}</td>
-            <td>${c.platform}</td>
-            <td>
-                <div style="display:flex; gap:4px;">
-                    <div style="width:8px; height:8px; border-radius:50%; background:#10b981;"></div>
-                    <div style="width:8px; height:8px; border-radius:50%; background:#444;"></div>
-                </div>
-            </td>
-            <td>
-                <button class="btn-mini" onclick="event.stopPropagation(); window.deleteAsset('${c.id}')"><i class="fa-solid fa-trash"></i></button>
-            </td>
-        </tr>
-    `).join('');
+    body.innerHTML = contents.map(c => {
+        const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Escala Pendente';
+        const isAwaitingApproval = c.status === 'APROVAÇÃO' || c.status === 'PAUTA';
+
+        return `
+            <tr>
+                <td>
+                    <div style="font-weight: 700; color: #fff;">${c.title}</div>
+                    <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;">
+                        <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> ${scheduled}
+                    </div>
+                </td>
+                <td><span class="status-badge" style="background:${getStatusBg(c.status)}; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem; font-weight: 800;">${c.status}</span></td>
+                <td style="font-size: 0.7rem; font-weight: 800; color: ${c.priority === 'ALTA' ? 'var(--os-danger)' : 'var(--os-text-muted)'};">${c.priority}</td>
+                <td style="font-size: 0.75rem; font-weight: 600;">${c.platform}</td>
+                <td>
+                    <div style="display:flex; gap:4px;">
+                        <div style="width:8px; height:8px; border-radius:50%; background:${isAwaitingApproval ? '#f59e0b' : '#10b981'};"></div>
+                        <div style="width:8px; height:8px; border-radius:50%; background:#444;"></div>
+                    </div>
+                </td>
+                <td>
+                    <div style="display: flex; gap: 8px; justify-content: flex-end;">
+                        <button class="btn-mini" title="Ver Planejamento" onclick="window.openApproval('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
+                            <i class="fa-solid fa-eye"></i>
+                        </button>
+                        <button class="btn-mini" title="Excluir" onclick="window.deleteAsset('${c.id}')">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
 function renderCalendar(contents) {
