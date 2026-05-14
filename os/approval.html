@@ -85,10 +85,60 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        const CLIENT_VIEW_MATRIX = {
+            'Direção Estratégica Audiovisual': 'REELS',
+            'Direção Estratégica Visual': 'POST',
+            'Estrutura Narrativa de Carrossel': 'CARROSSEL',
+            'Arquitetura Estratégica Digital': 'SITE',
+            'Arquitetura de Posicionamento': 'POSICIONAMENTO',
+            'Estratégia de Aquisição': 'AQUISIÇÃO',
+            'Arquitetura Operacional': 'AUTOMAÇÃO',
+            'Estrutura de Relacionamento': 'CRM',
+            'Infraestrutura Analítica': 'DASHBOARD',
+            'Inteligência Operacional': 'IA',
+            'Direção de Produção': 'CAPTAÇÃO',
+            'Diagnóstico Estratégico': 'DIAGNÓSTICO',
+            'Estrutura de Conversão': 'LANDING PAGE',
+            'Engenharia Narrativa de Legenda': 'LEGENDA',
+            'Estrutura Institucional': 'APRESENTAÇÃO',
+            'Sistema de Identidade Visual': 'IDENTIDADE',
+            'Arquitetura de Conversão': 'FUNIL',
+            'Estrutura de Descoberta': 'SEO',
+            'Fluxo Conversacional': 'WHATSAPP',
+            'Infraestrutura Pública Digital': 'GOVOS'
+        };
+
+        function formatClientTitle(title) {
+            if (!title) return 'Sem Título';
+            if (title.includes(':')) {
+                const parts = title.split(':');
+                const internalName = parts[0].trim();
+                const objective = parts[1].trim();
+                const clientPrefix = CLIENT_VIEW_MATRIX[internalName] || internalName;
+                return `${clientPrefix} • ${objective}`;
+            }
+            return title;
+        }
+
+        function cleanExecutiveCaption(caption) {
+            if (!caption) return 'Sem descrição.';
+            // Remove linhas de ruído técnico
+            return caption.split('\n')
+                .filter(line => {
+                    const l = line.trim();
+                    return !l.startsWith('🚀') && 
+                           !l.startsWith('---') && 
+                           !l.startsWith('🧠 CONTEXTO') && 
+                           !l.startsWith('[IA') && 
+                           !l.startsWith('🛠️ PRIORIDADES');
+                })
+                .join('\n')
+                .trim();
+        }
+
         async function load() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
-            console.log('[DEBUG] Carregando aprovação para ID:', id);
             
             if (!id) {
                 document.getElementById('loading-state').innerHTML = 'Erro: Link inválido.';
@@ -109,10 +159,16 @@
                 if (error) throw error;
                 if (!c) throw new Error('Conteúdo não encontrado.');
 
-                console.log('[DEBUG] Conteúdo carregado:', c);
-
                 document.getElementById('asset-preview').src = c.media_url || 'https://images.unsplash.com/photo-1493612276216-ee3925520721?w=800';
-                document.getElementById('asset-caption').innerText = c.caption || 'Sem legenda.';
+                
+                // Aplicando Camada Executiva
+                const clientTitle = formatClientTitle(c.title);
+                const executiveCaption = cleanExecutiveCaption(c.caption);
+                
+                document.getElementById('asset-caption').innerHTML = `
+                    <div style="font-size: 1.1rem; font-weight: 800; margin-bottom: 15px; color: #fff;">${clientTitle}</div>
+                    <div style="opacity: 0.9;">${executiveCaption}</div>
+                `;
                 
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('content-data').style.display = 'block';
