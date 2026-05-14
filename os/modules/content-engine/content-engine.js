@@ -436,6 +436,7 @@ window.closeEditModal = () => {
     document.getElementById('modal-edit-asset').style.display = 'none';
 };
 
+window.saveAssetEdit = async () => {
     try {
         const title = document.getElementById('edit-asset-title').value;
         const caption = document.getElementById('edit-asset-caption').value;
