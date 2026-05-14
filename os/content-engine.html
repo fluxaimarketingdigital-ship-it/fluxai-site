@@ -112,7 +112,7 @@
         </div>
     </div>
 
-    <!-- RASTREADOR DE EMERGÊNCIA (INFALÍVEL) -->
+    <!-- RASTREADOR DE EMERGÊNCIA V71 (FORÇADO) -->
     <script>
         function screenLog(msg) {
             console.log('[SCREEN LOG]', msg);
@@ -120,64 +120,62 @@
             if (!logBox) {
                 logBox = document.createElement('div');
                 logBox.id = 'debug-log-box';
-                logBox.style = 'position:fixed; top:10px; right:10px; background:#000; color:#0f0; padding:15px; font-family:monospace; font-size:11px; z-index:99999; border:2px solid #0f0; max-width:320px; box-shadow:0 0 20px rgba(0,255,0,0.3);';
+                logBox.style = 'position:fixed; top:10px; right:10px; background:#001f3f; color:#0f0; padding:15px; font-family:monospace; font-size:11px; z-index:99999; border:2px solid #0074d9; max-width:320px; box-shadow:0 0 20px rgba(0,116,217,0.5);';
                 document.body.appendChild(logBox);
-                logBox.innerHTML = '<div style="border-bottom:1px solid #0f0; margin-bottom:10px; font-weight:bold;">FLUXAI OS™ BOOT DIAGNOSTIC</div>';
+                logBox.innerHTML = '<div style="border-bottom:1px solid #0074d9; margin-bottom:10px; font-weight:bold; color:#fff;">FLUXAI OS™ DIAGNOSTIC V71</div>';
             }
             const line = document.createElement('div');
             line.innerHTML = `> ${msg}`;
             logBox.appendChild(line);
         }
         window.screenLog = screenLog;
-        screenLog('Iniciando Reparo em Tempo Real...');
+        screenLog('Iniciando Reparo V71 (FORÇADO)...');
     </script>
 
     <script type="module">
-        import { OS_UI, OS_AUTH } from './js/os-core.js';
-        import { getSupabase } from './services/supabase-client.js';
-
         async function boot() {
-            screenLog('Iniciando Boot do Arquivo Raiz...');
+            screenLog('Boot V71 iniciado...');
             
             try {
-                // Pequeno delay para garantir que os containers no HTML foram processados
-                await new Promise(r => setTimeout(r, 100));
+                // Delay maior para vencer o carregamento lento
+                await new Promise(r => setTimeout(r, 300));
 
-                // Injetar funções globais para que o content-engine.js as veja
-                window.getSupabase = getSupabase;
+                screenLog('Buscando arquivos de sistema...');
+                const v = Date.now();
+                const core = await import(`/os/js/os-core.js?v=${v}`);
+                const db = await import(`/os/services/supabase-client.js?v=${v}`);
+                
+                const { OS_UI, OS_AUTH } = core;
+                window.getSupabase = db.getSupabase;
                 window.OS_UI = OS_UI;
                 window.OS_AUTH = OS_AUTH;
 
-                if (document.getElementById('os-sidebar-container')) {
-                    OS_UI.renderSidebar('content-engine', 'ADMIN');
-                    OS_UI.renderTopbar();
-                    screenLog('Interface Renderizada: OK');
-                } else {
-                    screenLog('Aviso: Containers de UI não encontrados.');
+                screenLog('Processando Interface...');
+                try {
+                    if (document.getElementById('os-sidebar-container')) {
+                        OS_UI.renderSidebar('content-engine', 'ADMIN');
+                        OS_UI.renderTopbar();
+                        screenLog('Menu Lateral: OK');
+                    }
+                } catch (e) {
+                    screenLog('Aviso: Falha leve no menu, ignorando...');
                 }
 
-                const user = await OS_AUTH.check();
-                screenLog('Usuário: ' + (user ? user.email : 'Nenhum'));
+                screenLog('Autenticando...');
+                const user = await OS_AUTH.check().catch(() => null);
+                screenLog('Usuário: ' + (user ? user.email : 'Visitante'));
 
-                // Carregar o Motor de Conteúdo (está na pasta modules)
-                screenLog('Sincronizando Motor Externo...');
-                const engine = await import('./modules/content-engine/content-engine.js?v=' + Date.now()).catch(e => { 
-                    throw new Error('Falha ao carregar engine: ' + e.message); 
-                });
-                
-                screenLog('Motor Sincronizado: OK');
+                screenLog('Sincronizando Esteira...');
+                await import(`./modules/content-engine/content-engine.js?v=${v}`);
+                screenLog('SISTEMA OPERACIONAL ONLINE');
 
             } catch (err) {
-                screenLog('<span style="color:#ff4444; font-weight:bold;">ERRO CRÍTICO: ' + err.message + '</span>');
+                screenLog('<span style="color:#ff4444; font-weight:bold;">FALHA NO BOOT: ' + err.message + '</span>');
                 console.error(err);
             }
         }
 
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', boot);
-        } else {
-            boot();
-        }
+        boot();
     </script>
 </body>
 </html>
