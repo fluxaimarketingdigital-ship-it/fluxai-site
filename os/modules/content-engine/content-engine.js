@@ -187,6 +187,46 @@ async function loadProjects() {
 }
 
 async function loadContent() {
+    const dashboard = document.querySelector('main');
+    const projectFilter = document.getElementById('project-filter');
+    
+    if (!currentProject) {
+        if (dashboard) {
+            // Criar ou mostrar placeholder de seleção
+            let placeholder = document.getElementById('project-placeholder');
+            if (!placeholder) {
+                placeholder = document.createElement('div');
+                placeholder.id = 'project-placeholder';
+                placeholder.innerHTML = `
+                    <div style="text-align:center; padding:100px; background:rgba(255,255,255,0.02); border:1px dashed #333; border-radius:12px; margin-top:20px;">
+                        <i class="fa-solid fa-hand-pointer" style="font-size:3rem; color:var(--os-primary); margin-bottom:20px; opacity:0.5;"></i>
+                        <h2 style="color:#fff;">Selecione um Projeto</h2>
+                        <p style="color:var(--os-text-muted);">Escolha um cliente no menu superior para gerenciar o Motor de Conteúdo.</p>
+                    </div>
+                `;
+                dashboard.appendChild(placeholder);
+            }
+            
+            // Ocultar elementos reais
+            const sections = dashboard.querySelectorAll('.os-metric-grid, .os-tabs, #tab-esteira, #tab-calendario-estrategico, #tab-calendario-operacional');
+            sections.forEach(s => s.style.display = 'none');
+            placeholder.style.display = 'block';
+        }
+        return;
+    }
+
+    // Se tem projeto, mostrar tudo
+    const placeholder = document.getElementById('project-placeholder');
+    if (placeholder) placeholder.style.display = 'none';
+    const sections = dashboard.querySelectorAll('.os-metric-grid, .os-tabs');
+    sections.forEach(s => s.style.display = 'flex');
+    // Mostrar a aba ativa
+    const activeTabBtn = document.querySelector('.os-tab-btn.active');
+    if (activeTabBtn) {
+        const tabMatch = activeTabBtn.getAttribute('onclick').match(/'([^']+)'/);
+        if (tabMatch) switchTab(tabMatch[1]);
+    }
+
     try {
         const supabase = getSupabase();
         let query = supabase.from('content_assets').select('*');
@@ -343,6 +383,16 @@ window.openEditModal = async (id) => {
         document.getElementById('edit-asset-title').value = c.title;
         document.getElementById('edit-asset-caption').value = c.caption;
         document.getElementById('edit-asset-ref').value = c.metadata?.reference_url || '';
+        
+        // MOSTRAR FEEDBACK SE HOUVER AJUSTE
+        const feedbackContainer = document.getElementById('edit-asset-feedback-container');
+        if (c.status === 'AJUSTE' && c.internal_notes) {
+            document.getElementById('edit-asset-feedback').innerText = c.internal_notes;
+            feedbackContainer.style.display = 'block';
+        } else {
+            feedbackContainer.style.display = 'none';
+        }
+
         document.getElementById('modal-edit-asset').style.display = 'flex';
     }
 };

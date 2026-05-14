@@ -31,11 +31,25 @@ export const AIPlanner = {
         const now = new Date();
         const services = Object.keys(AIPlanner.STRATEGIC_MATRIX);
 
-        // Gerar 1 item de cada serviço para demonstrar a abrangência do Plano Mestre
+        // Gerar 1 item de cada serviço seguindo uma cadência estratégica (Ter, Qui, Sáb)
+        const strategicDays = [2, 4, 6]; // Terça, Quinta, Sábado
+        let dayCounter = 0;
+        let daysOffset = 0;
+
         services.forEach((sKey, index) => {
             const service = AIPlanner.STRATEGIC_MATRIX[sKey];
-            const date = new Date(now.getTime() + (index * 24 * 60 * 60 * 1000));
             
+            // Encontrar próxima data estratégica
+            let date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            date.setDate(date.getDate() + daysOffset);
+            
+            while (!strategicDays.includes(date.getDay())) {
+                daysOffset++;
+                date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                date.setDate(date.getDate() + daysOffset);
+            }
+            daysOffset++; // Próximo item começa do próximo dia
+
             contents.push({
                 project_id: projectId,
                 title: `${service.name} • Estratégico`,
