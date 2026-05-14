@@ -76,19 +76,32 @@
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <div class="os-page-header">
-                    <div class="os-page-title">
+                <div class="os-page-header" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: nowrap; gap: 20px;">
+                    <div class="os-page-title" style="flex: 1;">
                         <h1>Motor de Conteúdo</h1>
                         <p>Orquestração estratégica e produção de ativos de autoridade.</p>
                     </div>
-                    <div class="os-page-actions">
-                        <select id="project-filter" class="os-select">
+
+                    <div class="os-page-actions" style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+                        <!-- Card Workflow Dinâmico -->
+                        <div id="workflow-card" style="background: rgba(168,85,247,0.1); border: 1px solid rgba(168,85,247,0.3); padding: 8px 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px;">
+                            <div style="font-size: 0.6rem; font-weight: 800; color: var(--os-primary); text-transform: uppercase;">Workflow Institucional</div>
+                            <div id="workflow-deadline" style="font-family: 'JetBrains Mono'; font-size: 0.75rem; font-weight: 700; color: #fff;">DEADLINE: TODO DIA 28</div>
+                        </div>
+
+                        <select id="project-filter" class="os-select" style="min-width: 180px;">
                             <option value="">Todos os Projetos</option>
                         </select>
-                        <button class="btn-pub" id="btn-ai-planner" style="background: var(--os-accent);">
+                        
+                        <button class="btn-pub" id="btn-ai-planner" style="background: var(--os-accent); white-space: nowrap;">
                             <i class="fa-solid fa-wand-magic-sparkles"></i> PLANEJAMENTO IA
                         </button>
-                        <button class="btn-pub" id="btn-new-content">
+                        
+                        <button class="btn-pub" onclick="window.openWorkspace()" style="background: #6b7a45; white-space: nowrap;">
+                            <i class="fa-solid fa-calendar-days"></i> VISUALIZAR CALENDÁRIO
+                        </button>
+
+                        <button class="btn-pub" id="btn-new-content" style="white-space: nowrap;">
                             <i class="fa-solid fa-plus"></i> NOVO CONTEÚDO
                         </button>
                     </div>

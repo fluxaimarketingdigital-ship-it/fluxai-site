@@ -20,16 +20,32 @@ async function init() {
         }
 
         // 3. Carregar Dados
+        // Listener para Workflow Dinâmico
+        const projectFilter = document.getElementById('project-filter');
+        projectFilter.onchange = (e) => {
+            currentProject = e.target.value;
+            
+            // Simulação de Workflow Dinâmico por Cliente
+            // No futuro, isso virá de project.contract_deadline
+            const deadlineMap = {
+                'maria-aparecida': 'TODO DIA 10', // Exemplo
+                'fluxai': 'TODO DIA 28',
+                'nutricao-clinica': 'TODO DIA 05'
+            };
+            
+            const deadlineEl = document.getElementById('workflow-deadline');
+            if (deadlineEl) {
+                deadlineEl.innerText = `DEADLINE: ${deadlineMap[currentProject] || 'TODO DIA 28'}`;
+            }
+            
+            loadContent();
+        };
+
         await loadProjects();
         await loadContent();
         console.log('[CONTENT ENGINE] Dados carregados com sucesso.');
 
         // 4. Listeners
-        document.getElementById('project-filter').addEventListener('change', (e) => {
-            currentProject = e.target.value;
-            loadContent();
-        });
-
         document.getElementById('btn-ai-planner').onclick = async () => {
             if (!currentProject) return alert('Selecione um projeto primeiro!');
             await generateSampleContent(currentProject);
