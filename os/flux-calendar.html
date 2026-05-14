@@ -2,91 +2,148 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
-    <title>DEBUG: FluxAI Calendar</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Planejamento Estratégico</title>
+    <link rel="stylesheet" href="/src/styles/os/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        body { background: #000; color: #fff; font-family: sans-serif; padding: 50px; }
-        #debug-status { border: 2px solid #a855f7; padding: 20px; border-radius: 10px; background: #1a1a1a; }
-        .loading-step { margin: 10px 0; color: #888; }
-        .loading-step.active { color: #a855f7; font-weight: bold; }
-        .loading-step.done { color: #10b981; }
-        .loading-step.error { color: #ff4444; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 30px; }
+        .calendar-day { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 12px; min-height: 140px; padding: 12px; position: relative; transition: 0.3s; }
+        .calendar-day:hover { border-color: var(--os-primary); background: rgba(168,85,247,0.05); }
+        .calendar-day.empty { opacity: 0.2; background: transparent; border: none; }
+        .day-number { font-size: 0.8rem; font-weight: 800; color: var(--os-primary); margin-bottom: 10px; opacity: 0.5; }
+        
+        .calendar-event { background: rgba(107,122,69,0.15); border-left: 3px solid var(--os-primary); padding: 8px; border-radius: 6px; font-size: 0.7rem; margin-bottom: 8px; cursor: pointer; transition: 0.2s; color: #fff; line-height: 1.3; }
+        .calendar-event:hover { background: var(--os-primary); transform: translateX(5px); }
+        .event-status { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+        
+        .workspace-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; border-bottom: 1px solid var(--os-border); padding-bottom: 20px; }
+        .client-info { display: flex; align-items: center; gap: 20px; }
+        .client-logo { width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, var(--os-primary), #8b5cf6); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.2rem; color: #fff; box-shadow: 0 4px 15px rgba(168,85,247,0.3); }
+        
+        .os-badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        @media (max-width: 768px) {
+            .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+            .workspace-header { flex-direction: column; align-items: flex-start; gap: 20px; }
+        }
     </style>
 </head>
-<body>
-    <div id="debug-status">
-        <h1 style="color: #a855f7">FluxAI OS™ | Diagnóstico de Conexão</h1>
-        <div id="step-1" class="loading-step active">1. Iniciando Script...</div>
-        <div id="step-2" class="loading-step">2. Conectando ao Banco (Supabase)...</div>
-        <div id="step-3" class="loading-step">3. Buscando Projeto...</div>
-        <div id="step-4" class="loading-step">4. Renderizando Calendário...</div>
-    </div>
+<body class="os-mode">
+    <div class="os-layout">
+        <main class="os-viewport" style="margin-left:0; padding: 40px; max-width: 1400px; margin: 0 auto;">
+            <header class="workspace-header">
+                <div class="client-info">
+                    <div class="client-logo" id="client-initials">FX</div>
+                    <div>
+                        <h1 id="client-name" style="font-size:1.8rem; margin:0; letter-spacing: -1px;">Carregando Planejamento...</h1>
+                        <p id="workspace-period" style="font-size:0.9rem; opacity:0.5; margin:5px 0 0 0;">FluxAI OS™ Strategy Engine</p>
+                    </div>
+                </div>
+                <div class="workspace-stats" style="display:flex; gap:15px;">
+                    <div class="os-badge" id="stat-pending" style="background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid #f59e0b;">-- Pendentes</div>
+                    <div class="os-badge" id="stat-approved" style="background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid #10b981;">-- Aprovados</div>
+                </div>
+            </header>
 
-    <div id="calendar-container" style="margin-top: 30px;"></div>
+            <div class="calendar-grid" id="calendar-body">
+                <!-- Conteúdo Gerado Automaticamente -->
+            </div>
+        </main>
+    </div>
 
     <script>
         const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
         const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-        
-        function updateStep(id, status) {
-            const el = document.getElementById('step-' + id);
-            if (!el) return;
-            el.className = 'loading-step ' + status;
-            if (status === 'active') el.innerHTML = el.innerText.split(' ')[0] + ' ' + el.innerText.split(' ').slice(1).join(' ') + ' ⏳';
-            if (status === 'done') el.innerHTML = el.innerText.split(' ')[0] + ' ' + el.innerText.split(' ').slice(1).join(' ') + ' ✅';
-            if (status === 'error') el.innerHTML = el.innerText.split(' ')[0] + ' ' + el.innerText.split(' ').slice(1).join(' ') + ' ❌';
-        }
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-        async function startDiagnostic() {
-            console.log('[DEBUG] Iniciando diagnóstico...');
-            updateStep(1, 'done');
-            updateStep(2, 'active');
-
+        async function init() {
             const params = new URLSearchParams(window.location.search);
             const projectId = params.get('project');
+            const statusEl = document.getElementById('client-name');
 
             if (!projectId) {
-                updateStep(2, 'error');
-                alert('ID do projeto ausente na URL');
-                return;
-            }
-
-            if (!window.supabase) {
-                updateStep(2, 'error');
-                document.getElementById('debug-status').innerHTML += `<p style="color:red">Erro: Biblioteca Supabase não carregou!</p>`;
+                statusEl.innerText = "Link Inválido";
                 return;
             }
 
             try {
-                const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
-                
-                // Teste de conexão simples
-                const { data: test, error: err } = await supabase.from('projects').select('id').limit(1);
-                if (err) throw err;
-                updateStep(2, 'done');
-                
-                updateStep(3, 'active');
-                const { data: contents } = await supabase.from('content_assets').select('*').eq('project_id', projectId);
-                updateStep(3, 'done');
+                // 1. Carregar Dados em Paralelo
+                const [projectRes, contentRes] = await Promise.all([
+                    supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle(),
+                    supabase.from('content_assets').select('*').eq('project_id', projectId).order('scheduled_at', { ascending: true })
+                ]);
 
-                updateStep(4, 'active');
-                document.getElementById('calendar-container').innerHTML = `
-                    <div style="border:1px solid #10b981; padding:20px; border-radius:8px;">
-                        <h2 style="color:#10b981">Conexão Estabelecida!</h2>
-                        <p>Encontramos ${contents?.length || 0} posts para este projeto.</p>
-                        <button onclick="location.reload()" style="padding:10px 20px; background:#a855f7; border:none; color:white; border-radius:5px; cursor:pointer">Tentar abrir versão final</button>
-                    </div>
-                `;
-                updateStep(4, 'done');
-            } catch (e) {
-                console.error(e);
-                updateStep(2, 'error');
-                document.getElementById('debug-status').innerHTML += `<p style="color:red">Erro na Conexão: ${e.message}</p>`;
+                if (projectRes.data) {
+                    statusEl.innerText = projectRes.data.company_name;
+                    document.getElementById('client-initials').innerText = projectRes.data.company_name.substring(0, 2).toUpperCase();
+                }
+
+                renderCalendar(contentRes.data || []);
+                updateStats(contentRes.data || []);
+
+            } catch (err) {
+                console.error(err);
+                statusEl.innerText = "Erro ao carregar planejamento.";
             }
         }
 
-        // Disparo imediato
-        document.addEventListener('DOMContentLoaded', startDiagnostic);
+        function renderCalendar(contents) {
+            const container = document.getElementById('calendar-body');
+            container.innerHTML = '';
+            
+            let targetDate = new Date();
+            if (contents.length > 0 && contents[0].scheduled_at) {
+                targetDate = new Date(contents[0].scheduled_at);
+            }
+            
+            const year = targetDate.getFullYear();
+            const month = targetDate.getMonth();
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            document.getElementById('workspace-period').innerText = `Planejamento Estratégico Mensal | ${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                container.innerHTML += `<div class="calendar-day empty"></div>`;
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
+                
+                let eventsHtml = dayContents.map(c => `
+                    <div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')">
+                        <span class="event-status" style="background:${getStatusColor(c.status)}"></span>
+                        ${c.title}
+                    </div>
+                `).join('');
+
+                container.innerHTML += `
+                    <div class="calendar-day">
+                        <div class="day-number">${day}</div>
+                        ${eventsHtml}
+                    </div>
+                `;
+            }
+        }
+
+        function getStatusColor(status) {
+            if (status === 'PRONTO' || status === 'PUBLICADO') return '#10b981';
+            if (status === 'AJUSTE') return '#ff4444';
+            return '#f59e0b';
+        }
+
+        function updateStats(contents) {
+            const pending = contents.filter(c => c.status !== 'PRONTO' && c.status !== 'PUBLICADO').length;
+            const approved = contents.filter(c => c.status === 'PRONTO' || c.status === 'PUBLICADO').length;
+            document.getElementById('stat-pending').innerText = `${pending} Pendentes`;
+            document.getElementById('stat-approved').innerText = `${approved} Aprovados`;
+        }
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
