@@ -30,8 +30,12 @@
         .os-main-content { margin-left: 260px; padding: 40px; min-height: 100vh; }
         
         .os-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
-        .metric-card { background: var(--os-surface); border: 1px solid var(--os-border); padding: 24px; border-radius: 16px; position: relative; }
+        .metric-card { background: var(--os-surface); border: 1px solid var(--os-border); padding: 24px; border-radius: 16px; position: relative; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .metric-card:hover { border-color: rgba(168, 85, 247, 0.4); transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .metric-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--os-accent-gradient); opacity: 0.3; }
+        .btn-ai:hover { filter: brightness(1.1); box-shadow: 0 0 20px rgba(168, 85, 247, 0.3); }
+        .os-btn-secondary { background: rgba(255,255,255,0.03); border: 1px solid var(--os-border); color: white; padding: 14px 24px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 8px; font-size: 0.85rem; font-weight: 700; transition: all 0.2s; }
+        .os-btn-secondary:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
         .metric-label { font-size: 0.65rem; color: var(--os-text-muted); text-transform: uppercase; letter-spacing: 1.5px; font-weight: 800; margin-bottom: 8px; }
         .metric-value { font-size: 2rem; font-weight: 900; letter-spacing: -1px; }
 
@@ -72,14 +76,21 @@
             <!-- HEADER -->
             <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 50px; padding-bottom: 30px; border-bottom: 1px solid var(--os-border);">
                 <div>
-                    <h1 style="font-size: 3rem; font-weight: 900; margin: 0; letter-spacing: -2px;">Motor de Conteúdo</h1>
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+                        <span style="background: var(--os-primary); width: 12px; height: 12px; border-radius: 3px;"></span>
+                        <span style="font-size: 0.7rem; font-weight: 800; color: var(--os-text-muted); text-transform: uppercase; letter-spacing: 2px;">Core Intelligence</span>
+                    </div>
+                    <h1 style="font-size: 3.2rem; font-weight: 900; margin: 0; letter-spacing: -1.5px; background: linear-gradient(to right, #fff 30%, #555 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Motor de Conteúdo</h1>
                     <p style="color: var(--os-text-muted); margin-top: 10px; font-size: 1rem;">Orquestração estratégica para ativos de autoridade.</p>
                 </div>
                 
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <select id="project-filter" class="os-select" style="min-width: 240px;"></select>
-                    <button id="btn-ai-planner" class="btn-ai">
+                    <select id="project-filter" class="os-select" style="min-width: 240px; height: 48px;"></select>
+                    <button id="btn-ai-planner" class="btn-ai" style="height: 48px;">
                         <i class="fa-solid fa-wand-magic-sparkles"></i> PLANEJAMENTO IA
+                    </button>
+                    <button class="os-btn-secondary" style="height: 48px;" onclick="window.location.href='/os/flux-calendar.html'">
+                        <i class="fa-solid fa-calendar-days"></i> CALENDÁRIO
                     </button>
                 </div>
             </div>
@@ -94,7 +105,12 @@
 
             <!-- ESTEIRA -->
             <div style="margin-top: 20px;">
-                <h3 style="margin-bottom: 25px; font-size: 1.2rem; font-weight: 800;">Esteira de Produção</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h3 style="margin: 0; font-size: 1.2rem; font-weight: 800;">Esteira Operacional</h3>
+                    <div id="workflow-deadline" style="font-size: 0.7rem; color: var(--os-text-muted); font-weight: 800; background: rgba(255,255,255,0.03); padding: 8px 16px; border-radius: 8px; border: 1px solid var(--os-border);">
+                        <i class="fa-solid fa-calendar-check" style="color: var(--os-primary); margin-right: 5px;"></i> DEADLINE: DIA 28
+                    </div>
+                </div>
                 <table class="pipeline-table">
                     <thead>
                         <tr>
