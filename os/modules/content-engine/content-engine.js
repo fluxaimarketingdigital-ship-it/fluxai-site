@@ -38,31 +38,28 @@ async function init() {
 
     } catch (err) {
         console.error('[CONTENT ENGINE] Erro crítico no INIT:', err);
-    }
-}
-
-// MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI
+  // MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI (DUPLA CAMADA: INTERNO vs CLIENTE)
 const STRATEGIC_MATRIX = {
-    'REELS': { name: 'Direção Estratégica Audiovisual', platform: 'REELS' },
-    'CARD': { name: 'Direção Estratégica Visual', platform: 'INSTAGRAM' },
-    'CARROSSEL': { name: 'Estrutura Narrativa de Carrossel', platform: 'INSTAGRAM' },
-    'SITE': { name: 'Arquitetura Estratégica Digital', platform: 'WEB' },
-    'BRANDING': { name: 'Arquitetura de Posicionamento', platform: 'BRAND' },
-    'TRAFEGO': { name: 'Estratégia de Aquisição', platform: 'ADS' },
-    'AUTOMACAO': { name: 'Arquitetura Operacional', platform: 'SYSTEM' },
-    'CRM': { name: 'Estrutura de Relacionamento', platform: 'CRM' },
-    'DASHBOARD': { name: 'Infraestrutura Analítica', platform: 'DATA' },
-    'IA': { name: 'Inteligência Operacional', platform: 'AI' },
-    'CAPTACAO': { name: 'Direção de Produção', platform: 'PRODUCTION' },
-    'CONSULTORIA': { name: 'Diagnóstico Estratégico', platform: 'CONSULTING' },
-    'LP': { name: 'Estrutura de Conversão', platform: 'WEB' },
-    'COPY': { name: 'Engenharia Narrativa', platform: 'COPY' },
-    'APRESENTACAO': { name: 'Estrutura Institucional', platform: 'DOC' },
-    'IDV': { name: 'Sistema de Identidade', platform: 'DESIGN' },
-    'FUNIL': { name: 'Arquitetura de Conversão', platform: 'SALES' },
-    'SEO': { name: 'Estrutura de Descoberta', platform: 'WEB' },
-    'WHATSAPP': { name: 'Fluxo Conversacional', platform: 'CHAT' },
-    'GOVOS': { name: 'Infraestrutura Pública Digital', platform: 'GOV' }
+    'REELS': { name: 'Direção Estratégica Audiovisual', clientPrefix: 'REELS', platform: 'REELS' },
+    'CARD': { name: 'Direção Estratégica Visual', clientPrefix: 'POST', platform: 'INSTAGRAM' },
+    'CARROSSEL': { name: 'Estrutura Narrativa de Carrossel', clientPrefix: 'CARROSSEL', platform: 'INSTAGRAM' },
+    'SITE': { name: 'Arquitetura Estratégica Digital', clientPrefix: 'SITE', platform: 'WEB' },
+    'BRANDING': { name: 'Arquitetura de Posicionamento', clientPrefix: 'POSICIONAMENTO', platform: 'BRAND' },
+    'TRAFEGO': { name: 'Estratégia de Aquisição', clientPrefix: 'AQUISIÇÃO', platform: 'ADS' },
+    'AUTOMACAO': { name: 'Arquitetura Operacional', clientPrefix: 'AUTOMAÇÃO', platform: 'SYSTEM' },
+    'CRM': { name: 'Estrutura de Relacionamento', clientPrefix: 'CRM', platform: 'CRM' },
+    'DASHBOARD': { name: 'Infraestrutura Analítica', clientPrefix: 'DASHBOARD', platform: 'DATA' },
+    'IA': { name: 'Inteligência Operacional', clientPrefix: 'IA', platform: 'AI' },
+    'CAPTACAO': { name: 'Direção de Produção', clientPrefix: 'CAPTAÇÃO', platform: 'PRODUCTION' },
+    'CONSULTORIA': { name: 'Diagnóstico Estratégico', clientPrefix: 'DIAGNÓSTICO', platform: 'CONSULTING' },
+    'LP': { name: 'Estrutura de Conversão', clientPrefix: 'LANDING PAGE', platform: 'WEB' },
+    'COPY': { name: 'Engenharia Narrativa', clientPrefix: 'LEGENDA', platform: 'COPY' },
+    'APRESENTACAO': { name: 'Estrutura Institucional', clientPrefix: 'APRESENTAÇÃO', platform: 'DOC' },
+    'IDV': { name: 'Sistema de Identidade', clientPrefix: 'IDENTIDADE', platform: 'DESIGN' },
+    'FUNIL': { name: 'Arquitetura de Conversão', clientPrefix: 'FUNIL', platform: 'SALES' },
+    'SEO': { name: 'Estrutura de Descoberta', clientPrefix: 'SEO', platform: 'WEB' },
+    'WHATSAPP': { name: 'Fluxo Conversacional', clientPrefix: 'WHATSAPP', platform: 'CHAT' },
+    'GOVOS': { name: 'Infraestrutura Pública Digital', clientPrefix: 'GOVOS', platform: 'GOV' }
 };
 
 async function generateSampleContent(projectId, count = 12) {
@@ -84,6 +81,9 @@ async function generateSampleContent(projectId, count = 12) {
         const sys = STRATEGIC_MATRIX[sysKey] || STRATEGIC_MATRIX['CARD'];
         const obj = objectives[i % objectives.length];
         
+        const internalTitle = `${sys.name}: ${obj}`;
+        const clientTitle = `${sys.clientPrefix} • ${obj}`;
+        
         let contentBody = `
 🚀 ${sys.name.toUpperCase()}
 ----------------------------------
@@ -100,7 +100,7 @@ async function generateSampleContent(projectId, count = 12) {
 
         samples.push({
             project_id: projectId,
-            title: `${sys.name}: ${obj}`,
+            title: internalTitle, // Salvamos o técnico no banco para controle interno
             status: 'PAUTA',
             priority: 'ALTA',
             platform: sys.platform,
@@ -112,7 +112,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro: ' + error.message);
     else {
-        alert(`Ativos de Alta Performance Gerados! 🚀 ${count} demandas coordenadas via Matriz Operacional.`);
+        alert(`Ativos Gerados! 🚀 (Camada Dupla: Interno + Cliente)`);
         loadContent();
     }
 }

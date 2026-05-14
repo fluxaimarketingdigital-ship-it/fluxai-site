@@ -46,6 +46,41 @@
         const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
         const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
 
+        const CLIENT_VIEW_MATRIX = {
+            'Direção Estratégica Audiovisual': 'REELS',
+            'Direção Estratégica Visual': 'POST',
+            'Estrutura Narrativa de Carrossel': 'CARROSSEL',
+            'Arquitetura Estratégica Digital': 'SITE',
+            'Arquitetura de Posicionamento': 'POSICIONAMENTO',
+            'Estratégia de Aquisição': 'AQUISIÇÃO',
+            'Arquitetura Operacional': 'AUTOMAÇÃO',
+            'Estrutura de Relacionamento': 'CRM',
+            'Infraestrutura Analítica': 'DASHBOARD',
+            'Inteligência Operacional': 'IA',
+            'Direção de Produção': 'CAPTAÇÃO',
+            'Diagnóstico Estratégico': 'DIAGNÓSTICO',
+            'Estrutura de Conversão': 'LANDING PAGE',
+            'Engenharia Narrativa de Legenda': 'LEGENDA',
+            'Estrutura Institucional': 'APRESENTAÇÃO',
+            'Sistema de Identidade Visual': 'IDENTIDADE',
+            'Arquitetura de Conversão': 'FUNIL',
+            'Estrutura de Descoberta': 'SEO',
+            'Fluxo Conversacional': 'WHATSAPP',
+            'Infraestrutura Pública Digital': 'GOVOS'
+        };
+
+        function formatClientTitle(title) {
+            if (!title) return 'Sem Título';
+            if (title.includes(':')) {
+                const parts = title.split(':');
+                const internalName = parts[0].trim();
+                const objective = parts[1].trim();
+                const clientPrefix = CLIENT_VIEW_MATRIX[internalName] || internalName;
+                return `${clientPrefix} • ${objective}`;
+            }
+            return title;
+        }
+
         async function init() {
             const statusEl = document.getElementById('client-name');
             const params = new URLSearchParams(window.location.search);
@@ -93,7 +128,7 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
-                let eventsHtml = dayContents.map(c => `<div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')">${c.title}</div>`).join('');
+                let eventsHtml = dayContents.map(c => `<div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')">${formatClientTitle(c.title)}</div>`).join('');
                 container.innerHTML += `<div class="calendar-day"><div class="day-number">${day}</div>${eventsHtml}</div>`;
             }
         }
