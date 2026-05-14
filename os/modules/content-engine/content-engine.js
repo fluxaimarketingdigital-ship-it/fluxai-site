@@ -46,7 +46,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
     if (!project) return alert('Projeto não encontrado!');
 
-    const objectives = ['AUTORIDADE', 'PERCEPÇÃO PREMIUM', 'CONVERSÃO', 'DIAGNÓSTICO', 'POSICIONAMENTO'];
+    const objectives = ['AUTORIDADE', 'PERCEPÇÃO PREMIUM', 'QUEBRA DE CRENÇA', 'GERAÇÃO DE LEADS', 'DIAGNÓSTICO'];
     const assetTypes = ['REELS', 'CARROSSEL', 'STATIC'];
     
     const samples = [];
@@ -84,17 +84,21 @@ async function generateSampleContent(projectId, count = 12) {
 🎠 ESTRUTURA NARRATIVA DE CARROSSEL
 ----------------------------------
 🎯 OBJETIVO: ${obj}
-🎨 DIREÇÃO CRIATIVA: Capa Minimalista + Contraste Alto (Retenção)
-📊 PADRÃO VISUAL: Títulos curtos e impacto visual por slide
+🔥 TENSÃO DE RETENÇÃO: Alta (Provocação Técnica)
+🧩 INTENÇÃO ESTRATÉGICA: [IA definiu como ${obj} no segmento ${project.company_name}]
 
-🖼️ ESTRUTURA DOS SLIDES:
-- Slide 01: [Capa Provocativa baseada em ${obj}]
-- Slide 02: Exposição do Problema Estrutural
-- Slide 03-06: Desenvolvimento da Autoridade FluxAI
-- Slide 07: Prova de Conceito
-- Slide 08: CTA: "Estrutura precede escala."
+🎨 DIREÇÃO VISUAL: Capa Minimalista | Contraste de Retenção
+📊 PADRÃO: Baixa densidade textual por slide (Foco em Título)
 
-📝 LEGENDA: [IA gerando hierarquia textual profunda...]
+🖼️ ORDEM NARRATIVA DOS SLIDES:
+- Slide 01: PROVOCAÇÃO: [Título de impacto para ${obj}]
+- Slide 02: TENSÃO: Expor o erro comum do mercado
+- Slide 03: QUEBRA: Mostrar a lógica FluxAI (Inovação)
+- Slide 04-05: EXPLICAÇÃO: Detalhes técnicos e autoridade
+- Slide 06: APROFUNDAMENTO: Case / Resultado / Prova
+- Slide 07: CTA ESTRATÉGICO: "Estrutura precede escala."
+
+📝 LEGENDA: [Hierarquia textual focada em salvamentos...]
             `;
         } else {
             title = `🖼️ DIREÇÃO VISUAL: ${obj}`;
@@ -102,12 +106,12 @@ async function generateSampleContent(projectId, count = 12) {
 🖼️ DIREÇÃO ESTRATÉGICA VISUAL (ESTÁTICO)
 ----------------------------------
 🎯 OBJETIVO: ${obj}
-🎨 DIREÇÃO CRIATIVA: Design de Alto Impacto | Fundo Claro (Conversão)
-📐 HIERARQUIA TEXTUAL: Título Curto (Máx 5 palavras) + Subtítulo Técnico
+🎨 DIREÇÃO CRIATIVA: Design de Alto Impacto | Fundo Claro
+📐 HIERARQUIA TEXTUAL: Título Curto + Subtítulo Técnico
 
 🧠 TENSÃO NARRATIVA: [IA focando em quebra de objeção para ${obj}]
 📝 LEGENDA: Foco em percepção premium e autoridade imediata.
-🛠️ OBS: Evitar excesso de texto no card. Deixar a profundidade para a legenda.
+🛠️ OBS: Evitar excesso de texto no card.
             `;
         }
 
@@ -125,7 +129,7 @@ async function generateSampleContent(projectId, count = 12) {
     const { error } = await supabase.from('content_assets').insert(samples);
     if (error) alert('Erro: ' + error.message);
     else {
-        alert(`Ativos Estratégicos Gerados! 🚀 ${count} estruturas contextuais criadas.`);
+        alert(`Ativos Estratégicos Gerados! 🚀 ${count} jornadas de retenção criadas.`);
         loadContent();
     }
 }
