@@ -132,6 +132,17 @@ const STRATEGIC_MATRIX = {
     }
 };
 
+const RESPONSIBLE_MAP = {
+    'REELS': 'Audiovisual',
+    'CARROSSEL': 'Design',
+    'CARD': 'Design',
+    'SITE': 'Desenvolvimento Web',
+    'TRAFEGO': 'Gestor de Tráfego',
+    'BRANDING': 'Estrategista',
+    'CRM': 'Estrategista',
+    'AUTOMAÇÃO': 'Sistemas'
+};
+
 export async function initEngine() {
     sLog('Iniciando Motor de Conteúdo v7.0...');
     try {
@@ -141,6 +152,20 @@ export async function initEngine() {
         await loadProjects();
         await loadContent();
         sLog('Carga Inicial: OK');
+
+        // BOTÃO GLOBAL WA (TOP BAR)
+        const btnGlobalWa = document.getElementById('btn-global-wa');
+        if (btnGlobalWa) {
+            btnGlobalWa.onclick = () => {
+                const projectFilter = document.getElementById('project-filter');
+                const selectedId = projectFilter.value;
+                if (!selectedId) return alert('Selecione um cliente específico para enviar o lembrete direto.');
+                
+                const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${selectedId}`;
+                const msg = `Olá! 🚀%0A%0APassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.%0A%0AConfira aqui seu calendário atualizado:%0A${portalLink}`;
+                window.open(`https://wa.me/?text=${msg}`, '_blank');
+            };
+        }
 
         // Listeners
         const filter = document.getElementById('project-filter');
@@ -612,7 +637,8 @@ window.finalizeProduction = async (id) => {
                 ...c.metadata,
                 final_asset_url: artLink,
                 responsible: document.getElementById('edit-asset-responsible').value,
-                version: 'FINAL'
+                version: 'FINAL',
+                approval_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h para aprovação final da arte
             }
         };
 
@@ -651,6 +677,17 @@ window.openPublishBridge = async (id) => {
     document.getElementById('btn-open-account').onclick = () => {
         window.open('https://business.facebook.com/latest/composer', '_blank');
     };
+
+    // BOTÃO WHATSAPP REMINDER
+    const btnWa = document.getElementById('btn-wa-reminder');
+    if (btnWa) {
+        btnWa.onclick = () => {
+            const project = document.getElementById('project-filter').options[document.getElementById('project-filter').selectedIndex]?.text || 'Cliente';
+            const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${c.project_id}`;
+            const msg = `Olá! 🚀%0A%0APassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.%0A%0ASeu prazo expira em breve! Confira aqui o calendário:%0A${portalLink}`;
+            window.open(`https://wa.me/?text=${msg}`, '_blank');
+        };
+    }
 
     document.getElementById('btn-confirm-pub').onclick = async () => {
         if (confirm('Confirmar que este conteúdo foi publicado com sucesso?')) {
@@ -743,9 +780,26 @@ window.runAiPlanner = async () => {
             const newAssets = await AIPlanner.generatePlan(currentProject, type);
             
             if (newAssets && newAssets.length > 0) {
-                const { error } = await supabase.from('content_assets').insert(newAssets);
+                // APLICAR INTELIGÊNCIA DE PRAZO (48H) E RESPONSÁVEL
+                const processedAssets = newAssets.map(asset => {
+                    const type = Object.keys(RESPONSIBLE_MAP).find(k => asset.title.includes(k)) || 'CARD';
+                    const deadline = new Date();
+                    deadline.setHours(deadline.getHours() + 48);
+                    
+                    return {
+                        ...asset,
+                        metadata: {
+                            ...asset.metadata,
+                            responsible: RESPONSIBLE_MAP[type] || 'Design',
+                            approval_deadline: deadline.toISOString(),
+                            version: 'V1'
+                        }
+                    };
+                });
+
+                const { error } = await supabase.from('content_assets').insert(processedAssets);
                 if (error) throw error;
-                sLog(`${newAssets.length} Ativos de Logística Gerados.`);
+                sLog(`${processedAssets.length} Ativos de Logística Gerados.`);
                 loadContent();
             }
         }

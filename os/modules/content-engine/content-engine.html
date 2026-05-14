@@ -52,10 +52,13 @@
 
             <div class="pub-step">
                 <label>2. Abrir Canal e Arquivo</label>
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
                     <button class="btn-pub-outline" style="flex: 1;" id="btn-open-account"><i class="fa-brands fa-instagram"></i> ABRIR CONTA</button>
                     <button class="btn-pub-outline" style="flex: 1;" id="btn-open-assets"><i class="fa-solid fa-folder-open"></i> ABRIR DRIVE/CANVA</button>
                 </div>
+                <button class="btn-pub-outline" style="width: 100%; border-color: #25d366; color: #25d366;" id="btn-wa-reminder">
+                    <i class="fa-brands fa-whatsapp"></i> LEMBRAR CLIENTE (WHATSAPP)
+                </button>
             </div>
 
             <div class="pub-checklist">
@@ -99,6 +102,10 @@
                         
                         <button class="btn-pub" onclick="window.openWorkspace()" style="background: #6b7a45; white-space: nowrap;">
                             <i class="fa-solid fa-calendar-days"></i> VISUALIZAR CALENDÁRIO
+                        </button>
+                        
+                        <button class="btn-pub-outline" id="btn-global-wa" style="border-color: #25d366; color: #25d366; white-space: nowrap;">
+                            <i class="fa-brands fa-whatsapp"></i> LEMBRAR CLIENTE
                         </button>
 
                         <button class="btn-pub" id="btn-new-content" style="white-space: nowrap;">

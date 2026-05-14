@@ -42,6 +42,13 @@
         .success-msg { display: none; text-align: center; padding: 50px 20px; }
         .success-msg i { font-size: 4rem; color: var(--os-primary); margin-bottom: 20px; }
 
+        @keyframes pulse-red {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); color: #ff4444; text-shadow: 0 0 15px rgba(255,68,68,0.5); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .deadline-alert { animation: pulse-red 2s infinite ease-in-out; display: inline-block; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -304,9 +311,16 @@
                         const note = document.getElementById('feedback-text').value;
                         const fullNote = `REVISÃO SOLICITADA | ITENS: ${selected.join(', ')} | OBS: ${note}`;
                         
+                        const newDeadline = new Date();
+                        newDeadline.setHours(newDeadline.getHours() + 48); // Mais 48h para revisão
+                        
                         const { error } = await supabase.from('content_assets').update({ 
                             status: 'AJUSTE', 
-                            internal_notes: fullNote
+                            internal_notes: fullNote,
+                            metadata: {
+                                ...c.metadata,
+                                approval_deadline: newDeadline.toISOString()
+                            }
                         }).eq('id', id);
                         
                         if (error) throw error;
