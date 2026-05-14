@@ -14,17 +14,14 @@ const STRATEGIC_MATRIX = {
         generate: (p, obj) => `
 🎯 OBJETIVO: ${obj}
 🎬 FORMATO: Reels (Vertical 9:16)
-⏱️ TEMPO ESTIMADO: 60 segundos
-📅 DATA SUGERIDA: Terça • 19h
+⏱️ TEMPO ESTIMADO: 45-60 segundos
 
-🪝 HOOK (GANCHO): "A maioria das pessoas não perde o controle por falta de disciplina alimentar."
-⏸️ PAUSA: [Silêncio de 2s] "Elas perdem porque vivem alternando entre restrição extrema e culpa."
-📝 DESENVOLVIMENTO: Explicar como o cérebro reage ao radicalismo. Citar comportamento alimentar e saciedade.
-👁️ DIREÇÃO DE CENA: Ambiente clínico/minimalista. Iluminação natural. Olhar direto para a lente. 
-🎬 RITMO: Dinâmico, com cortes secos em frases de impacto.
-🖼️ APOIO VISUAL: Inserir texto: "Restrição extrema gera descontrole."
-✨ CTA: "Nutrição eficiente precisa funcionar na vida real."
-📝 LEGENDA: [IA gerando narrativa de autoridade clínica para ${p.company_name}...]
+🪝 HOOK: "A maioria das empresas não falha por falta de produto, mas por excesso de ruído operacional."
+⏸️ PAUSA ESTRATÉGICA: [Silêncio de 1.5s para ênfase visual]
+📝 DESENVOLVIMENTO: Discorrer sobre a diferença entre 'movimento' e 'progresso real'. Utilizar tom de voz Soberano e Técnico.
+👁️ DIREÇÃO DE CENA: Enquadramento em plano médio. Fundo neutro/escritório. Iluminação de alto contraste.
+✨ CTA: "Comente ESTRUTURA para acessar o diagnóstico de eficiência da FluxAI."
+📝 LEGENDA: Narrativa focada em autoridade executiva e diferenciação de mercado.
         `
     },
     'CARROSSEL': { 
@@ -33,17 +30,16 @@ const STRATEGIC_MATRIX = {
         platform: 'INSTAGRAM',
         generate: (p, obj) => `
 🎯 OBJETIVO: ${obj}
-🎬 FORMATO: Carrossel (1080x1350)
-📅 DATA SUGERIDA: Quinta • 18h
+🎬 FORMATO: Carrossel Estratégico (10 slides)
 
-🖼️ ESTRUTURA NARRATIVA (Slide a Slide):
-- Slide 01: [Hook/Tensão] "Você provavelmente está dificultando sua alimentação sem perceber."
-- Slide 02: [Conceito] Explicar o perigo do excesso de radicalismo.
-- Slide 03: [Quebra de Objeção] Por que "comer pouco" nem sempre emagrece.
-- Slide 04: [Aprofundamento] A lógica da constância vs. intensidade.
-- Slide 05: [Metodologia] Como a FluxAI e ${p.company_name} resolvem isso.
-- Slide 06: [CTA] Direcionamento para Conversa Estratégica.
-📝 LEGENDA: Narrativa focada em retenção e autoridade técnica.
+🖼️ ESTRUTURA NARRATIVA:
+- Slide 01: [Gancho de Atenção] "O custo invisível da desorganização estratégica."
+- Slide 02: [Tensão] Por que processos manuais estão drenando sua margem de lucro.
+- Slide 03: [Conceito] A lógica da Engenharia de Processos aplicada ao marketing.
+- Slide 04: [Diferenciação] FluxAI OS vs. Gestão Tradicional.
+- Slide 05: [Metodologia] Os 4 pilares da escala sustentável.
+- Slide 06: [Visualização] Gráfico de eficiência operacional.
+- Slide 10: [CTA] Direcionamento para a Central de Inteligência.
         `
     },
     'CARD': { 
@@ -52,10 +48,10 @@ const STRATEGIC_MATRIX = {
         platform: 'INSTAGRAM',
         generate: (p, obj) => `
 🎯 OBJETIVO: ${obj}
-💡 HEADLINE: "Consistência vale mais que perfeição."
-🎨 CONCEITO VISUAL: Ambiente clean e humano. Silêncio visual.
-📐 HIERARQUIA: Foco total na autoridade da frase central.
-✨ CTA: Estratégia alimentar sustentável.
+💡 CONCEITO: Afirmação de Autoridade Absoluta.
+🎨 DESIGN: Tipografia imponente, alto espaço negativo (silêncio visual).
+📝 HEADLINE: "Escala não é sobre intensidade, é sobre arquitetura."
+✨ CTA: "Toque no link da Bio para entender a Engenharia por trás da FluxAI."
         `
     },
     'SITE': { 
@@ -63,29 +59,15 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'SITE', 
         platform: 'WEB',
         generate: (p, obj) => `
-🎯 OBJETIVO: Autoridade e Conversão
-🌐 ARQUITETURA UX: Foco em Jornada de Confiança
+🎯 OBJETIVO: Conversão de Alta Autoridade (High-Ticket)
+🌐 ESTRUTURA UX: Foco em Jornada de Decisão Executiva
 
-🏗️ SEÇÕES ESTRATÉGICAS:
-- HOME: Headline de impacto + Problema Crítico.
-- SEÇÃO 01: Diagnóstico de Mercado e Diferenciais de ${p.company_name}.
-- SEÇÃO 02: Estrutura Institucional e Atendimento.
-- SEÇÃO 03: Provas Sociais e Resultados Auditados.
-- CTA: Arquitetura de conversão direta para agendamento.
-🚀 SEO: Estruturação de palavras-chave para descoberta orgânica.
-        `
-    },
-    'STORIES': { 
-        name: 'Fluxo Estratégico de Stories', 
-        clientPrefix: 'STORIES', 
-        platform: 'INSTAGRAM',
-        generate: (p, obj) => `
-🎯 SEQUÊNCIA DE RETENÇÃO (5 Stories):
-- S01: Enquete provocativa sobre dor comum do ICP.
-- S02: Exposição técnica de um erro recorrente.
-- S03: Quebra de crença limitante.
-- S04: Bastidor operacional ou Prova de Valor.
-- S05: CTA com Caixa de Perguntas ou Link Direto.
+🏗️ SEÇÕES:
+1. HERO: Proposta de valor inquestionável + Visual Cinematic.
+2. DIAGNÓSTICO: Exposição das dores do ICP e solução técnica.
+3. ECOSSISTEMA: Detalhamento dos módulos operacionais.
+4. PROVA DE VALOR: Resultados tangíveis e depoimentos selecionados.
+🚀 SEO: Otimização para palavras-chave de intenção comercial institucional.
         `
     },
     'BRANDING': { 
@@ -93,15 +75,52 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'BRANDING', 
         platform: 'BRAND',
         generate: (p, obj) => `
-💎 PERCEPÇÃO DESEJADA: Autoridade de Elite e Confiança Técnica.
-📝 NARRATIVA: Posicionar ${p.company_name} como a solução para quem busca performance real.
-🎨 COMPORTAMENTO VISUAL: Minimalismo executivo. Uso de tipografia imponente.
+💎 PERCEPÇÃO: Posicionamento de Elite e Exclusividade Técnica.
+📝 NARRATIVA: Construir a imagem de ${p.company_name} como autoridade máxima no setor.
+🎨 VISUAL: Paleta sóbria, contrastes elegantes e iconografia proprietária.
         `
     },
-    'TRAFEGO': { name: 'Estratégia de Aquisição', clientPrefix: 'AQUISIÇÃO', platform: 'ADS' },
-    'CRM': { name: 'Estrutura de Relacionamento', clientPrefix: 'CRM', platform: 'CRM' },
-    'AUTOMACAO': { name: 'Arquitetura Operacional', clientPrefix: 'AUTOMAÇÃO', platform: 'SYSTEM' },
-    'CONSULTORIA': { name: 'Diagnóstico Estratégico', clientPrefix: 'DIAGNÓSTICO', platform: 'CONSULTING' }
+    'TRAFEGO': { 
+        name: 'Estratégia de Aquisição', 
+        clientPrefix: 'AQUISIÇÃO', 
+        platform: 'ADS',
+        generate: (p, obj) => `
+🎯 OBJETIVO: Atração de Leads Qualificados (ICP High-Ticket)
+📡 CANAIS: Meta Ads + LinkedIn Ads
+📝 CRIATIVOS: Foco em dor latente e prova de autoridade.
+💰 ESTRATÉGIA: Funil de conscientização progressiva com foco em LTV.
+        `
+    },
+    'CRM': { 
+        name: 'Estrutura de Relacionamento', 
+        clientPrefix: 'CRM', 
+        platform: 'CRM',
+        generate: (p, obj) => `
+📊 GESTÃO: Inteligência de Dados aplicada ao Funil de Vendas.
+🔄 AUTOMAÇÃO: Réguas de relacionamento baseadas no comportamento do lead.
+📈 MÉTRICA: Foco em Health Score e Taxa de Retenção.
+        `
+    },
+    'AUTOMACAO': { 
+        name: 'Arquitetura Operacional', 
+        clientPrefix: 'AUTOMAÇÃO', 
+        platform: 'SYSTEM',
+        generate: (p, obj) => `
+⚙️ FLUXO: Automação de processos repetitivos para ganho de eficiência.
+🔗 INTEGRAÇÃO: Sincronização em tempo real entre vendas e operação.
+🛡️ GOVERNANÇA: Segurança de dados e rastreabilidade total das ações.
+        `
+    },
+    'CONSULTORIA': { 
+        name: 'Diagnóstico Estratégico', 
+        clientPrefix: 'DIAGNÓSTICO', 
+        platform: 'CONSULTING',
+        generate: (p, obj) => `
+📋 ESCOPO: Análise 360º da infraestrutura digital e operacional.
+📑 ENTREGA: Relatório técnico com pontos de atrito e oportunidades de escala.
+🚀 IMPACTO: Definição do roadmap estratégico para os próximos 12 meses.
+        `
+    }
 };
 
 export async function initEngine() {

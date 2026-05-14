@@ -91,27 +91,27 @@
 
             <div class="actions">
                 <button class="btn btn-reject" id="btn-reject-action">
-                    <i class="fa-solid fa-xmark"></i> SOLICITAR AJUSTE
+                    <i class="fa-solid fa-xmark"></i> SOLICITAR REVISÃO
                 </button>
                 <button class="btn btn-approve" id="btn-approve-action">
-                    <i class="fa-solid fa-check"></i> APROVAR DIRETRIZ
+                    <i class="fa-solid fa-check"></i> APROVAR PLANEJAMENTO
                 </button>
             </div>
 
             <div class="feedback-area" id="feedback-ui">
-                <h3 style="font-size:0.8rem; color:var(--os-primary); margin-bottom:15px;">O que precisamos ajustar nesta pauta?</h3>
+                <h3 style="font-size:0.8rem; color:var(--os-primary); margin-bottom:15px;">O que precisa ser ajustado antes da aprovação?</h3>
                 <div class="check-grid" id="adjustment-checks">
                     <!-- Checkboxes Injected -->
                 </div>
                 <textarea id="feedback-text" rows="4" placeholder="Outras observações estratégicas..."></textarea>
-                <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR PARA REVISÃO</button>
+                <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR SOLICITAÇÃO DE REVISÃO</button>
             </div>
         </div>
     </div>
 
     <div class="success-msg" id="success-ui">
         <i class="fa-solid fa-circle-check"></i>
-        <h2 id="success-title">Diretriz Aprovada!</h2>
+        <h2 id="success-title">Planejamento Aprovado!</h2>
         <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
     </div>
 
@@ -193,7 +193,7 @@
                 document.getElementById('meta-date').innerText = meta.date || '---';
                 document.getElementById('meta-version').innerText = c.internal_notes || 'V1';
                 
-                document.getElementById('asset-caption').innerText = c.caption || 'Sem descrição disponível.';
+                document.getElementById('asset-caption').innerText = c.caption || 'Diretriz criada a partir das informações estratégicas do cliente. Revise tema, objetivo, abordagem e CTA antes da aprovação.';
                 
                 const badge = document.getElementById('status-badge-container');
                 if (c.status === 'APROVAÇÃO' || c.status === 'PAUTA') {
