@@ -764,10 +764,11 @@ window.runAiPlanner = async () => {
                 sLog(`${newAssets.length} Ativos de Logística Gerados.`);
                 loadContent();
             }
-        } catch (err) {
-            alert('Erro ao gerar plano: ' + err.message);
         }
-    };
+    } catch (err) {
+        alert('Erro ao gerar plano: ' + err.message);
+    }
+};
 
 window.deleteAsset = async (id) => {
     if (!confirm('Deseja excluir este ativo da esteira?')) return;
