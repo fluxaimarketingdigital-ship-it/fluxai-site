@@ -62,17 +62,20 @@
         .btn-return {
             background: var(--os-primary);
             color: #000;
-            padding: 18px 40px;
+            padding: 18px 0; /* Remover padding lateral para centralizar via flex */
             border: none;
             border-radius: 8px;
             font-weight: 800;
             font-size: 0.9rem;
             cursor: pointer;
-            margin-top: 40px;
-            display: inline-flex;
+            margin: 40px auto 0 auto; /* Centralizar o próprio botão se necessário */
+            display: flex;
             align-items: center;
+            justify-content: center;
             gap: 12px;
             transition: all 0.3s;
+            width: 100%;
+            max-width: 320px;
         }
         .btn-return:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(142, 158, 104, 0.3); }
 
@@ -342,39 +345,48 @@
                 if (!allowedStatus.includes(currentStatus)) {
                     document.getElementById('loading-state').style.display = 'none';
                     document.getElementById('main-ui').style.display = 'none';
-                    
-                    if (currentStatus === 'PLANEJAMENTO' || currentStatus === 'REVISÃO GESTÃO' || currentStatus === 'REVISÃO INTERNA FINAL') {
-                        document.getElementById('success-title').innerText = 'Em Revisão Estratégica';
-                        document.getElementById('success-message').innerHTML = `Este conteúdo está passando por uma <b>Validação Estratégica Interna</b> pela nossa equipe de gestão para garantir a máxima qualidade. Em breve ele estará disponível para sua aprovação final.`;
+
+                    // ── FLUXO VISÍVEL AO CLIENTE ──────────────────────────────────────────
+                    // PLANEJAMENTO / REVISÃO GESTÃO / APROVAÇÃO ESTRATÉGICA
+                    //   → Equipe ainda não enviou para aprovação
+                    // APROVAÇÃO PLANEJAMENTO → cliente aprova (handled above via allowedStatus)
+                    // AJUSTE → cliente pediu ajuste; equipe está corrigindo
+                    // APROVAÇÃO PLANEJAMENTO (de novo) → após ajuste, volta para aprovação
+                    // PRODUÇÃO → cliente aprovou; equipe produz a arte
+                    // APROVAÇÃO FINAL → cliente aprova a arte (handled above via allowedStatus)
+                    // AJUSTE DE PRODUÇÃO → cliente pediu ajuste na arte; equipe corrige
+                    // APROVAÇÃO FINAL (de novo) → volta para aprovação da arte
+                    // PRONTO / PUBLICADO → fluxo concluído
+
+                    if (currentStatus === 'AJUSTE') {
+                        document.getElementById('success-title').innerText = 'Ajuste em Andamento';
+                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:#60a5fa;">Seu Pedido de Ajuste:</strong><br>${c.internal_notes}</div>` : '';
+                        document.getElementById('success-message').innerHTML = `✅ Seus apontamentos foram recebidos e nossa equipe já está aplicando os ajustes no planejamento.<br><br>Assim que estiver pronto, você receberá acesso para uma nova rodada de aprovação. ${feedbackMsg}`;
                     } else if (currentStatus === 'PRODUÇÃO') {
                         document.getElementById('success-title').innerText = 'Em Produção';
-                        document.getElementById('success-message').innerHTML = `<b>Planejamento Aprovado!</b><br><br>Este conteúdo já foi enviado para nossa equipe técnica e está em fase de <b>Produção Audiovisual/Design</b>. Você receberá uma notificação assim que a arte final estiver pronta para sua validação.`;
-                    } else if (currentStatus === 'AJUSTE') {
-                        document.getElementById('success-title').innerText = 'Aguardando Ajustes';
-                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Sua Solicitação:</strong><br>${c.internal_notes}</div>` : '';
-                        document.getElementById('success-message').innerHTML = `Seus apontamentos já foram enviados para a nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes. ${feedbackMsg}`;
+                        document.getElementById('success-message').innerHTML = `🎬 <b>Planejamento Aprovado com sucesso!</b><br><br>Nossa equipe técnica já recebeu o briefing e está em fase de <b>Produção Audiovisual / Design</b>.<br><br>Você receberá uma notificação assim que a arte final estiver pronta para sua validação.`;
                     } else if (currentStatus === 'AJUSTE DE PRODUÇÃO') {
-                        document.getElementById('success-title').innerText = 'Em Ajuste de Produção';
-                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Suas Observações Técnicas:</strong><br>${c.internal_notes}</div>` : '';
-                        document.getElementById('success-message').innerHTML = `A arte final está sendo refinada pela nossa equipe de design com base nos seus últimos apontamentos. ${feedbackMsg}`;
+                        document.getElementById('success-title').innerText = 'Arte em Ajuste';
+                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(236,72,153,0.08); border:1px solid rgba(236,72,153,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:#ec4899;">Suas Observações:</strong><br>${c.internal_notes}</div>` : '';
+                        document.getElementById('success-message').innerHTML = `🎨 Nossa equipe de design está refinando a arte final com base nos seus apontamentos. Em breve estará disponível para sua aprovação. ${feedbackMsg}`;
+                    } else if (currentStatus === 'PRONTO' || currentStatus === 'PUBLICADO') {
+                        document.getElementById('success-title').innerText = currentStatus === 'PUBLICADO' ? '🚀 Publicado!' : '✅ Conteúdo Finalizado!';
+                        document.getElementById('success-message').innerText = currentStatus === 'PUBLICADO' ? 'Este conteúdo foi publicado nas plataformas conforme planejado. Acompanhe os resultados no seu dashboard.' : 'Este ativo foi aprovado e está pronto para publicação. Acompanhe o calendário para ver a data programada.';
                     } else {
-                        document.getElementById('success-title').innerText = 'Acesso Encerrado';
-                        document.getElementById('success-message').innerText = 'Este ativo já foi validado e seguiu para a próxima etapa operacional. Você pode acompanhar o progresso no seu Calendário.';
+                        // PLANEJAMENTO, REVISÃO GESTÃO, APROVAÇÃO ESTRATÉGICA, etc.
+                        document.getElementById('success-title').innerText = 'Em Preparação Estratégica';
+                        document.getElementById('success-message').innerHTML = `Nossa equipe está finalizando os últimos ajustes estratégicos neste conteúdo para garantir a máxima qualidade antes de enviar para sua aprovação.<br><br>Em breve você receberá acesso para revisar e aprovar.`;
                     }
                     
                     const actionsContainer = document.getElementById('success-actions');
-                    if (actionsContainer && !document.getElementById('btn-return-portal')) {
-                        const btn = document.createElement('button');
-                        btn.id = 'btn-return-portal';
-                        btn.className = 'btn btn-approve';
-                        btn.style.background = 'var(--os-primary)';
-                        btn.style.color = '#000';
-                        btn.style.width = '100%';
-                        btn.style.marginTop = '20px';
-                        btn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
-                        btn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
-                        actionsContainer.appendChild(btn);
-                    }
+                        if (actionsContainer && !document.getElementById('btn-return-portal')) {
+                            const btn = document.createElement('button');
+                            btn.id = 'btn-return-portal';
+                            btn.className = 'btn-return';
+                            btn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
+                            btn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
+                            actionsContainer.appendChild(btn);
+                        }
 
                     document.getElementById('success-ui').style.display = 'block';
                     return;
@@ -435,10 +447,10 @@
                 
                 if (isFinalArt && c.metadata?.final_asset_url) {
                     document.getElementById('asset-caption').innerHTML = `
-                        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px;">
-                            <i class="fa-solid fa-file-circle-check" style="font-size: 3rem; color: #8b5cf6; margin-bottom: 15px;"></i>
-                            <h3 style="color: #fff; margin-bottom: 10px;">A Arte Final está pronta!</h3>
-                            <a href="${c.metadata.final_asset_url}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; padding: 12px 30px;">
+                        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 40px 30px; border-radius: 12px; text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                            <i class="fa-solid fa-file-circle-check" style="font-size: 4rem; color: #8b5cf6; display: block;"></i>
+                            <h3 style="color: #fff; margin: 0; font-size: 1.2rem;">A Arte Final está pronta!</h3>
+                            <a href="${c.metadata.final_asset_url}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 35px; border-radius: 8px; font-weight: 800; text-decoration: none;">
                                 <i class="fa-solid fa-eye"></i> VISUALIZAR ARTE FINAL
                             </a>
                         </div>

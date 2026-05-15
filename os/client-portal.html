@@ -72,12 +72,13 @@
         }
         .asset-card:hover { transform: translateY(-2px); border-color: var(--os-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         
+        /* Status visíveis ao cliente */
         .status-aprovação-planejamento { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
-        .status-aprovação-final { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); font-weight: 800; }
-        .status-ajuste { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .status-ajuste-de-produção { background: rgba(236, 72, 153, 0.1); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.3); }
-        .status-produção { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
-        .status-pronto { background: #10b981; color: #fff; border: 1px solid #10b981; font-weight: 900; }
+        .status-aprovação-final { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.5); font-weight: 800; }
+        .status-ajuste { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .status-ajuste-de-produção { background: rgba(236, 72, 153, 0.15); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.4); }
+        .status-produção { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .status-pronto { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; font-weight: 900; }
         .status-publicado { background: #000; color: #10b981; border: 1px solid #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
         
         @media (max-width: 900px) {
@@ -134,11 +135,22 @@
                     document.getElementById('client-name').innerText = 'Projeto não localizado';
                 }
 
-                // 2. Buscar Todos os Ativos (para navegar entre meses sem novo fetch)
+                // Status internos que o cliente NÃO deve ver no calendário:
+                // PLANEJAMENTO = IA gerou mas não enviou ainda
+                // REVISÃO GESTÃO = gestor revisando internamente
+                // REVISÃO INTERNA FINAL = revisão antes de enviar
+                // APROVAÇÃO ESTRATÉGICA = aguardando decisão interna de enviar
+                const INTERNAL_STATUSES = [
+                    'PLANEJAMENTO',
+                    'REVISÃO GESTÃO',
+                    'REVISÃO INTERNA FINAL',
+                    'APROVAÇÃO ESTRATÉGICA'
+                ];
+
                 const { data: assets } = await _supabaseClient.from('content_assets')
                     .select('*')
                     .eq('project_id', projectId)
-                    .not('status', 'in', '("PLANEJAMENTO","REVISÃO GESTÃO")')
+                    .not('status', 'in', `(${INTERNAL_STATUSES.map(s => `"${s}"`).join(',')})`)
                     .order('scheduled_at', { ascending: true });
 
                 _allAssets = assets || [];
