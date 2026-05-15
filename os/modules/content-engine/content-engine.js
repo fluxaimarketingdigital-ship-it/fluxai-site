@@ -208,24 +208,31 @@ function switchTab(tab) {
 async function loadProjects() {
     try {
         const supabase = getSupabase();
-        const { data: projects, error } = await supabase.from('projects').select('id, company_name, next_cycle_day').eq('status', 'ATIVO');
-        if (error) throw error;
+        // Busca Segura: Tenta buscar os campos essenciais primeiro
+        const { data: projects, error } = await supabase.from('projects').select('*').eq('status', 'ATIVO');
+        
+        if (error) {
+            sLog('Erro DB Projetos: ' + error.message);
+            throw error;
+        }
 
         // Armazenar projetos globalmente para consulta rápida
-        window.allProjects = projects;
+        window.allProjects = projects || [];
 
         const select = document.getElementById('project-filter');
-        if (select && projects) {
+        if (select) {
             select.innerHTML = '<option value="">Todos os Projetos</option>';
-            projects.forEach(p => {
+            window.allProjects.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.id;
-                opt.innerText = p.company_name;
+                opt.innerText = p.company_name || p.name;
                 select.appendChild(opt);
             });
+            sLog(`${window.allProjects.length} Clientes Sincronizados.`);
         }
     } catch (e) {
-        sLog('Erro Projetos: ' + e.message);
+        sLog('Falha Crítica na Carga de Clientes: ' + e.message);
+        console.error(e);
     }
 }
 
@@ -248,7 +255,8 @@ async function loadContent() {
     } else {
         const projectData = window.allProjects?.find(p => p.id === currentProject);
         if (projectData && workflowDeadline && workflowCard) {
-            const deadlineDay = projectData.next_cycle_day || 20;
+            // Tenta buscar o dia em diferentes possíveis colunas do banco
+            const deadlineDay = projectData.next_cycle_day || projectData.planning_day || 20;
             const now = new Date();
             const currentDay = now.getDate();
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toLocaleString('pt-BR', { month: 'long' }).toUpperCase();
