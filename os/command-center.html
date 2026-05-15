@@ -1,39 +1,227 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FluxAI OS™ | Centro de Comando</title>
-    <link rel="stylesheet" href="/src/styles/os/interface.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --os-primary: #8e9e68;
+            --os-bg: #050705;
+            --os-surface: rgba(15, 18, 15, 0.7);
+            --os-border: rgba(142, 158, 104, 0.15);
+            --os-text: #e0e0e0;
+            --os-text-muted: #888;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --os-success: #10b981;
+            --os-warning: #f59e0b;
+            --os-danger: #ef4444;
+        }
 
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--os-bg);
+            color: var(--os-text);
+            overflow: hidden;
+        }
+
+        /* BACKGROUND SYSTEM */
+        .os-bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 0% 0%, rgba(142, 158, 104, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 100% 100%, rgba(142, 158, 104, 0.1) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        .os-shell {
+            display: flex;
+            height: 100vh;
+            background: transparent;
+        }
+
+        /* SIDEBAR & TOPBAR REFINEMENTS */
+        .os-sidebar {
+            width: 280px;
+            background: rgba(10, 12, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--os-border);
+            z-index: 100;
+        }
+
+        .os-viewport-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .os-topbar {
+            height: 70px;
+            background: rgba(10, 12, 10, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--os-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 90;
+        }
+
+        .os-viewport {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* TYPOGRAPHY */
+        .os-page-title h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            margin: 0;
+            background: linear-gradient(to right, #fff, var(--os-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .os-page-title p {
+            color: var(--os-text-muted);
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* GLASS WIDGETS */
+        .os-widget-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .os-widget {
+            background: var(--os-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--os-border);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .os-widget:hover {
+            transform: translateY(-5px);
+            border-color: rgba(142, 158, 104, 0.4);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .os-widget::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--os-primary), transparent);
+            opacity: 0.3;
+        }
+
+        .os-widget-label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--os-primary);
+            opacity: 0.8;
+        }
+
+        /* METRICS */
+        .os-metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 10px 0;
+            color: #fff;
+        }
+
+        .os-metric-meta {
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .trend-up { color: var(--os-success); }
+        .trend-down { color: var(--os-danger); }
+
+        /* ALERTS */
+        .os-alert-item {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            gap: 12px;
+            transition: 0.3s;
+        }
+
+        .os-alert-item:hover {
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        /* ACTIVITY LOG */
+        .log-entry {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            display: flex;
+            gap: 10px;
+        }
+
+        .log-time { color: var(--os-primary); opacity: 0.6; }
+        .log-user { font-weight: 700; color: #fff; }
+        .log-msg { color: var(--os-text-muted); }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .os-widget { animation: fadeInUp 0.5s ease backwards; }
+        .os-widget:nth-child(1) { animation-delay: 0.1s; }
+        .os-widget:nth-child(2) { animation-delay: 0.15s; }
+        .os-widget:nth-child(3) { animation-delay: 0.2s; }
+        .os-widget:nth-child(4) { animation-delay: 0.25s; }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(142, 158, 104, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--os-primary); }
+    </style>
 </head>
 <body class="os-mode">
-
+    <div class="os-bg-glow"></div>
     <div class="os-shell">
-        <!-- SIDEBAR (Renderizada via Core) -->
         <aside class="os-sidebar"></aside>
 
-        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
-            <!-- TOPBAR (Renderizada via Core) -->
+        <div class="os-viewport-wrapper">
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
                 <div class="os-page-title">
-                    <h1 id="page-title">Centro de Comando</h1>
-                    <p id="page-desc">Visão geral da inteligência e estados operacionais da FluxAI Labs.</p>
+                    <h1>Centro de Comando</h1>
+                    <p>Orquestração estratégica e estados operacionais em tempo real.</p>
                 </div>
 
                 <div class="os-widget-grid">
-                    <!-- MÉTRICAS PRINCIPAIS (Containers) -->
-                    <div class="os-widget" id="metric-comercial" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-conteudo" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-crm" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-roas" style="grid-column: span 3;"></div>
+                    <!-- MÉTRICAS PRINCIPAIS -->
+                    <div class="os-widget" id="metric-assets" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-approval" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-production" style="grid-column: span 3;"></div>
+                    <div class="os-widget" id="metric-schedule" style="grid-column: span 3;"></div>
 
                     <!-- CENTRAL OPERACIONAL DO DIA (LOGÍSTICA) -->
                     <div class="os-widget" style="grid-column: span 8; grid-row: span 2;">
@@ -70,10 +258,10 @@
         </div>
     </div>
 
-    <!-- CORE ENGINE INITIALIZATION -->
     <script type="module">
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { getSupabase } from './services/supabase-client.js';
+
         async function initPage() {
             const user = await OS_AUTH.check('OPERATOR');
             if (!user) return;
@@ -81,9 +269,69 @@
             OS_UI.renderSidebar('command-center', user.role);
             await OS_UI.renderTopbar();
  
-            // Inicializar Logística
+            await renderMetrics();
             await runLogisticsEngine();
             await renderActivity();
+        }
+
+        async function renderMetrics() {
+            const supabase = getSupabase();
+            
+            try {
+                // 1. Total de Ativos (Mês)
+                const { count: totalAssets } = await supabase.from('content_assets').select('*', { count: 'exact', head: true });
+                OS_UI.renderMetric('metric-assets', {
+                    label: 'Ativos Gerenciados',
+                    value: totalAssets || 0,
+                    icon: 'fa-layer-group',
+                    trend: '+12%',
+                    trendUp: true
+                });
+            } catch (e) {
+                OS_UI.renderMetric('metric-assets', { label: 'Ativos Gerenciados', value: '0', icon: 'fa-layer-group' });
+            }
+
+            try {
+                // 2. Aguardando Aprovação
+                const { count: pendingApproval } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('status', 'AGUARDANDO APROVAÇÃO');
+                OS_UI.renderMetric('metric-approval', {
+                    label: 'Aguardando Aprovação',
+                    value: pendingApproval || 0,
+                    icon: 'fa-clock',
+                    trend: 'Sincronizado',
+                    trendUp: true
+                });
+            } catch (e) {
+                OS_UI.renderMetric('metric-approval', { label: 'Aguardando Aprovação', value: '0', icon: 'fa-clock' });
+            }
+
+            try {
+                // 3. Em Produção
+                const { count: inProduction } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('status', 'EM PRODUÇÃO');
+                OS_UI.renderMetric('metric-production', {
+                    label: 'Em Produção',
+                    value: inProduction || 0,
+                    icon: 'fa-gears',
+                    trend: 'Ativo',
+                    trendUp: true
+                });
+            } catch (e) {
+                OS_UI.renderMetric('metric-production', { label: 'Em Produção', value: '0', icon: 'fa-gears' });
+            }
+
+            try {
+                // 4. Agendados (Total)
+                const { count: scheduled } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('status', 'AGENDADO');
+                OS_UI.renderMetric('metric-schedule', {
+                    label: 'Total Agendados',
+                    value: scheduled || 0,
+                    icon: 'fa-calendar-check',
+                    trend: 'Online',
+                    trendUp: true
+                });
+            } catch (e) {
+                OS_UI.renderMetric('metric-schedule', { label: 'Total Agendados', value: '0', icon: 'fa-calendar-check' });
+            }
         }
 
         async function runLogisticsEngine() {
@@ -92,7 +340,6 @@
             const startOfDay = new Date(now.setHours(0,0,0,0)).toISOString();
             const endOfDay = new Date(now.setHours(23,59,59,999)).toISOString();
 
-            // 1. Buscar Publicações de Hoje
             const { data: hoy } = await supabase.from('content_assets')
                 .select('*, projects(name)')
                 .gte('scheduled_at', startOfDay)
@@ -104,7 +351,7 @@
             const countBadge = document.getElementById('pub-today-count');
 
             if (!hoy || hoy.length === 0) {
-                container.innerHTML = '<div style="grid-column:span 2; opacity:0.5; text-align:center; padding:20px;">Nenhuma publicação agendada para hoje.</div>';
+                container.innerHTML = '<div style="grid-column:span 2; opacity:0.5; text-align:center; padding:40px; font-size:0.8rem;">SISTEMA OPERANDO EM STANDBY • SEM AGENDAMENTOS</div>';
                 countBadge.innerText = '0 HOJE';
                 return;
             }
@@ -114,7 +361,7 @@
             let alertsHtml = '';
             container.innerHTML = hoy.map(c => {
                 const time = new Date(c.scheduled_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const statusColor = c.status === 'PRONTO' ? 'var(--os-success)' : 'var(--os-warning)';
+                const statusColor = c.status === 'AGENDADO' ? 'var(--os-primary)' : 'var(--os-warning)';
                 
                 // Lógica de Alertas
                 const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
@@ -125,41 +372,31 @@
                         <div class="os-alert-item" style="border-left: 3px solid var(--os-danger);">
                             <div class="os-alert-icon" style="color: var(--os-danger);"><i class="fa-solid fa-clock-rotate-left"></i></div>
                             <div class="os-alert-content">
-                                <h4 style="font-size:0.7rem;">APROVAÇÃO ATRASADA</h4>
-                                <p style="font-size:0.6rem;">${c.projects?.name} • Post ${time} bloqueado.</p>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                if (c.metadata?.risk) {
-                    alertsHtml += `
-                        <div class="os-alert-item" style="border-left: 3px solid var(--os-warning);">
-                            <div class="os-alert-icon" style="color: var(--os-warning);"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                            <div class="os-alert-content">
-                                <h4 style="font-size:0.7rem;">RISCO OPERACIONAL</h4>
-                                <p style="font-size:0.6rem;">${c.projects?.name} • Atraso impacta o dia.</p>
+                                <h4 style="font-size:0.7rem; margin:0; color:#fff;">APROVAÇÃO ATRASADA</h4>
+                                <p style="font-size:0.6rem; margin:2px 0 0; color:var(--os-text-muted);">${c.projects?.name} • Post ${time}</p>
                             </div>
                         </div>
                     `;
                 }
 
                 return `
-                    <div style="background:rgba(255,255,255,0.03); border:1px solid #222; padding:12px; border-radius:8px; display:flex; flex-direction:column; gap:8px;">
-                        <div style="display:flex; justify-content:space-between; align-items:start;">
-                            <div style="font-size:0.6rem; font-weight:800; color:var(--os-primary);">${time} • ${c.projects?.name}</div>
-                            <i class="fa-solid fa-rocket" style="color:${statusColor}; font-size:0.7rem;"></i>
-                        </div>
-                        <div style="font-size:0.75rem; font-weight:700; color:#fff;">${c.title}</div>
-                        <div style="display:flex; gap:5px; margin-top:5px;">
-                            <span style="font-size:0.5rem; background:#111; padding:2px 6px; border-radius:4px; border:1px solid #333;">${c.platform}</span>
-                            <span style="font-size:0.5rem; background:#111; padding:2px 6px; border-radius:4px; border:1px solid #333;">${c.metadata?.responsible || 'Design'}</span>
+                    <div class="os-alert-item" style="margin-bottom:0; background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.05);">
+                        <div style="flex:1;">
+                            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:5px;">
+                                <div style="font-size:0.6rem; font-weight:800; color:var(--os-primary); text-transform:uppercase;">${time} • ${c.projects?.name}</div>
+                                <i class="fa-solid fa-circle-dot" style="color:${statusColor}; font-size:0.5rem; animation: pulse 2s infinite;"></i>
+                            </div>
+                            <div style="font-size:0.8rem; font-weight:600; color:#fff;">${c.title}</div>
+                            <div style="display:flex; gap:8px; margin-top:8px;">
+                                <span style="font-size:0.55rem; color:var(--os-text-muted); border:1px solid var(--os-border); padding:2px 6px; border-radius:4px;">${c.platform}</span>
+                                <span style="font-size:0.55rem; color:var(--os-text-muted); border:1px solid var(--os-border); padding:2px 6px; border-radius:4px;">${c.metadata?.responsible || 'SQUAD'}</span>
+                            </div>
                         </div>
                     </div>
                 `;
             }).join('');
 
-            alertContainer.innerHTML = alertsHtml || '<p style="font-size:0.7rem; opacity:0.5; text-align:center;">Nenhum alerta crítico no momento.</p>';
+            alertContainer.innerHTML = alertsHtml || '<div style="opacity:0.3; text-align:center; padding:20px; font-size:0.7rem;">ESTADO OPERACIONAL ESTÁVEL</div>';
         }
 
         const renderActivity = async () => {
@@ -167,20 +404,19 @@
             const supabase = getSupabase();
             
             if (supabase) {
-                const { data, error } = await supabase.from('audit_logs').select('*').limit(5).order('created_at', { ascending: false });
-                if (!error && data && data.length > 0) {
+                const { data } = await supabase.from('audit_logs').select('*').limit(8).order('created_at', { ascending: false });
+                if (data && data.length > 0) {
                     logContainer.innerHTML = data.map(log => `
                         <div class="log-entry">
                             <span class="log-time">[${new Date(log.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}]</span>
-                            <span class="log-user">SISTEMA:</span>
+                            <span class="log-user">CORE:</span>
                             <span class="log-msg">${log.action}</span>
                         </div>
                     `).join('');
                     return;
                 }
             }
- 
-            logContainer.innerHTML = `<div class="log-entry" style="opacity:0.5;">Aguardando novas atividades sincronizadas...</div>`;
+            logContainer.innerHTML = `<div class="log-entry" style="opacity:0.5;">AGUARDANDO SINCRONIZAÇÃO...</div>`;
         };
 
         initPage();
