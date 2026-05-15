@@ -277,6 +277,13 @@ async function loadContent() {
                 workflowCard.classList.remove('pulse-red');
             }
         }
+
+        // RESTAURAR BOTÕES DE AÇÃO
+        const copyBtn = document.getElementById('btn-copy-portal');
+        if (copyBtn) copyBtn.style.display = 'flex';
+        
+        const sendBtn = document.getElementById('btn-send-approval');
+        if (sendBtn) sendBtn.style.display = 'flex';
     }
 
     // (Removido o bloco redundante)
