@@ -84,10 +84,16 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         let supabase;
+        let initAttempts = 0;
+
         function getSupabaseClient() {
             if (supabase) return supabase;
-            if (window.supabase) {
-                supabase = window.supabase.createClient("https://mufgwetfhfhhmhowbhjj.supabase.co", "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5");
+            
+            // Tenta capturar a biblioteca global em diferentes escopos
+            const lib = window.supabase || (typeof supabase !== 'undefined' ? supabase : null);
+            
+            if (lib && typeof lib.createClient === 'function') {
+                supabase = lib.createClient("https://mufgwetfhfhhmhowbhjj.supabase.co", "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5");
                 return supabase;
             }
             return null;
@@ -96,40 +102,34 @@
         const params = new URLSearchParams(window.location.search);
         const projectId = params.get('project_id') || params.get('project');
 
-        async function getStatusBg(status) {
-            if (status === 'PLANEJAMENTO') return '#8b5cf6';
-            if (status === 'REVISÃO GESTÃO') return '#8b5cf6';
-            if (status === 'APROVAÇÃO PLANEJAMENTO') return '#3b82f6';
-            if (status === 'APROVAÇÃO ESTRATÉGICA') return '#3b82f6';
-            if (status === 'AJUSTE') return '#ef4444';
-            if (status === 'PRODUÇÃO') return '#f59e0b';
-            if (status === 'AJUSTE DE PRODUÇÃO') return '#ec4899';
-            if (status === 'APROVAÇÃO FINAL') return '#3b82f6';
-            if (status === 'PRONTO') return '#10b981';
-            if (status === 'PUBLICADO') return '#059669';
-            if (status === 'ATRASADO') return '#7f1d1d';
-            return '#444';
-        }
-
         async function init() {
+            const nameEl = document.getElementById('client-name');
+            
             if (!projectId) {
                 console.error('[PORTAL] Nenhum ID de projeto fornecido.');
+                if (nameEl) nameEl.innerText = 'Acesso Negado: ID do Projeto Ausente';
                 return document.body.innerHTML = '<div style="padding:50px; text-align:center;"><h1>Acesso negado.</h1><p>ID do projeto não encontrado na URL.</p></div>';
             }
 
             const client = getSupabaseClient();
             if (!client) {
-                console.log('[PORTAL] Supabase não pronto, tentando novamente em 500ms...');
+                initAttempts++;
+                if (initAttempts > 20) { // 10 segundos
+                    console.error('[PORTAL] Falha ao carregar biblioteca Supabase após 10s.');
+                    if (nameEl) nameEl.innerText = 'Erro de Conexão: Biblioteca não carregada.';
+                    return;
+                }
+                console.log(`[PORTAL] Aguardando Supabase (Tentativa ${initAttempts})...`);
                 return setTimeout(init, 500);
             }
 
+            if (nameEl) nameEl.innerText = 'Sincronizando Ativos...';
             console.log('[PORTAL] Iniciando sincronização para projeto:', projectId);
 
             // 1. Buscar Nome do Projeto/Cliente
             try {
                 const { data: projData, error: pError } = await client.from('projects').select('company_name, name').eq('id', projectId).single();
                 
-                const nameEl = document.getElementById('client-name');
                 if (projData) {
                     const now = new Date();
                     const currentMonth = now.toLocaleString('pt-BR', { month: 'long' });
@@ -139,11 +139,10 @@
                     if (nameEl) nameEl.innerText = `${projData.company_name || projData.name}`;
                 } else {
                     console.warn('[PORTAL] Projeto não encontrado ou erro:', pError);
-                    if (nameEl) nameEl.innerText = 'Cronograma de Conteúdo';
+                    if (nameEl) nameEl.innerText = 'Projeto não localizado no Ecossistema';
                 }
             } catch (err) {
-                console.error('[PORTAL] Falha crítica ao buscar projeto:', err);
-                const nameEl = document.getElementById('client-name');
+                console.error('[PORTAL] Falha ao buscar projeto:', err);
                 if (nameEl) nameEl.innerText = 'Cronograma de Conteúdo';
             }
 
@@ -161,10 +160,15 @@
                     renderCalendar(assets || []);
                 }
             } catch (err) {
-                console.error('[PORTAL] Falha crítica ao carregar ativos:', err);
+                console.error('[PORTAL] Falha ao carregar ativos:', err);
                 renderCalendar([]);
             }
         }
+
+        // Inicialização Segura
+        document.addEventListener('DOMContentLoaded', () => {
+            init();
+        });
 
         // ATUALIZAÇÃO AUTOMÁTICA: Quando o cliente volta para esta aba
         window.onfocus = () => {
