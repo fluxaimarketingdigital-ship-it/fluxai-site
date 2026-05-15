@@ -724,7 +724,6 @@ window.finalizeProduction = async (id) => {
         if (deadline < now) deadline = new Date(now.getTime() + 12 * 60 * 60 * 1000);
 
         const updatePayload = {
-            status: 'APROVAÇÃO FINAL',
             metadata: {
                 ...c.metadata,
                 final_asset_url: artLink,
@@ -734,10 +733,17 @@ window.finalizeProduction = async (id) => {
             }
         };
 
+        if (confirm('Enviar para APROVAÇÃO FINAL do cliente?\n\n(Cancele para marcar como PRONTO e pular aprovação)')) {
+            updatePayload.status = 'APROVAÇÃO FINAL';
+            sLog('Produção finalizada e enviada ao cliente.');
+        } else {
+            updatePayload.status = 'PRONTO';
+            sLog('Produção finalizada e marcada como PRONTO (Aprovação Pulada).');
+        }
+
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', id);
         if (error) throw error;
 
-        sLog('Produção finalizada e enviada ao cliente.');
         closeEditModal();
         loadContent();
     } catch (e) {
@@ -924,13 +930,15 @@ window.forceReady = async (id) => {
 };
 
 window.approveManager = async (id) => {
-    if (!confirm('Deseja validar esta pauta estrategicamente e liberar para a aprovação do cliente?')) return;
+    const choice = confirm('Enviar esta pauta para APROVAÇÃO do cliente?\n\n(Cancele para enviar DIRETO PARA PRODUÇÃO)');
     try {
         const supabase = getSupabase();
-        // Move do Planejamento para a Aprovação Estratégica do Cliente
-        const { error } = await supabase.from('content_assets').update({ status: 'APROVAÇÃO ESTRATÉGICA' }).eq('id', id);
+        const nextStatus = choice ? 'APROVAÇÃO ESTRATÉGICA' : 'PRODUÇÃO';
+        
+        const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
         if (error) throw error;
-        sLog('Pauta validada pela gestão e enviada ao cliente.');
+        
+        sLog(choice ? 'Pauta enviada ao cliente.' : 'Pauta aprovada internamente e enviada para PRODUÇÃO.');
         loadContent();
     } catch (e) {
         alert('Erro ao validar pauta: ' + e.message);
