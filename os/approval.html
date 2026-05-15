@@ -183,7 +183,7 @@
                     document.getElementById('loading-state').style.display = 'none';
                     document.getElementById('main-ui').style.display = 'none';
                     
-                    if (currentStatus === 'PLANEJAMENTO' || currentStatus === 'REVISÃO GESTÃO') {
+                    if (currentStatus === 'PLANEJAMENTO' || currentStatus === 'REVISÃO GESTÃO' || currentStatus === 'REVISÃO INTERNA FINAL') {
                         document.getElementById('success-title').innerText = 'Em Revisão Estratégica';
                         document.getElementById('success-message').innerHTML = `Este conteúdo está passando por uma <b>Validação Estratégica Interna</b> pela nossa equipe de gestão para garantir a máxima qualidade. Em breve ele estará disponível para sua aprovação final.`;
                     } else if (currentStatus === 'PRODUÇÃO') {
