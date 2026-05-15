@@ -528,9 +528,8 @@ window.openEditModal = async (id) => {
         const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVAÇÃO ESTRATÉGICA' || c.status === 'REVISÃO GESTÃO';
         const isDirector = localStorage.getItem('os_role') === 'DIRETOR';
         
-        // Mapear campos do HTML
+        // Mapear campos do HTML (Somente os que são fixos)
         document.getElementById('edit-asset-title').value = c.title;
-        document.getElementById('edit-asset-caption').value = c.caption || '';
         document.getElementById('edit-asset-ref').value = c.metadata?.reference_url || '';
         document.getElementById('edit-asset-art-final').value = c.metadata?.final_asset_url || '';
         
@@ -626,14 +625,7 @@ window.openEditModal = async (id) => {
             }
         }
 
-        // Feedback de Ajuste
-        const feedbackContainer = document.getElementById('edit-asset-feedback-container');
-        if (c.internal_notes && feedbackContainer) {
-            document.getElementById('edit-asset-feedback').innerText = c.internal_notes;
-            feedbackContainer.style.display = 'block';
-        } else if (feedbackContainer) {
-            feedbackContainer.style.display = 'none';
-        }
+
 
         // Atualizar Botões Dinâmicos
         const footerActions = document.getElementById('edit-asset-footer-actions');
@@ -882,21 +874,24 @@ window.runAiPlanner = async () => {
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', selectedId).single();
     const { count } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('project_id', selectedId);
     
-    // Tentar extrair número da cota do 'content_scope' ou default 12
+    // Tentar extrair número da cota do 'content_scope' (Ex: "12 Ativos/mês")
     const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
     const quota = quotaMatch ? parseInt(quotaMatch[0]) : 12;
 
-    if (count >= quota) {
-        return alert(`Limite de Cota Atingido (${count}/${quota}).\n\nApague ativos antigos ou solicite upgrade de contrato para gerar novos planejamentos.`);
+    const remaining = quota - count;
+
+    if (remaining <= 0) {
+        return alert(`Limite de Cota Atingido (${count}/${quota}).\n\nApague ativos para liberar espaço ou solicite upgrade de contrato.`);
     }
 
-    sLog(`Iniciando Motor Estratégico (Cota: ${count}/${quota})`);
+    sLog(`Iniciando Motor Estratégico (Cota: ${count}/${quota} | Disponível: ${remaining})`);
     
     try {
         const { AIPlanner } = await import('../../services/ai-planner.js');
-        if (confirm(`Gerar novo planejamento estratégico para o projeto?`)) {
-            const type = document.getElementById('ai-planner-service').value;
-            const newAssets = await AIPlanner.generatePlan(currentProject, type);
+        const type = document.getElementById('ai-planner-service').value;
+        
+        if (confirm(`Gerar ${type === 'ALL' ? 'novo planejamento' : 'ativos de ' + type} para preencher os ${remaining} slots disponíveis no contrato?`)) {
+            const newAssets = await AIPlanner.generatePlan(currentProject, type, remaining);
             
             if (newAssets && newAssets.length > 0) {
                 // APLICAR INTELIGÊNCIA DE PRAZO E RESPONSÁVEL

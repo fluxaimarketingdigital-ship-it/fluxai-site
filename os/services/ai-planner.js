@@ -18,7 +18,7 @@ export const AIPlanner = {
     /**
      * Gera o planejamento estratégico operacional completo
      */
-    generatePlan: async (projectId, specificService = 'ALL') => {
+    generatePlan: async (projectId, specificService = 'ALL', maxToGenerate = 99) => {
         const supabase = window.getSupabase();
         const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
         
@@ -46,29 +46,31 @@ export const AIPlanner = {
         if (specificService === 'ALL') {
             servicesToGenerate = Object.keys(AIPlanner.STRATEGIC_MATRIX);
         } else {
-            if (AIPlanner.STRATEGIC_MATRIX[specificService]) {
-                servicesToGenerate = [specificService];
-            } else {
-                // Fallback ou erro se o serviço não existir
-                servicesToGenerate = Object.keys(AIPlanner.STRATEGIC_MATRIX);
-            }
+            // Se for serviço específico, vamos gerar várias instâncias dele até atingir o limite
+            servicesToGenerate = Array(maxToGenerate).fill(specificService);
         }
+
+        // Limitar ao máximo solicitado pelo contrato
+        servicesToGenerate = servicesToGenerate.slice(0, maxToGenerate);
 
         const strategicDays = [2, 4, 6]; // Terça, Quinta, Sábado
         let daysOffset = 0;
 
         servicesToGenerate.forEach((sKey) => {
             const service = AIPlanner.STRATEGIC_MATRIX[sKey];
+            if (!service) return;
             
             let date;
             let found = false;
             
+            // Procurar o próximo slot livre (Preenchendo lacunas de itens excluídos)
             while (!found) {
                 date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 date.setDate(date.getDate() + daysOffset);
                 
                 const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
                 
+                // Só gera para o futuro e em dias estratégicos não ocupados
                 if (strategicDays.includes(date.getDay()) && !occupiedDates.includes(dateKey)) {
                     found = true;
                     occupiedDates.push(dateKey);
@@ -76,9 +78,9 @@ export const AIPlanner = {
                 daysOffset++;
             }
 
-            // CÁLCULO AUTOMÁTICO DE SLA (LOGÍSTICA DE MÍDIA)
+            // CÁLCULO AUTOMÁTICO DE SLA
             const scheduledAt = date;
-            const strategicDeadline = new Date(scheduledAt.getTime() - (5 * 24 * 60 * 60 * 1000)); // 5 dias antes
+            const strategicDeadline = new Date(scheduledAt.getTime() - (5 * 24 * 60 * 60 * 1000));
             strategicDeadline.setHours(18, 0, 0, 0);
 
             contents.push({
@@ -97,7 +99,7 @@ export const AIPlanner = {
                     approval_deadline: strategicDeadline.toISOString(),
                     risk: false
                 },
-                internal_notes: `LOGÍSTICA DE MÍDIA: Prazo estratégico calculado automaticamente.`
+                internal_notes: "" // Removida a mensagem redundante
             });
         });
 
