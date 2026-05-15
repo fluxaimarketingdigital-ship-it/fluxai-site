@@ -414,11 +414,7 @@ function renderContentTable(contents) {
                 </td>
                 <td>
                     <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
-                        ${c.status === 'PLANEJAMENTO' ? `
-                            <button class="btn-mini" title="Validar Estratégia (Enviar p/ Cliente)" onclick="window.approveManager('${c.id}')" style="background: #8b5cf6; color: #fff; border: none;">
-                                <i class="fa-solid fa-shield-check"></i>
-                            </button>
-                        ` : ''}
+
                         ${c.status === 'PRONTO' ? `
                             <button class="btn-mini" title="Ponte de Publicação" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
                                 <i class="fa-solid fa-rocket"></i>
@@ -546,6 +542,8 @@ window.openEditModal = async (id) => {
             metaGrid.style.gap = '15px';
             metaGrid.style.marginTop = '20px';
 
+            const isLocked = c.status !== 'PLANEJAMENTO' && c.status !== 'AJUSTE';
+
             metaGrid.innerHTML = `
                 <div>
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">RESPONSÁVEL</label>
@@ -572,15 +570,9 @@ window.openEditModal = async (id) => {
                 </div>
                 <div style="display:flex; flex-direction:column; gap:10px; justify-content: flex-end;">
                      <div style="display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" id="edit-asset-strategic-req" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.strategic_approval_required ? 'checked' : ''}>
+                        <input type="checkbox" id="edit-asset-strategic-req" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.strategic_approval_required ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
                         <label for="edit-asset-strategic-req" style="font-size:0.6rem; color:#3b82f6; font-weight:800; cursor:pointer;">EXIGIR APROVAÇÃO ESTRATÉGICA?</label>
                      </div>
-                     ${(c.status === 'PLANEJAMENTO' || c.status === 'APROVAÇÃO ESTRATÉGICA') ? `
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <input type="checkbox" id="edit-asset-internal-review" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.internal_review_required ? 'checked' : ''}>
-                            <label for="edit-asset-internal-review" style="font-size:0.6rem; color:#8b5cf6; font-weight:800; cursor:pointer;">REVISAR ARTE (GESTÃO)?</label>
-                        </div>
-                     ` : ''}
                      <div style="display:flex; align-items:center; gap:8px;">
                         <input type="checkbox" id="edit-asset-risk" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.risk ? 'checked' : ''}>
                         <label for="edit-asset-risk" style="font-size:0.6rem; color:var(--os-danger); font-weight:800; cursor:pointer;">RISCO OPERACIONAL</label>
@@ -619,11 +611,17 @@ window.openEditModal = async (id) => {
         // Atualizar Botões Dinâmicos
         const footerActions = document.getElementById('edit-asset-footer-actions');
         if (footerActions) {
+            const hasStrategic = c.metadata?.strategic_approval_required;
+            
             footerActions.innerHTML = `
                 ${(c.status === 'PRODUÇÃO' || c.status === 'AJUSTE DE PRODUÇÃO') ? `
-                    <button class="btn-mini" onclick="window.finalizeProduction('${c.id}')" style="padding:10px 20px; background:#8b5cf6; color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
-                        <i class="fa-solid fa-paper-plane"></i> Finalizar e Enviar
+                    <button class="btn-mini" onclick="window.sendToStrategicOrFinal('${c.id}')" style="padding:10px 20px; background:#8b5cf6; color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
+                        <i class="fa-solid fa-paper-plane"></i> ${hasStrategic ? 'Enviar para Aprovação Estratégica' : 'Enviar para Aprovação Final'}
                     </button>
+                ` : ''}
+                ${c.status === 'APROVAÇÃO ESTRATÉGICA' ? `
+                    <button class="btn-mini" onclick="window.strategicInternalAction('${c.id}', 'REJECT')" style="padding:10px 20px; background:var(--os-danger); color:#fff; font-weight:800; border:none;">Solicitar Ajuste (Produção)</button>
+                    <button class="btn-mini" onclick="window.strategicInternalAction('${c.id}', 'APPROVE')" style="padding:10px 20px; background:var(--os-success); color:#fff; font-weight:800; border:none;">Aprovar p/ Cliente</button>
                 ` : ''}
                 <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
             `;
@@ -643,7 +641,6 @@ window.saveAssetEdit = async () => {
         const caption = document.getElementById('edit-asset-caption').value;
         const ref = document.getElementById('edit-asset-ref').value;
         const artFinal = document.getElementById('edit-asset-art-final')?.value;
-        const internalReview = document.getElementById('edit-asset-internal-review')?.checked;
         const strategicApproval = document.getElementById('edit-asset-strategic-req')?.checked;
         const responsible = document.getElementById('edit-asset-responsible')?.value;
         const version = document.getElementById('edit-asset-version')?.value;
@@ -656,7 +653,6 @@ window.saveAssetEdit = async () => {
         const newMetadata = currentAsset.metadata || {};
         newMetadata.reference_url = ref;
         newMetadata.final_asset_url = artFinal;
-        if (internalReview !== undefined) newMetadata.internal_review_required = internalReview;
         newMetadata.strategic_approval_required = strategicApproval;
         newMetadata.responsible = responsible;
         newMetadata.version = version;
@@ -673,15 +669,7 @@ window.saveAssetEdit = async () => {
         if (currentAsset.status === 'AJUSTE') {
             updatePayload.status = 'PLANEJAMENTO';
         } else if (currentAsset.status === 'AJUSTE DE PRODUÇÃO') {
-            updatePayload.status = 'PRODUÇÃO'; // Volta para a produção, não para o planejamento
-        } else if (currentAsset.status === 'PRODUÇÃO' && artFinal) {
-            if (newMetadata.strategic_approval_required) {
-                updatePayload.status = 'APROVAÇÃO ESTRATÉGICA';
-            } else if (newMetadata.internal_review_required) {
-                updatePayload.status = 'REVISÃO GESTÃO';
-            } else {
-                updatePayload.status = 'APROVAÇÃO FINAL';
-            }
+            updatePayload.status = 'PRODUÇÃO'; 
         }
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', editingAssetId);
         if (error) throw error;
@@ -694,49 +682,27 @@ window.saveAssetEdit = async () => {
     }
 }
 
-window.finalizeProduction = async (id) => {
+window.sendToStrategicOrFinal = async (id) => {
     const artLink = document.getElementById('edit-asset-art-final').value;
     if (!artLink) return alert('Por favor, insira o link da arte final antes de enviar!');
     
-    if (!confirm('Deseja finalizar a produção e enviar para aprovação do cliente agora?')) return;
-
     try {
         const supabase = getSupabase();
         const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
         
-        const scheduledDate = new Date(c.scheduled_at);
-        const now = new Date();
+        const hasStrategic = c.metadata?.strategic_approval_required;
+        const nextStatus = hasStrategic ? 'APROVAÇÃO ESTRATÉGICA' : 'APROVAÇÃO FINAL';
         
-        // Lógica Pub-1: Prazo de aprovação do cliente é 1 dia antes da postagem
-        let deadline = new Date(scheduledDate.getTime() - 24 * 60 * 60 * 1000);
-        if (deadline < now) deadline = new Date(now.getTime() + 12 * 60 * 60 * 1000);
+        if (!confirm(`Confirmar envio para ${hasStrategic ? 'Aprovação Estratégica (Interna)' : 'Aprovação Final (Cliente)'}?`)) return;
 
         const updatePayload = {
+            status: nextStatus,
             metadata: {
                 ...c.metadata,
                 final_asset_url: artLink,
-                responsible: document.getElementById('edit-asset-responsible').value,
-                version: 'FINAL',
-                approval_deadline: deadline.toISOString()
+                version: 'FINAL'
             }
         };
-
-        const mustReviewInternally = c.metadata?.internal_review_required;
-        const mustStrategicApprove = c.metadata?.strategic_approval_required;
-
-        if (mustStrategicApprove) {
-            alert('🚀 ESTE ATIVO SEGUE PARA VALIDAÇÃO ESTRATÉGICA.');
-            updatePayload.status = 'APROVAÇÃO ESTRATÉGICA';
-        } else if (mustReviewInternally) {
-            alert('🔒 ESTE ATIVO EXIGE VALIDAÇÃO DA GESTÃO.\n\nA produção será enviada para a revisão interna antes de seguir para o cliente.');
-            updatePayload.status = 'REVISÃO GESTÃO';
-        } else {
-            if (confirm('Enviar para APROVAÇÃO FINAL do cliente?\n\n(Cancele para marcar como PRONTO e pular aprovação)')) {
-                updatePayload.status = 'APROVAÇÃO FINAL';
-            } else {
-                updatePayload.status = 'PRONTO';
-            }
-        }
 
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', id);
         if (error) throw error;
@@ -744,7 +710,28 @@ window.finalizeProduction = async (id) => {
         closeEditModal();
         loadContent();
     } catch (e) {
-        sLog('Erro ao finalizar: ' + e.message);
+        alert('Erro ao enviar: ' + e.message);
+    }
+};
+
+window.strategicInternalAction = async (id, action) => {
+    try {
+        const supabase = getSupabase();
+        let nextStatus = action === 'APPROVE' ? 'APROVAÇÃO FINAL' : 'PRODUÇÃO';
+        
+        if (action === 'REJECT') {
+            const note = prompt('Qual ajuste deve ser feito na produção?');
+            if (!note) return;
+            await supabase.from('content_assets').update({ internal_notes: note }).eq('id', id);
+        }
+
+        const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
+        if (error) throw error;
+
+        closeEditModal();
+        loadContent();
+    } catch (e) {
+        alert('Erro: ' + e.message);
     }
 };
 
@@ -817,7 +804,22 @@ window.copyPortalLink = () => {
 };
 
 window.approvePendingAssets = async () => {
-    alert('Ação Descontinuada. Use o botão de Escudo (Validar) ou o Lápis para controle individual.');
+    if (!currentProject) return alert('Selecione um projeto!');
+    if (!confirm('Deseja enviar todas as pautas de PLANEJAMENTO para a aprovação do cliente?')) return;
+
+    try {
+        const supabase = getSupabase();
+        const { error } = await supabase.from('content_assets')
+            .update({ status: 'APROVAÇÃO PLANEJAMENTO' })
+            .eq('project_id', currentProject)
+            .eq('status', 'PLANEJAMENTO');
+
+        if (error) throw error;
+        sLog('Pautas enviadas para Aprovação de Planejamento.');
+        loadContent();
+    } catch (e) {
+        alert('Erro ao enviar pautas: ' + e.message);
+    }
 };
 
 window.runAiPlanner = async () => {
@@ -902,37 +904,7 @@ window.forceReady = async (id) => {
     }
 };
 
-window.approveManager = async (id) => {
-    try {
-        const supabase = getSupabase();
-        const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
-        
-        let nextStatus = 'APROVAÇÃO ESTRATÉGICA';
-        let logMsg = 'Pauta enviada ao cliente.';
 
-        if (c.status === 'REVISÃO GESTÃO' && c.metadata?.final_asset_url) {
-            nextStatus = 'APROVAÇÃO FINAL';
-            logMsg = 'Arte validada pela gestão e enviada para aprovação final do cliente.';
-        } else {
-            const needsStrategic = c.metadata?.strategic_approval_required;
-            if (needsStrategic) {
-                nextStatus = 'APROVAÇÃO ESTRATÉGICA';
-                logMsg = 'Pauta enviada para Aprovação Estratégica conforme configurado.';
-            } else {
-                nextStatus = 'PRODUÇÃO';
-                logMsg = 'Pauta aprovada internamente e enviada para PRODUÇÃO.';
-            }
-        }
-        
-        const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
-        if (error) throw error;
-        
-        sLog(logMsg);
-        loadContent();
-    } catch (e) {
-        alert('Erro ao validar pauta: ' + e.message);
-    }
-};
 
 window.deleteAsset = async (id) => {
     if (!confirm('Deseja excluir este ativo da esteira?')) return;
