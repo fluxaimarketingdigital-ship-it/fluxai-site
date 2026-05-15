@@ -70,38 +70,36 @@
         </div>
 
         <div id="content-data" style="display: none;">
-            <div class="meta-grid">
+            <div class="meta-grid" style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
                 <div class="meta-item">
-                    <span class="meta-label">Objetivo</span>
-                    <span class="meta-value" id="meta-obj">---</span>
+                    <span class="meta-label">OBJETIVO</span>
+                    <span class="meta-value" id="meta-obj" style="font-weight:700;">---</span>
                 </div>
                 <div class="meta-item">
-                    <span class="label">FORMATO</span>
-                    <span class="value" id="meta-format">---</span>
+                    <span class="meta-label">FORMATO</span>
+                    <span class="meta-value" id="meta-format" style="font-weight:700;">---</span>
                 </div>
+                <div class="meta-item">
+                    <span class="meta-label">VERSÃO</span>
+                    <span class="meta-value" id="meta-version" style="font-weight:700;">V1</span>
+                </div>
+            </div>
 
-                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; padding:15px; background:rgba(255,255,255,0.03); border-radius:8px; margin-top:20px;">
-                    <div>
-                        <span class="label" style="display:block; font-size:0.55rem; color:var(--os-text-muted); margin-bottom:5px;">REFERÊNCIA / INSPIRAÇÃO</span>
-                        <div id="meta-reference" style="font-size:0.7rem; font-weight:700;">---</div>
+            <div style="margin-top:20px; display:grid; grid-template-columns: 1.5fr 1fr; gap:15px;">
+                <div style="background:rgba(245,158,11,0.05); border:1px solid rgba(245,158,11,0.2); padding:20px; border-radius:12px; display:flex; flex-direction:column; justify-content:center;">
+                    <span style="font-size:0.6rem; color:#f59e0b; font-weight:800; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;">📅 PRAZO LIMITE PARA APROVAÇÃO</span>
+                    <div id="meta-deadline-highlight" style="font-size:1.6rem; color:#f59e0b; font-weight:900; text-shadow: 0 0 15px rgba(245,158,11,0.3);">---</div>
+                </div>
+                
+                <div style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:8px;">
+                        <span style="display:block; font-size:0.55rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800;">🚀 DATA DE PUBLICAÇÃO</span>
+                        <div id="meta-time" style="font-size:0.85rem; font-weight:700; color:var(--os-primary);">---</div>
                     </div>
-                    <div>
-                        <span class="label" style="display:block; font-size:0.55rem; color:var(--os-text-muted); margin-bottom:5px;">PRAZO DE APROVAÇÃO</span>
-                        <div id="meta-deadline" style="font-size:0.7rem; font-weight:800; color:var(--os-primary);">---</div>
+                    <div id="meta-reference-container" style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05); padding:12px; border-radius:8px;">
+                        <span style="display:block; font-size:0.55rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800;">🔗 REFERÊNCIA</span>
+                        <div id="meta-reference" style="font-size:0.75rem; font-weight:700;">---</div>
                     </div>
-                </div>
-
-                <div class="meta-item">
-                    <span class="meta-label">Publicação</span>
-                    <span class="meta-value" id="meta-time">---</span>
-                </div>
-                <div class="meta-item" style="border: 1px solid rgba(245,158,11,0.3); background: rgba(245,158,11,0.05); padding: 10px; border-radius: 8px;">
-                    <span class="meta-label" style="color:#f59e0b;">PRAZO P/ APROVAÇÃO</span>
-                    <span class="meta-value" id="meta-date" style="color:#f59e0b; font-weight:900; font-size: 1.1rem; text-shadow: 0 0 10px rgba(245,158,11,0.3);">---</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">Versão</span>
-                    <span class="meta-value" id="meta-version">V1</span>
                 </div>
             </div>
             
@@ -268,27 +266,18 @@
 
                 document.getElementById('meta-obj').innerText = obj;
                 document.getElementById('meta-format').innerText = prefix;
+                document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
-                // INJETAR REFERÊNCIA E PRAZO
+                // INJETAR REFERÊNCIA
                 const refLink = c.metadata?.reference_url;
                 document.getElementById('meta-reference').innerHTML = refLink ? `<a href="${refLink}" target="_blank" style="color:var(--os-primary); text-decoration:none;"><i class="fa-solid fa-link"></i> Ver Referência</a>` : '<span style="opacity:0.3;">Não enviada</span>';
                 
-                if (c.metadata?.approval_deadline) {
-                    const deadline = new Date(c.metadata.approval_deadline).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                    document.getElementById('meta-deadline').innerText = deadline;
-                }
-
-                const pubDate = new Date(c.scheduled_at);
-                document.getElementById('meta-time').innerText = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                
-                const deadlineEl = document.getElementById('meta-date');
+                // FORMATAR PRAZO (17/05 / 14:35)
+                const deadlineEl = document.getElementById('meta-deadline-highlight');
                 if (c.metadata?.approval_deadline) {
                     const d = new Date(c.metadata.approval_deadline);
-                    const day = String(d.getDate()).padStart(2, '0');
-                    const month = String(d.getMonth() + 1).padStart(2, '0');
-                    const hours = String(d.getHours()).padStart(2, '0');
-                    const mins = String(d.getMinutes()).padStart(2, '0');
-                    deadlineEl.innerText = `${day}/${month} às ${hours}:${mins}`;
+                    const formatted = d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' / ' + d.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    deadlineEl.innerText = formatted;
                     
                     const now = new Date();
                     if ((d - now) / (1000 * 60 * 60) < 24) {
@@ -298,6 +287,11 @@
                 } else {
                     deadlineEl.innerText = 'S/ Prazo';
                 }
+
+                // FORMATAR PUBLICAÇÃO (15/05 às 00:00h)
+                const pubDate = new Date(c.scheduled_at);
+                const pubFormatted = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + pubDate.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
+                document.getElementById('meta-time').innerText = pubFormatted;
                 
                 document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
