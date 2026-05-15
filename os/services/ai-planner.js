@@ -94,7 +94,7 @@ export const AIPlanner = {
                 project_id: projectId,
                 title: `${service.name} • Estratégico`,
                 status: 'PLANEJAMENTO',
-                priority: 'ALTA',
+                priority: 'MÉDIA',
                 platform: service.platform,
                 scheduled_at: scheduledAt.toISOString(),
                 caption: service.template

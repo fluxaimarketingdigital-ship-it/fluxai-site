@@ -970,7 +970,8 @@ window.runAiPlanner = async () => {
                     let deadline = new Date(scheduledDate.getTime() - 48 * 60 * 60 * 1000);
                     if (deadline < now) deadline = new Date(now.getTime() + 48 * 60 * 60 * 1000);
                     
-                    const priority = (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('ESTRATÉGICO')) ? 'ALTA' : 'MÉDIA';
+                    // Lógica de Prioridade: Apenas itens críticos de Tração e Marca são ALTA por padrão
+                    const priority = (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('BRANDING')) ? 'ALTA' : 'MÉDIA';
 
                     return {
                         ...asset,
