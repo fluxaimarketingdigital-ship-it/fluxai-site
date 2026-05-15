@@ -505,7 +505,7 @@ function renderCalendar(containerId, contents, mode) {
             const statusColor = getStatusBg(c.status);
             
             // Filtro de visibilidade por modo
-            if (isStrategic && !['PLANEJAMENTO', 'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO ESTRATÉGICA', 'AJUSTE', 'PRODUÇÃO'].includes(c.status)) return '';
+            // Filtro Estrategico Removido para sincronia total com a esteira
             if (!isStrategic && !['PRODUÇÃO', 'REVISÃO INTERNA FINAL', 'APROVAÇÃO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
 
             return `
