@@ -76,9 +76,21 @@
                     <span class="meta-value" id="meta-obj">---</span>
                 </div>
                 <div class="meta-item">
-                    <span class="meta-label">Formato</span>
-                    <span class="meta-value" id="meta-format">---</span>
+                    <span class="label">FORMATO</span>
+                    <span class="value" id="meta-format">---</span>
                 </div>
+
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; padding:15px; background:rgba(255,255,255,0.03); border-radius:8px; margin-top:20px;">
+                    <div>
+                        <span class="label" style="display:block; font-size:0.55rem; color:var(--os-text-muted); margin-bottom:5px;">REFERÊNCIA / INSPIRAÇÃO</span>
+                        <div id="meta-reference" style="font-size:0.7rem; font-weight:700;">---</div>
+                    </div>
+                    <div>
+                        <span class="label" style="display:block; font-size:0.55rem; color:var(--os-text-muted); margin-bottom:5px;">PRAZO DE APROVAÇÃO</span>
+                        <div id="meta-deadline" style="font-size:0.7rem; font-weight:800; color:var(--os-primary);">---</div>
+                    </div>
+                </div>
+
                 <div class="meta-item">
                     <span class="meta-label">Publicação</span>
                     <span class="meta-value" id="meta-time">---</span>
@@ -132,11 +144,21 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         const CLIENT_VIEW_MATRIX = {
-            'Direção Operacional Audiovisual': 'REELS',
-            'Direção Estratégica Visual': 'POST',
-            'Estrutura Narrativa de Carrossel': 'CARROSSEL',
-            'Arquitetura Estratégica Digital': 'SITE',
-            'Arquitetura de Posicionamento': 'BRANDING'
+            'Direção Audiovisual (Reels)': 'REELS',
+            'Estrutura Narrativa (Carrossel)': 'CARROSSEL',
+            'Direção Estratégica Visual (Card)': 'POST',
+            'Fluxo Estratégico de Stories': 'STORIES',
+            'Arquitetura Estratégica Digital (Site)': 'SITE',
+            'Estrutura Estratégica de Conversão (LP)': 'LANDING PAGE',
+            'Arquitetura de Posicionamento': 'BRANDING',
+            'Sistema de Identidade Visual': 'IDENTIDADE VISUAL',
+            'Estratégia de Aquisição (Tráfego)': 'TRÁFEGO PAGO',
+            'Estrutura de Relacionamento (CRM)': 'CRM',
+            'Arquitetura Operacional (Automação)': 'AUTOMAÇÃO',
+            'Infraestrutura Analítica': 'DASHBOARD',
+            'Estrutura Institucional': 'APRESENTAÇÃO',
+            'Diagnóstico Estratégico': 'CONSULTORIA',
+            'GOVOS™ | Infra Pública Digital': 'GOVOS™'
         };
 
         const ADJUSTMENT_CHECKS = {
@@ -247,6 +269,15 @@
                 document.getElementById('meta-obj').innerText = obj;
                 document.getElementById('meta-format').innerText = prefix;
                 
+                // INJETAR REFERÊNCIA E PRAZO
+                const refLink = c.metadata?.reference_url;
+                document.getElementById('meta-reference').innerHTML = refLink ? `<a href="${refLink}" target="_blank" style="color:var(--os-primary); text-decoration:none;"><i class="fa-solid fa-link"></i> Ver Referência</a>` : '<span style="opacity:0.3;">Não enviada</span>';
+                
+                if (c.metadata?.approval_deadline) {
+                    const deadline = new Date(c.metadata.approval_deadline).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                    document.getElementById('meta-deadline').innerText = deadline;
+                }
+
                 const pubDate = new Date(c.scheduled_at);
                 document.getElementById('meta-time').innerText = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
                 

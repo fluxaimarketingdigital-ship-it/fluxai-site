@@ -575,23 +575,26 @@ window.openEditModal = async (id) => {
         `).join('') : '<div style="padding:40px; text-align:center; opacity:0.3; font-size:0.7rem;">Sem histórico de ajustes até o momento.</div>';
 
         document.getElementById('edit-asset-roadmap-container').innerHTML = `
-            <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:20px;">
+            <div class="edit-modal-grid">
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">ROTEIRO ESTRATÉGICO (PAUTA)</label>
-                    <textarea id="edit-asset-caption" style="width:100%; height:250px; background:#111; border:1px solid #333; color:#fff; padding:15px; border-radius:4px; font-family:inherit; font-size:0.85rem; line-height:1.6;">${c.caption || ''}</textarea>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">ROTEIRO ESTRATÉGICO (PAUTA)</label>
+                    <textarea id="edit-asset-caption" style="width:100%; height:320px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none; transition: border 0.3s;"></textarea>
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">HISTÓRICO DE AJUSTES</label>
-                    <div id="edit-asset-history" style="height:250px; background:#050505; border:1px solid #222; border-radius:4px; overflow-y:auto; scrollbar-width: thin;">
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">HISTÓRICO DE AJUSTES</label>
+                    <div id="edit-asset-history" style="height:320px; background:#050505; border:1px solid #222; border-radius:8px; overflow-y:auto; scrollbar-width: thin; padding: 5px;">
                         ${historyHtml}
                     </div>
                 </div>
             </div>
         `;
-            metaGrid.style.display = 'grid';
-            metaGrid.style.gridTemplateColumns = '1fr 1fr';
-            metaGrid.style.gap = '15px';
-            metaGrid.style.marginTop = '20px';
+        
+        document.getElementById('edit-asset-caption').value = c.caption || '';
+
+        metaGrid.style.display = 'grid';
+        metaGrid.style.gridTemplateColumns = '1fr 1fr';
+        metaGrid.style.gap = '15px';
+        metaGrid.style.marginTop = '20px';
 
             const isLocked = c.status !== 'PLANEJAMENTO' && c.status !== 'AJUSTE';
 

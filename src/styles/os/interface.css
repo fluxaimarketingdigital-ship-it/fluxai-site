@@ -318,3 +318,48 @@ body.os-mode {
     0% { background-position: 200% 0; }
     100% { background-position: -200% 0; }
 }
+
+/* BUTTONS & INTERACTIONS */
+.os-btn, .btn-mini, .btn-ai {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.os-btn:hover, .btn-mini:hover, .btn-ai:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.2);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.os-btn:active, .btn-mini:active, .btn-ai:active {
+    transform: translateY(0);
+}
+
+/* breathing effect for primary buttons */
+.btn-ai, .os-btn-primary {
+    animation: breathing 4s ease-in-out infinite;
+}
+
+@keyframes breathing {
+    0% { box-shadow: 0 0 0 0 rgba(107, 122, 69, 0.4); }
+    50% { box-shadow: 0 0 20px 5px rgba(107, 122, 69, 0.2); }
+    100% { box-shadow: 0 0 0 0 rgba(107, 122, 69, 0.4); }
+}
+
+/* MODAL FIXES */
+.os-modal {
+    backdrop-filter: blur(10px);
+}
+
+.edit-modal-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+@media (max-width: 900px) {
+    .edit-modal-grid { grid-template-columns: 1fr; }
+}
