@@ -83,12 +83,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
-        const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        let supabase;
+        function getSupabaseClient() {
+            if (supabase) return supabase;
+            if (window.supabase) {
+                supabase = window.supabase.createClient("https://mufgwetfhfhhmhowbhjj.supabase.co", "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5");
+                return supabase;
+            }
+            return null;
+        }
 
         const params = new URLSearchParams(window.location.search);
-        const projectId = params.get('project_id');
+        const projectId = params.get('project_id') || params.get('project');
 
         async function getStatusBg(status) {
             if (status === 'PLANEJAMENTO') return '#8b5cf6';
@@ -106,38 +112,56 @@
         }
 
         async function init() {
-            if (!projectId) return document.body.innerHTML = '<h1>Acesso negado.</h1>';
+            if (!projectId) {
+                console.error('[PORTAL] Nenhum ID de projeto fornecido.');
+                return document.body.innerHTML = '<div style="padding:50px; text-align:center;"><h1>Acesso negado.</h1><p>ID do projeto não encontrado na URL.</p></div>';
+            }
 
-            // Buscar Projeto (com tratamento de erro para RLS ou rede)
+            const client = getSupabaseClient();
+            if (!client) {
+                console.log('[PORTAL] Supabase não pronto, tentando novamente em 500ms...');
+                return setTimeout(init, 500);
+            }
+
+            console.log('[PORTAL] Iniciando sincronização para projeto:', projectId);
+
+            // 1. Buscar Nome do Projeto/Cliente
             try {
-                const { data: projData } = await supabase.from('projects').select('company_name, name').eq('id', projectId).single();
-                const project = projData;
+                const { data: projData, error: pError } = await client.from('projects').select('company_name, name').eq('id', projectId).single();
                 
-                if (project) {
+                const nameEl = document.getElementById('client-name');
+                if (projData) {
                     const now = new Date();
                     const currentMonth = now.toLocaleString('pt-BR', { month: 'long' });
                     const titleEl = document.getElementById('portal-title');
                     if (titleEl) titleEl.innerText = `Fluxo Estratégico: ${currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)}`;
                     
-                    const nameEl = document.getElementById('client-name');
-                    if (nameEl) nameEl.innerText = `${project.company_name || project.name}`;
+                    if (nameEl) nameEl.innerText = `${projData.company_name || projData.name}`;
+                } else {
+                    console.warn('[PORTAL] Projeto não encontrado ou erro:', pError);
+                    if (nameEl) nameEl.innerText = 'Cronograma de Conteúdo';
                 }
             } catch (err) {
-                console.warn('[PORTAL] Erro ao carregar nome do projeto:', err);
-                document.getElementById('client-name').innerText = 'Cronograma de Conteúdo';
+                console.error('[PORTAL] Falha crítica ao buscar projeto:', err);
+                const nameEl = document.getElementById('client-name');
+                if (nameEl) nameEl.innerText = 'Cronograma de Conteúdo';
             }
 
-            // Buscar Ativos
+            // 2. Buscar Ativos do Calendário
             try {
-                const { data: assets, error } = await supabase.from('content_assets')
+                const { data: assets, error } = await client.from('content_assets')
                     .select('*')
                     .eq('project_id', projectId)
                     .order('scheduled_at', { ascending: true });
 
-                if (error) throw error;
-                renderCalendar(assets || []);
+                if (error) {
+                    console.error('[PORTAL] Erro ao buscar ativos:', error);
+                    renderCalendar([]);
+                } else {
+                    renderCalendar(assets || []);
+                }
             } catch (err) {
-                console.error('[PORTAL] Erro ao carregar ativos:', err);
+                console.error('[PORTAL] Falha crítica ao carregar ativos:', err);
                 renderCalendar([]);
             }
         }
@@ -148,36 +172,40 @@
         };
 
         function renderCalendar(contents) {
+            console.log('[PORTAL] Renderizando calendário com', contents.length, 'ativos');
             const grid = document.getElementById('calendar-body');
+            if (!grid) return;
             grid.innerHTML = '';
 
             const now = new Date();
             const year = now.getFullYear();
             const month = now.getMonth();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const monthName = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"][month];
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            const monthName = monthNames[month];
             
-            document.querySelector('.portal-header h1').innerText = `Fluxo Estratégico: ${monthName}`;
+            const titleEl = document.getElementById('portal-title');
+            if (titleEl) titleEl.innerText = `Fluxo Estratégico: ${monthName}`;
 
             for (let i = 1; i <= daysInMonth; i++) {
                 const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-                const dayAssets = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
+                const dayAssets = (contents || []).filter(c => c && c.scheduled_at && c.scheduled_at.startsWith(dayStr));
 
                 const dayHtml = `
                     <div class="calendar-day">
                         <div class="day-num">${i}</div>
                         ${dayAssets.map(c => {
-                            const statusClass = c.status.toLowerCase().replace(/\s+/g, '-');
+                            const statusClass = (c.status || '').toLowerCase().replace(/\s+/g, '-');
                             return `
                                 <div class="asset-card status-${statusClass}" onclick="window.openApproval('${c.id}')">
-                                    <div style="font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
-                                    <div style="font-size:0.5rem; opacity:0.7; margin-top:2px;">${c.status}</div>
+                                    <div style="font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title || 'Sem Título'}</div>
+                                    <div style="font-size:0.5rem; opacity:0.7; margin-top:2px;">${c.status || 'Pendente'}</div>
                                 </div>
                             `;
                         }).join('')}
                     </div>
                 `;
-                grid.innerHTML += dayHtml;
+                grid.insertAdjacentHTML('beforeend', dayHtml);
             }
         }
 
