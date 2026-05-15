@@ -321,25 +321,24 @@
                 document.getElementById('content-data').style.display = 'block';
 
                 document.getElementById('btn-approve-action').onclick = async () => {
+                    const btn = document.getElementById('btn-approve-action');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+                    btn.disabled = true;
+
                     try {
-                        const now = new Date().toLocaleDateString('pt-BR');
-                        const targetStatus = isArtValidation ? 'PRONTO' : 'PRODUÇÃO';
+                        const isStrategic = c.status === 'APROVAÇÃO ESTRATÉGICA';
+                        const nextStatus = isStrategic ? 'PRODUÇÃO' : 'PRONTO';
                         
-                        const { error } = await supabase.from('content_assets').update({ 
-                            status: targetStatus,
-                            internal_notes: `APROVADO PELO CLIENTE EM ${now}`
-                        }).eq('id', id);
-                        
+                        const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
                         if (error) throw error;
                         
                         document.getElementById('main-ui').style.display = 'none';
-                        document.getElementById('success-title').innerText = isArtValidation ? 'Tudo Pronto!' : 'Planejamento Aprovado!';
-                        document.getElementById('success-message').innerText = isArtValidation ? 'A arte final foi validada com sucesso e já está disponível para publicação.' : 'Excelente. Esta pauta foi enviada para a Execução Operacional.';
                         document.getElementById('success-ui').style.display = 'block';
-                        // Forçar recarregamento após 2s para garantir o bloqueio
-                        setTimeout(() => window.location.reload(), 2000);
                     } catch (err) {
-                        alert('Erro ao processar aprovação: ' + err.message);
+                        alert('Erro: ' + err.message);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
                     }
                 };
 
@@ -348,13 +347,15 @@
                 };
 
                 document.getElementById('btn-submit-feedback').onclick = async () => {
+                    const btn = document.getElementById('btn-submit-feedback');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+                    btn.disabled = true;
+
                     try {
                         const selected = Array.from(document.querySelectorAll('#adjustment-checks input:checked')).map(i => i.value);
                         const note = document.getElementById('feedback-text').value;
                         const fullNote = `REVISÃO SOLICITADA | ITENS: ${selected.join(', ')} | OBS: ${note}`;
-                        
-                        const newDeadline = new Date();
-                        newDeadline.setHours(newDeadline.getHours() + 48); // Mais 48h para revisão
                         
                         const currentCycle = c.metadata?.revision_cycle || 1;
                         const isFinalArtPhase = c.status === 'APROVAÇÃO FINAL';
@@ -374,13 +375,13 @@
                         if (error) throw error;
 
                         document.getElementById('main-ui').style.display = 'none';
-                        document.getElementById('success-title').innerText = 'Solicitação Enviada!';
-                        document.getElementById('success-message').innerText = 'Recebemos seus apontamentos estratégicos. Vamos ajustar o planejamento conforme as diretrizes enviadas.';
+                        document.getElementById('success-title').innerText = 'Ajuste Solicitado';
+                        document.getElementById('success-message').innerText = 'Seus apontamentos foram enviados para nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes.';
                         document.getElementById('success-ui').style.display = 'block';
-                        // Forçar recarregamento após 2s para garantir o bloqueio
-                        setTimeout(() => window.location.reload(), 2000);
                     } catch (err) {
-                        alert('Erro ao enviar solicitação: ' + err.message);
+                        alert('Erro: ' + err.message);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
                     }
                 };
 
