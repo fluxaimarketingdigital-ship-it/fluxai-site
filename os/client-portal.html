@@ -49,7 +49,9 @@
         }
         .asset-card:hover { transform: translateY(-2px); border-color: var(--os-primary); }
         
-        .status-aprovacao { background: rgba(107, 122, 69, 0.1); color: var(--os-primary); border: 1px solid rgba(107, 122, 69, 0.3); }
+        .status-aprovação-estratégica { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .status-aprovacao-estratégica { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .status-aprovação-final { background: rgba(139, 92, 246, 0.1); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
         .status-ajuste { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
         .status-producao { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
         .status-pronto { background: var(--os-primary); color: #000; border: 1px solid var(--os-primary); }
@@ -85,7 +87,7 @@
             // Buscar Projeto
             const { data: project } = await supabase.from('projects').select('*').eq('id', projectId).single();
             if (project) {
-                document.getElementById('client-name').innerText = `Cronograma de Conteúdo: ${project.company_name || project.name}`;
+                document.getElementById('client-name').innerText = project.company_name || project.name || 'Cliente FluxAI';
             }
 
             // Buscar Ativos
@@ -116,12 +118,15 @@
                 const dayHtml = `
                     <div class="calendar-day">
                         <div class="day-num">${i}</div>
-                        ${dayAssets.map(c => `
-                            <div class="asset-card status-${c.status.toLowerCase()}" onclick="window.openApproval('${c.id}')">
-                                <div style="font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
-                                <div style="font-size:0.5rem; opacity:0.7; margin-top:2px;">${c.status}</div>
-                            </div>
-                        `).join('')}
+                        ${dayAssets.map(c => {
+                            const statusClass = c.status.toLowerCase().replace(/\s+/g, '-');
+                            return `
+                                <div class="asset-card status-${statusClass}" onclick="window.openApproval('${c.id}')">
+                                    <div style="font-weight:800; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
+                                    <div style="font-size:0.5rem; opacity:0.7; margin-top:2px;">${c.status}</div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
                 `;
                 grid.innerHTML += dayHtml;
