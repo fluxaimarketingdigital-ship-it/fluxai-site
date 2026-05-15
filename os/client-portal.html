@@ -81,6 +81,9 @@
         .status-pronto { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid #10b981; font-weight: 900; }
         .status-publicado { background: #000; color: #10b981; border: 1px solid #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
         
+        /* Status internos */
+        .status-planejamento, .status-revisão-gestão, .status-aprovação-estratégica, .status-revisão-interna-final { background: rgba(255, 255, 255, 0.05); color: #999; border: 1px dashed rgba(255, 255, 255, 0.2); opacity: 0.7; }
+        
         @media (max-width: 900px) {
             .calendar-grid { grid-template-columns: repeat(4, 1fr); }
         }
@@ -93,7 +96,7 @@
     <header class="portal-header">
         <div style="color:var(--os-primary); font-weight:900; font-size:0.6rem; letter-spacing:4px; margin-bottom:10px; opacity: 0.8;">FLUXAI OS™</div>
         
-        <h1 id="portal-title">Fluxo Estratégico</h1>
+        <h1 id="portal-title">Esteira Operacional</h1>
         <p id="client-name" style="font-weight: 700; color: #eee; font-size: 0.9rem;">Sincronizando...</p>
         <p id="client-profession" style="opacity: 0.5; margin-top: 2px;">Carregando perfil...</p>
 
@@ -135,22 +138,9 @@
                     document.getElementById('client-name').innerText = 'Projeto não localizado';
                 }
 
-                // Status internos que o cliente NÃO deve ver no calendário:
-                // PLANEJAMENTO = IA gerou mas não enviou ainda
-                // REVISÃO GESTÃO = gestor revisando internamente
-                // REVISÃO INTERNA FINAL = revisão antes de enviar
-                // APROVAÇÃO ESTRATÉGICA = aguardando decisão interna de enviar
-                const INTERNAL_STATUSES = [
-                    'PLANEJAMENTO',
-                    'REVISÃO GESTÃO',
-                    'REVISÃO INTERNA FINAL',
-                    'APROVAÇÃO ESTRATÉGICA'
-                ];
-
                 const { data: assets } = await _supabaseClient.from('content_assets')
                     .select('*')
                     .eq('project_id', projectId)
-                    .not('status', 'in', `(${INTERNAL_STATUSES.map(s => `"${s}"`).join(',')})`)
                     .order('scheduled_at', { ascending: true });
 
                 _allAssets = assets || [];
@@ -182,16 +172,19 @@
                         ${dayAssets.map(c => {
                             const statusClass = (c.status || '').toLowerCase().replace(/\s+/g, '-');
                             const isActionable = c.status === 'APROVAÇÃO PLANEJAMENTO' || c.status === 'APROVAÇÃO FINAL';
+                            const statusName = c.status || 'SEM STATUS';
                             
                             if (isActionable) {
                                 return `
                                     <div class="asset-card status-${statusClass}" onclick="window.location.href='/os/approval.html?id=${c.id}'">
+                                        <div style="font-size:0.5rem; opacity:0.8; margin-bottom:2px; text-transform:uppercase; font-weight:800;">${statusName}</div>
                                         <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
                                     </div>
                                 `;
                             } else {
                                 return `
                                     <div class="asset-card status-${statusClass} non-clickable" style="cursor: default;">
+                                        <div style="font-size:0.5rem; opacity:0.8; margin-bottom:2px; text-transform:uppercase; font-weight:800;">${statusName}</div>
                                         <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
                                     </div>
                                 `;
