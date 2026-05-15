@@ -385,17 +385,17 @@ function renderContentTable(contents) {
 
     body.innerHTML = contents.map(c => {
         const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Escala Pendente';
-        const isAwaitingApproval = c.status === 'APROVAÇÃO' || c.status === 'PAUTA';
-        const revCount = c.metadata?.adjustment_count || 0;
-        const versionLabel = revCount > 0 ? `R${revCount + 1}` : 'V1';
+        const revCount = c.metadata?.revision_cycle || 1;
+        const versionLabel = `V${revCount}`;
+        const isHighRisk = revCount >= 3 || c.metadata?.risk;
 
         return `
             <tr>
                 <td>
                     <div style="display:flex; align-items:center; gap:8px;">
                         <div style="font-weight: 700; color: #fff;">${c.title}</div>
-                        <span style="font-size: 0.5rem; background: ${c.metadata?.version === 'FINAL' ? 'var(--os-primary)' : '#333'}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800;">${c.metadata?.version || 'V1'}</span>
-                        ${c.metadata?.risk ? '<i class="fa-solid fa-triangle-exclamation" title="Risco Operacional: Atraso pode impactar publicação" style="color:var(--os-danger); font-size:0.7rem; animation: pulse 2s infinite;"></i>' : ''}
+                        <span style="font-size: 0.5rem; background: ${isHighRisk ? 'var(--os-danger)' : (c.metadata?.version === 'FINAL' ? 'var(--os-primary)' : '#333')}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800;">${versionLabel}</span>
+                        ${isHighRisk ? '<i class="fa-solid fa-triangle-exclamation" title="Risco Operacional: Ciclo de ajustes alto ou atraso crítico" style="color:var(--os-danger); font-size:0.7rem; animation: pulse 2s infinite;"></i>' : ''}
                     </div>
                     <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;">
                         <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> ${scheduled}
@@ -563,12 +563,12 @@ window.openEditModal = async (id) => {
                     </select>
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">VERSÃO</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">CICLO DE AJUSTE</label>
                     <select id="edit-asset-version" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
-                        <option value="V1">V1</option>
-                        <option value="V2">V2</option>
-                        <option value="V3">V3</option>
-                        <option value="FINAL">FINAL</option>
+                        <option value="V1">V1 - Inicial</option>
+                        <option value="V2">V2 - Ajuste 1</option>
+                        <option value="V3">V3 - Ajuste 2 (CRÍTICO)</option>
+                        <option value="FINAL">FINAL - Pronto para Postar</option>
                     </select>
                 </div>
                 <div>
@@ -611,14 +611,22 @@ window.openEditModal = async (id) => {
         
         // TRAVA DE GOVERNANÇA: Bloquear campos técnicos durante o Planejamento
         const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVAÇÃO ESTRATÉGICA';
+        
+        // Bloquear PRAZO para todos, exceto se for "DIRETOR" (Simulado por flag no localStorage por enquanto)
+        const isDirector = localStorage.getItem('os_role') === 'DIRETOR';
+        
         const fieldsToLock = ['edit-asset-responsible', 'edit-asset-version', 'edit-asset-deadline'];
         
         fieldsToLock.forEach(id => {
             const el = document.getElementById(id);
             if (el) {
-                el.disabled = isPlanning;
-                el.style.opacity = isPlanning ? '0.5' : '1';
-                el.style.cursor = isPlanning ? 'not-allowed' : 'default';
+                // Responsável e Versão bloqueados no planejamento
+                // Prazo SEMPRE bloqueado para operadores
+                const shouldLock = (isPlanning && id !== 'edit-asset-deadline') || (id === 'edit-asset-deadline' && !isDirector);
+                
+                el.disabled = shouldLock;
+                el.style.opacity = shouldLock ? '0.5' : '1';
+                el.style.cursor = shouldLock ? 'not-allowed' : 'default';
             }
         });
 
@@ -708,6 +716,13 @@ window.finalizeProduction = async (id) => {
         const supabase = getSupabase();
         const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
         
+        const scheduledDate = new Date(c.scheduled_at);
+        const now = new Date();
+        
+        // Lógica Pub-1: Prazo de aprovação do cliente é 1 dia antes da postagem
+        let deadline = new Date(scheduledDate.getTime() - 24 * 60 * 60 * 1000);
+        if (deadline < now) deadline = new Date(now.getTime() + 12 * 60 * 60 * 1000);
+
         const updatePayload = {
             status: 'APROVAÇÃO FINAL',
             metadata: {
@@ -715,7 +730,7 @@ window.finalizeProduction = async (id) => {
                 final_asset_url: artLink,
                 responsible: document.getElementById('edit-asset-responsible').value,
                 version: 'FINAL',
-                approval_deadline: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString() // 24h para aprovação final da arte
+                approval_deadline: deadline.toISOString()
             }
         };
 
@@ -861,10 +876,14 @@ window.runAiPlanner = async () => {
                 const processedAssets = newAssets.map(asset => {
                     const titleUpper = asset.title.toUpperCase();
                     const type = Object.keys(RESPONSIBLE_MAP).find(k => titleUpper.includes(k)) || 'CARD';
-                    const deadline = new Date();
-                    deadline.setHours(deadline.getHours() + 48);
                     
-                    // Prioridade Automática: Tráfego e Estratégia = ALTA, o resto MÉDIA
+                    const scheduledDate = new Date(asset.scheduled_at);
+                    const now = new Date();
+                    
+                    // Lógica Pub-2 para Planejamento/Produção Inicial
+                    let deadline = new Date(scheduledDate.getTime() - 48 * 60 * 60 * 1000);
+                    if (deadline < now) deadline = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+                    
                     const priority = (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('ESTRATÉGICO')) ? 'ALTA' : 'MÉDIA';
 
                     return {
@@ -874,6 +893,7 @@ window.runAiPlanner = async () => {
                             ...asset.metadata,
                             responsible: RESPONSIBLE_MAP[type] || 'Design',
                             approval_deadline: deadline.toISOString(),
+                            revision_cycle: 1,
                             version: 'V1'
                         }
                     };

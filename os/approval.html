@@ -356,12 +356,15 @@
                         const newDeadline = new Date();
                         newDeadline.setHours(newDeadline.getHours() + 48); // Mais 48h para revisão
                         
+                        const currentCycle = c.metadata?.revision_cycle || 1;
                         const { error } = await supabase.from('content_assets').update({ 
                             status: 'AJUSTE', 
                             internal_notes: fullNote,
                             metadata: {
                                 ...c.metadata,
-                                approval_deadline: newDeadline.toISOString()
+                                revision_cycle: currentCycle + 1,
+                                version: `V${currentCycle + 1}`,
+                                risk: true
                             }
                         }).eq('id', id);
                         
