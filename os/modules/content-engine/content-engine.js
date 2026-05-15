@@ -505,17 +505,17 @@ function renderCalendar(containerId, contents, mode) {
 }
 
 function getStatusBg(status) {
-    if (status === 'PLANEJAMENTO') return '#6366f1'; 
-    if (status === 'REVISÃO GESTÃO') return '#8b5cf6'; // Roxo (Aprovação da Gestão)
-    if (status === 'APROVAÇÃO ESTRATÉGICA') return '#f59e0b'; 
-    if (status === 'AJUSTE') return '#ef4444'; 
-    if (status === 'PRODUÇÃO') return '#f59e0b'; 
-    if (status === 'AJUSTE DE PRODUÇÃO') return '#ec4899'; // Rosa (Ajuste técnico de arte)
+    if (status === 'PLANEJAMENTO') return '#8b5cf6'; // Roxo
+    if (status === 'REVISÃO GESTÃO') return '#8b5cf6'; // Roxo
+    if (status === 'APROVAÇÃO ESTRATÉGICA') return '#3b82f6'; // Azul
+    if (status === 'AJUSTE') return '#ef4444'; // Vermelho
+    if (status === 'PRODUÇÃO') return '#f59e0b'; // Amarelo/Laranja
+    if (status === 'AJUSTE DE PRODUÇÃO') return '#ec4899'; // Rosa (Refinamento técnico)
     if (status === 'REVISÃO INTERNA FINAL') return '#ec4899';
-    if (status === 'APROVAÇÃO FINAL') return '#8b5cf6'; 
-    if (status === 'PRONTO') return '#10b981'; 
-    if (status === 'PUBLICADO') return '#059669'; 
-    if (status === 'ATRASADO') return '#7f1d1d'; 
+    if (status === 'APROVAÇÃO FINAL') return '#3b82f6'; // Azul
+    if (status === 'PRONTO') return '#10b981'; // Verde
+    if (status === 'PUBLICADO') return '#059669'; // Verde Escuro
+    if (status === 'ATRASADO') return '#7f1d1d'; // Marrom/Vermelho Escuro
     return '#444';
 }
 

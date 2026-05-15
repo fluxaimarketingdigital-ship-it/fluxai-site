@@ -49,15 +49,15 @@
         }
         .asset-card:hover { transform: translateY(-2px); border-color: var(--os-primary); }
         
-        .status-aprovação-estratégica { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
+        .status-aprovação-estratégica { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
         .status-revisão-gestão { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.4); }
-        .status-aprovação-final { background: rgba(139, 92, 246, 0.2); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.5); font-weight: 800; }
+        .status-aprovação-final { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); font-weight: 800; }
         .status-ajuste { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
         .status-ajuste-de-produção { background: rgba(236, 72, 153, 0.15); color: #ec4899; border: 1px solid rgba(236, 72, 153, 0.4); }
         .status-produção { background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.4); }
-        .status-pronto { background: var(--os-primary); color: #000; border: 1px solid var(--os-primary); font-weight: 900; }
-        .status-planejamento { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.4); }
-        .status-publicado { background: #000; color: var(--os-primary); border: 1px solid var(--os-primary); box-shadow: 0 0 10px rgba(142, 158, 104, 0.2); }
+        .status-pronto { background: #10b981; color: #fff; border: 1px solid #10b981; font-weight: 900; }
+        .status-planejamento { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.4); }
+        .status-publicado { background: #000; color: #10b981; border: 1px solid #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
         
         @media (max-width: 768px) {
             .calendar-grid { grid-template-columns: repeat(2, 1fr); }
@@ -67,6 +67,14 @@
 <body>
     <header class="portal-header">
         <div style="color:var(--os-primary); font-weight:900; font-size:0.7rem; letter-spacing:3px; margin-bottom:10px;">FLUXAI OS™</div>
+        <div class="success-msg" id="success-ui" style="display:none;">
+            <i class="fa-solid fa-circle-check"></i>
+            <h2 id="success-title">Planejamento Aprovado!</h2>
+            <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
+            <button class="btn btn-approve" style="margin-top: 30px; padding: 15px 40px; font-size: 0.9rem; background: var(--os-primary); color: #000; font-weight: 800; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(142, 158, 104, 0.4);" onclick="window.history.back()">
+                <i class="fa-solid fa-arrow-left"></i> VOLTAR AO CALENDÁRIO
+            </button>
+        </div>
         <h1 id="portal-title">Fluxo Estratégico</h1>
         <p id="client-name">Sincronizando dados...</p>
     </header>
@@ -79,6 +87,20 @@
 
         const params = new URLSearchParams(window.location.search);
         const projectId = params.get('project_id');
+
+        async function getStatusBg(status) {
+            if (status === 'PLANEJAMENTO') return '#8b5cf6';
+            if (status === 'REVISÃO GESTÃO') return '#8b5cf6';
+            if (status === 'APROVAÇÃO ESTRATÉGICA') return '#3b82f6';
+            if (status === 'AJUSTE') return '#ef4444';
+            if (status === 'PRODUÇÃO') return '#f59e0b';
+            if (status === 'AJUSTE DE PRODUÇÃO') return '#ec4899';
+            if (status === 'APROVAÇÃO FINAL') return '#3b82f6';
+            if (status === 'PRONTO') return '#10b981';
+            if (status === 'PUBLICADO') return '#059669';
+            if (status === 'ATRASADO') return '#7f1d1d';
+            return '#444';
+        }
 
         async function init() {
             if (!projectId) return document.body.innerHTML = '<h1>Acesso negado.</h1>';
