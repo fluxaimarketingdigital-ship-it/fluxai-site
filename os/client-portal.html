@@ -102,6 +102,11 @@
             renderCalendar(assets || []);
         }
 
+        // ATUALIZAÇÃO AUTOMÁTICA: Quando o cliente volta para esta aba
+        window.onfocus = () => {
+            init();
+        };
+
         function renderCalendar(contents) {
             const grid = document.getElementById('calendar-body');
             grid.innerHTML = '';

@@ -192,6 +192,24 @@
                         document.getElementById('success-message').innerText = 'Este planejamento já foi validado e seguiu para a Etapa de Produção Operacional. Você pode acompanhar o progresso no seu Calendário.';
                     }
                     
+                    // Adicionar botão de retorno se não existir
+                    if (!document.getElementById('btn-return-portal')) {
+                        const btn = document.createElement('button');
+                        btn.id = 'btn-return-portal';
+                        btn.className = 'btn btn-approve';
+                        btn.style.marginTop = '20px';
+                        btn.style.background = 'var(--os-primary)';
+                        btn.style.color = '#000';
+                        btn.style.width = '100%';
+                        btn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
+                        
+                        btn.onclick = () => {
+                            window.location.href = `/os/client-portal.html?project_id=${c.project_id}`;
+                        };
+                        
+                        document.getElementById('success-ui').appendChild(btn);
+                    }
+
                     document.getElementById('success-ui').style.display = 'block';
                     return;
                 }
