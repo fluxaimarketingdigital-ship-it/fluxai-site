@@ -4,6 +4,7 @@ import { getSupabase } from '../../services/supabase-client.js';
 let currentProject = null;
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
+let realtimeChannel = null;
 
 window.changeMonth = (delta) => {
     currentMonth += delta;
@@ -157,7 +158,9 @@ export async function initEngine() {
         
         await loadProjects();
         await loadContent();
+        setupRealtime();
         sLog('Carga Inicial: OK');
+        setupRealtime();
 
         // BOTÃO GLOBAL WA (TOP BAR)
         const btnGlobalWa = document.getElementById('btn-global-wa');
