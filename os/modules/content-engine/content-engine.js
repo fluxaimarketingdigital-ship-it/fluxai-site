@@ -1031,3 +1031,4 @@ window.deleteAsset = async (id) => {
 };
 
 initEngine();
+async function setupRealtime() { const supabase = getSupabase(); if (realtimeChannel) { supabase.removeChannel(realtimeChannel); } realtimeChannel = supabase.channel('content-updates').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'content_assets' }, (payload) => { sLog('Sincronização Realtime: Alteração detectada.'); loadContent(); }).subscribe(); }
