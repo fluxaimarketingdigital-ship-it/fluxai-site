@@ -82,8 +82,10 @@
     <div class="calendar-grid" id="calendar-body"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module">
-        import { getSupabase } from '/os/services/supabase-client.js';
+    <script>
+        const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
+        const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
         const params = new URLSearchParams(window.location.search);
         const projectId = params.get('project_id');
@@ -106,8 +108,6 @@
         async function init() {
             if (!projectId) return document.body.innerHTML = '<h1>Acesso negado.</h1>';
 
-            const supabase = getSupabase();
-            
             // Buscar Projeto (com tratamento de erro para RLS ou rede)
             try {
                 const { data: projData } = await supabase.from('projects').select('company_name, name').eq('id', projectId).single();
