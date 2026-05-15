@@ -507,8 +507,12 @@ window.openEditModal = async (id) => {
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">RESPONSÁVEL</label>
                     <select id="edit-asset-responsible" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
                         <option value="Design">Design</option>
-                        <option value="Editor Audiovisual">Editor Audiovisual</option>
+                        <option value="Audiovisual">Audiovisual</option>
+                        <option value="Estrategista">Estrategista</option>
+                        <option value="Gestor de Tráfego">Gestor de Tráfego</option>
                         <option value="Social Media">Social Media</option>
+                        <option value="Desenvolvimento Web">Desenvolvimento Web</option>
+                        <option value="Sistemas">Sistemas</option>
                         <option value="Copywriter">Copywriter</option>
                     </select>
                 </div>
