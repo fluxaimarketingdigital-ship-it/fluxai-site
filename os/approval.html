@@ -222,13 +222,37 @@
                 const appDeadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
 
                 document.getElementById('meta-time').innerText = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                document.getElementById('meta-date').innerText = appDeadline ? appDeadline.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'S/ Prazo';
+                
+                const deadlineEl = document.getElementById('meta-date');
+                if (appDeadline) {
+                    deadlineEl.innerText = appDeadline.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+                    
+                    // LÓGICA DE PULSO: Se faltar menos de 24h para o prazo
+                    const now = new Date();
+                    const diffHours = (appDeadline - now) / (1000 * 60 * 60);
+                    if (diffHours < 24 && diffHours > 0) {
+                        deadlineEl.classList.add('deadline-alert');
+                    } else {
+                        deadlineEl.classList.remove('deadline-alert');
+                    }
+                } else {
+                    deadlineEl.innerText = 'S/ Prazo';
+                    deadlineEl.classList.remove('deadline-alert');
+                }
                 
                 // EXIBIÇÃO DE VERSÃO
                 document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
                 // MOSTRAR APENAS O ROTEIRO (SEM LEGENDA/HASHTAGS NA ETAPA 1)
-                const roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
+                let roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
+                
+                // Formatação Elegante do Roteiro
+                roadmap = roadmap
+                    .replace(/🎯 OBJETIVO:/g, '<b style="color:var(--os-primary);">🎯 OBJETIVO:</b>')
+                    .replace(/🎬 HOOK:/g, '<br><b style="color:var(--os-primary);">🎬 HOOK:</b>')
+                    .replace(/💬 FALAS:/g, '<br><b style="color:var(--os-primary);">💬 FALAS:</b>')
+                    .replace(/✨ CTA:/g, '<br><b style="color:var(--os-primary);">✨ CTA:</b>')
+                    .replace(/\n/g, '<br>');
                 
                 if (isArtValidation && c.metadata?.final_asset_url) {
                     document.getElementById('asset-caption').innerHTML = `
