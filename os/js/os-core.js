@@ -45,7 +45,7 @@ export const OS_UI = {
                 html += `<span class="os-nav-label">${currentGroup}</span>`;
             }
             html += `
-                <a href="${item.id}.html" class="os-nav-link ${activeModule === item.id ? 'active' : ''}">
+                <a href="${item.id === 'client-portal' ? 'client-portal.html?project_id=' + (localStorage.getItem('fluxai_current_project_id') || '') : item.id + '.html'}" class="os-nav-link ${activeModule === item.id ? 'active' : ''}">
                     <i class="fa-solid ${item.icon}"></i> ${item.label}
                 </a>`;
         });
