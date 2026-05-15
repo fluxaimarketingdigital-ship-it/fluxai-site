@@ -309,6 +309,8 @@
             }
         };
 
+        let _supabaseClient = null;
+
         function formatClientTitle(title) {
             if (!title) return { prefix: 'POST', obj: 'Estratégia' };
             const parts = title.split(':');
@@ -328,9 +330,9 @@
             try {
                 const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
                 const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-                const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+                _supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-                const { data: c, error } = await supabase.from('content_assets').select('*').eq('id', id).single();
+                const { data: c, error } = await _supabaseClient.from('content_assets').select('*').eq('id', id).single();
                 
                 if (error || !c) throw new Error('Conteúdo não encontrado.');
 
@@ -543,18 +545,26 @@
 
                 document.getElementById('btn-submit-feedback').onclick = async () => {
                     const btn = document.getElementById('btn-submit-feedback');
+                    const obs = document.getElementById('feedback-text').value.trim();
+                    const checked = document.querySelectorAll('.adj-check:checked');
+                    const nuances = document.querySelectorAll('.micro-grid .radio-opt.active');
+                    
+                    // VALIDAÇÃO OBRIGATÓRIA
+                    if (checked.length === 0 && nuances.length === 0 && obs.length < 10) {
+                        alert('Atenção: Para solicitar um ajuste, selecione ao menos um item da estrutura acima ou descreva o motivo no campo final (mínimo 10 caracteres).');
+                        return;
+                    }
+
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
                     btn.disabled = true;
 
                     try {
                         let feedback = `📌 SOLICITAÇÃO DE AJUSTE (${prefix})\n\n`;
-                        const checked = document.querySelectorAll('.adj-check:checked');
                         if (checked.length > 0) {
                             feedback += `📍 ESTRUTURA/ESTRATÉGIA:\n`;
                             checked.forEach(c => feedback += `- [${c.getAttribute('data-cat')}] ${c.value}\n`);
                             feedback += `\n`;
                         }
-                        const nuances = document.querySelectorAll('.micro-grid .radio-opt.active');
                         if (nuances.length > 0) {
                             feedback += `🎯 MICROAJUSTES:\n`;
                             nuances.forEach(n => {
@@ -565,7 +575,6 @@
                         }
                         const priority = document.querySelector('#priority-selector .radio-opt.active')?.getAttribute('data-val') || 'Ajuste moderado';
                         feedback += `⚠️ PRIORIDADE: ${priority}\n\n`;
-                        const obs = document.getElementById('feedback-text').value;
                         if (obs) feedback += `💬 OBSERVAÇÃO FINAL:\n${obs}`;
 
                         const nextStatus = isFinalArt ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
@@ -577,8 +586,8 @@
                         if (error) throw error;
                         showFinalSuccess('Ajuste Solicitado', 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.');
                     } catch (err) {
-                        console.error(err);
-                        alert('Erro ao enviar feedback.');
+                        console.error('[FEEDBACK_ERROR]', err);
+                        alert('Erro ao enviar feedback. Verifique sua conexão.');
                         btn.innerHTML = 'Tentar Novamente';
                         btn.disabled = false;
                     }
