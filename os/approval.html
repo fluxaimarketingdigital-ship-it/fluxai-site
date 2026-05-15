@@ -32,15 +32,49 @@
         .btn-secondary:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(107, 122, 69, 0.6); }
 
         .feedback-area { display: none; margin-top: 30px; animation: fadeIn 0.4s ease; }
+        .section-label { font-size: 0.65rem; color: var(--os-primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin: 20px 0 10px 0; display: block; border-bottom: 1px solid rgba(142, 158, 104, 0.2); padding-bottom: 5px; }
         .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
-        .check-item { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; border: 1px solid transparent; }
-        .check-item input { accent-color: var(--os-primary); }
-        .check-item:hover { border-color: var(--os-primary); }
+        .check-item { background: rgba(255,255,255,0.03); border: 1px solid var(--os-border); padding: 10px 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px; font-size: 0.75rem; cursor: pointer; transition: 0.2s; }
+        .check-item:hover { background: rgba(255,255,255,0.06); border-color: var(--os-primary); }
+        .check-item input { width: 16px; height: 16px; cursor: pointer; }
+        
+        .micro-grid { display: flex; flex-direction: column; gap: 15px; margin-bottom: 25px; }
+        .micro-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); }
+        .micro-item label { display: block; font-size: 0.7rem; font-weight: 700; color: #fff; margin-bottom: 10px; }
+        .radio-group { display: flex; flex-wrap: wrap; gap: 8px; }
+        .radio-opt { background: #000; border: 1px solid #333; padding: 6px 12px; border-radius: 20px; font-size: 0.65rem; cursor: pointer; transition: 0.2s; color: #999; }
+        .radio-opt:hover { border-color: var(--os-primary); color: #fff; }
+        .radio-opt.active { background: var(--os-primary); color: #000; border-color: var(--os-primary); font-weight: 800; }
         
         textarea { width: 100%; background: #000; border: 1px solid var(--os-border); color: #fff; padding: 15px; border-radius: 10px; box-sizing: border-box; margin-bottom: 15px; font-family: inherit; }
         
-        .success-msg { display: none; text-align: center; padding: 50px 20px; }
-        .success-msg i { font-size: 4rem; color: var(--os-primary); margin-bottom: 20px; }
+        .success-msg { 
+            display: none; 
+            text-align: center; 
+            padding: 100px 40px; 
+            animation: fadeIn 0.6s ease;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .success-msg i { font-size: 4rem; color: var(--os-primary); margin-bottom: 30px; display: block; }
+        .success-msg h2 { font-size: 2rem; margin-bottom: 15px; }
+        .success-msg p { opacity: 0.7; line-height: 1.6; }
+        .btn-return {
+            background: var(--os-primary);
+            color: #000;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 40px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            transition: all 0.3s;
+        }
+        .btn-return:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(142, 158, 104, 0.3); }
 
         @keyframes pulse-red {
             0% { transform: scale(1); opacity: 1; }
@@ -120,11 +154,19 @@
             </div>
 
             <div class="feedback-area" id="feedback-ui">
-                <h3 style="font-size:0.8rem; color:var(--os-primary); margin-bottom:15px;">O que precisa ser ajustado antes da aprovação?</h3>
-                <div class="check-grid" id="adjustment-checks">
-                    <!-- Checkboxes Injected -->
+                <div id="adjustment-matrix-container">
+                    <!-- Injected by JS -->
                 </div>
-                <textarea id="feedback-text" rows="4" placeholder="Outras observações estratégicas..."></textarea>
+
+                <span class="section-label">PRIORIDADE DO AJUSTE</span>
+                <div class="radio-group" id="priority-selector" style="margin-bottom: 25px;">
+                    <div class="radio-opt" data-val="Pequeno ajuste">Pequeno ajuste</div>
+                    <div class="radio-opt active" data-val="Ajuste moderado">Ajuste moderado</div>
+                    <div class="radio-opt" data-val="Revisão completa">Revisão completa</div>
+                </div>
+
+                <span class="section-label">CAMPO FINAL</span>
+                <textarea id="feedback-text" rows="4" placeholder="Descreva objetivamente o ajuste desejado..."></textarea>
                 <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR SOLICITAÇÃO DE AJUSTE</button>
             </div>
         </div>
@@ -159,15 +201,112 @@
             'GOVOS™ | Infra Pública Digital': 'GOVOS™'
         };
 
-        const ADJUSTMENT_CHECKS = {
-            'REELS': ['Tema', 'Hook (Gancho)', 'Tempo', 'CTA', 'Linguagem', 'Abordagem'],
-            'CARROSSEL': ['Tema', 'Quantidade de Slides', 'Estrutura Narrativa', 'Abordagem Visual', 'Tensão'],
-            'SITE': ['Estrutura', 'Páginas', 'Navegação', 'Copy', 'CTA', 'SEO'],
-            'BRANDING': ['Posicionamento', 'Tom de voz', 'Paleta', 'Tipografia', 'Narrativa'],
-            'TRÁFEGO PAGO': ['Canais', 'Públicos', 'Criativos', 'Orçamento', 'CTA'],
-            'CRM': ['Pipeline', 'Gatilhos', 'Automações', 'Health Score'],
-            'AUTOMAÇÃO': ['Fluxo Lógico', 'Integrações', 'Gatilhos', 'Eficiência'],
-            'DEFAULT': ['Tema', 'Objetivo', 'Abordagem', 'Contexto Estratégico']
+        const ADJUSTMENT_SCHEMA = {
+            'REELS': {
+                sections: [
+                    { title: 'Estratégia', items: ['Tema', 'Objetivo', 'Linguagem', 'Contexto estratégico', 'Posicionamento'] },
+                    { title: 'Estrutura do roteiro', items: ['Hook inicial', 'Desenvolvimento', 'CTA', 'Tempo do vídeo', 'Ritmo e pausas', 'Direção corporal', 'Cenário', 'Sequência narrativa'] }
+                ],
+                micro: [
+                    { title: 'Hook', items: ['muito técnico', 'pouco claro', 'pouco forte', 'pouco humano', 'não conversa comigo'] },
+                    { title: 'Tempo', items: ['muito longo', 'muito curto'] },
+                    { title: 'Linguagem', items: ['muito técnica', 'muito simples', 'pouco alinhada à marca'] }
+                ]
+            },
+            'CARROSSEL': {
+                sections: [
+                    { title: 'Estratégia', items: ['Tema', 'Objetivo', 'Posicionamento', 'Linguagem'] },
+                    { title: 'Estrutura', items: ['Slide inicial', 'Sequência narrativa', 'Ordem dos slides', 'Desenvolvimento', 'CTA', 'Retenção', 'Profundidade do conteúdo'] }
+                ],
+                micro: [
+                    { title: 'Slide inicial', items: ['pouco impactante', 'muito genérico', 'pouco claro'] },
+                    { title: 'Estrutura', items: ['muito técnica', 'muito extensa', 'superficial', 'repetitiva'] }
+                ]
+            },
+            'POST': {
+                sections: [
+                    { title: 'Estratégia', items: ['Tema', 'Objetivo', 'Linguagem', 'Posicionamento'] },
+                    { title: 'Estrutura', items: ['Headline', 'CTA', 'Hierarquia textual', 'Direção visual sugerida', 'Intenção emocional'] }
+                ],
+                micro: [
+                    { title: 'Headline', items: ['pouco forte', 'pouco clara', 'muito comercial', 'pouco alinhada à marca'] }
+                ]
+            },
+            'STORIES': {
+                sections: [
+                    { title: 'Estratégia', items: ['Tema', 'Objetivo', 'Linguagem', 'Posicionamento'] },
+                    { title: 'Estrutura', items: ['Sequência', 'Interações', 'CTA', 'Perguntas', 'Engajamento'] }
+                ]
+            },
+            'SITE': {
+                sections: [
+                    { title: 'Estratégia', items: ['Objetivo do site', 'Posicionamento', 'ICP', 'Jornada do usuário'] },
+                    { title: 'Estrutura', items: ['Páginas', 'Navegação', 'Estrutura das seções', 'CTA', 'Fluxo de conversão', 'SEO estrutural'] }
+                ],
+                micro: [
+                    { title: 'Estrutura', items: ['muito complexa', 'muito simples', 'pouco estratégica', 'pouco comercial'] }
+                ]
+            },
+            'LANDING PAGE': {
+                sections: [
+                    { title: 'Estratégia', items: ['Oferta', 'Objetivo', 'Posicionamento'] },
+                    { title: 'Estrutura', items: ['Headline', 'CTA', 'Copy', 'Fluxo persuasivo', 'Quebra de objeção', 'Conversão'] }
+                ]
+            },
+            'BRANDING': {
+                sections: [
+                    { title: 'Estratégia', items: ['Posicionamento', 'Diferenciação', 'Narrativa', 'Percepção desejada', 'Tom de voz'] },
+                    { title: 'Estrutura', items: ['Linguagem', 'Estratégia da marca', 'Comunicação', 'Direção da percepção'] }
+                ]
+            },
+            'IDENTIDADE VISUAL': {
+                sections: [
+                    { title: 'Estratégia', items: ['Percepção desejada', 'Posicionamento', 'Comportamento visual'] },
+                    { title: 'Estrutura', items: ['Paleta', 'Tipografia', 'Grid', 'Direção estética', 'Aplicações', 'Consistência visual'] }
+                ]
+            },
+            'TRÁFEGO PAGO': {
+                sections: [
+                    { title: 'Estratégia', items: ['Objetivo', 'Público', 'Posicionamento', 'Oferta'] },
+                    { title: 'Estrutura', items: ['Criativos', 'CTA', 'Copy', 'Segmentação', 'Estratégia de conversão'] }
+                ]
+            },
+            'CRM': {
+                sections: [
+                    { title: 'Estratégia', items: ['Jornada do cliente', 'Organização', 'Fluxo operacional'] },
+                    { title: 'Estrutura', items: ['Pipeline', 'Qualificação', 'Automações', 'Fluxos de contato', 'Health score'] }
+                ]
+            },
+            'AUTOMAÇÃO': {
+                sections: [
+                    { title: 'Estratégia', items: ['Objetivo da automação', 'Fluxo operacional', 'Integrações'] },
+                    { title: 'Estrutura', items: ['Triggers', 'Ações', 'Sequências', 'Fallbacks', 'Alertas'] }
+                ]
+            },
+            'DASHBOARD': {
+                sections: [
+                    { title: 'Estratégia', items: ['Objetivo analítico', 'Organização executiva', 'Hierarquia de leitura'] },
+                    { title: 'Estrutura', items: ['KPIs', 'Métricas', 'Navegação', 'Alertas', 'Organização visual'] }
+                ]
+            },
+            'APRESENTAÇÃO': {
+                sections: [
+                    { title: 'Estratégia', items: ['Narrativa', 'Posicionamento', 'Objetivo da apresentação'] },
+                    { title: 'Estrutura', items: ['Ordem dos slides', 'Hierarquia', 'CTA', 'Storytelling', 'Fluxo argumentativo'] }
+                ]
+            },
+            'CONSULTORIA': {
+                sections: [
+                    { title: 'Estratégia', items: ['Diagnóstico', 'Prioridades', 'Oportunidades'] },
+                    { title: 'Estrutura', items: ['Plano estratégico', 'Organização', 'Direcionamento executivo', 'Fluxo operacional'] }
+                ]
+            },
+            'GOVOS™': {
+                sections: [
+                    { title: 'Estratégia', items: ['Estrutura institucional', 'Governança', 'Fluxo público'] },
+                    { title: 'Estrutura', items: ['Serviços digitais', 'Experiência do cidadão', 'Painéis executivos', 'Estrutura operacional'] }
+                ]
+            }
         };
 
         function formatClientTitle(title) {
@@ -195,7 +334,6 @@
                 
                 if (error || !c) throw new Error('Conteúdo não encontrado.');
 
-                // BLOQUEIO DE ACESSO PÓS-APROVAÇÃO OU EM REVISÃO
                 const currentStatus = (c.status || '').toUpperCase();
                 const allowedStatus = ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL'];
                 
@@ -240,9 +378,7 @@
                     return;
                 }
 
-                // DETECTAR SE É VALIDAÇÃO DE ARTE OU ESTRATÉGIA
                 const isFinalArt = currentStatus === 'APROVAÇÃO FINAL';
-
                 document.getElementById('main-ui').style.display = 'block';
 
                 if (isFinalArt) {
@@ -251,10 +387,7 @@
                     document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE FINAL';
                     document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
                 } else {
-                    const isFinalArt = currentStatus === 'APROVAÇÃO FINAL' || currentStatus === 'AJUSTE DE PRODUÇÃO';
-                    document.getElementById('asset-body-title').innerText = isFinalArt ? 'Aprovação de Arte Final' : 'Aprovação de Planejamento';
-                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-xmark"></i> SOLICITAR AJUSTE';
-                    document.getElementById('btn-submit-feedback').innerHTML = isFinalArt ? 'ENVIAR SOLICITAÇÃO DE AJUSTE' : 'ENVIAR SOLICITAÇÃO DE AJUSTE';
+                    document.getElementById('asset-body-title').innerText = 'Aprovação de Planejamento';
                 }
 
                 let prefix = 'POST', obj = 'Estratégia';
@@ -268,11 +401,9 @@
                 document.getElementById('meta-format').innerText = prefix;
                 document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
-                // INJETAR REFERÊNCIA
                 const refLink = c.metadata?.reference_url;
                 document.getElementById('meta-reference').innerHTML = refLink ? `<a href="${refLink}" target="_blank" style="color:var(--os-primary); text-decoration:none;"><i class="fa-solid fa-link"></i> Ver Referência</a>` : '<span style="opacity:0.3;">Não enviada</span>';
                 
-                // FORMATAR PRAZO (17/05 / 14:35)
                 const deadlineEl = document.getElementById('meta-deadline-highlight');
                 if (c.metadata?.approval_deadline) {
                     const d = new Date(c.metadata.approval_deadline);
@@ -288,12 +419,9 @@
                     deadlineEl.innerText = 'S/ Prazo';
                 }
 
-                // FORMATAR PUBLICAÇÃO (15/05 às 00:00h)
                 const pubDate = new Date(c.scheduled_at);
                 const pubFormatted = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + pubDate.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
                 document.getElementById('meta-time').innerText = pubFormatted;
-                
-                document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
                 let roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
                 roadmap = roadmap
@@ -308,14 +436,9 @@
                         <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px;">
                             <i class="fa-solid fa-file-circle-check" style="font-size: 3rem; color: #8b5cf6; margin-bottom: 15px;"></i>
                             <h3 style="color: #fff; margin-bottom: 10px;">A Arte Final está pronta!</h3>
-                            <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px;">Visualize o arquivo antes de aprovar para postagem.</p>
                             <a href="${c.metadata.final_asset_url}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; padding: 12px 30px;">
                                 <i class="fa-solid fa-eye"></i> VISUALIZAR ARTE FINAL
                             </a>
-                        </div>
-                        <div style="opacity: 0.5; font-size: 0.8rem;">
-                            <strong>Roteiro Aprovado:</strong><br>
-                            ${roadmap}
                         </div>
                     `;
                 } else {
@@ -323,40 +446,68 @@
                 }
                 
                 const badge = document.getElementById('status-badge-container');
-                if (currentStatus === 'APROVAÇÃO FINAL') {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">AGUARDANDO ARTE FINAL</span>`;
-                } else {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">AGUARDANDO PLANEJAMENTO</span>`;
+                badge.innerHTML = isFinalArt ? `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">AGUARDANDO ARTE FINAL</span>` : `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">AGUARDANDO PLANEJAMENTO</span>`;
+
+                // INJETAR MATRIZ DE AJUSTE
+                const schema = ADJUSTMENT_SCHEMA[prefix] || ADJUSTMENT_SCHEMA['REELS'];
+                const matrixContainer = document.getElementById('adjustment-matrix-container');
+                let matrixHtml = '';
+
+                if (schema.sections) {
+                    schema.sections.forEach(sec => {
+                        matrixHtml += `<span class="section-label">${sec.title}</span><div class="check-grid">`;
+                        sec.items.forEach(item => {
+                            matrixHtml += `
+                                <label class="check-item">
+                                    <input type="checkbox" class="adj-check" data-cat="${sec.title}" value="${item}">
+                                    <span>${item}</span>
+                                </label>
+                            `;
+                        });
+                        matrixHtml += `</div>`;
+                    });
                 }
 
-                const checks = ADJUSTMENT_CHECKS[prefix] || ADJUSTMENT_CHECKS['DEFAULT'];
-                document.getElementById('adjustment-checks').innerHTML = checks.map(check => `
-                    <label class="check-item">
-                        <input type="checkbox" value="${check}"> ${check}
-                    </label>
-                `).join('');
+                if (schema.micro) {
+                    matrixHtml += `<span class="section-label" style="color:#60a5fa; border-color:rgba(96,165,250,0.2);">Microajustes Inteligentes</span><div class="micro-grid">`;
+                    schema.micro.forEach(m => {
+                        matrixHtml += `
+                            <div class="micro-item">
+                                <label>${m.title}</label>
+                                <div class="radio-group" data-nuance="${m.title}">
+                                    ${m.items.map(opt => `<div class="radio-opt" data-val="${opt}">${opt}</div>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    matrixHtml += `</div>`;
+                }
+                matrixContainer.innerHTML = matrixHtml;
+
+                document.querySelectorAll('.radio-opt').forEach(opt => {
+                    opt.onclick = function() {
+                        const parent = this.parentElement;
+                        parent.querySelectorAll('.radio-opt').forEach(r => r.classList.remove('active'));
+                        this.classList.add('active');
+                    };
+                });
 
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('content-data').style.display = 'block';
 
-                const showFinalSuccess = (title, msg) => {
-                    document.getElementById('main-ui').style.display = 'none';
+                const showFinalSuccess = (title, message) => {
+                    document.getElementById('content-data').style.display = 'none';
                     document.getElementById('success-title').innerText = title;
-                    document.getElementById('success-message').innerText = msg;
+                    document.getElementById('success-message').innerText = message;
                     
                     const actionsContainer = document.getElementById('success-actions');
-                    if (actionsContainer && !document.getElementById('btn-return-portal-success')) {
-                        const btnReturn = document.createElement('button');
-                        btnReturn.id = 'btn-return-portal-success';
-                        btnReturn.className = 'btn btn-approve';
-                        btnReturn.style.background = 'var(--os-primary)';
-                        btnReturn.style.color = '#000';
-                        btnReturn.style.width = '100%';
-                        btnReturn.style.marginTop = '20px';
-                        btnReturn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
-                        btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
-                        actionsContainer.appendChild(btnReturn);
-                    }
+                    actionsContainer.innerHTML = '';
+                    const btnReturn = document.createElement('button');
+                    btnReturn.className = 'btn-return';
+                    btnReturn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
+                    btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
+                    actionsContainer.appendChild(btnReturn);
+                    
                     document.getElementById('success-ui').style.display = 'block';
                 };
 
@@ -370,24 +521,14 @@
                         if (currentStatus === 'APROVAÇÃO FINAL') nextStatus = 'PRONTO';
                         
                         const updateData = { status: nextStatus };
-                        
-                        // Resetar ciclos ao entrar em PRODUÇÃO (Nova esteira técnica)
                         if (nextStatus === 'PRODUÇÃO') {
-                            updateData.metadata = {
-                                ...c.metadata,
-                                revision_cycle: 1,
-                                version: 'V1'
-                            };
+                            updateData.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
                         }
 
-                        const { error } = await supabase.from('content_assets').update(updateData).eq('id', id);
+                        const { error } = await _supabaseClient.from('content_assets').update(updateData).eq('id', id);
                         if (error) throw error;
                         
-                        if (nextStatus === 'PRONTO') {
-                            showFinalSuccess('Conteúdo Finalizado!', 'A arte foi aprovada e já está pronta para publicação conforme o cronograma.');
-                        } else {
-                            showFinalSuccess('Planejamento Aprovado!', 'Excelente. Esta pauta foi enviada para a Execução Operacional.');
-                        }
+                        showFinalSuccess(nextStatus === 'PRONTO' ? 'Conteúdo Finalizado!' : 'Planejamento Aprovado!', 'A pauta seguiu para a próxima etapa.');
                     } catch (err) {
                         alert('Erro: ' + err.message);
                         btn.innerHTML = 'Tentar Novamente';
@@ -397,6 +538,7 @@
 
                 document.getElementById('btn-reject-action').onclick = () => {
                     document.getElementById('feedback-ui').style.display = 'block';
+                    document.getElementById('main-actions').style.display = 'none';
                 };
 
                 document.getElementById('btn-submit-feedback').onclick = async () => {
@@ -405,45 +547,44 @@
                     btn.disabled = true;
 
                     try {
-                        const selected = Array.from(document.querySelectorAll('#adjustment-checks input:checked')).map(i => i.value);
-                        const note = document.getElementById('feedback-text').value;
-                        const fullNote = `AJUSTE SOLICITADO | ITENS: ${selected.join(', ')} | OBS: ${note}`;
-                        
-                        const currentCycle = c.metadata?.revision_cycle || 1;
-                        const newHistory = c.metadata?.history || [];
-                        newHistory.push({
-                            date: new Date().toISOString(),
-                            type: 'CLIENT',
-                            author: 'Cliente',
-                            note: fullNote
-                        });
+                        let feedback = `📌 SOLICITAÇÃO DE AJUSTE (${prefix})\n\n`;
+                        const checked = document.querySelectorAll('.adj-check:checked');
+                        if (checked.length > 0) {
+                            feedback += `📍 ESTRUTURA/ESTRATÉGIA:\n`;
+                            checked.forEach(c => feedback += `- [${c.getAttribute('data-cat')}] ${c.value}\n`);
+                            feedback += `\n`;
+                        }
+                        const nuances = document.querySelectorAll('.micro-grid .radio-opt.active');
+                        if (nuances.length > 0) {
+                            feedback += `🎯 MICROAJUSTES:\n`;
+                            nuances.forEach(n => {
+                                const cat = n.parentElement.getAttribute('data-nuance');
+                                feedback += `- ${cat}: ${n.getAttribute('data-val')}\n`;
+                            });
+                            feedback += `\n`;
+                        }
+                        const priority = document.querySelector('#priority-selector .radio-opt.active')?.getAttribute('data-val') || 'Ajuste moderado';
+                        feedback += `⚠️ PRIORIDADE: ${priority}\n\n`;
+                        const obs = document.getElementById('feedback-text').value;
+                        if (obs) feedback += `💬 OBSERVAÇÃO FINAL:\n${obs}`;
 
-                        const newStatus = (currentStatus === 'APROVAÇÃO FINAL') ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
-
-                        const { error } = await supabase.from('content_assets').update({ 
-                            status: newStatus, 
-                            internal_notes: fullNote,
-                            metadata: {
-                                ...c.metadata,
-                                history: newHistory,
-                                revision_cycle: currentCycle + 1,
-                                version: `V${currentCycle + 1}`,
-                                risk: true
-                            }
+                        const nextStatus = isFinalArt ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
+                        const { error } = await _supabaseClient.from('content_assets').update({ 
+                            status: nextStatus,
+                            internal_notes: feedback 
                         }).eq('id', id);
-                        
-                        if (error) throw error;
 
+                        if (error) throw error;
                         showFinalSuccess('Ajuste Solicitado', 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.');
                     } catch (err) {
-                        alert('Erro: ' + err.message);
-                        btn.innerHTML = 'Enviar Solicitação';
+                        console.error(err);
+                        alert('Erro ao enviar feedback.');
+                        btn.innerHTML = 'Tentar Novamente';
                         btn.disabled = false;
                     }
                 };
 
             } catch (err) {
-                document.getElementById('loading-state').innerText = 'Erro ao carregar.';
             }
         }
         window.onload = load;
