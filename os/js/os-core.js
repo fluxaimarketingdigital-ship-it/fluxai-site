@@ -22,7 +22,7 @@ export const OS_UI = {
             { id: 'crm-intelligence', label: 'Inteligência de CRM', icon: 'fa-users-gear', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
             { id: 'automation-hub', label: 'Central de Automação', icon: 'fa-robot', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
             { id: 'analytics', label: 'Análise de Dados', icon: 'fa-chart-line', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'client-workspace', label: 'Workspace do Cliente', icon: 'fa-briefcase', group: 'Interface de Valor', roles: ['ADMIN', 'CLIENT'] },
+            { id: 'client-portal', label: 'Portal do Cliente', icon: 'fa-briefcase', group: 'Interface de Valor', roles: ['ADMIN', 'CLIENT'] },
             { id: 'contracts-finance', label: 'Contratos & Financeiro', icon: 'fa-file-invoice-dollar', group: 'Governança', roles: ['ADMIN'] },
             { id: 'governance', label: 'Governança', icon: 'fa-user-shield', group: 'Governança', roles: ['ADMIN'] },
             { id: 'governance-users', label: 'Gestão de Usuários', icon: 'fa-users-cog', group: 'Governança', roles: ['ADMIN'] },
