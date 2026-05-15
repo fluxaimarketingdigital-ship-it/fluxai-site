@@ -1,4 +1,4 @@
-/**
+﻿/**
  * FLUXAI OS™ CORE ENGINE v1.0.0
  * Gestão de Componentes Operacionais e Estados Globais
  */
