@@ -47,15 +47,19 @@ export const AIPlanner = {
         
         // Determinar quais serviços gerar
         let servicesToGenerate = [];
+        const availableKeys = Object.keys(AIPlanner.STRATEGIC_MATRIX);
+        
         if (specificService === 'ALL') {
-            servicesToGenerate = Object.keys(AIPlanner.STRATEGIC_MATRIX);
+            // Repetir a matriz até preencher a cota (Ex: se cota é 12 e matriz tem 10, gera os 10 + 2 primeiros)
+            let i = 0;
+            while (servicesToGenerate.length < maxToGenerate) {
+                servicesToGenerate.push(availableKeys[i % availableKeys.length]);
+                i++;
+            }
         } else {
             // Se for serviço específico, vamos gerar várias instâncias dele até atingir o limite
             servicesToGenerate = Array(maxToGenerate).fill(specificService);
         }
-
-        // Limitar ao máximo solicitado pelo contrato
-        servicesToGenerate = servicesToGenerate.slice(0, maxToGenerate);
 
         let daysOffset = 0;
 
