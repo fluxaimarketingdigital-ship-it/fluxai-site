@@ -423,6 +423,11 @@ function renderContentTable(contents) {
                                 <i class="fa-solid fa-circle-check"></i>
                             </button>
                         `}
+                        ${c.metadata?.reference_url ? `
+                            <a href="${c.metadata.reference_url}" target="_blank" class="btn-mini" title="Ver Referência" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: #3b82f6;">
+                                <i class="fa-solid fa-link"></i>
+                            </a>
+                        ` : ''}
                         ${c.metadata?.final_asset_url ? `
                             <a href="${c.metadata.final_asset_url}" target="_blank" class="btn-mini" title="Ver Arte Final" style="background: rgba(139, 92, 246, 0.2); color: #a78bfa; border-color: #8b5cf6;">
                                 <i class="fa-solid fa-file-image"></i>
