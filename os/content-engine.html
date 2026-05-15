@@ -193,6 +193,44 @@
         </div>
     </div>
 
+    <!-- MODAL DE PONTE DE PUBLICAÇÃO -->
+    <div id="pub-modal-overlay" class="os-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); z-index:9999; align-items:center; justify-content:center;">
+        <div class="os-widget" style="width: 100%; max-width: 600px; padding: 40px; border: 1px solid var(--os-border); border-top: 4px solid var(--os-primary);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+                <h2 style="color:var(--os-primary); font-size:1.2rem; font-weight:900;">🚀 Ponte de Publicação</h2>
+                <button class="btn-mini" id="close-pub-modal" style="background:transparent; border:none; font-size:1.2rem; cursor:pointer; color:#fff;">&times;</button>
+            </div>
+
+            <div style="margin-bottom:25px;">
+                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">DATA E HORA PROGRAMADA</label>
+                <div id="pub-scheduled-time" style="font-size:1.1rem; font-weight:900; color:#fff;">---</div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-bottom:25px;">
+                <button id="btn-open-assets" class="os-btn os-btn-primary" style="width:100%; height:50px; background:var(--os-primary); color:#000; font-weight:800; border:none; border-radius:4px; cursor:pointer;">
+                    <i class="fa-solid fa-cloud-arrow-down"></i> BAIXAR CONTEÚDO
+                </button>
+                <button id="btn-open-account" class="os-btn os-btn-outline" style="width:100%; height:50px; background:rgba(255,255,255,0.05); color:#fff; border:1px solid #444; border-radius:4px; cursor:pointer;">
+                    <i class="fa-brands fa-instagram"></i> ABRIR PLATAFORMA
+                </button>
+            </div>
+
+            <div style="margin-bottom:25px;">
+                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">LEGENDA E HASHTAGS</label>
+                <textarea id="pub-caption-preview" readonly style="width:100%; height:180px; background:#0a0a0a; border:1px solid #222; color:rgba(255,255,255,0.8); padding:15px; border-radius:8px; font-size:0.85rem; line-height:1.6; font-family:inherit;"></textarea>
+                <button id="btn-copy-caption" class="os-btn os-btn-primary" style="width:100%; margin-top:10px; background:rgba(107, 122, 69, 0.2); color:var(--os-primary); border:1px solid var(--os-primary); font-size:0.7rem; padding:10px; cursor:pointer;">
+                    <i class="fa-solid fa-copy"></i> COPIAR LEGENDA COMPLETA
+                </button>
+            </div>
+
+            <div style="border-top:1px solid var(--os-border); padding-top:25px; display:flex; justify-content:center;">
+                <button id="btn-confirm-pub" class="os-btn os-btn-primary" style="background:#10b981; color:#fff; padding:15px 40px; font-weight:800; border:none; border-radius:4px; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3); cursor:pointer;">
+                    <i class="fa-solid fa-check-double"></i> CONFIRMAR PUBLICAÇÃO
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script type="module">
         import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
         import { getSupabase } from '/os/services/supabase-client.js';

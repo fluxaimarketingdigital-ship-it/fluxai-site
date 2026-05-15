@@ -313,6 +313,7 @@ async function loadContent() {
         
         // NOVO: Verificar Alerta de Ciclo
         checkLogisticsCycle();
+        checkPublishingAlerts(contents);
         
     } catch (e) {
         sLog('Erro Conteúdo: ' + e.message);
@@ -342,6 +343,29 @@ async function checkLogisticsCycle() {
             banner.style.display = 'none';
         }
     } catch (e) { console.error('[LOGÍSTICA] Erro ao verificar ciclo:', e); }
+}
+
+async function checkPublishingAlerts(contents) {
+    if (!contents || contents.length === 0) return;
+    
+    const now = new Date();
+    const todayStr = now.toISOString().split('T')[0];
+    
+    const todayPosts = contents.filter(c => {
+        if (c.status !== 'PRONTO') return false;
+        const scheduledDate = c.scheduled_at ? c.scheduled_at.split('T')[0] : null;
+        return scheduledDate === todayStr;
+    });
+
+    if (todayPosts.length > 0) {
+        sLog(`📢 ALERTA: Você tem ${todayPosts.length} conteúdos para publicar HOJE!`);
+        // Opcional: Mostrar uma notificação visual mais agressiva ou banner
+        const metricSchedule = document.getElementById('metric-schedule');
+        if (metricSchedule) {
+            metricSchedule.style.border = '1px solid var(--os-primary)';
+            metricSchedule.style.boxShadow = '0 0 20px rgba(107, 122, 69, 0.2)';
+        }
+    }
 }
 
 function renderMetrics(contents) {
@@ -783,38 +807,41 @@ window.openPublishBridge = async (id) => {
     const modal = document.getElementById('pub-modal-overlay');
     if (!modal) return alert('Modal de Publicação não encontrado no HTML.');
 
-    document.getElementById('pub-caption-preview').value = c.caption;
+    // Preencher dados
+    const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Data não definida';
+    document.getElementById('pub-scheduled-time').innerText = scheduled;
+    document.getElementById('pub-caption-preview').value = c.caption || '';
     
     // Configurar botões
     document.getElementById('btn-copy-caption').onclick = () => {
-        navigator.clipboard.writeText(c.caption);
-        alert('Legenda copiada para a área de transferência!');
+        const text = document.getElementById('pub-caption-preview').value;
+        navigator.clipboard.writeText(text);
+        
+        const btn = document.getElementById('btn-copy-caption');
+        const oldText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> COPIADO!';
+        setTimeout(() => btn.innerHTML = oldText, 2000);
     };
 
     document.getElementById('btn-open-assets').onclick = () => {
         if (c.metadata?.final_asset_url) window.open(c.metadata.final_asset_url, '_blank');
-        else alert('Nenhum arquivo final encontrado.');
+        else alert('Nenhum arquivo final encontrado para este conteúdo.');
     };
 
     document.getElementById('btn-open-account').onclick = () => {
-        window.open('https://business.facebook.com/latest/composer', '_blank');
+        // Direcionar para o Creator Studio / Business Suite conforme plataforma
+        if (c.platform === 'INSTAGRAM') window.open('https://business.facebook.com/latest/composer', '_blank');
+        else if (c.platform === 'WEB') window.open('/os/site-editor', '_blank'); // Exemplo
+        else window.open('https://google.com', '_blank');
     };
 
-    // BOTÃO WHATSAPP REMINDER
-    const btnWa = document.getElementById('btn-wa-reminder');
-    if (btnWa) {
-        btnWa.onclick = () => {
-            const project = document.getElementById('project-filter').options[document.getElementById('project-filter').selectedIndex]?.text || 'Cliente';
-            const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${c.project_id}`;
-            const msg = `Olá! 🚀%0A%0APassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.%0A%0ASeu prazo expira em breve! Confira aqui o calendário:%0A${portalLink}`;
-            window.open(`https://wa.me/?text=${msg}`, '_blank');
-        };
-    }
-
     document.getElementById('btn-confirm-pub').onclick = async () => {
-        if (confirm('Confirmar que este conteúdo foi publicado com sucesso?')) {
-            await supabase.from('content_assets').update({ status: 'PUBLICADO' }).eq('id', id);
+        if (confirm('Deseja confirmar a publicação deste conteúdo agora? O status será alterado para PUBLICADO.')) {
+            const { error } = await supabase.from('content_assets').update({ status: 'PUBLICADO' }).eq('id', id);
+            if (error) return alert('Erro ao atualizar: ' + error.message);
+            
             modal.style.display = 'none';
+            sLog('Conteúdo marcado como PUBLICADO.');
             loadContent();
         }
     };
