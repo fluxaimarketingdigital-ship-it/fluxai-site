@@ -70,7 +70,7 @@
             border: 1px solid transparent;
             font-weight: 600;
         }
-        .asset-card:hover { transform: translateY(-2px); border-color: var(--os-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        .asset-card:hover:not(.non-clickable) { transform: translateY(-2px); border-color: var(--os-primary); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         
         /* Status visíveis ao cliente */
         .status-aprovação-planejamento { background: rgba(59, 130, 246, 0.1); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
@@ -181,11 +181,21 @@
                         <div class="day-num">${i}</div>
                         ${dayAssets.map(c => {
                             const statusClass = (c.status || '').toLowerCase().replace(/\s+/g, '-');
-                            return `
-                                <div class="asset-card status-${statusClass}" onclick="window.location.href='/os/approval.html?id=${c.id}'">
-                                    <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
-                                </div>
-                            `;
+                            const isActionable = c.status === 'APROVAÇÃO PLANEJAMENTO' || c.status === 'APROVAÇÃO FINAL';
+                            
+                            if (isActionable) {
+                                return `
+                                    <div class="asset-card status-${statusClass}" onclick="window.location.href='/os/approval.html?id=${c.id}'">
+                                        <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
+                                    </div>
+                                `;
+                            } else {
+                                return `
+                                    <div class="asset-card status-${statusClass} non-clickable" style="cursor: default;">
+                                        <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
+                                    </div>
+                                `;
+                            }
                         }).join('')}
                     </div>
                 `;

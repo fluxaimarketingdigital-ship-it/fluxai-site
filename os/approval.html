@@ -11,9 +11,9 @@
         body { background: var(--os-bg); color: var(--os-text); font-family: 'Inter', sans-serif; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; justify-content: center; }
         .approval-container { width: 100%; max-width: 800px; background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 16px; padding: 40px; box-sizing: border-box; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-top: 4px solid var(--os-primary); }
         
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 40px; border-bottom: 1px solid var(--os-border); padding-bottom: 25px; }
-        .header h1 { font-size: 1.4rem; font-weight: 900; margin: 0; letter-spacing: -1px; }
-        .status-badge { padding: 6px 14px; border-radius: 20px; font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; }
+        .header { display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; margin-bottom: 40px; border-bottom: 1px solid var(--os-border); padding-bottom: 30px; gap: 15px; }
+        .header h1 { font-size: 1.6rem; font-weight: 900; margin: 0; letter-spacing: -1px; }
+        .status-badge { padding: 8px 18px; border-radius: 30px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; display: inline-block; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
         
         .meta-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 35px; background: rgba(255,255,255,0.03); padding: 20px; border-radius: 12px; border: 1px solid var(--os-border); }
         .meta-item { display: flex; flex-direction: column; gap: 5px; }
@@ -95,7 +95,7 @@
         <div class="header">
             <div>
                 <h1>FluxAI <span>OS™</span></h1>
-                <p style="font-size:0.7rem; opacity:0.5; margin:5px 0 0 0;" id="portal-subtitle">APROVAÇÃO DE PLANEJAMENTO</p>
+                <p style="font-size:0.7rem; opacity:0.5; margin:5px 0 0 0;" id="portal-subtitle">REVISÃO ESTRATÉGICA</p>
             </div>
             <div id="status-badge-container">
                 <!-- Status Badge Injected -->
@@ -396,7 +396,7 @@
                 document.getElementById('main-ui').style.display = 'block';
 
                 if (isFinalArt) {
-                    document.getElementById('portal-subtitle').innerText = 'APROVAÇÃO DE ARTE FINAL';
+                    document.getElementById('portal-subtitle').innerText = 'REVISÃO DE ARTE FINAL';
                     document.getElementById('asset-body-title').innerText = 'Arte Finalizada';
                     document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE FINAL';
                     document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
@@ -460,7 +460,7 @@
                 }
                 
                 const badge = document.getElementById('status-badge-container');
-                badge.innerHTML = isFinalArt ? `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">AGUARDANDO ARTE FINAL</span>` : `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">AGUARDANDO PLANEJAMENTO</span>`;
+                badge.innerHTML = isFinalArt ? `<span class="status-badge" style="background:rgba(139, 92, 246,0.15); color:#a78bfa; border:1px solid rgba(139,92,246,0.5);">AGUARDANDO SUA APROVAÇÃO</span>` : `<span class="status-badge" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.5);">AGUARDANDO SUA APROVAÇÃO</span>`;
 
                 // INJETAR MATRIZ DE AJUSTE
                 const schema = ADJUSTMENT_SCHEMA[prefix] || ADJUSTMENT_SCHEMA['REELS'];
