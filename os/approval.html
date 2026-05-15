@@ -357,8 +357,11 @@
                         newDeadline.setHours(newDeadline.getHours() + 48); // Mais 48h para revisão
                         
                         const currentCycle = c.metadata?.revision_cycle || 1;
+                        const isFinalArtPhase = c.status === 'APROVAÇÃO FINAL';
+                        const newStatus = isFinalArtPhase ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
+
                         const { error } = await supabase.from('content_assets').update({ 
-                            status: 'AJUSTE', 
+                            status: newStatus, 
                             internal_notes: fullNote,
                             metadata: {
                                 ...c.metadata,

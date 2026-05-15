@@ -414,14 +414,21 @@ function renderContentTable(contents) {
                 </td>
                 <td>
                     <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                        ${c.status === 'PLANEJAMENTO' ? `
+                            <button class="btn-mini" title="Validar Estratégia (Enviar p/ Cliente)" onclick="window.approveManager('${c.id}')" style="background: #8b5cf6; color: #fff; border: none;">
+                                <i class="fa-solid fa-shield-check"></i>
+                            </button>
+                        ` : ''}
                         ${c.status === 'PRONTO' ? `
                             <button class="btn-mini" title="Ponte de Publicação" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
                                 <i class="fa-solid fa-rocket"></i>
                             </button>
                         ` : `
-                            <button class="btn-mini" title="Forçar Conclusão (Pular Aprovação)" onclick="window.forceReady('${c.id}')" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">
-                                <i class="fa-solid fa-circle-check"></i>
-                            </button>
+                            ${c.status !== 'PLANEJAMENTO' ? `
+                                <button class="btn-mini" title="Forçar Conclusão (Pular Aprovação)" onclick="window.forceReady('${c.id}')" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                </button>
+                            ` : ''}
                         `}
                         ${c.metadata?.reference_url ? `
                             <a href="${c.metadata.reference_url}" target="_blank" class="btn-mini" title="Ver Referência" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: #3b82f6;">
@@ -499,10 +506,11 @@ function renderCalendar(containerId, contents, mode) {
 
 function getStatusBg(status) {
     if (status === 'PLANEJAMENTO') return '#6366f1'; 
-    if (status === 'REVISÃO INTERNA') return '#ec4899';
+    if (status === 'REVISÃO GESTÃO') return '#8b5cf6'; // Roxo (Aprovação da Gestão)
     if (status === 'APROVAÇÃO ESTRATÉGICA') return '#f59e0b'; 
     if (status === 'AJUSTE') return '#ef4444'; 
-    if (status === 'PRODUÇÃO') return '#f59e0b'; // Amarelo (Aprovado p/ Produção)
+    if (status === 'PRODUÇÃO') return '#f59e0b'; 
+    if (status === 'AJUSTE DE PRODUÇÃO') return '#ec4899'; // Rosa (Ajuste técnico de arte)
     if (status === 'REVISÃO INTERNA FINAL') return '#ec4899';
     if (status === 'APROVAÇÃO FINAL') return '#8b5cf6'; 
     if (status === 'PRONTO') return '#10b981'; 
@@ -675,19 +683,11 @@ window.saveAssetEdit = async () => {
             metadata: newMetadata
         };
 
-        // LÓGICA DE TRANSIÇÃO DE STATUS
-        const statusMap = {
-            'PLANEJAMENTO': 'PLANEJAMENTO',
-            'REVISÃO INTERNA': 'REVISÃO INTERNA',
-            'APROVAÇÃO ESTRATÉGICA': 'APROVAÇÃO ESTRATÉGICA',
-            'AJUSTE': 'PLANEJAMENTO', // Volta para o início do fluxo em caso de ajuste
-            'PRODUÇÃO': 'PRODUÇÃO',
-            'REVISÃO INTERNA FINAL': 'REVISÃO INTERNA FINAL',
-            'APROVAÇÃO FINAL': 'APROVAÇÃO FINAL'
-        };
-
+        // LÓGICA DE TRANSIÇÃO DE STATUS INTELIGENTE
         if (currentAsset.status === 'AJUSTE') {
             updatePayload.status = 'PLANEJAMENTO';
+        } else if (currentAsset.status === 'AJUSTE DE PRODUÇÃO') {
+            updatePayload.status = 'PRODUÇÃO'; // Volta para a produção, não para o planejamento
         } else if (currentAsset.status === 'PRODUÇÃO' && artFinal) {
             if (confirm('Enviar para REVISÃO INTERNA FINAL antes do cliente?')) {
                 updatePayload.status = 'REVISÃO INTERNA FINAL';
@@ -920,6 +920,20 @@ window.forceReady = async (id) => {
         loadContent();
     } catch (e) {
         alert('Erro ao forçar conclusão: ' + e.message);
+    }
+};
+
+window.approveManager = async (id) => {
+    if (!confirm('Deseja validar esta pauta estrategicamente e liberar para a aprovação do cliente?')) return;
+    try {
+        const supabase = getSupabase();
+        // Move do Planejamento para a Aprovação Estratégica do Cliente
+        const { error } = await supabase.from('content_assets').update({ status: 'APROVAÇÃO ESTRATÉGICA' }).eq('id', id);
+        if (error) throw error;
+        sLog('Pauta validada pela gestão e enviada ao cliente.');
+        loadContent();
+    } catch (e) {
+        alert('Erro ao validar pauta: ' + e.message);
     }
 };
 
