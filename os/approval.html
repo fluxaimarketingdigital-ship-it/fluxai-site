@@ -189,10 +189,14 @@
                     } else if (currentStatus === 'PRODUÇÃO') {
                         document.getElementById('success-title').innerText = 'Em Produção';
                         document.getElementById('success-message').innerHTML = `<b>Planejamento Aprovado!</b><br><br>Este conteúdo já foi enviado para nossa equipe técnica e está em fase de <b>Produção Audiovisual/Design</b>. Você receberá uma notificação assim que a arte final estiver pronta para sua validação.`;
-                    } else if (currentStatus === 'AJUSTE' || currentStatus === 'AJUSTE DE PRODUÇÃO') {
+                    } else if (currentStatus === 'AJUSTE') {
                         document.getElementById('success-title').innerText = 'Aguardando Ajustes';
                         const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Sua Solicitação:</strong><br>${c.internal_notes}</div>` : '';
                         document.getElementById('success-message').innerHTML = `Seus apontamentos já foram enviados para a nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes. ${feedbackMsg}`;
+                    } else if (currentStatus === 'AJUSTE DE PRODUÇÃO') {
+                        document.getElementById('success-title').innerText = 'Em Ajuste de Produção';
+                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Suas Observações Técnicas:</strong><br>${c.internal_notes}</div>` : '';
+                        document.getElementById('success-message').innerHTML = `A arte final está sendo refinada pela nossa equipe de design com base nos seus últimos apontamentos. ${feedbackMsg}`;
                     } else {
                         document.getElementById('success-title').innerText = 'Acesso Encerrado';
                         document.getElementById('success-message').innerText = 'Este ativo já foi validado e seguiu para a próxima etapa operacional. Você pode acompanhar o progresso no seu Calendário.';
