@@ -233,53 +233,42 @@ async function loadContent() {
     const dashboard = document.querySelector('main');
     const projectFilter = document.getElementById('project-filter');
     
+    // DEFESA DE INTERFACE: Garantir que elementos básicos existam
+    const workflowDeadline = document.getElementById('workflow-deadline');
+    const workflowCard = document.getElementById('workflow-card');
+    const placeholder = document.getElementById('project-placeholder');
+
     if (!currentProject) {
-        // Se não tem projeto, vamos carregar TUDO (Requisito do Usuário)
-        const placeholder = document.getElementById('project-placeholder');
-        if (placeholder) placeholder.style.display = 'none'; // Esconder o aviso de "selecione"
-        
-        // Reset Workflow Card
-        document.getElementById('workflow-deadline').innerText = 'SELECIONE UM CLIENTE';
-        document.getElementById('workflow-card').style.background = 'rgba(168,85,247,0.1)';
-        document.getElementById('workflow-card').style.borderColor = 'rgba(168,85,247,0.3)';
+        if (placeholder) placeholder.style.display = 'none';
+        if (workflowDeadline) workflowDeadline.innerText = 'SELECIONE UM CLIENTE';
+        if (workflowCard) {
+            workflowCard.style.background = 'rgba(168,85,247,0.1)';
+            workflowCard.style.borderColor = 'rgba(168,85,247,0.3)';
+        }
     } else {
-        // Atualizar Card de Workflow com base no Contrato (SLA)
         const projectData = window.allProjects?.find(p => p.id === currentProject);
-        if (projectData) {
+        if (projectData && workflowDeadline && workflowCard) {
             const deadlineDay = projectData.next_cycle_day || 20;
             const now = new Date();
             const currentDay = now.getDate();
             const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toLocaleString('pt-BR', { month: 'long' }).toUpperCase();
             
-            const deadlineEl = document.getElementById('workflow-deadline');
-            const cardEl = document.getElementById('workflow-card');
+            workflowDeadline.innerText = `DEADLINE: DIA ${deadlineDay} (PARA ${nextMonth})`;
             
-            deadlineEl.innerText = `DEADLINE: DIA ${deadlineDay} (PARA ${nextMonth})`;
-            
-            // Lógica de Alerta Contratual
             if (currentDay > deadlineDay) {
-                cardEl.style.background = 'rgba(239, 68, 68, 0.2)';
-                cardEl.style.borderColor = '#ef4444';
-                cardEl.classList.add('pulse-red'); // Reusando a animação de pulso
+                workflowCard.style.background = 'rgba(239, 68, 68, 0.2)';
+                workflowCard.style.borderColor = '#ef4444';
+                workflowCard.classList.add('pulse-red');
             } else if (deadlineDay - currentDay <= 3) {
-                cardEl.style.background = 'rgba(245, 158, 11, 0.2)';
-                cardEl.style.borderColor = '#f59e0b';
-                cardEl.classList.remove('pulse-red');
+                workflowCard.style.background = 'rgba(245, 158, 11, 0.2)';
+                workflowCard.style.borderColor = '#f59e0b';
+                workflowCard.classList.remove('pulse-red');
             } else {
-                cardEl.style.background = 'rgba(168,85,247,0.1)';
-                cardEl.style.borderColor = 'rgba(168,85,247,0.3)';
-                cardEl.classList.remove('pulse-red');
+                workflowCard.style.background = 'rgba(168,85,247,0.1)';
+                workflowCard.style.borderColor = 'rgba(168,85,247,0.3)';
+                workflowCard.classList.remove('pulse-red');
             }
         }
-        
-        const placeholder = document.getElementById('project-placeholder');
-        if (placeholder) placeholder.style.display = 'none';
-        
-        const copyBtn = document.getElementById('btn-copy-portal');
-        if (copyBtn) copyBtn.style.display = 'flex';
-        
-        const sendBtn = document.getElementById('btn-send-approval');
-        if (sendBtn) sendBtn.style.display = 'flex';
     }
 
     // (Removido o bloco redundante)
