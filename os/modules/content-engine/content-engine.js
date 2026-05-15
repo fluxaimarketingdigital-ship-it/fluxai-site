@@ -478,7 +478,7 @@ function renderCalendar(containerId, contents, mode) {
             const statusColor = getStatusBg(c.status);
             
             // Filtro de visibilidade por modo
-            if (isStrategic && !['PLANEJAMENTO', 'APROVAÇÃO ESTRATÉGICA', 'AJUSTE', 'PRODUÇÃO'].includes(c.status)) return '';
+            if (isStrategic && !['PLANEJAMENTO', 'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO ESTRATÉGICA', 'AJUSTE', 'PRODUÇÃO'].includes(c.status)) return '';
             if (!isStrategic && !['PRODUÇÃO', 'REVISÃO INTERNA FINAL', 'APROVAÇÃO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
 
             return `
@@ -503,6 +503,7 @@ function renderCalendar(containerId, contents, mode) {
 function getStatusBg(status) {
     if (status === 'PLANEJAMENTO') return '#8b5cf6'; // Roxo
     if (status === 'REVISÃO GESTÃO') return '#8b5cf6'; // Roxo
+    if (status === 'APROVAÇÃO PLANEJAMENTO') return '#3b82f6'; // Azul
     if (status === 'APROVAÇÃO ESTRATÉGICA') return '#3b82f6'; // Azul
     if (status === 'AJUSTE') return '#ef4444'; // Vermelho
     if (status === 'PRODUÇÃO') return '#f59e0b'; // Amarelo/Laranja

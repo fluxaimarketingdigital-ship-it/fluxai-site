@@ -186,7 +186,10 @@
                     if (currentStatus === 'PLANEJAMENTO' || currentStatus === 'REVISÃO GESTÃO') {
                         document.getElementById('success-title').innerText = 'Em Revisão Estratégica';
                         document.getElementById('success-message').innerHTML = `Este conteúdo está passando por uma <b>Validação Estratégica Interna</b> pela nossa equipe de gestão para garantir a máxima qualidade. Em breve ele estará disponível para sua aprovação final.`;
-                    } else if (currentStatus === 'AJUSTE' || currentStatus === 'AJUSTE DE PRODUÇÃO' || (currentStatus === 'PRODUÇÃO' && !c.metadata?.final_asset_url)) {
+                    } else if (currentStatus === 'PRODUÇÃO') {
+                        document.getElementById('success-title').innerText = 'Em Produção';
+                        document.getElementById('success-message').innerHTML = `<b>Planejamento Aprovado!</b><br><br>Este conteúdo já foi enviado para nossa equipe técnica e está em fase de <b>Produção Audiovisual/Design</b>. Você receberá uma notificação assim que a arte final estiver pronta para sua validação.`;
+                    } else if (currentStatus === 'AJUSTE' || currentStatus === 'AJUSTE DE PRODUÇÃO') {
                         document.getElementById('success-title').innerText = 'Aguardando Ajustes';
                         const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Sua Solicitação:</strong><br>${c.internal_notes}</div>` : '';
                         document.getElementById('success-message').innerHTML = `Seus apontamentos já foram enviados para a nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes. ${feedbackMsg}`;

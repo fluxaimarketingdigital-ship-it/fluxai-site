@@ -130,10 +130,11 @@
                     if (nameEl) nameEl.innerText = 'Projeto não localizado.';
                 }
 
-                // 2. Ativos
+                // 2. Ativos (Filtrar para não mostrar itens internos)
                 const { data: assets, error: aErr } = await _supabaseClient.from('content_assets')
                     .select('*')
                     .eq('project_id', projectId)
+                    .not('status', 'in', '("PLANEJAMENTO","REVISÃO GESTÃO")')
                     .order('scheduled_at', { ascending: true });
 
                 renderCalendar(assets || []);
