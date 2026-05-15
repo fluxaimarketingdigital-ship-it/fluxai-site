@@ -583,13 +583,20 @@ window.openEditModal = async (id) => {
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">PRAZO DE APROVAÇÃO</label>
                     <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
                 </div>
-                <div style="display:flex; align-items:center; gap:10px; margin-top:20px;">
+                <div style="display:flex; align-items:center; gap:10px; margin-top:20px; grid-column: span 2; border-top: 1px solid #222; padding-top: 10px;">
+                    <input type="checkbox" id="edit-asset-internal-review">
+                    <label style="font-size:0.7rem; color:#8b5cf6; font-weight:800;">REVISAR ARTE FINAL ANTES DO CLIENTE?</label>
+                </div>
+                <div style="display:flex; align-items:center; gap:10px; margin-top:5px; grid-column: span 2;">
                     <input type="checkbox" id="edit-asset-risk">
                     <label style="font-size:0.7rem; color:var(--os-danger); font-weight:800;">RISCO OPERACIONAL</label>
                 </div>
             `;
             document.getElementById('edit-asset-art-final').parentElement.after(metaFields);
         }
+        
+        document.getElementById('edit-asset-internal-review').checked = c.metadata?.internal_review_required || false;
+        document.getElementById('edit-asset-internal-review').disabled = !isPlanning;
         
         document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || (c.status === 'PRODUÇÃO' ? 'Design' : 'Social Media');
         document.getElementById('edit-asset-version').value = c.metadata?.version || 'V1';
@@ -661,6 +668,7 @@ window.saveAssetEdit = async () => {
         const caption = document.getElementById('edit-asset-caption').value;
         const ref = document.getElementById('edit-asset-ref').value;
         const artFinal = document.getElementById('edit-asset-art-final')?.value;
+        const internalReview = document.getElementById('edit-asset-internal-review')?.checked;
         const responsible = document.getElementById('edit-asset-responsible')?.value;
         const version = document.getElementById('edit-asset-version')?.value;
         const deadline = document.getElementById('edit-asset-deadline')?.value;
@@ -672,6 +680,7 @@ window.saveAssetEdit = async () => {
         const newMetadata = currentAsset.metadata || {};
         newMetadata.reference_url = ref;
         newMetadata.final_asset_url = artFinal;
+        newMetadata.internal_review_required = internalReview;
         newMetadata.responsible = responsible;
         newMetadata.version = version;
         newMetadata.approval_deadline = deadline;
@@ -733,12 +742,17 @@ window.finalizeProduction = async (id) => {
             }
         };
 
-        if (confirm('Enviar para APROVAÇÃO FINAL do cliente?\n\n(Cancele para marcar como PRONTO e pular aprovação)')) {
-            updatePayload.status = 'APROVAÇÃO FINAL';
-            sLog('Produção finalizada e enviada ao cliente.');
+        const mustReviewInternally = c.metadata?.internal_review_required;
+
+        if (mustReviewInternally) {
+            alert('🔒 ESTE ATIVO EXIGE VALIDAÇÃO DA GESTÃO.\n\nA produção será enviada para a revisão interna antes de seguir para o cliente.');
+            updatePayload.status = 'REVISÃO GESTÃO';
         } else {
-            updatePayload.status = 'PRONTO';
-            sLog('Produção finalizada e marcada como PRONTO (Aprovação Pulada).');
+            if (confirm('Enviar para APROVAÇÃO FINAL do cliente?\n\n(Cancele para marcar como PRONTO e pular aprovação)')) {
+                updatePayload.status = 'APROVAÇÃO FINAL';
+            } else {
+                updatePayload.status = 'PRONTO';
+            }
         }
 
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', id);
@@ -930,15 +944,28 @@ window.forceReady = async (id) => {
 };
 
 window.approveManager = async (id) => {
-    const choice = confirm('Enviar esta pauta para APROVAÇÃO do cliente?\n\n(Cancele para enviar DIRETO PARA PRODUÇÃO)');
     try {
         const supabase = getSupabase();
-        const nextStatus = choice ? 'APROVAÇÃO ESTRATÉGICA' : 'PRODUÇÃO';
+        const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
+        
+        let nextStatus = 'APROVAÇÃO ESTRATÉGICA';
+        let logMsg = 'Pauta enviada ao cliente.';
+
+        if (c.status === 'REVISÃO GESTÃO' && c.metadata?.final_asset_url) {
+            // Se já tem arte e está em revisão da gestão, envia para aprovação final do cliente
+            nextStatus = 'APROVAÇÃO FINAL';
+            logMsg = 'Arte validada pela gestão e enviada para aprovação final do cliente.';
+        } else {
+            // Se for planejamento inicial
+            const choice = confirm('Enviar esta pauta para APROVAÇÃO do cliente?\n\n(Cancele para enviar DIRETO PARA PRODUÇÃO)');
+            nextStatus = choice ? 'APROVAÇÃO ESTRATÉGICA' : 'PRODUÇÃO';
+            logMsg = choice ? 'Pauta enviada ao cliente.' : 'Pauta aprovada internamente e enviada para PRODUÇÃO.';
+        }
         
         const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
         if (error) throw error;
         
-        sLog(choice ? 'Pauta enviada ao cliente.' : 'Pauta aprovada internamente e enviada para PRODUÇÃO.');
+        sLog(logMsg);
         loadContent();
     } catch (e) {
         alert('Erro ao validar pauta: ' + e.message);
