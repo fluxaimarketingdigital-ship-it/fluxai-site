@@ -27,7 +27,7 @@
         }
 
         .portal-header { 
-            padding: 60px 20px 40px; 
+            padding: 40px 20px 30px; 
             text-align: center; 
             border-bottom: 1px solid var(--os-border); 
             background: transparent;
@@ -37,9 +37,9 @@
         }
 
         .portal-header h1 { 
-            font-size: 2rem; 
+            font-size: 1.8rem; 
             letter-spacing: -1.5px; 
-            margin: 10px 0; 
+            margin: 5px 0; 
             color: #fff; 
             text-transform: uppercase; 
             font-weight: 900;
@@ -53,15 +53,15 @@
             align-items: center;
             justify-content: center;
             gap: 30px;
-            margin-top: 25px;
+            margin-top: 20px;
         }
 
         .nav-btn {
             background: var(--glass-bg);
             border: 1px solid var(--os-border);
             color: #fff;
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             cursor: pointer;
             display: flex;
@@ -73,19 +73,19 @@
         .nav-btn:hover { background: var(--os-primary); color: #000; transform: scale(1.1); border-color: var(--os-primary); }
 
         #current-month-display { 
-            font-size: 0.8rem; 
+            font-size: 0.75rem; 
             font-weight: 900; 
             color: var(--os-primary); 
             text-transform: uppercase; 
             letter-spacing: 3px; 
-            min-width: 180px; 
+            min-width: 160px; 
         }
 
         .calendar-grid {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 12px;
-            padding: 40px 20px;
+            gap: 10px;
+            padding: 20px;
             max-width: 1400px;
             margin: 0 auto;
             animation: fadeInUp 0.8s ease;
@@ -96,10 +96,10 @@
             backdrop-filter: blur(10px);
             -webkit-backdrop-filter: blur(10px);
             border: 1px solid var(--os-border);
-            padding: 12px;
+            padding: 10px;
             border-radius: 12px;
             position: relative;
-            min-height: 120px;
+            min-height: 100px;
             display: flex;
             flex-direction: column;
             transition: all 0.3s;
@@ -156,8 +156,8 @@
         <div style="color:var(--os-primary); font-weight:900; font-size:0.6rem; letter-spacing:4px; margin-bottom:10px; opacity: 0.8;">FLUXAI OS™</div>
         
         <h1 id="portal-title">Portal do Cliente</h1>
-        <p id="client-name" style="font-weight: 700; color: #eee; font-size: 0.9rem;">Sincronizando...</p>
-        <p id="client-profession" style="opacity: 0.5; margin-top: 2px;">Carregando perfil...</p>
+        <p id="client-name" style="font-weight: 700; color: #eee; font-size: 1rem; margin-top: 10px;">Aguarde...</p>
+        <p id="client-profession" style="opacity: 0.5; margin-top: 5px; font-size: 0.7rem; letter-spacing: 1px;">SINCRONIZANDO ECOSSISTEMA DIGITAL...</p>
 
         <div class="month-nav">
             <button class="nav-btn" onclick="changeMonth(-1)"><i class="fa-solid fa-chevron-left"></i></button>
@@ -190,11 +190,12 @@
                 const { data: proj } = await _supabaseClient.from('projects').select('name, company_name, metadata').eq('id', projectId).single();
                 
                 if (proj) {
-                    document.getElementById('client-name').innerText = proj.name || proj.company_name;
-                    const profession = proj.metadata?.onboarding?.profession || 'Estratégia Digital';
-                    document.getElementById('client-profession').innerText = profession;
+                    document.getElementById('client-name').innerText = (proj.name || proj.company_name).toUpperCase();
+                    const profession = proj.metadata?.onboarding?.profession || 'Estratégia Institucional';
+                    document.getElementById('client-profession').innerText = profession.toUpperCase();
                 } else {
-                    document.getElementById('client-name').innerText = 'Projeto não localizado';
+                    document.getElementById('client-name').innerText = 'PROJETO FLUXAI OS™';
+                    document.getElementById('client-profession').innerText = 'SINCRONIZAÇÃO DE ATIVOS';
                 }
 
                 const { data: assets } = await _supabaseClient.from('content_assets')
