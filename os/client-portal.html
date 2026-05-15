@@ -84,13 +84,23 @@
 
             const supabase = getSupabase();
             
-            // Buscar Projeto
-            const { data: project } = await supabase.from('projects').select('*').eq('id', projectId).single();
-            if (project) {
-                const now = new Date();
-                const currentMonth = now.toLocaleString('pt-BR', { month: 'long' });
-                document.getElementById('portal-title').innerText = `Fluxo Estratégico: ${currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)}`;
-                document.getElementById('client-name').innerText = project.company_name || project.name || 'Cliente FluxAI';
+            // Buscar Projeto (com tratamento de erro para RLS ou rede)
+            try {
+                const { data: projData } = await supabase.from('projects').select('company_name, name').eq('id', projectId);
+                const project = projData && projData.length > 0 ? projData[0] : null;
+                
+                if (project) {
+                    const now = new Date();
+                    const currentMonth = now.toLocaleString('pt-BR', { month: 'long' });
+                    const titleEl = document.getElementById('portal-title');
+                    if (titleEl) titleEl.innerText = `Fluxo Estratégico: ${currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)}`;
+                    
+                    const nameEl = document.getElementById('client-name');
+                    if (nameEl) nameEl.innerText = `${project.company_name || project.name} | Planejamento`;
+                }
+            } catch (err) {
+                console.warn('[PORTAL] Erro ao carregar nome do projeto:', err);
+                document.getElementById('client-name').innerText = 'Cronograma de Conteúdo';
             }
 
             // Buscar Ativos
