@@ -62,17 +62,15 @@
         .btn-return {
             background: var(--os-primary);
             color: #000;
-            padding: 18px 0; /* Remover padding lateral para centralizar via flex */
+            padding: 18px 20px;
             border: none;
             border-radius: 8px;
             font-weight: 800;
             font-size: 0.9rem;
             cursor: pointer;
-            margin: 40px auto 0 auto; /* Centralizar o próprio botão se necessário */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
+            margin: 40px auto 0 auto;
+            text-align: center;
+            display: block;
             transition: all 0.3s;
             width: 100%;
             max-width: 320px;
@@ -383,7 +381,7 @@
                             const btn = document.createElement('button');
                             btn.id = 'btn-return-portal';
                             btn.className = 'btn-return';
-                            btn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
+                            btn.innerHTML = 'VOLTAR AO CALENDÁRIO';
                             btn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
                             actionsContainer.appendChild(btn);
                         }
@@ -510,7 +508,7 @@
                 document.getElementById('content-data').style.display = 'block';
 
                 const showFinalSuccess = (title, message) => {
-                    document.getElementById('content-data').style.display = 'none';
+                    document.getElementById('main-ui').style.display = 'none';
                     document.getElementById('success-title').innerText = title;
                     document.getElementById('success-message').innerText = message;
                     
@@ -518,7 +516,7 @@
                     actionsContainer.innerHTML = '';
                     const btnReturn = document.createElement('button');
                     btnReturn.className = 'btn-return';
-                    btnReturn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
+                    btnReturn.innerHTML = 'VOLTAR AO CALENDÁRIO';
                     btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
                     actionsContainer.appendChild(btnReturn);
                     
