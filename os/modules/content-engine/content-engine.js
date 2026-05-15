@@ -537,6 +537,33 @@ window.openEditModal = async (id) => {
         // Injetar campos de metadados no container específico
         const metaGrid = document.getElementById('edit-asset-meta-fields');
         if (metaGrid) {
+        // Renderizar Roteiro e Histórico
+        const history = c.metadata?.history || [];
+        const historyHtml = history.length > 0 ? history.map(h => `
+            <div style="padding:10px; border-bottom:1px solid #222; font-size:0.7rem;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                    <b style="color:${h.type === 'CLIENT' ? '#60a5fa' : '#8b5cf6'}">${h.type === 'CLIENT' ? '📌 AJUSTE CLIENTE' : '🛡️ AJUSTE ESTRATÉGICO'}</b>
+                    <span style="opacity:0.5;">${new Date(h.date).toLocaleString('pt-BR')}</span>
+                </div>
+                <div style="color:#eee; line-height:1.4;">${h.note}</div>
+                <div style="font-size:0.6rem; opacity:0.4; margin-top:3px;">Por: ${h.author}</div>
+            </div>
+        `).join('') : '<div style="padding:40px; text-align:center; opacity:0.3; font-size:0.7rem;">Sem histórico de ajustes até o momento.</div>';
+
+        document.getElementById('edit-asset-roadmap-container').innerHTML = `
+            <div style="display:grid; grid-template-columns: 1.5fr 1fr; gap:20px;">
+                <div>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">ROTEIRO ESTRATÉGICO (PAUTA)</label>
+                    <textarea id="edit-asset-caption" style="width:100%; height:250px; background:#111; border:1px solid #333; color:#fff; padding:15px; border-radius:4px; font-family:inherit; font-size:0.85rem; line-height:1.6;">${c.caption || ''}</textarea>
+                </div>
+                <div>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">HISTÓRICO DE AJUSTES</label>
+                    <div id="edit-asset-history" style="height:250px; background:#050505; border:1px solid #222; border-radius:4px; overflow-y:auto; scrollbar-width: thin;">
+                        ${historyHtml}
+                    </div>
+                </div>
+            </div>
+        `;
             metaGrid.style.display = 'grid';
             metaGrid.style.gridTemplateColumns = '1fr 1fr';
             metaGrid.style.gap = '15px';
@@ -716,13 +743,32 @@ window.sendToStrategicOrFinal = async (id) => {
 
 window.strategicInternalAction = async (id, action) => {
     try {
+        const user = await OS_AUTH.check();
         const supabase = getSupabase();
+        const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
+        
         let nextStatus = action === 'APPROVE' ? 'APROVAÇÃO FINAL' : 'PRODUÇÃO';
+        let newHistory = c.metadata?.history || [];
         
         if (action === 'REJECT') {
             const note = prompt('Qual ajuste deve ser feito na produção?');
             if (!note) return;
-            await supabase.from('content_assets').update({ internal_notes: note }).eq('id', id);
+            
+            newHistory.push({
+                date: new Date().toISOString(),
+                type: 'STRATEGIC',
+                author: user?.name || 'Gestão FluxAI',
+                note: note
+            });
+
+            await supabase.from('content_assets').update({ 
+                internal_notes: note,
+                metadata: { ...c.metadata, history: newHistory }
+            }).eq('id', id);
+        } else {
+            await supabase.from('content_assets').update({ 
+                metadata: { ...c.metadata, history: newHistory }
+            }).eq('id', id);
         }
 
         const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);

@@ -58,7 +58,7 @@
         <div class="header">
             <div>
                 <h1>FluxAI <span>OS™</span></h1>
-                <p style="font-size:0.7rem; opacity:0.5; margin:5px 0 0 0;">PLANEJAMENTO ESTRATÉGICO</p>
+                <p style="font-size:0.7rem; opacity:0.5; margin:5px 0 0 0;" id="portal-subtitle">APROVAÇÃO DE PLANEJAMENTO</p>
             </div>
             <div id="status-badge-container">
                 <!-- Status Badge Injected -->
@@ -96,7 +96,7 @@
             <div id="ref-link-container"></div>
 
             <div class="content-body">
-                <h2>Roteiro Estratégico</h2>
+                <h2 id="asset-body-title">Roteiro Estratégico</h2>
                 <div id="asset-caption" style="white-space: pre-wrap;"></div>
             </div>
 
@@ -177,22 +177,24 @@
 
                 // BLOQUEIO DE ACESSO PÓS-APROVAÇÃO OU EM REVISÃO
                 const currentStatus = (c.status || '').toUpperCase();
-                const allowedStatus = ['APROVAÇÃO ESTRATÉGICA', 'APROVAÇÃO FINAL', 'PLANEJAMENTO'];
+                const allowedStatus = ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'PLANEJAMENTO'];
                 
                 if (!allowedStatus.includes(currentStatus)) {
                     document.getElementById('loading-state').style.display = 'none';
                     document.getElementById('main-ui').style.display = 'none';
                     
-                    if (currentStatus === 'AJUSTE' || currentStatus === 'REVISÃO INTERNA' || (currentStatus === 'PRODUÇÃO' && !c.metadata?.final_asset_url)) {
+                    if (currentStatus === 'APROVAÇÃO ESTRATÉGICA') {
+                        document.getElementById('success-title').innerText = 'Em Revisão Estratégica';
+                        document.getElementById('success-message').innerHTML = `Este conteúdo está passando por uma <b>Validação Estratégica Interna</b> pela nossa equipe de gestão para garantir a máxima qualidade. Em breve ele estará disponível para sua aprovação final.`;
+                    } else if (currentStatus === 'AJUSTE' || currentStatus === 'REVISÃO INTERNA' || (currentStatus === 'PRODUÇÃO' && !c.metadata?.final_asset_url)) {
                         document.getElementById('success-title').innerText = 'Aguardando Revisão';
                         const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Sua Solicitação:</strong><br>${c.internal_notes}</div>` : '';
                         document.getElementById('success-message').innerHTML = `Seus apontamentos já foram enviados para a nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes. ${feedbackMsg}`;
                     } else {
                         document.getElementById('success-title').innerText = 'Acesso Encerrado';
-                        document.getElementById('success-message').innerText = 'Este planejamento já foi validado e seguiu para a Etapa de Produção Operacional. Você pode acompanhar o progresso no seu Calendário.';
+                        document.getElementById('success-message').innerText = 'Este ativo já foi validado e seguiu para a próxima etapa operacional. Você pode acompanhar o progresso no seu Calendário.';
                     }
                     
-                    // Adicionar botão de retorno se não existir
                     const actionsContainer = document.getElementById('success-actions');
                     if (actionsContainer && !document.getElementById('btn-return-portal')) {
                         const btn = document.createElement('button');
@@ -202,11 +204,7 @@
                         btn.style.color = '#000';
                         btn.style.width = '100%';
                         btn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
-                        
-                        btn.onclick = () => {
-                            window.location.href = `/os/client-portal.html?project_id=${c.project_id}`;
-                        };
-                        
+                        btn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
                         actionsContainer.appendChild(btn);
                     }
 
@@ -215,26 +213,31 @@
                 }
 
                 // DETECTAR SE É VALIDAÇÃO DE ARTE OU ESTRATÉGIA
-                const isArtValidation = currentStatus === 'APROVAÇÃO FINAL';
+                const isFinalArt = currentStatus === 'APROVAÇÃO FINAL';
 
-                // ACESSO PERMITIDO - MOSTRAR UI
                 document.getElementById('main-ui').style.display = 'block';
 
-                if (isArtValidation) {
-                    document.querySelector('h1').innerHTML = 'FluxAI <span>OS™</span>';
-                    document.querySelector('p[style*="font-size:0.7rem"]').innerText = 'APROVAÇÃO DE ARTE FINAL';
+                if (isFinalArt) {
+                    document.getElementById('portal-subtitle').innerText = 'APROVAÇÃO DE ARTE FINAL';
+                    document.getElementById('asset-body-title').innerText = 'Arte Finalizada';
+                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE FINAL';
+                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
+                } else {
+                    document.getElementById('portal-subtitle').innerText = 'APROVAÇÃO DE PLANEJAMENTO';
+                    document.getElementById('asset-body-title').innerText = 'Roteiro Estratégico';
+                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-check"></i> APROVAR PLANEJAMENTO';
+                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-xmark"></i> SOLICITAR REVISÃO';
                 }
 
-                // Proteção contra dados malformados
                 let prefix = 'POST', obj = 'Estratégia';
                 try {
                     const titleParts = formatClientTitle(c.title);
                     prefix = titleParts.prefix;
                     obj = titleParts.obj;
-                } catch (e) { console.warn('[APPROVAL] Meta parsing failed:', e); }
+                } catch (e) {}
 
-                document.getElementById('meta-obj').innerText = obj || 'Estratégia';
-                document.getElementById('meta-format').innerText = prefix || 'POST';
+                document.getElementById('meta-obj').innerText = obj;
+                document.getElementById('meta-format').innerText = prefix;
                 
                 const pubDate = new Date(c.scheduled_at);
                 const appDeadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
@@ -244,30 +247,18 @@
                 const deadlineEl = document.getElementById('meta-date');
                 if (appDeadline) {
                     deadlineEl.innerText = appDeadline.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
-                    
-                    // LÓGICA DE PULSO: Sempre chamativo se for urgente
                     const now = new Date();
-                    const diffHours = (appDeadline - now) / (1000 * 60 * 60);
-                    
-                    if (diffHours < 24) {
-                        deadlineEl.style.color = '#ef4444'; // Vermelho se estiver muito perto
+                    if ((appDeadline - now) / (1000 * 60 * 60) < 24) {
+                        deadlineEl.style.color = '#ef4444';
                         deadlineEl.classList.add('deadline-alert');
-                    } else {
-                        deadlineEl.style.color = '#f59e0b'; // Amarelo/Laranja por padrão
-                        deadlineEl.classList.add('deadline-alert'); // Pulsar sempre para chamar atenção
                     }
                 } else {
                     deadlineEl.innerText = 'S/ Prazo';
-                    deadlineEl.classList.remove('deadline-alert');
                 }
                 
-                // EXIBIÇÃO DE VERSÃO
                 document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
-                // MOSTRAR APENAS O ROTEIRO (SEM LEGENDA/HASHTAGS NA ETAPA 1)
                 let roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
-                
-                // Formatação Elegante do Roteiro
                 roadmap = roadmap
                     .replace(/🎯 OBJETIVO:/g, '<b style="color:var(--os-primary);">🎯 OBJETIVO:</b>')
                     .replace(/🎬 HOOK:/g, '<br><b style="color:var(--os-primary);">🎬 HOOK:</b>')
@@ -275,42 +266,30 @@
                     .replace(/✨ CTA:/g, '<br><b style="color:var(--os-primary);">✨ CTA:</b>')
                     .replace(/\n/g, '<br>');
                 
-                if (isArtValidation && c.metadata?.final_asset_url) {
+                if (isFinalArt && c.metadata?.final_asset_url) {
                     document.getElementById('asset-caption').innerHTML = `
                         <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 25px;">
                             <i class="fa-solid fa-file-circle-check" style="font-size: 3rem; color: #8b5cf6; margin-bottom: 15px;"></i>
                             <h3 style="color: #fff; margin-bottom: 10px;">A Arte Final está pronta!</h3>
-                            <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px;">Clique no botão abaixo para visualizar o arquivo final em alta resolução.</p>
+                            <p style="font-size: 0.8rem; opacity: 0.7; margin-bottom: 20px;">Visualize o arquivo antes de aprovar para postagem.</p>
                             <a href="${c.metadata.final_asset_url}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; padding: 12px 30px;">
                                 <i class="fa-solid fa-eye"></i> VISUALIZAR ARTE FINAL
                             </a>
                         </div>
                         <div style="opacity: 0.5; font-size: 0.8rem;">
-                            <strong>Lembrete do Planejamento:</strong><br>
+                            <strong>Roteiro Aprovado:</strong><br>
                             ${roadmap}
                         </div>
                     `;
-                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE PARA POSTAGEM';
-                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
                 } else {
-                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-check"></i> APROVAR PLANEJAMENTO';
-                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-xmark"></i> SOLICITAR REVISÃO';
                     document.getElementById('asset-caption').innerHTML = roadmap;
                 }
                 
-                // LINK DE REFERÊNCIA (Oculto para o cliente por segurança operacional)
-                const refBtn = document.getElementById('ref-link-container');
-                if (refBtn) refBtn.innerHTML = '';
-
                 const badge = document.getElementById('status-badge-container');
-                if (c.status === 'APROVAÇÃO FINAL') {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">🟣 AGUARDANDO APROVAÇÃO FINAL</span>`;
-                } else if (c.status === 'PRODUÇÃO') {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(245,158,11,0.2); color:#f59e0b; border:1px solid #f59e0b;">🟡 EM PRODUÇÃO</span>`;
-                } else if (c.status === 'APROVAÇÃO ESTRATÉGICA' || c.status === 'PLANEJAMENTO') {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">🟢 AGUARDANDO APROVAÇÃO</span>`;
-                } else if (c.status === 'AJUSTE') {
-                    badge.innerHTML = `<span class="status-badge" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid #ef4444;">🔴 EM REVISÃO</span>`;
+                if (currentStatus === 'APROVAÇÃO FINAL') {
+                    badge.innerHTML = `<span class="status-badge" style="background:rgba(139, 92, 246,0.2); color:#a78bfa; border:1px solid #8b5cf6;">AGUARDANDO ARTE FINAL</span>`;
+                } else {
+                    badge.innerHTML = `<span class="status-badge" style="background:rgba(16,185,129,0.2); color:#10b981; border:1px solid #10b981;">AGUARDANDO PLANEJAMENTO</span>`;
                 }
 
                 const checks = ADJUSTMENT_CHECKS[prefix] || ADJUSTMENT_CHECKS['DEFAULT'];
@@ -325,29 +304,17 @@
 
                 document.getElementById('btn-approve-action').onclick = async () => {
                     const btn = document.getElementById('btn-approve-action');
-                    const originalText = btn.innerHTML;
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
                     btn.disabled = true;
 
                     try {
-                        const status = (c.status || '').toUpperCase();
-                        const isStrategic = status === 'APROVAÇÃO ESTRATÉGICA';
-                        const isPlanning = status === 'PLANEJAMENTO';
-                        const hasArt = !!c.metadata?.final_asset_url;
-                        
-                        let nextStatus = 'PRONTO';
-                        
-                        if (isStrategic) {
-                            nextStatus = hasArt ? 'APROVAÇÃO FINAL' : 'PRODUÇÃO';
-                        } else if (isPlanning) {
-                            nextStatus = 'PRODUÇÃO';
-                        }
+                        let nextStatus = 'PRODUÇÃO';
+                        if (currentStatus === 'APROVAÇÃO FINAL') nextStatus = 'PRONTO';
                         
                         const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
                         if (error) throw error;
                         
                         document.getElementById('main-ui').style.display = 'none';
-                        // Adicionar botão de retorno no sucesso
                         const actionsContainer = document.getElementById('success-actions');
                         if (actionsContainer && !document.getElementById('btn-return-portal-success')) {
                             const btnReturn = document.createElement('button');
@@ -360,10 +327,19 @@
                             btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
                             actionsContainer.appendChild(btnReturn);
                         }
+                        
+                        if (nextStatus === 'PRONTO') {
+                            document.getElementById('success-title').innerText = 'Conteúdo Finalizado!';
+                            document.getElementById('success-message').innerText = 'A arte foi aprovada e já está pronta para publicação conforme o cronograma.';
+                        } else {
+                            document.getElementById('success-title').innerText = 'Planejamento Aprovado!';
+                            document.getElementById('success-message').innerText = 'Excelente. Esta pauta foi enviada para a Execução Operacional.';
+                        }
+                        
                         document.getElementById('success-ui').style.display = 'block';
                     } catch (err) {
                         alert('Erro: ' + err.message);
-                        btn.innerHTML = originalText;
+                        btn.innerHTML = 'Tentar Novamente';
                         btn.disabled = false;
                     }
                 };
@@ -374,7 +350,6 @@
 
                 document.getElementById('btn-submit-feedback').onclick = async () => {
                     const btn = document.getElementById('btn-submit-feedback');
-                    const originalText = btn.innerHTML;
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
                     btn.disabled = true;
 
@@ -384,14 +359,22 @@
                         const fullNote = `REVISÃO SOLICITADA | ITENS: ${selected.join(', ')} | OBS: ${note}`;
                         
                         const currentCycle = c.metadata?.revision_cycle || 1;
-                        const isFinalArtPhase = c.status === 'APROVAÇÃO FINAL';
-                        const newStatus = isFinalArtPhase ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
+                        const newHistory = c.metadata?.history || [];
+                        newHistory.push({
+                            date: new Date().toISOString(),
+                            type: 'CLIENT',
+                            author: 'Cliente',
+                            note: fullNote
+                        });
+
+                        const newStatus = (currentStatus === 'APROVAÇÃO FINAL') ? 'AJUSTE DE PRODUÇÃO' : 'PLANEJAMENTO';
 
                         const { error } = await supabase.from('content_assets').update({ 
                             status: newStatus, 
                             internal_notes: fullNote,
                             metadata: {
                                 ...c.metadata,
+                                history: newHistory,
                                 revision_cycle: currentCycle + 1,
                                 version: `V${currentCycle + 1}`,
                                 risk: true
@@ -402,11 +385,10 @@
 
                         document.getElementById('main-ui').style.display = 'none';
                         document.getElementById('success-title').innerText = 'Ajuste Solicitado';
-                        document.getElementById('success-message').innerText = 'Seus apontamentos foram enviados para nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes.';
+                        document.getElementById('success-message').innerText = 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.';
                         document.getElementById('success-ui').style.display = 'block';
                     } catch (err) {
                         alert('Erro: ' + err.message);
-                        btn.innerHTML = originalText;
                         btn.disabled = false;
                     }
                 };
