@@ -865,8 +865,9 @@ window.approvePendingAssets = async () => {
         if (error) throw error;
         
         // 2. Gerar link do portal e texto de compartilhamento
-        const portalUrl = `https://fluxaidigital.com.br/os/client-portal?project_id=${currentProject}`;
-        document.getElementById('share-portal-link').value = portalUrl;
+        const portalUrl = `https://fluxaidigital.com.br/os/client-portal.html?project_id=${currentProject}`;
+        const shareLinkEl = document.getElementById('share-portal-link');
+        if (shareLinkEl) shareLinkEl.value = portalUrl;
         
         const { data: proj } = await supabase.from('projects').select('name').eq('id', currentProject).single();
         const { data: assets } = await supabase.from('content_assets')
@@ -875,16 +876,22 @@ window.approvePendingAssets = async () => {
             .eq('status', 'APROVAÇÃO PLANEJAMENTO')
             .limit(10);
 
-        let waText = `🚀 *NOVO PLANEJAMENTO DISPONÍVEL - ${proj.name}*\n\nOlá! Acabamos de liberar o novo fluxo estratégico de conteúdo. \n\nAcesse agora para validar roteiros e prazos:\n🔗 ${portalUrl}\n\n*Resumo do Lote:*\n`;
-        assets.forEach(a => { waText += `• ${a.title}\n`; });
+        let waText = `🚀 *NOVO PLANEJAMENTO DISPONÍVEL - ${proj?.name || 'Projeto'}*\n\nOlá! Acabamos de liberar o novo fluxo estratégico de conteúdo. \n\nAcesse agora para validar roteiros e prazos:\n🔗 ${portalUrl}\n\n*Resumo do Lote:*\n`;
+        if (assets && assets.length > 0) {
+            assets.forEach(a => { waText += `• ${a.title}\n`; });
+        }
         waText += `\n#FluxAI #EstratégiaDigital #HighTicket`;
         
-        document.getElementById('share-whatsapp-text').value = waText;
-        document.getElementById('modal-share-assets').style.display = 'flex';
+        const waTextEl = document.getElementById('share-whatsapp-text');
+        if (waTextEl) waTextEl.value = waText;
+
+        const modal = document.getElementById('modal-share-assets');
+        if (modal) modal.style.display = 'flex';
 
         sLog('Pautas enviadas para Aprovação.');
         loadContent();
     } catch (e) {
+        console.error('Erro ao enviar pautas:', e);
         alert('Erro ao enviar pautas: ' + e.message);
     }
 };
