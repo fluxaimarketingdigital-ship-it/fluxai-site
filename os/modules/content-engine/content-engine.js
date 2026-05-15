@@ -591,17 +591,21 @@ window.openEditModal = async (id) => {
         
         document.getElementById('edit-asset-caption').value = c.caption || '';
 
-        metaGrid.style.display = 'grid';
-        metaGrid.style.gridTemplateColumns = '1fr 1fr';
-        metaGrid.style.gap = '15px';
-        metaGrid.style.marginTop = '20px';
+            metaGrid.style.display = 'grid';
+            metaGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            metaGrid.style.gap = '20px';
+            metaGrid.style.marginTop = '25px';
+            metaGrid.style.padding = '20px';
+            metaGrid.style.background = 'rgba(255,255,255,0.02)';
+            metaGrid.style.borderRadius = '8px';
+            metaGrid.style.border = '1px solid rgba(255,255,255,0.05)';
 
             const isLocked = c.status !== 'PLANEJAMENTO' && c.status !== 'AJUSTE';
 
             metaGrid.innerHTML = `
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">RESPONSÁVEL</label>
-                    <select id="edit-asset-responsible" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONSÁVEL</label>
+                    <select id="edit-asset-responsible" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                         <option value="Design">Design</option>
                         <option value="Audiovisual">Audiovisual</option>
                         <option value="Estrategista">Estrategista</option>
@@ -610,8 +614,8 @@ window.openEditModal = async (id) => {
                     </select>
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">CICLO DE AJUSTE</label>
-                    <select id="edit-asset-version" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">CICLO DE AJUSTE</label>
+                    <select id="edit-asset-version" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                         <option value="V1">V1 - Inicial</option>
                         <option value="V2">V2 - Ajuste 1</option>
                         <option value="V3">V3 - Ajuste 2 (CRÍTICO)</option>
@@ -619,17 +623,18 @@ window.openEditModal = async (id) => {
                     </select>
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">PRAZO DE APROVAÇÃO</label>
-                    <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRAZO DE APROVAÇÃO</label>
+                    <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                 </div>
-                <div style="display:flex; flex-direction:column; gap:10px; justify-content: flex-end;">
-                     <div style="display:flex; align-items:center; gap:8px; opacity: ${isLocked ? '0.5' : '1'};">
-                        <input type="checkbox" id="edit-asset-strategic-req" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.strategic_approval_required ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
-                        <label for="edit-asset-strategic-req" style="font-size:0.6rem; color:#3b82f6; font-weight:800; cursor:pointer;">EXIGIR APROVAÇÃO ESTRATÉGICA?</label>
+                
+                <div style="grid-column: span 3; display:flex; gap:30px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.05); margin-top:5px;">
+                     <div style="display:flex; align-items:center; gap:10px; opacity: ${isLocked ? '0.5' : '1'};">
+                        <input type="checkbox" id="edit-asset-strategic-req" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.strategic_approval_required ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
+                        <label for="edit-asset-strategic-req" style="font-size:0.65rem; color:#3b82f6; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">EXIGIR APROVAÇÃO ESTRATÉGICA?</label>
                      </div>
-                     <div style="display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" id="edit-asset-risk" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.risk ? 'checked' : ''}>
-                        <label for="edit-asset-risk" style="font-size:0.6rem; color:var(--os-danger); font-weight:800; cursor:pointer;">RISCO OPERACIONAL</label>
+                     <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" id="edit-asset-risk" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.risk ? 'checked' : ''}>
+                        <label for="edit-asset-risk" style="font-size:0.65rem; color:var(--os-danger); font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">RISCO OPERACIONAL</label>
                      </div>
                 </div>
             `;
