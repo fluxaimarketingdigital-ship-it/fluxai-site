@@ -351,6 +351,22 @@ body.os-mode {
 /* MODAL FIXES */
 .os-modal {
     backdrop-filter: blur(10px);
+    overflow-y: auto;
+    padding: 40px 0;
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.85);
+    z-index: 9999;
+}
+
+.os-modal .os-widget {
+    margin: auto;
+    max-width: 900px;
+    width: 95%;
 }
 
 .edit-modal-grid {
