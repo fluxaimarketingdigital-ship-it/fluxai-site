@@ -569,7 +569,7 @@ window.openEditModal = async (id) => {
                     <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
                 </div>
                 <div style="display:flex; flex-direction:column; gap:10px; justify-content: flex-end;">
-                     <div style="display:flex; align-items:center; gap:8px;">
+                     <div style="display:flex; align-items:center; gap:8px; opacity: ${isLocked ? '0.5' : '1'};">
                         <input type="checkbox" id="edit-asset-strategic-req" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.strategic_approval_required ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
                         <label for="edit-asset-strategic-req" style="font-size:0.6rem; color:#3b82f6; font-weight:800; cursor:pointer;">EXIGIR APROVAÇÃO ESTRATÉGICA?</label>
                      </div>
@@ -616,7 +616,7 @@ window.openEditModal = async (id) => {
             footerActions.innerHTML = `
                 ${(c.status === 'PRODUÇÃO' || c.status === 'AJUSTE DE PRODUÇÃO') ? `
                     <button class="btn-mini" onclick="window.sendToStrategicOrFinal('${c.id}')" style="padding:10px 20px; background:#8b5cf6; color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
-                        <i class="fa-solid fa-paper-plane"></i> ${hasStrategic ? 'Enviar para Aprovação Estratégica' : 'Enviar para Aprovação Final'}
+                        <i class="fa-solid fa-paper-plane"></i> ${hasStrategic ? 'Finalizar e Enviar p/ Aprovação Estratégica' : 'Finalizar e Enviar'}
                     </button>
                 ` : ''}
                 ${c.status === 'APROVAÇÃO ESTRATÉGICA' ? `
