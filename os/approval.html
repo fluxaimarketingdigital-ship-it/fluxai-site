@@ -100,9 +100,9 @@
                 <div id="asset-caption" style="white-space: pre-wrap;"></div>
             </div>
 
-            <div class="actions">
+            <div class="actions" id="main-actions">
                 <button class="btn btn-reject" id="btn-reject-action">
-                    <i class="fa-solid fa-xmark"></i> SOLICITAR REVISÃO
+                    <i class="fa-solid fa-xmark"></i> SOLICITAR AJUSTE
                 </button>
                 <button class="btn btn-approve" id="btn-approve-action">
                     <i class="fa-solid fa-check"></i> APROVAR PLANEJAMENTO
@@ -115,7 +115,7 @@
                     <!-- Checkboxes Injected -->
                 </div>
                 <textarea id="feedback-text" rows="4" placeholder="Outras observações estratégicas..."></textarea>
-                <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR SOLICITAÇÃO DE REVISÃO</button>
+                <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR SOLICITAÇÃO DE AJUSTE</button>
             </div>
         </div>
     </div>
@@ -183,11 +183,10 @@
                     document.getElementById('loading-state').style.display = 'none';
                     document.getElementById('main-ui').style.display = 'none';
                     
-                    if (currentStatus === 'APROVAÇÃO ESTRATÉGICA') {
                         document.getElementById('success-title').innerText = 'Em Revisão Estratégica';
                         document.getElementById('success-message').innerHTML = `Este conteúdo está passando por uma <b>Validação Estratégica Interna</b> pela nossa equipe de gestão para garantir a máxima qualidade. Em breve ele estará disponível para sua aprovação final.`;
-                    } else if (currentStatus === 'AJUSTE' || currentStatus === 'REVISÃO INTERNA' || (currentStatus === 'PRODUÇÃO' && !c.metadata?.final_asset_url)) {
-                        document.getElementById('success-title').innerText = 'Aguardando Revisão';
+                    } else if (currentStatus === 'AJUSTE' || currentStatus === 'AJUSTE DE PRODUÇÃO' || (currentStatus === 'PRODUÇÃO' && !c.metadata?.final_asset_url)) {
+                        document.getElementById('success-title').innerText = 'Aguardando Ajustes';
                         const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(245,158,11,0.1); border:1px solid rgba(245,158,11,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:var(--os-primary);">Sua Solicitação:</strong><br>${c.internal_notes}</div>` : '';
                         document.getElementById('success-message').innerHTML = `Seus apontamentos já foram enviados para a nossa equipe técnica. No momento, o planejamento está sendo ajustado conforme suas diretrizes. ${feedbackMsg}`;
                     } else {
@@ -223,10 +222,10 @@
                     document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE FINAL';
                     document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
                 } else {
-                    document.getElementById('portal-subtitle').innerText = 'APROVAÇÃO DE PLANEJAMENTO';
-                    document.getElementById('asset-body-title').innerText = 'Roteiro Estratégico';
-                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-check"></i> APROVAR PLANEJAMENTO';
-                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-xmark"></i> SOLICITAR REVISÃO';
+                    const isFinalArt = currentStatus === 'APROVAÇÃO FINAL' || currentStatus === 'AJUSTE DE PRODUÇÃO';
+                    document.getElementById('asset-body-title').innerText = isFinalArt ? 'Aprovação de Arte Final' : 'Aprovação de Planejamento';
+                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-xmark"></i> SOLICITAR AJUSTE';
+                    document.getElementById('btn-submit-feedback').innerHTML = isFinalArt ? 'ENVIAR SOLICITAÇÃO DE AJUSTE' : 'ENVIAR SOLICITAÇÃO DE AJUSTE';
                 }
 
                 let prefix = 'POST', obj = 'Estratégia';
@@ -302,6 +301,27 @@
                 document.getElementById('loading-state').style.display = 'none';
                 document.getElementById('content-data').style.display = 'block';
 
+                const showFinalSuccess = (title, msg) => {
+                    document.getElementById('main-ui').style.display = 'none';
+                    document.getElementById('success-title').innerText = title;
+                    document.getElementById('success-message').innerText = msg;
+                    
+                    const actionsContainer = document.getElementById('success-actions');
+                    if (actionsContainer && !document.getElementById('btn-return-portal-success')) {
+                        const btnReturn = document.createElement('button');
+                        btnReturn.id = 'btn-return-portal-success';
+                        btnReturn.className = 'btn btn-approve';
+                        btnReturn.style.background = 'var(--os-primary)';
+                        btnReturn.style.color = '#000';
+                        btnReturn.style.width = '100%';
+                        btnReturn.style.marginTop = '20px';
+                        btnReturn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
+                        btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
+                        actionsContainer.appendChild(btnReturn);
+                    }
+                    document.getElementById('success-ui').style.display = 'block';
+                };
+
                 document.getElementById('btn-approve-action').onclick = async () => {
                     const btn = document.getElementById('btn-approve-action');
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
@@ -314,29 +334,11 @@
                         const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
                         if (error) throw error;
                         
-                        document.getElementById('main-ui').style.display = 'none';
-                        const actionsContainer = document.getElementById('success-actions');
-                        if (actionsContainer && !document.getElementById('btn-return-portal-success')) {
-                            const btnReturn = document.createElement('button');
-                            btnReturn.id = 'btn-return-portal-success';
-                            btnReturn.className = 'btn btn-approve';
-                            btnReturn.style.background = 'var(--os-primary)';
-                            btnReturn.style.color = '#000';
-                            btnReturn.style.width = '100%';
-                            btnReturn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
-                            btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
-                            actionsContainer.appendChild(btnReturn);
-                        }
-                        
                         if (nextStatus === 'PRONTO') {
-                            document.getElementById('success-title').innerText = 'Conteúdo Finalizado!';
-                            document.getElementById('success-message').innerText = 'A arte foi aprovada e já está pronta para publicação conforme o cronograma.';
+                            showFinalSuccess('Conteúdo Finalizado!', 'A arte foi aprovada e já está pronta para publicação conforme o cronograma.');
                         } else {
-                            document.getElementById('success-title').innerText = 'Planejamento Aprovado!';
-                            document.getElementById('success-message').innerText = 'Excelente. Esta pauta foi enviada para a Execução Operacional.';
+                            showFinalSuccess('Planejamento Aprovado!', 'Excelente. Esta pauta foi enviada para a Execução Operacional.');
                         }
-                        
-                        document.getElementById('success-ui').style.display = 'block';
                     } catch (err) {
                         alert('Erro: ' + err.message);
                         btn.innerHTML = 'Tentar Novamente';
@@ -356,7 +358,7 @@
                     try {
                         const selected = Array.from(document.querySelectorAll('#adjustment-checks input:checked')).map(i => i.value);
                         const note = document.getElementById('feedback-text').value;
-                        const fullNote = `REVISÃO SOLICITADA | ITENS: ${selected.join(', ')} | OBS: ${note}`;
+                        const fullNote = `AJUSTE SOLICITADO | ITENS: ${selected.join(', ')} | OBS: ${note}`;
                         
                         const currentCycle = c.metadata?.revision_cycle || 1;
                         const newHistory = c.metadata?.history || [];
@@ -367,7 +369,7 @@
                             note: fullNote
                         });
 
-                        const newStatus = (currentStatus === 'APROVAÇÃO FINAL') ? 'AJUSTE DE PRODUÇÃO' : 'PLANEJAMENTO';
+                        const newStatus = (currentStatus === 'APROVAÇÃO FINAL') ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
 
                         const { error } = await supabase.from('content_assets').update({ 
                             status: newStatus, 
@@ -383,12 +385,10 @@
                         
                         if (error) throw error;
 
-                        document.getElementById('main-ui').style.display = 'none';
-                        document.getElementById('success-title').innerText = 'Ajuste Solicitado';
-                        document.getElementById('success-message').innerText = 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.';
-                        document.getElementById('success-ui').style.display = 'block';
+                        showFinalSuccess('Ajuste Solicitado', 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.');
                     } catch (err) {
                         alert('Erro: ' + err.message);
+                        btn.innerHTML = 'Enviar Solicitação';
                         btn.disabled = false;
                     }
                 };
