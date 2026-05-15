@@ -563,15 +563,15 @@ window.openEditModal = async (id) => {
                 </div>
                 <div>
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">PRAZO DE APROVAÇÃO</label>
-                    <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
+                    <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
                 </div>
-                <div style="display:flex; flex-direction:column; gap:8px;">
-                     <div style="display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" id="edit-asset-internal-review" ${c.metadata?.internal_review_required ? 'checked' : ''} ${!isPlanning ? 'disabled' : ''}>
+                <div style="display:flex; flex-direction:column; gap:12px; margin-top: 10px;">
+                     <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" id="edit-asset-internal-review" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.internal_review_required ? 'checked' : ''} ${!isPlanning ? 'disabled' : ''}>
                         <label for="edit-asset-internal-review" style="font-size:0.65rem; color:#8b5cf6; font-weight:800; cursor:pointer;">REVISAR ARTE ANTES DO CLIENTE?</label>
                      </div>
-                     <div style="display:flex; align-items:center; gap:8px;">
-                        <input type="checkbox" id="edit-asset-risk" ${c.metadata?.risk ? 'checked' : ''}>
+                     <div style="display:flex; align-items:center; gap:10px;">
+                        <input type="checkbox" id="edit-asset-risk" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.risk ? 'checked' : ''}>
                         <label for="edit-asset-risk" style="font-size:0.65rem; color:var(--os-danger); font-weight:800; cursor:pointer;">RISCO OPERACIONAL</label>
                      </div>
                 </div>
@@ -878,8 +878,7 @@ window.runAiPlanner = async () => {
                             responsible: RESPONSIBLE_MAP[type] || 'Design',
                             approval_deadline: deadline.toISOString(),
                             revision_cycle: 1,
-                            version: 'V1',
-                            internal_review_required: globalReview // APLICAR TRAVA GLOBAL
+                            version: 'V1'
                         }
                     };
                 });
