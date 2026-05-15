@@ -85,7 +85,7 @@
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Prazo p/ Aprovação</span>
-                    <span class="meta-value" id="meta-date" style="color:#60a5fa; font-weight:800;">---</span>
+                    <span class="meta-value" id="meta-date" style="color:#f59e0b; font-weight:800;">---</span>
                 </div>
                 <div class="meta-item">
                     <span class="meta-label">Versão</span>
@@ -124,9 +124,6 @@
         <i class="fa-solid fa-circle-check"></i>
         <h2 id="success-title">Planejamento Aprovado!</h2>
         <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
-        <button class="btn btn-secondary" style="margin: 20px auto; width: auto; padding: 15px 35px; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;" onclick="window.history.back()">
-            <i class="fa-solid fa-calendar-days"></i> VOLTAR PARA O CALENDÁRIO
-        </button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -245,13 +242,16 @@
                 if (appDeadline) {
                     deadlineEl.innerText = appDeadline.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
                     
-                    // LÓGICA DE PULSO: Se faltar menos de 24h para o prazo
+                    // LÓGICA DE PULSO: Sempre chamativo se for urgente
                     const now = new Date();
                     const diffHours = (appDeadline - now) / (1000 * 60 * 60);
-                    if (diffHours < 24 && diffHours > 0) {
+                    
+                    if (diffHours < 24) {
+                        deadlineEl.style.color = '#ef4444'; // Vermelho se estiver muito perto
                         deadlineEl.classList.add('deadline-alert');
                     } else {
-                        deadlineEl.classList.remove('deadline-alert');
+                        deadlineEl.style.color = '#f59e0b'; // Amarelo/Laranja por padrão
+                        deadlineEl.classList.add('deadline-alert'); // Pulsar sempre para chamar atenção
                     }
                 } else {
                     deadlineEl.innerText = 'S/ Prazo';
