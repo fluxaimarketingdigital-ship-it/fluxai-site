@@ -1,4 +1,4 @@
-﻿/**
+/**
  * FLUXAI OS™ CORE ENGINE v1.0.0
  * Gestão de Componentes Operacionais e Estados Globais
  */
@@ -90,22 +90,24 @@ export const OS_UI = {
      * Renderiza um Card de Métrica
      */
     renderMetric: (containerId, data) => {
-        const trendClass = data.trend.startsWith('+') ? 'trend-up' : 'trend-down';
-        const trendIcon = data.trend.startsWith('+') ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down';
+        const isPositive = data.trend && data.trend.startsWith('+');
+        const trendClass = isPositive ? 'trend-up' : 'trend-down';
+        const trendIcon = isPositive ? 'fa-arrow-trend-up' : 'fa-arrow-trend-down';
         
         const html = `
             <div class="os-widget-header">
                 <span class="os-widget-label">${data.label}</span>
-                <i class="fa-solid ${trendIcon} ${trendClass}"></i>
+                ${data.trend ? `<i class="fa-solid ${trendIcon} ${trendClass}"></i>` : `<i class="fa-solid ${data.icon || 'fa-chart-line'}" style="opacity:0.3"></i>`}
             </div>
             <div class="os-metric">
-                <div class="os-metric-value">${data.value}</div>
+                <div class="os-metric-value">${data.value || '0'}</div>
                 <div class="os-metric-meta">
-                    <span class="${trendClass}">${data.trend}</span> 
-                    <span style="color: var(--os-text-muted);">${data.meta}</span>
+                    ${data.trend ? `<span class="${trendClass}">${data.trend}</span>` : ''} 
+                    ${data.meta ? `<span style="color: var(--os-text-muted);">${data.meta}</span>` : ''}
                 </div>
             </div>`;
-        document.getElementById(containerId).innerHTML = html;
+        const container = document.getElementById(containerId);
+        if (container) container.innerHTML = html;
     }
 };
 
