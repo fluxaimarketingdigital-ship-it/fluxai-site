@@ -529,34 +529,19 @@ window.openEditModal = async (id) => {
     const supabase = getSupabase();
     const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
     if (c) {
+        const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVAÇÃO ESTRATÉGICA' || c.status === 'REVISÃO GESTÃO';
+        const isDirector = localStorage.getItem('os_role') === 'DIRETOR';
+        
+        // Mapear campos do HTML
         document.getElementById('edit-asset-title').value = c.title;
-        document.getElementById('edit-asset-caption').value = c.caption;
+        document.getElementById('edit-asset-caption').value = c.caption || '';
         document.getElementById('edit-asset-ref').value = c.metadata?.reference_url || '';
-        
-        // NOVO CAMPO: ARTE FINAL
-        let artField = document.getElementById('edit-asset-art-final');
-        if (!artField) {
-            const container = document.getElementById('edit-asset-ref').parentElement;
-            const newField = document.createElement('div');
-            newField.style = "margin-top: 15px;";
-            newField.innerHTML = `
-                <label style="display:block; font-size:0.7rem; color:var(--os-primary); margin-bottom:5px; font-weight:800;">LINK DA ARTE FINAL (PARA VALIDAÇÃO)</label>
-                <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive / Vídeo..." style="width:100%; padding:10px; background:#000; border:1px solid var(--os-primary); color:#fff; border-radius:4px; font-size:0.8rem;">
-            `;
-            container.after(newField);
-            artField = document.getElementById('edit-asset-art-final');
-        }
-        artField.value = c.metadata?.final_asset_url || '';
-        
         document.getElementById('edit-asset-art-final').value = c.metadata?.final_asset_url || '';
         
-        // NOVOS CAMPOS: RESPONSÁVEL, PRAZO, VERSÃO, RISCO
-        let metaFields = document.getElementById('edit-asset-meta-group');
-        if (!metaFields) {
-            metaFields = document.createElement('div');
-            metaFields.id = 'edit-asset-meta-group';
-            metaFields.style = "display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 4px; border: 1px solid #222;";
-            metaFields.innerHTML = `
+        // Injetar campos de metadados no container específico
+        const metaGrid = document.getElementById('edit-asset-meta-fields');
+        if (metaGrid) {
+            metaGrid.innerHTML = `
                 <div>
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">RESPONSÁVEL</label>
                     <select id="edit-asset-responsible" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
@@ -565,9 +550,6 @@ window.openEditModal = async (id) => {
                         <option value="Estrategista">Estrategista</option>
                         <option value="Gestor de Tráfego">Gestor de Tráfego</option>
                         <option value="Social Media">Social Media</option>
-                        <option value="Desenvolvimento Web">Desenvolvimento Web</option>
-                        <option value="Sistemas">Sistemas</option>
-                        <option value="Copywriter">Copywriter</option>
                     </select>
                 </div>
                 <div>
@@ -583,75 +565,56 @@ window.openEditModal = async (id) => {
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">PRAZO DE APROVAÇÃO</label>
                     <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:8px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
                 </div>
-                <div style="display:flex; align-items:center; gap:10px; margin-top:20px; grid-column: span 2; border-top: 1px solid #222; padding-top: 10px;">
-                    <input type="checkbox" id="edit-asset-internal-review">
-                    <label style="font-size:0.7rem; color:#8b5cf6; font-weight:800;">REVISAR ARTE FINAL ANTES DO CLIENTE?</label>
-                </div>
-                <div style="display:flex; align-items:center; gap:10px; margin-top:5px; grid-column: span 2;">
-                    <input type="checkbox" id="edit-asset-risk">
-                    <label style="font-size:0.7rem; color:var(--os-danger); font-weight:800;">RISCO OPERACIONAL</label>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                     <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="edit-asset-internal-review" ${c.metadata?.internal_review_required ? 'checked' : ''} ${!isPlanning ? 'disabled' : ''}>
+                        <label for="edit-asset-internal-review" style="font-size:0.65rem; color:#8b5cf6; font-weight:800; cursor:pointer;">REVISAR ARTE ANTES DO CLIENTE?</label>
+                     </div>
+                     <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="edit-asset-risk" ${c.metadata?.risk ? 'checked' : ''}>
+                        <label for="edit-asset-risk" style="font-size:0.65rem; color:var(--os-danger); font-weight:800; cursor:pointer;">RISCO OPERACIONAL</label>
+                     </div>
                 </div>
             `;
-            document.getElementById('edit-asset-art-final').parentElement.after(metaFields);
+            
+            // Setar valores após injeção
+            document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || 'Design';
+            document.getElementById('edit-asset-version').value = c.metadata?.version || 'V1';
+            
+            // Governança de Edição
+            document.getElementById('edit-asset-responsible').disabled = isPlanning;
+            document.getElementById('edit-asset-version').disabled = isPlanning;
+            document.getElementById('edit-asset-deadline').disabled = !isDirector;
+            if (!isDirector) document.getElementById('edit-asset-deadline').style.opacity = '0.5';
+
+            if (c.metadata?.approval_deadline) {
+                try {
+                    const d = new Date(c.metadata.approval_deadline);
+                    document.getElementById('edit-asset-deadline').value = d.toISOString().slice(0, 16);
+                } catch (e) {}
+            }
         }
-        
-        document.getElementById('edit-asset-internal-review').checked = c.metadata?.internal_review_required || false;
-        document.getElementById('edit-asset-internal-review').disabled = !isPlanning;
-        
-        document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || (c.status === 'PRODUÇÃO' ? 'Design' : 'Social Media');
-        document.getElementById('edit-asset-version').value = c.metadata?.version || 'V1';
-        
-        // Atualizar Ações do Rodapé
+
+        // Feedback de Ajuste
+        const feedbackContainer = document.getElementById('edit-asset-feedback-container');
+        if (c.internal_notes && feedbackContainer) {
+            document.getElementById('edit-asset-feedback').innerText = c.internal_notes;
+            feedbackContainer.style.display = 'block';
+        } else if (feedbackContainer) {
+            feedbackContainer.style.display = 'none';
+        }
+
+        // Atualizar Botões Dinâmicos
         const footerActions = document.getElementById('edit-asset-footer-actions');
         if (footerActions) {
             footerActions.innerHTML = `
-                ${c.status === 'PRODUÇÃO' ? `
+                ${(c.status === 'PRODUÇÃO' || c.status === 'AJUSTE DE PRODUÇÃO') ? `
                     <button class="btn-mini" onclick="window.finalizeProduction('${c.id}')" style="padding:10px 20px; background:#8b5cf6; color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
                         <i class="fa-solid fa-paper-plane"></i> Finalizar e Enviar
                     </button>
                 ` : ''}
                 <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
             `;
-        }
-        // Formatar data para o input datetime-local (exige YYYY-MM-DDTHH:MM)
-        let formattedDeadline = '';
-        if (c.metadata?.approval_deadline) {
-            try {
-                const d = new Date(c.metadata.approval_deadline);
-                formattedDeadline = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
-            } catch (e) { console.error('Erro formatar data:', e); }
-        }
-        document.getElementById('edit-asset-deadline').value = formattedDeadline;
-        document.getElementById('edit-asset-risk').checked = c.metadata?.risk || false;
-        
-        // TRAVA DE GOVERNANÇA: Bloquear campos técnicos durante o Planejamento
-        const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVAÇÃO ESTRATÉGICA';
-        
-        // Bloquear PRAZO para todos, exceto se for "DIRETOR" (Simulado por flag no localStorage por enquanto)
-        const isDirector = localStorage.getItem('os_role') === 'DIRETOR';
-        
-        const fieldsToLock = ['edit-asset-responsible', 'edit-asset-version', 'edit-asset-deadline'];
-        
-        fieldsToLock.forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                // Responsável e Versão bloqueados no planejamento
-                // Prazo SEMPRE bloqueado para operadores
-                const shouldLock = (isPlanning && id !== 'edit-asset-deadline') || (id === 'edit-asset-deadline' && !isDirector);
-                
-                el.disabled = shouldLock;
-                el.style.opacity = shouldLock ? '0.5' : '1';
-                el.style.cursor = shouldLock ? 'not-allowed' : 'default';
-            }
-        });
-
-        // MOSTRAR FEEDBACK SE HOUVER AJUSTE
-        const feedbackContainer = document.getElementById('edit-asset-feedback-container');
-        if (c.status === 'AJUSTE' && c.internal_notes) {
-            document.getElementById('edit-asset-feedback').innerText = c.internal_notes;
-            feedbackContainer.style.display = 'block';
-        } else {
-            feedbackContainer.style.display = 'none';
         }
 
         document.getElementById('modal-edit-asset').style.display = 'flex';
@@ -889,10 +852,11 @@ window.runAiPlanner = async () => {
         const { AIPlanner } = await import('../../services/ai-planner.js');
         if (confirm(`Gerar novo planejamento estratégico para o projeto?`)) {
             const type = document.getElementById('ai-planner-service').value;
+            const globalReview = document.getElementById('global-internal-review').checked;
             const newAssets = await AIPlanner.generatePlan(currentProject, type);
             
             if (newAssets && newAssets.length > 0) {
-                // APLICAR INTELIGÊNCIA DE PRAZO (48H) E RESPONSÁVEL
+                // APLICAR INTELIGÊNCIA DE PRAZO E RESPONSÁVEL
                 const processedAssets = newAssets.map(asset => {
                     const titleUpper = asset.title.toUpperCase();
                     const type = Object.keys(RESPONSIBLE_MAP).find(k => titleUpper.includes(k)) || 'CARD';
@@ -914,7 +878,8 @@ window.runAiPlanner = async () => {
                             responsible: RESPONSIBLE_MAP[type] || 'Design',
                             approval_deadline: deadline.toISOString(),
                             revision_cycle: 1,
-                            version: 'V1'
+                            version: 'V1',
+                            internal_review_required: globalReview // APLICAR TRAVA GLOBAL
                         }
                     };
                 });
