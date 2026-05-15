@@ -852,7 +852,6 @@ window.runAiPlanner = async () => {
         const { AIPlanner } = await import('../../services/ai-planner.js');
         if (confirm(`Gerar novo planejamento estratégico para o projeto?`)) {
             const type = document.getElementById('ai-planner-service').value;
-            const globalReview = document.getElementById('global-internal-review').checked;
             const newAssets = await AIPlanner.generatePlan(currentProject, type);
             
             if (newAssets && newAssets.length > 0) {
