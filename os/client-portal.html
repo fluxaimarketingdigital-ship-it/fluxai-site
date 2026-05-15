@@ -124,7 +124,7 @@
 
             try {
                 // 1. Dados do Projeto
-                const { data: proj } = await _supabaseClient.from('projects').select('*, contracts(*)').eq('id', projectId).single();
+                const { data: proj } = await _supabaseClient.from('projects').select('name, company_name, metadata').eq('id', projectId).single();
                 
                 if (proj) {
                     document.getElementById('client-name').innerText = proj.name || proj.company_name;
