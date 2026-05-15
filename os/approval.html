@@ -124,9 +124,9 @@
         <i class="fa-solid fa-circle-check"></i>
         <h2 id="success-title">Planejamento Aprovado!</h2>
         <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
-        <button class="btn btn-approve" style="margin-top: 30px; padding: 15px 40px; font-size: 0.9rem; background: #8e9e68; color: #000; font-weight: 800; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(142, 158, 104, 0.4);" onclick="window.history.back()">
-            <i class="fa-solid fa-arrow-left"></i> VOLTAR AO CALENDÁRIO
-        </button>
+        <div id="success-actions" style="margin-top: 30px;">
+            <!-- Botão de retorno injetado via JS -->
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -193,11 +193,11 @@
                     }
                     
                     // Adicionar botão de retorno se não existir
-                    if (!document.getElementById('btn-return-portal')) {
+                    const actionsContainer = document.getElementById('success-actions');
+                    if (actionsContainer && !document.getElementById('btn-return-portal')) {
                         const btn = document.createElement('button');
                         btn.id = 'btn-return-portal';
                         btn.className = 'btn btn-approve';
-                        btn.style.marginTop = '20px';
                         btn.style.background = 'var(--os-primary)';
                         btn.style.color = '#000';
                         btn.style.width = '100%';
@@ -207,7 +207,7 @@
                             window.location.href = `/os/client-portal.html?project_id=${c.project_id}`;
                         };
                         
-                        document.getElementById('success-ui').appendChild(btn);
+                        actionsContainer.appendChild(btn);
                     }
 
                     document.getElementById('success-ui').style.display = 'block';
@@ -329,40 +329,36 @@
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
                     btn.disabled = true;
 
-                   function getStatusBg(status) {
-                        if (status === 'PLANEJAMENTO') return '#8b5cf6'; // Roxo
-                        if (status === 'REVISÃO GESTÃO') return '#8b5cf6'; // Roxo
-                        if (status === 'APROVAÇÃO ESTRATÉGICA') return '#3b82f6'; // Azul
-                        if (status === 'AJUSTE') return '#ef4444'; // Vermelho
-                        if (status === 'PRODUÇÃO') return '#f59e0b'; // Amarelo/Laranja
-                        if (status === 'AJUSTE DE PRODUÇÃO') return '#ec4899'; // Rosa
-                        if (status === 'APROVAÇÃO FINAL') return '#3b82f6'; // Azul
-                        if (status === 'PRONTO') return '#10b981'; // Verde
-                        if (status === 'PUBLICADO') return '#059669'; 
-                        if (status === 'ATRASADO') return '#7f1d1d'; 
-                        return '#444';
-                    }
-
                     try {
-                        const isStrategic = c.status === 'APROVAÇÃO ESTRATÉGICA';
-                        const nextStatus = isStrategic ? 'PRODUÇÃO' : 'PRONTO';
+                        const status = (c.status || '').toUpperCase();
+                        const isStrategic = status === 'APROVAÇÃO ESTRATÉGICA';
+                        const isPlanning = status === 'PLANEJAMENTO';
+                        const hasArt = !!c.metadata?.final_asset_url;
+                        
+                        let nextStatus = 'PRONTO';
+                        
+                        if (isStrategic) {
+                            nextStatus = hasArt ? 'APROVAÇÃO FINAL' : 'PRODUÇÃO';
+                        } else if (isPlanning) {
+                            nextStatus = 'PRODUÇÃO';
+                        }
                         
                         const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
                         if (error) throw error;
                         
                         document.getElementById('main-ui').style.display = 'none';
                         // Adicionar botão de retorno no sucesso
-                        if (!document.getElementById('btn-return-portal-success')) {
+                        const actionsContainer = document.getElementById('success-actions');
+                        if (actionsContainer && !document.getElementById('btn-return-portal-success')) {
                             const btnReturn = document.createElement('button');
                             btnReturn.id = 'btn-return-portal-success';
                             btnReturn.className = 'btn btn-approve';
-                            btnReturn.style.marginTop = '20px';
                             btnReturn.style.background = 'var(--os-primary)';
                             btnReturn.style.color = '#000';
                             btnReturn.style.width = '100%';
                             btnReturn.innerHTML = '<i class="fa-solid fa-calendar-days"></i> VOLTAR AO CALENDÁRIO';
                             btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
-                            document.getElementById('success-ui').appendChild(btnReturn);
+                            actionsContainer.appendChild(btnReturn);
                         }
                         document.getElementById('success-ui').style.display = 'block';
                     } catch (err) {

@@ -541,6 +541,11 @@ window.openEditModal = async (id) => {
         // Injetar campos de metadados no container específico
         const metaGrid = document.getElementById('edit-asset-meta-fields');
         if (metaGrid) {
+            metaGrid.style.display = 'grid';
+            metaGrid.style.gridTemplateColumns = '1fr 1fr';
+            metaGrid.style.gap = '15px';
+            metaGrid.style.marginTop = '20px';
+
             metaGrid.innerHTML = `
                 <div>
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">RESPONSÁVEL</label>
@@ -565,14 +570,20 @@ window.openEditModal = async (id) => {
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">PRAZO DE APROVAÇÃO</label>
                     <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem;">
                 </div>
-                <div style="display:flex; flex-direction:column; gap:12px; margin-top: 10px;">
-                     <div style="display:flex; align-items:center; gap:10px;">
-                        <input type="checkbox" id="edit-asset-internal-review" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.internal_review_required ? 'checked' : ''} ${!isPlanning ? 'disabled' : ''}>
-                        <label for="edit-asset-internal-review" style="font-size:0.65rem; color:#8b5cf6; font-weight:800; cursor:pointer;">REVISAR ARTE ANTES DO CLIENTE?</label>
+                <div style="display:flex; flex-direction:column; gap:10px; justify-content: flex-end;">
+                     <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="edit-asset-strategic-req" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.strategic_approval_required ? 'checked' : ''}>
+                        <label for="edit-asset-strategic-req" style="font-size:0.6rem; color:#3b82f6; font-weight:800; cursor:pointer;">EXIGIR APROVAÇÃO ESTRATÉGICA?</label>
                      </div>
-                     <div style="display:flex; align-items:center; gap:10px;">
-                        <input type="checkbox" id="edit-asset-risk" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.risk ? 'checked' : ''}>
-                        <label for="edit-asset-risk" style="font-size:0.65rem; color:var(--os-danger); font-weight:800; cursor:pointer;">RISCO OPERACIONAL</label>
+                     ${(c.status === 'PLANEJAMENTO' || c.status === 'APROVAÇÃO ESTRATÉGICA') ? `
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <input type="checkbox" id="edit-asset-internal-review" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.internal_review_required ? 'checked' : ''}>
+                            <label for="edit-asset-internal-review" style="font-size:0.6rem; color:#8b5cf6; font-weight:800; cursor:pointer;">REVISAR ARTE (GESTÃO)?</label>
+                        </div>
+                     ` : ''}
+                     <div style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" id="edit-asset-risk" style="width:14px; height:14px; cursor:pointer;" ${c.metadata?.risk ? 'checked' : ''}>
+                        <label for="edit-asset-risk" style="font-size:0.6rem; color:var(--os-danger); font-weight:800; cursor:pointer;">RISCO OPERACIONAL</label>
                      </div>
                 </div>
             `;
@@ -582,8 +593,9 @@ window.openEditModal = async (id) => {
             document.getElementById('edit-asset-version').value = c.metadata?.version || 'V1';
             
             // Governança de Edição
-            document.getElementById('edit-asset-responsible').disabled = isPlanning;
-            document.getElementById('edit-asset-version').disabled = isPlanning;
+            const canEditOps = c.status === 'PLANEJAMENTO' || c.status === 'AJUSTE' || isDirector;
+            document.getElementById('edit-asset-responsible').disabled = !canEditOps;
+            document.getElementById('edit-asset-version').disabled = !canEditOps;
             document.getElementById('edit-asset-deadline').disabled = !isDirector;
             if (!isDirector) document.getElementById('edit-asset-deadline').style.opacity = '0.5';
 
@@ -632,6 +644,7 @@ window.saveAssetEdit = async () => {
         const ref = document.getElementById('edit-asset-ref').value;
         const artFinal = document.getElementById('edit-asset-art-final')?.value;
         const internalReview = document.getElementById('edit-asset-internal-review')?.checked;
+        const strategicApproval = document.getElementById('edit-asset-strategic-req')?.checked;
         const responsible = document.getElementById('edit-asset-responsible')?.value;
         const version = document.getElementById('edit-asset-version')?.value;
         const deadline = document.getElementById('edit-asset-deadline')?.value;
@@ -643,7 +656,8 @@ window.saveAssetEdit = async () => {
         const newMetadata = currentAsset.metadata || {};
         newMetadata.reference_url = ref;
         newMetadata.final_asset_url = artFinal;
-        newMetadata.internal_review_required = internalReview;
+        if (internalReview !== undefined) newMetadata.internal_review_required = internalReview;
+        newMetadata.strategic_approval_required = strategicApproval;
         newMetadata.responsible = responsible;
         newMetadata.version = version;
         newMetadata.approval_deadline = deadline;
@@ -661,9 +675,11 @@ window.saveAssetEdit = async () => {
         } else if (currentAsset.status === 'AJUSTE DE PRODUÇÃO') {
             updatePayload.status = 'PRODUÇÃO'; // Volta para a produção, não para o planejamento
         } else if (currentAsset.status === 'PRODUÇÃO' && artFinal) {
-            if (confirm('Enviar para REVISÃO INTERNA FINAL antes do cliente?')) {
-                updatePayload.status = 'REVISÃO INTERNA FINAL';
-            } else if (confirm('Pular revisão e enviar direto para APROVAÇÃO FINAL do cliente?')) {
+            if (newMetadata.strategic_approval_required) {
+                updatePayload.status = 'APROVAÇÃO ESTRATÉGICA';
+            } else if (newMetadata.internal_review_required) {
+                updatePayload.status = 'REVISÃO GESTÃO';
+            } else {
                 updatePayload.status = 'APROVAÇÃO FINAL';
             }
         }
@@ -706,8 +722,12 @@ window.finalizeProduction = async (id) => {
         };
 
         const mustReviewInternally = c.metadata?.internal_review_required;
+        const mustStrategicApprove = c.metadata?.strategic_approval_required;
 
-        if (mustReviewInternally) {
+        if (mustStrategicApprove) {
+            alert('🚀 ESTE ATIVO SEGUE PARA VALIDAÇÃO ESTRATÉGICA.');
+            updatePayload.status = 'APROVAÇÃO ESTRATÉGICA';
+        } else if (mustReviewInternally) {
             alert('🔒 ESTE ATIVO EXIGE VALIDAÇÃO DA GESTÃO.\n\nA produção será enviada para a revisão interna antes de seguir para o cliente.');
             updatePayload.status = 'REVISÃO GESTÃO';
         } else {
@@ -797,31 +817,7 @@ window.copyPortalLink = () => {
 };
 
 window.approvePendingAssets = async () => {
-    if (!currentProject) return alert('Selecione um projeto!');
-    
-    const supabase = getSupabase();
-    const { data: pendentes } = await supabase.from('content_assets')
-        .select('id')
-        .eq('project_id', currentProject)
-        .in('status', ['PLANEJAMENTO', 'REVISÃO INTERNA', 'AJUSTE']);
-
-    if (!pendentes || pendentes.length === 0) {
-        return alert('Nenhuma pauta pronta para envio estratégico.');
-    }
-
-    if (confirm(`Enviar ${pendentes.length} pautas para APROVAÇÃO ESTRATÉGICA do cliente?`)) {
-        const { error } = await supabase.from('content_assets')
-            .update({ status: 'APROVAÇÃO ESTRATÉGICA' })
-            .eq('project_id', currentProject)
-            .in('status', ['PLANEJAMENTO', 'REVISÃO INTERNA', 'AJUSTE']);
-
-        if (error) alert('Erro: ' + error.message);
-        else {
-            sLog('Pautas enviadas para aprovação estratégica.');
-            loadContent();
-            alert('Sucesso! O cliente já pode revisar as estratégias no portal.');
-        }
-    }
+    alert('Ação Descontinuada. Use o botão de Escudo (Validar) ou o Lápis para controle individual.');
 };
 
 window.runAiPlanner = async () => {
@@ -915,14 +911,17 @@ window.approveManager = async (id) => {
         let logMsg = 'Pauta enviada ao cliente.';
 
         if (c.status === 'REVISÃO GESTÃO' && c.metadata?.final_asset_url) {
-            // Se já tem arte e está em revisão da gestão, envia para aprovação final do cliente
             nextStatus = 'APROVAÇÃO FINAL';
             logMsg = 'Arte validada pela gestão e enviada para aprovação final do cliente.';
         } else {
-            // Se for planejamento inicial
-            const choice = confirm('Enviar esta pauta para APROVAÇÃO do cliente?\n\n(Cancele para enviar DIRETO PARA PRODUÇÃO)');
-            nextStatus = choice ? 'APROVAÇÃO ESTRATÉGICA' : 'PRODUÇÃO';
-            logMsg = choice ? 'Pauta enviada ao cliente.' : 'Pauta aprovada internamente e enviada para PRODUÇÃO.';
+            const needsStrategic = c.metadata?.strategic_approval_required;
+            if (needsStrategic) {
+                nextStatus = 'APROVAÇÃO ESTRATÉGICA';
+                logMsg = 'Pauta enviada para Aprovação Estratégica conforme configurado.';
+            } else {
+                nextStatus = 'PRODUÇÃO';
+                logMsg = 'Pauta aprovada internamente e enviada para PRODUÇÃO.';
+            }
         }
         
         const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
