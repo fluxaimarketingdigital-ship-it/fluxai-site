@@ -49,7 +49,7 @@
         }
         .asset-card:hover { transform: translateY(-2px); border-color: var(--os-primary); }
         
-        .status-aprovação-estratégica { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+        .status-aprovação-planejamento { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
         .status-revisão-gestão { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.4); }
         .status-aprovação-final { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); font-weight: 800; }
         .status-ajuste { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.4); }
@@ -71,8 +71,8 @@
             <i class="fa-solid fa-circle-check"></i>
             <h2 id="success-title">Planejamento Aprovado!</h2>
             <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
-            <button class="btn btn-approve" style="margin-top: 30px; padding: 15px 40px; font-size: 0.9rem; background: var(--os-primary); color: #000; font-weight: 800; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(142, 158, 104, 0.4);" onclick="window.history.back()">
-                <i class="fa-solid fa-arrow-left"></i> VOLTAR AO CALENDÁRIO
+            <button class="btn btn-approve" style="margin-top: 30px; padding: 15px 40px; font-size: 0.9rem; background: var(--os-primary); color: #000; font-weight: 800; border: none; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; gap: 10px; box-shadow: 0 4px 20px rgba(142, 158, 104, 0.4);" onclick="window.location.reload()">
+                <i class="fa-solid fa-rotate"></i> ATUALIZAR CALENDÁRIO
             </button>
         </div>
         <h1 id="portal-title">Fluxo Estratégico</h1>
@@ -91,6 +91,7 @@
         async function getStatusBg(status) {
             if (status === 'PLANEJAMENTO') return '#8b5cf6';
             if (status === 'REVISÃO GESTÃO') return '#8b5cf6';
+            if (status === 'APROVAÇÃO PLANEJAMENTO') return '#3b82f6';
             if (status === 'APROVAÇÃO ESTRATÉGICA') return '#3b82f6';
             if (status === 'AJUSTE') return '#ef4444';
             if (status === 'PRODUÇÃO') return '#f59e0b';
@@ -127,12 +128,18 @@
             }
 
             // Buscar Ativos
-            const { data: assets } = await supabase.from('content_assets')
-                .select('*')
-                .eq('project_id', projectId)
-                .order('scheduled_at', { ascending: true });
+            try {
+                const { data: assets, error } = await supabase.from('content_assets')
+                    .select('*')
+                    .eq('project_id', projectId)
+                    .order('scheduled_at', { ascending: true });
 
-            renderCalendar(assets || []);
+                if (error) throw error;
+                renderCalendar(assets || []);
+            } catch (err) {
+                console.error('[PORTAL] Erro ao carregar ativos:', err);
+                renderCalendar([]);
+            }
         }
 
         // ATUALIZAÇÃO AUTOMÁTICA: Quando o cliente volta para esta aba
@@ -177,6 +184,9 @@
         window.openApproval = (id) => {
             window.location.href = `/os/approval.html?id=${id}`;
         };
+
+        // EXPOR FUNÇÕES PARA O GLOBAL
+        window.initPortal = init;
 
         init();
     </script>
