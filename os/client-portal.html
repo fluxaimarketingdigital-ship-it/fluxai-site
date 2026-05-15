@@ -66,8 +66,8 @@
 <body>
     <header class="portal-header">
         <div style="color:var(--os-primary); font-weight:900; font-size:0.7rem; letter-spacing:3px; margin-bottom:10px;">FLUXAI OS™</div>
-        <h1>Planejamento Estratégico Mensal</h1>
-        <p id="client-name">Carregando cronograma...</p>
+        <h1 id="portal-title">Fluxo Estratégico</h1>
+        <p id="client-name">Sincronizando dados...</p>
     </header>
 
     <div class="calendar-grid" id="calendar-body"></div>
@@ -87,6 +87,9 @@
             // Buscar Projeto
             const { data: project } = await supabase.from('projects').select('*').eq('id', projectId).single();
             if (project) {
+                const now = new Date();
+                const currentMonth = now.toLocaleString('pt-BR', { month: 'long' });
+                document.getElementById('portal-title').innerText = `Fluxo Estratégico: ${currentMonth.charAt(0).toUpperCase() + currentMonth.slice(1)}`;
                 document.getElementById('client-name').innerText = project.company_name || project.name || 'Cliente FluxAI';
             }
 
