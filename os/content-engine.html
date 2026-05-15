@@ -168,6 +168,29 @@
                 </div>
             </div>
         </div>
+    <!-- MODAL DE COMPARTILHAMENTO -->
+    <div id="modal-share-assets" class="os-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); z-index:9999; align-items:center; justify-content:center;">
+        <div class="os-widget" style="width: 100%; max-width: 500px; padding: 30px; border: 1px solid var(--os-border);">
+            <h2 style="margin-bottom: 20px; color: var(--os-primary); font-size: 1.1rem;">Enviar para o Cliente</h2>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">LINK DO PORTAL DE APROVAÇÃO</label>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="share-portal-link" readonly style="flex:1; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px; font-size:0.8rem;">
+                    <button class="os-btn os-btn-outline" onclick="copyToClipboard('share-portal-link')" style="padding:0 15px;"><i class="fa-solid fa-copy"></i></button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:5px;">LEGENDA E TAGS PARA WHATSAPP</label>
+                <textarea id="share-whatsapp-text" readonly style="width:100%; height:150px; background:#111; border:1px solid #333; color:#fff; padding:10px; border-radius:4px; font-size:0.8rem; line-height:1.4;"></textarea>
+                <button class="os-btn os-btn-primary" onclick="copyToClipboard('share-whatsapp-text')" style="width:100%; margin-top:10px;">COPIAR TEXTO COMPLETO</button>
+            </div>
+
+            <div style="display:flex; justify-content:center; margin-top:20px;">
+                <button class="os-btn os-btn-outline" onclick="document.getElementById('modal-share-assets').style.display='none'">Fechar</button>
+            </div>
+        </div>
     </div>
 
     <script type="module">

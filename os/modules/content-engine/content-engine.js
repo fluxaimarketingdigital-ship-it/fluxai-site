@@ -842,19 +842,47 @@ window.copyPortalLink = () => {
     });
 };
 
+window.copyToClipboard = (id) => {
+    const el = document.getElementById(id);
+    el.select();
+    document.execCommand('copy');
+    sLog('Copiado para a área de transferência.');
+};
+
 window.approvePendingAssets = async () => {
     if (!currentProject) return alert('Selecione um projeto!');
     if (!confirm('Deseja enviar todas as pautas de PLANEJAMENTO para a aprovação do cliente?')) return;
 
     try {
         const supabase = getSupabase();
+        
+        // 1. Atualizar status no banco
         const { error } = await supabase.from('content_assets')
             .update({ status: 'APROVAÇÃO PLANEJAMENTO' })
             .eq('project_id', currentProject)
             .eq('status', 'PLANEJAMENTO');
 
         if (error) throw error;
-        sLog('Pautas enviadas para Aprovação de Planejamento.');
+        
+        // 2. Gerar link do portal e texto de compartilhamento
+        const portalUrl = `https://fluxaidigital.com.br/os/client-portal?project_id=${currentProject}`;
+        document.getElementById('share-portal-link').value = portalUrl;
+        
+        const { data: proj } = await supabase.from('projects').select('name').eq('id', currentProject).single();
+        const { data: assets } = await supabase.from('content_assets')
+            .select('title')
+            .eq('project_id', currentProject)
+            .eq('status', 'APROVAÇÃO PLANEJAMENTO')
+            .limit(10);
+
+        let waText = `🚀 *NOVO PLANEJAMENTO DISPONÍVEL - ${proj.name}*\n\nOlá! Acabamos de liberar o novo fluxo estratégico de conteúdo. \n\nAcesse agora para validar roteiros e prazos:\n🔗 ${portalUrl}\n\n*Resumo do Lote:*\n`;
+        assets.forEach(a => { waText += `• ${a.title}\n`; });
+        waText += `\n#FluxAI #EstratégiaDigital #HighTicket`;
+        
+        document.getElementById('share-whatsapp-text').value = waText;
+        document.getElementById('modal-share-assets').style.display = 'flex';
+
+        sLog('Pautas enviadas para Aprovação.');
         loadContent();
     } catch (e) {
         alert('Erro ao enviar pautas: ' + e.message);

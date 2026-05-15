@@ -331,7 +331,18 @@
                         let nextStatus = 'PRODUÇÃO';
                         if (currentStatus === 'APROVAÇÃO FINAL') nextStatus = 'PRONTO';
                         
-                        const { error } = await supabase.from('content_assets').update({ status: nextStatus }).eq('id', id);
+                        const updateData = { status: nextStatus };
+                        
+                        // Resetar ciclos ao entrar em PRODUÇÃO (Nova esteira técnica)
+                        if (nextStatus === 'PRODUÇÃO') {
+                            updateData.metadata = {
+                                ...c.metadata,
+                                revision_cycle: 1,
+                                version: 'V1'
+                            };
+                        }
+
+                        const { error } = await supabase.from('content_assets').update(updateData).eq('id', id);
                         if (error) throw error;
                         
                         if (nextStatus === 'PRONTO') {
