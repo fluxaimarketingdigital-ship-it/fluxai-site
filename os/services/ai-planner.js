@@ -38,6 +38,10 @@ export const AIPlanner = {
             return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
         });
 
+        // Determinar dias estratégicos baseados em métricas (Onboarding)
+        // Se não houver definição, usa dias úteis (Seg-Sex) como base de escala
+        const strategicDays = project.metadata?.onboarding?.best_posting_days || [1, 2, 3, 4, 5]; 
+        
         const contents = [];
         const now = new Date();
         
@@ -53,7 +57,6 @@ export const AIPlanner = {
         // Limitar ao máximo solicitado pelo contrato
         servicesToGenerate = servicesToGenerate.slice(0, maxToGenerate);
 
-        const strategicDays = [2, 4, 6]; // Terça, Quinta, Sábado
         let daysOffset = 0;
 
         servicesToGenerate.forEach((sKey) => {

@@ -610,10 +610,11 @@ window.openEditModal = async (id) => {
             document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || 'Design';
             document.getElementById('edit-asset-version').value = c.metadata?.version || 'V1';
             
-            // Governança de Edição
-            const canEditOps = c.status === 'PLANEJAMENTO' || c.status === 'AJUSTE' || isDirector;
-            document.getElementById('edit-asset-responsible').disabled = !canEditOps;
-            document.getElementById('edit-asset-version').disabled = !canEditOps;
+            // Governança de Edição: Campos automáticos ficam desabilitados
+            document.getElementById('edit-asset-responsible').disabled = true;
+            document.getElementById('edit-asset-version').disabled = true;
+            document.getElementById('edit-asset-responsible').style.opacity = '0.6';
+            document.getElementById('edit-asset-version').style.opacity = '0.6';
             document.getElementById('edit-asset-deadline').disabled = !isDirector;
             if (!isDirector) document.getElementById('edit-asset-deadline').style.opacity = '0.5';
 
