@@ -208,8 +208,11 @@ function switchTab(tab) {
 async function loadProjects() {
     try {
         const supabase = getSupabase();
-        const { data: projects, error } = await supabase.from('projects').select('id, company_name').eq('status', 'ATIVO');
+        const { data: projects, error } = await supabase.from('projects').select('id, company_name, next_cycle_day').eq('status', 'ATIVO');
         if (error) throw error;
+
+        // Armazenar projetos globalmente para consulta rápida
+        window.allProjects = projects;
 
         const select = document.getElementById('project-filter');
         if (select && projects) {
@@ -234,7 +237,41 @@ async function loadContent() {
         // Se não tem projeto, vamos carregar TUDO (Requisito do Usuário)
         const placeholder = document.getElementById('project-placeholder');
         if (placeholder) placeholder.style.display = 'none'; // Esconder o aviso de "selecione"
+        
+        // Reset Workflow Card
+        document.getElementById('workflow-deadline').innerText = 'SELECIONE UM CLIENTE';
+        document.getElementById('workflow-card').style.background = 'rgba(168,85,247,0.1)';
+        document.getElementById('workflow-card').style.borderColor = 'rgba(168,85,247,0.3)';
     } else {
+        // Atualizar Card de Workflow com base no Contrato (SLA)
+        const projectData = window.allProjects?.find(p => p.id === currentProject);
+        if (projectData) {
+            const deadlineDay = projectData.next_cycle_day || 20;
+            const now = new Date();
+            const currentDay = now.getDate();
+            const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1).toLocaleString('pt-BR', { month: 'long' }).toUpperCase();
+            
+            const deadlineEl = document.getElementById('workflow-deadline');
+            const cardEl = document.getElementById('workflow-card');
+            
+            deadlineEl.innerText = `DEADLINE: DIA ${deadlineDay} (PARA ${nextMonth})`;
+            
+            // Lógica de Alerta Contratual
+            if (currentDay > deadlineDay) {
+                cardEl.style.background = 'rgba(239, 68, 68, 0.2)';
+                cardEl.style.borderColor = '#ef4444';
+                cardEl.classList.add('pulse-red'); // Reusando a animação de pulso
+            } else if (deadlineDay - currentDay <= 3) {
+                cardEl.style.background = 'rgba(245, 158, 11, 0.2)';
+                cardEl.style.borderColor = '#f59e0b';
+                cardEl.classList.remove('pulse-red');
+            } else {
+                cardEl.style.background = 'rgba(168,85,247,0.1)';
+                cardEl.style.borderColor = 'rgba(168,85,247,0.3)';
+                cardEl.classList.remove('pulse-red');
+            }
+        }
+        
         const placeholder = document.getElementById('project-placeholder');
         if (placeholder) placeholder.style.display = 'none';
         
