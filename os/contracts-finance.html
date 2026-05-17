@@ -1,122 +1,229 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FluxAI OS™ | Contratos & Financeiro</title>
-    <link rel="stylesheet" href="../src/styles/os/interface.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        .finance-grid { display: grid; grid-template-columns: 1fr; gap: 25px; }
-        .finance-card { background: var(--os-card); border: 1px solid var(--os-border); padding: 25px; border-radius: 4px; }
-        .finance-stat { display: flex; flex-direction: column; }
-        .finance-stat span { font-size: 0.6rem; text-transform: uppercase; color: var(--os-text-muted); letter-spacing: 1.5px; font-weight: 700; margin-bottom: 8px; }
-        .finance-stat h2 { font-size: 1.5rem; font-weight: 800; margin: 0; font-family: var(--os-font-mono); }
-        .finance-stat p { font-size: 0.65rem; color: var(--os-text-muted); margin-top: 5px; }
-        
-        .os-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-        .os-table th { text-align: left; padding: 12px; color: var(--os-text-muted); text-transform: uppercase; font-size: 0.6rem; border-bottom: 1px solid var(--os-border); letter-spacing: 1px; }
-        .os-table td { padding: 12px; border-bottom: 1px solid var(--os-border); vertical-align: middle; }
-        
-        .status-badge { padding: 4px 8px; border-radius: 2px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase; display: inline-block; }
-        .status-atrasado { background: rgba(255, 77, 77, 0.1); color: var(--os-danger); }
-        .status-pago { background: rgba(0, 204, 102, 0.1); color: var(--os-success); }
-        .status-pendente { background: rgba(255, 204, 0, 0.1); color: var(--os-warning); }
-        .status-vence-hoje { background: rgba(77, 148, 255, 0.1); color: var(--os-info); border: 1px solid var(--os-info); }
-        
-        .health-pill { font-size: 0.6rem; padding: 2px 8px; border-radius: 10px; font-weight: 800; text-transform: uppercase; }
-        .health-saudavel { background: rgba(0, 204, 102, 0.1); color: var(--os-success); }
-        .health-atencao { background: rgba(255, 204, 0, 0.1); color: var(--os-warning); }
-        .health-risco { background: rgba(255, 77, 77, 0.1); color: var(--os-danger); }
+        :root {
+            --os-primary: #8e9e68;
+            --os-bg: #050705;
+            --os-surface: rgba(15, 18, 15, 0.7);
+            --os-border: rgba(142, 158, 104, 0.15);
+            --os-text: #e0e0e0;
+            --os-text-muted: #888;
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --os-success: #10b981;
+            --os-warning: #f59e0b;
+            --os-danger: #ef4444;
+            --os-info: #3b82f6;
+        }
 
-        .action-btns { display: flex; gap: 6px; }
-        .btn-mini { width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; border-radius: 2px; border: 1px solid var(--os-border); background: rgba(255,255,255,0.02); color: var(--os-text-muted); cursor: pointer; font-size: 0.75rem; transition: all 0.2s; }
-        .btn-mini:hover { background: var(--os-primary); border-color: var(--os-primary); color: #fff; }
-        .btn-whatsapp { color: #25d366; }
-        
-        .alert-item { display: flex; align-items: center; gap: 15px; padding: 12px; background: rgba(255,255,255,0.01); border-left: 3px solid var(--os-primary); margin-bottom: 10px; border-radius: 0 4px 4px 0; }
-        .alert-item.critical { border-left-color: var(--os-danger); }
-        .alert-item.warning { border-left-color: var(--os-warning); }
-        .alert-icon { font-size: 1rem; opacity: 0.8; }
-        .alert-content { flex: 1; }
-        .alert-content h4 { font-size: 0.8rem; margin: 0; color: #fff; }
-        .alert-content p { font-size: 0.7rem; color: var(--os-text-muted); margin: 2px 0 0 0; }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--os-bg);
+            color: var(--os-text);
+            overflow: hidden;
+        }
+
+        /* BACKGROUND SYSTEM */
+        .os-bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: 
+                radial-gradient(circle at 80% 20%, rgba(142, 158, 104, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 20% 80%, rgba(142, 158, 104, 0.08) 0%, transparent 40%);
+            z-index: -1;
+        }
+
+        .os-shell {
+            display: flex;
+            height: 100vh;
+            background: transparent;
+        }
+
+        .os-sidebar {
+            width: 280px;
+            background: rgba(10, 12, 10, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-right: 1px solid var(--os-border);
+            z-index: 100;
+        }
+
+        .os-viewport-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .os-topbar {
+            height: 70px;
+            background: rgba(10, 12, 10, 0.4);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--os-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 90;
+        }
+
+        .os-viewport {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        /* TYPOGRAPHY */
+        .os-page-title h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin: 0;
+            background: linear-gradient(to right, #fff, var(--os-primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* FINANCE CARDS */
+        .os-widget-grid {
+            display: grid;
+            grid-template-columns: repeat(14, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .os-widget {
+            background: var(--os-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--os-border);
+            border-radius: 12px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .os-widget:hover { border-color: rgba(142, 158, 104, 0.4); transform: translateY(-2px); }
+
+        .finance-stat span { font-size: 0.55rem; text-transform: uppercase; color: var(--os-primary); letter-spacing: 1.5px; font-weight: 800; margin-bottom: 10px; display: block; opacity: 0.8; }
+        .finance-stat h2 { font-size: 1.2rem; font-weight: 800; margin: 0; font-family: 'JetBrains Mono', monospace; color: #fff; }
+        .finance-stat p { font-size: 0.6rem; color: var(--os-text-muted); margin-top: 6px; }
+
+        /* TABLES */
+        .finance-card {
+            background: var(--os-surface);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--os-border);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+
+        .os-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .os-table th { text-align: left; padding: 12px; color: var(--os-primary); text-transform: uppercase; font-size: 0.6rem; border-bottom: 1px solid var(--os-border); letter-spacing: 2px; font-weight: 800; }
+        .os-table td { padding: 16px 12px; border-bottom: 1px solid rgba(255,255,255,0.03); vertical-align: middle; }
+        .os-table tr:hover { background: rgba(255,255,255,0.01); }
+
+        /* BADGES */
+        .status-badge { padding: 3px 10px; border-radius: 4px; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
+        .status-atrasado { background: rgba(239, 68, 68, 0.15); color: var(--os-danger); }
+        .status-pago { background: rgba(16, 185, 129, 0.15); color: var(--os-success); }
+        .status-pendente { background: rgba(245, 158, 11, 0.15); color: var(--os-warning); }
+
+        .health-pill { font-size: 0.55rem; padding: 2px 10px; border-radius: 20px; font-weight: 800; text-transform: uppercase; }
+        .health-saudavel { background: rgba(16, 185, 129, 0.1); color: var(--os-success); border: 1px solid rgba(16, 185, 129, 0.2); }
+
+        /* ACTIONS */
+        .btn-mini { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(255,255,255,0.03); color: var(--os-text-muted); cursor: pointer; transition: 0.2s; }
+        .btn-mini:hover { background: var(--os-primary); border-color: var(--os-primary); color: #000; }
+
+        /* ALERTS */
+        .alert-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255, 255, 255, 0.02); border-left: 4px solid var(--os-primary); margin-bottom: 12px; border-radius: 8px; }
+        .alert-content h4 { font-size: 0.8rem; margin: 0; color: #fff; font-weight: 700; }
+        .alert-content p { font-size: 0.7rem; color: var(--os-text-muted); margin: 4px 0 0 0; }
+
+        /* ANIMATIONS */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .os-widget, .finance-card { animation: fadeInUp 0.5s ease backwards; }
     </style>
 </head>
 <body class="os-mode">
-
+    <div class="os-bg-glow"></div>
     <div class="os-shell">
         <aside class="os-sidebar"></aside>
 
-        <div class="os-viewport-wrapper" style="display: flex; flex-direction: column; width: 100%;">
+        <div class="os-viewport-wrapper">
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 40px;">
+                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
                     <div>
-                        <h1 style="letter-spacing: -1.5px;">Saúde Contratual & Recorrência</h1>
-                        <p>Governança financeira de ativos institucionais e fluxo de caixa operacional FluxAI OS™.</p>
+                        <h1>Contratos & Financeiro</h1>
+                        <p>Governança de ativos institucionais e fluxo de caixa operacional.</p>
                     </div>
-                    <div style="display: flex; gap: 10px;">
-                        <button class="btn-os" id="btn-sync-finance" style="background: var(--os-card); border: 1px solid var(--os-border); color: #fff; padding: 10px 20px; font-size: 0.75rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">
-                            <i class="fa-solid fa-rotate"></i> Sincronizar Pipeline
-                        </button>
-                    </div>
+                    <button class="btn-os" id="btn-sync-finance" style="background: var(--os-primary); border: none; color: #000; padding: 12px 24px; font-size: 0.7rem; font-weight: 800; border-radius: 8px; cursor: pointer; text-transform: uppercase; letter-spacing: 1.5px; transition: 0.3s;">
+                        <i class="fa-solid fa-rotate"></i> Sincronizar Pipeline
+                    </button>
                 </div>
 
                 <!-- CAMADA DE MÉTRICAS EXECUTIVAS -->
-                <div class="os-widget-grid" style="margin-bottom: 40px; grid-template-columns: repeat(7, 1fr);">
-                    <div class="os-widget">
+                <div class="os-widget-grid">
+                    <div class="os-widget" style="grid-column: span 2;">
                         <div class="finance-stat">
-                            <span>Receita Prevista</span>
+                            <span>Previsto</span>
                             <h2 id="total-expected">R$ 0,00</h2>
                             <p>Projeção Mensal</p>
                         </div>
                     </div>
-                    <div class="os-widget">
+                    <div class="os-widget" style="grid-column: span 2;">
                         <div class="finance-stat">
-                            <span>Recebida</span>
+                            <span>Recebido</span>
                             <h2 id="total-paid" style="color: var(--os-success);">R$ 0,00</h2>
                             <p>Caixa Realizado</p>
                         </div>
                     </div>
-                    <div class="os-widget">
+                    <div class="os-widget" style="grid-column: span 2;">
                         <div class="finance-stat">
                             <span>Pendente</span>
                             <h2 id="total-pending" style="color: var(--os-warning);">R$ 0,00</h2>
                             <p>Em Cobrança</p>
                         </div>
                     </div>
-                    <div class="os-widget">
+                    <div class="os-widget" style="grid-column: span 2;">
                         <div class="finance-stat">
-                            <span>Contratos Ativos</span>
+                            <span>Contratos</span>
                             <h2 id="active-contracts-count">0</h2>
                             <p>Recorrência Base</p>
                         </div>
                     </div>
-                    <div class="os-widget">
+                    <div class="os-widget" style="grid-column: span 2;">
                         <div class="finance-stat">
                             <span>Ticket Médio</span>
                             <h2 id="avg-ticket">R$ 0,00</h2>
-                            <p>Por Contrato</p>
+                            <p>Por Unidade</p>
                         </div>
                     </div>
-                    <div class="os-widget">
+                    <div class="os-widget" style="grid-column: span 2;">
                         <div class="finance-stat">
-                            <span>Próx. Venc.</span>
+                            <span>Vencendo</span>
                             <h2 id="next-due-count">0</h2>
-                            <p>Próximos 7 dias</p>
+                            <p>Próx. 7 dias</p>
                         </div>
                     </div>
-                    <div class="os-widget">
-                        <div class="finance-stat">
-                            <span>Receita em Risco</span>
+                    <div class="os-widget" style="grid-column: span 2;">
+                        <div class="finance-stat" style="border-left: 2px solid var(--os-danger); padding-left: 15px;">
+                            <span>Em Risco</span>
                             <h2 id="revenue-at-risk" style="color: var(--os-danger);">R$ 0,00</h2>
-                            <p>Atraso > 5 dias</p>
+                            <p>Atraso > 5d</p>
                         </div>
                     </div>
                 </div>
@@ -124,94 +231,61 @@
                 <div class="finance-grid">
                     <!-- SEÇÃO 1: VENCIMENTOS E COBRANÇA -->
                     <div class="finance-card">
-                        <div class="os-widget-header" style="margin-bottom: 20px;">
-                            <span class="os-widget-label">Vencimentos e Governança de Cobrança</span>
-                        </div>
-                        <table class="os-table">
+                        <span class="os-widget-label">Vencimentos e Governança de Cobrança</span>
+                        <table class="os-table" style="margin-top: 20px;">
                             <thead>
                                 <tr>
-                                    <th>Cliente / Empresa</th>
+                                    <th>Empresa / Cliente</th>
                                     <th>Valor</th>
                                     <th>Vencimento</th>
-                                    <th>Forma Pagto</th>
+                                    <th>Sincronia</th>
                                     <th>Status</th>
-                                    <th>CICLO FINANCEIRO</th>
-                                    <th style="text-align: right;">Ações de Controle</th>
+                                    <th style="text-align: right;">Controle</th>
                                 </tr>
                             </thead>
                             <tbody id="payments-body">
-                                <!-- Maria Aparecida Example -->
-                                <tr>
-                                    <td>
-                                        <div style="font-weight: 700;">Maria Aparecida</div>
-                                        <div style="font-size: 0.7rem; color: var(--os-text-muted);">Nutrição & Consultoria Alimentar</div>
-                                    </td>
-                                    <td style="font-family: var(--os-font-mono); font-weight: 600;">R$ 800,00</td>
-                                    <td>04/06/2026</td>
-                                    <td style="font-size: 0.7rem; text-transform: uppercase;">Pix</td>
-                                    <td><span class="status-badge status-pago">Pago</span></td>
-                                    <td style="color: var(--os-success); font-size: 0.75rem; font-weight: 700;">Liquidado</td>
-                                    <td>
-                                        <div class="action-btns" style="justify-content: flex-end;">
-                                            <button class="btn-mini" title="Gerar Recibo"><i class="fa-solid fa-file-invoice"></i></button>
-                                            <button class="btn-mini" title="Abrir Workspace"><i class="fa-solid fa-briefcase"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                <!-- Injetado via JS -->
                             </tbody>
                         </table>
                     </div>
 
-                    <!-- SEÇÃO 2: CONTRATOS E ESCOPO ATIVO -->
-                    <div class="finance-card">
-                        <div class="os-widget-header" style="margin-bottom: 20px;">
-                            <span class="os-widget-label">Contratos e Escopo Operacional Ativo</span>
+                    <div style="display: grid; grid-template-columns: 1fr 400px; gap: 20px;">
+                        <!-- SEÇÃO 2: CONTRATOS ATIVOS -->
+                        <div class="finance-card">
+                            <span class="os-widget-label">Contratos e Escopo Operacional</span>
+                            <table class="os-table" style="margin-top: 20px;">
+                                <thead>
+                                    <tr>
+                                        <th>Unidade / Escopo</th>
+                                        <th>Valor Mensal</th>
+                                        <th>Status</th>
+                                        <th>Renovação</th>
+                                        <th style="text-align: right;">Docs</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contracts-body">
+                                    <!-- Injetado via JS -->
+                                </tbody>
+                            </table>
                         </div>
-                        <table class="os-table">
-                            <thead>
-                                <tr>
-                                    <th>Empresa / Responsável</th>
-                                    <th>Módulo</th>
-                                    <th>Escopo Mensal</th>
-                                    <th>Valor Mensal</th>
-                                    <th>Status</th>
-                                    <th>Início</th>
-                                    <th>Renovação</th>
-                                    <th style="text-align: right;">Ações</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contracts-body">
-                                <tr>
-                                    <td>
-                                        <div style="font-weight: 700;">Maria Aparecida Nutrição</div>
-                                        <div style="font-size: 0.7rem; color: var(--os-text-muted);">Maria Aparecida</div>
-                                    </td>
-                                    <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">ENGENHARIA DE CONTEÚDO</td>
-                                    <td style="font-size: 0.75rem;">2 carrosséis + 2 reels/mês</td>
-                                    <td style="font-family: var(--os-font-mono); font-weight: 600;">R$ 800,00</td>
-                                    <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">Ativo</span></td>
-                                    <td>10/05/2026</td>
-                                    <td>10/11/2026</td>
-                                    <td>
-                                        <div class="action-btns" style="justify-content: flex-end;">
-                                            <button class="btn-mini" title="Abrir Contrato"><i class="fa-solid fa-file-pdf"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+
+                        <!-- SEÇÃO 4: ALERTAS OPERACIONAIS -->
+                        <div class="finance-card">
+                            <span class="os-widget-label">Monitor de Conformidade</span>
+                            <div id="alerts-container" style="margin-top: 20px;">
+                                <!-- Injetado via JS -->
+                            </div>
+                        </div>
                     </div>
 
                     <!-- SEÇÃO 3: SAÚDE CONTRATUAL -->
                     <div class="finance-card">
-                        <div class="os-widget-header" style="margin-bottom: 20px;">
-                            <span class="os-widget-label">Monitoramento de Saúde Contratual</span>
-                        </div>
-                        <table class="os-table">
+                        <span class="os-widget-label">Matriz de Saúde Contratual</span>
+                        <table class="os-table" style="margin-top: 20px;">
                             <thead>
                                 <tr>
-                                    <th>Cliente</th>
-                                    <th>Status Saúde</th>
+                                    <th>Unidade</th>
+                                    <th>Status</th>
                                     <th>Risco Financeiro</th>
                                     <th>Risco Operacional</th>
                                     <th>Risco Escopo</th>
@@ -219,32 +293,9 @@
                                 </tr>
                             </thead>
                             <tbody id="health-body">
-                                <tr>
-                                    <td>Maria Aparecida</td>
-                                    <td><span class="health-pill health-saudavel">Saudável</span></td>
-                                    <td style="font-size: 0.7rem; color: var(--os-success);">Nulo</td>
-                                    <td style="font-size: 0.7rem; color: var(--os-success);">Baixo</td>
-                                    <td style="font-size: 0.7rem; color: var(--os-success);">Em Conformidade</td>
-                                    <td style="font-size: 0.75rem; font-weight: 700; color: var(--os-primary);">Manter Entrega</td>
-                                </tr>
+                                <!-- Injetado via JS -->
                             </tbody>
                         </table>
-                    </div>
-
-                    <!-- SEÇÃO 4: ALERTAS OPERACIONAIS -->
-                    <div class="finance-card">
-                        <div class="os-widget-header" style="margin-bottom: 20px;">
-                            <span class="os-widget-label">Alertas Operacionais e Governança</span>
-                        </div>
-                        <div id="alerts-container">
-                            <div class="alert-item">
-                                <div class="alert-icon" style="color: var(--os-primary);"><i class="fa-solid fa-circle-info"></i></div>
-                                <div class="alert-content">
-                                    <h4>Próximo Vencimento: Maria Aparecida</h4>
-                                    <p>Vencimento em 04/06/2026. Fluxo de cobrança automática agendado.</p>
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
             </main>
