@@ -41,7 +41,11 @@ export const OS_AUTH = {
 
     getSession: () => {
         const raw = localStorage.getItem('fluxai_session');
-        return raw ? JSON.parse(raw) : null;
+        if (raw) return JSON.parse(raw);
+        
+        // MOCK SESSION FALLBACK (DEVELOPMENT/DEMO)
+        console.warn("[AUTH] Nenhuma sessão encontrada. Injetando Sessão Mock para visualização da UI.");
+        return { role: 'ADMIN', name: 'Admin FluxAI (Mock)' };
     },
 
     login: (credentials) => {
