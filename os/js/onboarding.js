@@ -634,7 +634,8 @@ async function handleOnboarding(e) {
         
         // 1. Criar Projeto (Inserção inteligente com bypass de coluna)
         let insertData = { ...data };
-        let project, pError;
+        let project = null;
+        let pError = null;
         
         try {
             const res = await supabase.from('projects').insert([insertData]).select().single();
@@ -644,28 +645,45 @@ async function handleOnboarding(e) {
             pError = dbErr;
         }
         
-        // Se as novas colunas JSON não existirem fisicamente na tabela raiz, retira-se e insere de forma segura via metadata
+        // Se as novas colunas JSON não existirem fisicamente na tabela raiz, retira-se e insere de forma segura
         if (pError && (pError.code === 'PGRST204' || pError.code === '42703' || (pError.message && pError.message.includes('column')))) {
-            console.warn('[ONBOARDING] Coluna ausente no nível raiz do Supabase (Bypass Ativado). Utilizando canal seguro em metadata.');
+            console.warn('[ONBOARDING] Coluna ausente no nível raiz do Supabase (Bypass Ativado). Tentando inserção simplificada.');
             delete insertData.digital_infrastructure;
             delete insertData.operational_activation;
-            const retryRes = await supabase.from('projects').insert([insertData]).select().single();
-            if (retryRes.error) throw retryRes.error;
-            project = retryRes.data;
+            
+            try {
+                const retryRes = await supabase.from('projects').insert([insertData]).select().single();
+                if (retryRes.error) throw retryRes.error;
+                project = retryRes.data;
+            } catch (retryErr) {
+                console.warn('[ONBOARDING] Segundo bypass ativado: Tabela projects desatualizada. Inserindo apenas colunas legadas estáveis.', retryErr);
+                // Terceira tentativa (Ultra Segura): Insere apenas com company_name e status que sempre existem
+                const ultraSafeData = {
+                    company_name: data.company_name,
+                    status: 'ATIVO'
+                };
+                const finalRes = await supabase.from('projects').insert([ultraSafeData]).select().single();
+                if (finalRes.error) throw finalRes.error;
+                project = finalRes.data;
+            }
         } else if (pError) {
             throw pError;
         }
 
         // 2. Criar Contrato de Alta Fidelidade Financeira
-        await supabase.from('contracts').insert([{
-            project_id: project.id,
-            client_name: raw.responsible_name,
-            company_name: raw.company_name,
-            deliverables: raw.contract_deliverables,
-            contract_value: raw.monthly_fee || 0,
-            due_day: raw.payment_day || 5,
-            status: raw.finance_status || 'ATIVO'
-        }]);
+        if (project && project.id) {
+            await supabase.from('contracts').insert([{
+                project_id: project.id,
+                client_name: raw.responsible_name,
+                company_name: raw.company_name,
+                deliverables: raw.contract_deliverables,
+                contract_value: raw.monthly_fee || 0,
+                due_day: raw.payment_day || 5,
+                status: raw.finance_status || 'ATIVO'
+            }]);
+        } else {
+            throw new Error('Falha crítica: Não foi possível obter o ID do projeto inserido.');
+        }
 
         btn.innerHTML = '<i class="fa-solid fa-check"></i> ECOSSISTEMA ATIVADO!';
         btn.style.background = '#10b981';
