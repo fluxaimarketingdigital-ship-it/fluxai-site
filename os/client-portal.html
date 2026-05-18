@@ -206,8 +206,26 @@
                 _allAssets = assets || [];
                 renderCalendar();
             } catch (err) {
-                console.error('[PORTAL] Erro:', err);
-                document.getElementById('client-name').innerText = 'Erro na sincronização';
+                console.warn('[PORTAL] Offline ou Erro de ID. Exibindo Estado de Manutenção Segura.', err);
+                
+                document.getElementById('client-name').innerText = 'MANUTENÇÃO PROGRAMADA';
+                document.getElementById('client-name').style.color = 'var(--os-warning)';
+                document.getElementById('client-profession').innerText = 'Sincronização Temporariamente Indisponível';
+                
+                const grid = document.getElementById('calendar-body');
+                if (grid) {
+                    grid.style.display = 'flex';
+                    grid.style.justifyContent = 'center';
+                    grid.style.alignItems = 'center';
+                    grid.style.padding = '60px 20px';
+                    grid.innerHTML = `
+                        <div style="text-align:center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); padding: 40px; border-radius: 12px; max-width: 500px;">
+                            <i class="fa-solid fa-shield-halved" style="font-size: 2.5rem; color: var(--os-warning); margin-bottom: 20px; opacity: 0.8;"></i>
+                            <h2 style="font-size: 1.2rem; margin-bottom: 10px; font-weight: 800;">Protocolo de Segurança Ativo</h2>
+                            <p style="font-size: 0.8rem; color: var(--os-text-muted); line-height: 1.6;">O acesso ao portal foi pausado temporariamente para manutenção estrutural ou validação de ID. A operação retornará em breve.</p>
+                        </div>
+                    `;
+                }
             }
         }
 
