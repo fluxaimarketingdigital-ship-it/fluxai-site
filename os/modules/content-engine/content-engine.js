@@ -1,5 +1,6 @@
-﻿import { OS_UI, OS_AUTH } from '../../js/os-core.js';
+import { OS_UI, OS_AUTH } from '../../js/os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
+import { contentEngineData } from './content-engine.data.js';
 
 let currentProject = null;
 let currentMonth = new Date().getMonth();

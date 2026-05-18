@@ -294,9 +294,14 @@
             let leads = crmLeadsData;
 
             if (supabase) {
-                const { data, error } = await supabase.from('leads').select('*').order('updated_at', { ascending: false });
-                if (!error && data && data.length > 0) {
-                    leads = data;
+                try {
+                    const { data, error } = await supabase.from('leads').select('*').order('updated_at', { ascending: false });
+                    if (error) throw error;
+                    if (data && data.length > 0) {
+                        leads = data;
+                    }
+                } catch (e) {
+                    console.warn("[CRM INTELLIGENCE] Erro no banco de dados. Usando Mock Data.", e);
                 }
             }
 

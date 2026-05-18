@@ -6,8 +6,32 @@ export const contentEngineData = {
         { id: 'metric-reach', label: 'Alcance Dist.', value: '85k', trend: '+12k', meta: 'Canais Integrados' }
     ],
     pipeline: [
-        { id: "CONT-001", title: "Whitepaper: Arquitetura de Crescimento B2B", stage: "Revisão", priority: "Alta", owner: "Admin", deadline: "2026-05-15" },
-        { id: "CONT-002", title: "Framework: Protocolo de Diagnóstico FluxAI", stage: "Produção", priority: "Crítica", owner: "Editor", deadline: "2026-05-12" },
-        { id: "CONT-003", title: "Case Study: Escala 10x na Indústria X", stage: "Análise", priority: "Alta", owner: "Analytics", deadline: "Concluído" }
+        { 
+            id: "CONT-001", 
+            title: "Diagnóstico: Arquitetura de Crescimento B2B", 
+            status: "PRODUÇÃO", 
+            priority: "CRÍTICA", 
+            platform: "LINKEDIN",
+            scheduled_at: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString(),
+            metadata: { responsible: "Estrategista", version: "V2", risk: true, approval_deadline: new Date(new Date().setDate(new Date().getDate() - 1)).toISOString() }
+        },
+        { 
+            id: "CONT-002", 
+            title: "Reels: Engenharia de Processos", 
+            status: "APROVAÇÃO FINAL", 
+            priority: "ALTA", 
+            platform: "INSTAGRAM",
+            scheduled_at: new Date(new Date().setDate(new Date().getDate() + 5)).toISOString(),
+            metadata: { responsible: "Audiovisual", version: "V1", risk: false, approval_deadline: new Date(new Date().setDate(new Date().getDate() + 2)).toISOString() }
+        },
+        { 
+            id: "CONT-003", 
+            title: "Case Study: Escala 10x Industrial", 
+            status: "PRONTO", 
+            priority: "MÉDIA", 
+            platform: "YOUTUBE",
+            scheduled_at: new Date().toISOString(),
+            metadata: { responsible: "Design", version: "FINAL", risk: false }
+        }
     ]
 };
