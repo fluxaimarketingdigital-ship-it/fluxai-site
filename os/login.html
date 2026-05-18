@@ -110,6 +110,12 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             } else {
+                // Registrar sessão no formato esperado pelo OS_AUTH (Síncrono)
+                localStorage.setItem('fluxai_session', JSON.stringify({
+                    role: 'ADMIN', 
+                    name: data.user.email,
+                    loginTime: new Date().toISOString()
+                }));
                 window.location.href = 'command-center.html';
             }
         });
