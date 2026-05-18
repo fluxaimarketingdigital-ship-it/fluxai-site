@@ -44,10 +44,9 @@
         </main>
     </div>
 
-    <script>
-        const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
-        const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+    <script type="module">
+        import { SUPABASE_CONFIG } from './config/supabase-config.js';
+        const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
         window.onload = async () => {
             console.log('[WORKSPACE] Página carregada, iniciando conexão...');

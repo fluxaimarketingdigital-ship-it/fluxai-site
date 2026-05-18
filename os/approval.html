@@ -311,7 +311,8 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script>
+    <script type="module">
+        import { SUPABASE_CONFIG } from './config/supabase-config.js';
         const CLIENT_VIEW_MATRIX = {
             'Direção Audiovisual (Reels)': 'REELS',
             'Estrutura Narrativa (Carrossel)': 'CARROSSEL',
@@ -457,9 +458,7 @@
             }
 
             try {
-                const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
-                const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-                _supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+                _supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
                 const { data: c, error } = await _supabaseClient.from('content_assets').select('*').eq('id', id).single();
                 

@@ -1,0 +1,67 @@
+$path = "os/modules/content-engine/content-engine.js"
+$content = Get-Content $path -Raw
+
+# Mapeamento de correções de codificação
+$replacements = @{
+    "AtenÃ§Ã£o" = "Atenção"
+    "CrÃtico" = "Crítico"
+    "PublicaÃ§Ã£o" = "Publicação"
+    "AÃ‡Ã•ES" = "AÇÕES"
+    "ConteÃºdo" = "Conteúdo"
+    "DireÃ§Ã£o" = "Direção"
+    "estratÃ©gica" = "estratégica"
+    "EstratÃ©gica" = "Estratégica"
+    "EstratÃ©gico" = "Estratégico"
+    "estratÃ©gico" = "estratégico"
+    "AprovaÃ§Ã£o" = "Aprovação"
+    "aprovaÃ§Ã£o" = "aprovação"
+    "ProduÃ§Ã£o" = "Produção"
+    "produÃ§Ã£o" = "produção"
+    "LogÃstica" = "Logística"
+    "referÃªncia" = "referência"
+    "ReferÃªncia" = "Referência"
+    "conclusÃ£o" = "conclusão"
+    "ConclusÃ£o" = "Conclusão"
+    "operaÃ§Ã£o" = "operação"
+    "OperaÃ§Ã£o" = "Operação"
+    "funes" = "funções"
+    "funes" = "funções"
+    "Conteǜo" = "Conteúdo"
+    "Conteǜo" = "Conteúdo"
+    "Direǜo" = "Direção"
+    "estratǸgico" = "estratégico"
+    "EstratǸgico" = "Estratégico"
+    "estratǸgica" = "estratégica"
+    "EstratǸgica" = "Estratégica"
+    "SilǦncio" = "Silêncio"
+    "Ǧnfase" = "ênfase"
+    "diferenǟ" = "diferença"
+    "tǸcnico" = "técnico"
+    "TǸcnico" = "técnico"
+    "escritǟ" = "escritório"
+    "iluminaǟ" = "iluminação"
+    "diagnǟ" = "diagnóstico"
+    "eficiǦncia" = "eficiência"
+    "aquisiǟ" = "aquisição"
+    "Aquisiǟ" = "Aquisição"
+    "sustentǭvel" = "sustentável"
+    "sustentǟ" = "sustentável"
+    "grǭfico" = "gráfico"
+    "inteligǦncia" = "inteligência"
+    "afirmaǟ" = "afirmação"
+    "trǟ" = "trás"
+    "pǭgina" = "página"
+    "Pǭgina" = "Página"
+    "sessǜo" = "sessão"
+    "Sessǜo" = "Sessão"
+    "decisǜo" = "decisão"
+    "Decisǜo" = "decisão"
+}
+
+foreach ($key in $replacements.Keys) {
+    $content = $content.Replace($key, $replacements[$key])
+}
+
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($path, $content, $utf8NoBom)
+Write-Host "Escritas corrigidas com sucesso."

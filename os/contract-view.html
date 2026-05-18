@@ -82,6 +82,7 @@
 
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        import { SUPABASE_CONFIG } from './config/supabase-config.js';
         
         async function load() {
             const params = new URLSearchParams(window.location.search);
@@ -94,10 +95,7 @@
 
             try {
                 // Configuração Direta e Infalível
-                const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
-                const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
-                
-                const supabase = createClient(supabaseUrl, supabaseKey);
+                const supabase = createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
                 const { data: c, error } = await supabase
                     .from('contracts')

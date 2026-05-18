@@ -42,9 +42,9 @@
         </main>
     </div>
 
-    <script>
-        const supabaseUrl = "https://mufgwetfhfhhmhowbhjj.supabase.co";
-        const supabaseKey = "sb_publishable_Ui_zR38kkGVdTxRUELcRfw_5ahurUs5";
+    <script type="module">
+        import { SUPABASE_CONFIG } from './config/supabase-config.js';
+        const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
         const CLIENT_VIEW_MATRIX = {
             'Direção Estratégica Audiovisual': 'REELS',
@@ -95,7 +95,6 @@
             }
 
             try {
-                const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
                 statusEl.innerText = "🔌 Conectando ao Banco...";
                 const { data: project } = await supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle();
                 if (project) {

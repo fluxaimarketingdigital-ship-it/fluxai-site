@@ -110,13 +110,34 @@
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             } else {
-                // Registrar sessão no formato esperado pelo OS_AUTH (Síncrono)
-                localStorage.setItem('fluxai_session', JSON.stringify({
-                    role: 'ADMIN', 
-                    name: data.user.email,
-                    loginTime: new Date().toISOString()
-                }));
-                window.location.href = 'command-center.html';
+                try {
+                    // Buscar perfil para validar Role Real no banco de dados (tabela profiles)
+                    const { data: profile, error: profileError } = await supabase
+                        .from('profiles')
+                        .select('role, full_name')
+                        .eq('id', data.user.id)
+                        .single();
+
+                    const userRole = profile?.role || 'CLIENT';
+                    const userName = profile?.full_name || data.user.email;
+
+                    // Registrar sessão no formato esperado pelo OS_AUTH (Síncrono)
+                    localStorage.setItem('fluxai_session', JSON.stringify({
+                        role: userRole, 
+                        name: userName,
+                        loginTime: new Date().toISOString()
+                    }));
+                    window.location.href = 'command-center.html';
+                } catch (profileErr) {
+                    console.error('[LOGIN_PROFILE_ERROR]', profileErr);
+                    // Fallback seguro caso o perfil falhe
+                    localStorage.setItem('fluxai_session', JSON.stringify({
+                        role: 'CLIENT', 
+                        name: data.user.email,
+                        loginTime: new Date().toISOString()
+                    }));
+                    window.location.href = 'command-center.html';
+                }
             }
         });
     </script>
