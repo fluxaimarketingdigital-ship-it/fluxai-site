@@ -567,7 +567,10 @@ async function handleOnboarding(e) {
             readjustment: raw.finance_readjustment,
             status: raw.finance_status,
             responsible: raw.finance_responsible,
-            notes: raw.finance_contract_notes
+            notes: raw.finance_contract_notes,
+            extra_services_type: raw.finance_extra_services_type,
+            extra_services_value: raw.finance_extra_services_value,
+            extra_services_desc: raw.finance_extra_services_desc
         },
         bridges: {
             accesses: Array.from(formData.getAll('required_accesses')),
@@ -672,15 +675,36 @@ async function handleOnboarding(e) {
 
         // 2. Criar Contrato de Alta Fidelidade Financeira
         if (project && project.id) {
-            await supabase.from('contracts').insert([{
+            const extraValue = Number(raw.finance_extra_services_value) || 0;
+            let finalDeliverables = raw.contract_deliverables || '';
+            if (extraValue > 0) {
+                finalDeliverables += `\n[EXTRA]: ${raw.finance_extra_services_type} - ${raw.finance_extra_services_desc}`;
+            }
+
+            const contractRes = await supabase.from('contracts').insert([{
                 project_id: project.id,
                 client_name: raw.responsible_name,
                 company_name: raw.company_name,
-                deliverables: raw.contract_deliverables,
+                deliverables: finalDeliverables,
                 contract_value: raw.monthly_fee || 0,
                 due_day: raw.payment_day || 5,
                 status: raw.finance_status || 'ATIVO'
-            }]);
+            }]).select().single();
+
+            if (contractRes.data && extraValue > 0) {
+                try {
+                    await supabase.from('payments').insert([{
+                        contract_id: contractRes.data.id,
+                        amount_due: extraValue,
+                        amount_paid: 0,
+                        due_date: new Date().toISOString().split('T')[0],
+                        status: 'PENDENTE',
+                        payment_method: raw.finance_payment_method || 'Pix'
+                    }]);
+                } catch (e) {
+                    console.warn('[ONBOARDING] Erro ao inserir pagamento avulso', e);
+                }
+            }
         } else {
             throw new Error('Falha crítica: Não foi possível obter o ID do projeto inserido.');
         }

@@ -16,23 +16,23 @@ window.changeMonth = (delta) => {
 
 const sLog = (msg) => { if (window.screenLog) window.screenLog(msg); console.log('[ENGINE]', msg); };
 
-// MATRIZ DE OPERAÃ‡Ã•ES ESTRATÃ‰GICAS FLUXAI v7.0 (FLUXO MESTRE)
+// MATRIZ DE OPERA�!�"ES ESTRAT�0GICAS FLUXAI v7.0 (FLUXO MESTRE)
 const STRATEGIC_MATRIX = {
     'REELS': { 
-        name: 'DireÃ§Ã£o Operacional Audiovisual', 
+        name: 'Direção Operacional Audiovisual', 
         clientPrefix: 'REELS', 
         platform: 'REELS',
         generate: (p, obj) => `
-ðŸŽ¯ OBJETIVO: ${obj}
-ðŸŽ¬ FORMATO: Reels (Vertical 9:16)
-â�±ï¸� TEMPO ESTIMADO: 45-60 segundos
+�x}� OBJETIVO: ${obj}
+�x}� FORMATO: Reels (Vertical 9:16)
+����� TEMPO ESTIMADO: 45-60 segundos
 
-ðŸª� HOOK: "A maioria das empresas nÃ£o falha por falta de produto, mas por excesso de ruÃ­do operacional."
-â�¸ï¸� PAUSA ESTRATÃ‰GICA: [SilÃªncio de 1.5s para Ãªnfase visual]
-ðŸ“� DESENVOLVIMENTO: Discorrer sobre a diferenÃ§a entre 'movimento' e 'progresso real'. Utilizar tom de voz Soberano e TÃ©cnico.
-ðŸ‘�ï¸� DIREÃ‡ÃƒO DE CENA: Enquadramento em plano mÃ©dio. Fundo neutro/escritÃ³rio. IluminaÃ§Ã£o de alto contraste.
-âœ¨ CTA: "Comente ESTRUTURA para acessar o diagnÃ³stico de eficiÃªncia da FluxAI."
-ðŸ“� LEGENDA: Narrativa focada em autoridade executiva e diferenciaÃ§Ã£o de mercado.
+�x�� HOOK: "A maioria das empresas não falha por falta de produto, mas por excesso de ruído operacional."
+����� PAUSA ESTRAT�0GICA: [Silêncio de 1.5s para ênfase visual]
+�x� DESENVOLVIMENTO: Discorrer sobre a diferença entre 'movimento' e 'progresso real'. Utilizar tom de voz Soberano e Técnico.
+�x��� DIRE�!ÒO DE CENA: Enquadramento em plano médio. Fundo neutro/escritório. Iluminação de alto contraste.
+�S� CTA: "Comente ESTRUTURA para acessar o diagnóstico de eficiência da FluxAI."
+�x� LEGENDA: Narrativa focada em autoridade executiva e diferenciação de mercado.
         `
     },
     'CARROSSEL': { 
@@ -40,45 +40,45 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'CARROSSEL', 
         platform: 'INSTAGRAM',
         generate: (p, obj) => `
-ðŸŽ¯ OBJETIVO: ${obj}
-ðŸŽ¬ FORMATO: Carrossel EstratÃ©gico (10 slides)
+�x}� OBJETIVO: ${obj}
+�x}� FORMATO: Carrossel Estratégico (10 slides)
 
-ðŸ–¼ï¸� ESTRUTURA NARRATIVA:
-- Slide 01: [Gancho de AtenÃ§Ã£o] "O custo invisÃ­vel da desorganizaÃ§Ã£o estratÃ©gica."
-- Slide 02: [TensÃ£o] Por que processos manuais estÃ£o drenando sua margem de lucro.
-- Slide 03: [Conceito] A lÃ³gica da Engenharia de Processos aplicada ao marketing.
-- Slide 04: [DiferenciaÃ§Ã£o] FluxAI OS vs. GestÃ£o Tradicional.
-- Slide 05: [Metodologia] Os 4 pilares da escala sustentÃ¡vel.
-- Slide 06: [VisualizaÃ§Ã£o] GrÃ¡fico de eficiÃªncia operacional.
-- Slide 10: [CTA] Direcionamento para a Central de InteligÃªncia.
+�x��� ESTRUTURA NARRATIVA:
+- Slide 01: [Gancho de Atenção] "O custo invisível da desorganização estratégica."
+- Slide 02: [Tensão] Por que processos manuais estão drenando sua margem de lucro.
+- Slide 03: [Conceito] A lógica da Engenharia de Processos aplicada ao marketing.
+- Slide 04: [Diferenciação] FluxAI OS vs. Gestão Tradicional.
+- Slide 05: [Metodologia] Os 4 pilares da escala sustentável.
+- Slide 06: [Visualização] Gráfico de eficiência operacional.
+- Slide 10: [CTA] Direcionamento para a Central de Inteligência.
         `
     },
     'CARD': { 
-        name: 'DireÃ§Ã£o EstratÃ©gica Visual', 
+        name: 'Direção Estratégica Visual', 
         clientPrefix: 'POST', 
         platform: 'INSTAGRAM',
         generate: (p, obj) => `
-ðŸŽ¯ OBJETIVO: ${obj}
-ðŸ’¡ CONCEITO: AfirmaÃ§Ã£o de Autoridade Absoluta.
-ðŸŽ¨ DESIGN: Tipografia imponente, alto espaÃ§o negativo (silÃªncio visual).
-ðŸ“� HEADLINE: "Escala nÃ£o Ã© sobre intensidade, Ã© sobre arquitetura."
-âœ¨ CTA: "Toque no link da Bio para entender a Engenharia por trÃ¡s da FluxAI."
+�x}� OBJETIVO: ${obj}
+�x� CONCEITO: Afirmação de Autoridade Absoluta.
+�x}� DESIGN: Tipografia imponente, alto espaço negativo (silêncio visual).
+�x� HEADLINE: "Escala não é sobre intensidade, é sobre arquitetura."
+�S� CTA: "Toque no link da Bio para entender a Engenharia por trás da FluxAI."
         `
     },
     'SITE': { 
-        name: 'Arquitetura EstratÃ©gica Digital', 
+        name: 'Arquitetura Estratégica Digital', 
         clientPrefix: 'SITE', 
         platform: 'WEB',
         generate: (p, obj) => `
-ðŸŽ¯ OBJETIVO: ConversÃ£o de Alta Autoridade (High-Ticket)
-ðŸŒ� ESTRUTURA UX: Foco em Jornada de DecisÃ£o Executiva
+�x}� OBJETIVO: Conversão de Alta Autoridade (High-Ticket)
+�xR� ESTRUTURA UX: Foco em Jornada de Decisão Executiva
 
-ðŸ�—ï¸� SEÃ‡Ã•ES:
-1. HERO: Proposta de valor inquestionÃ¡vel + Visual Cinematic.
-2. DIAGNÃ“STICO: ExposiÃ§Ã£o das dores do ICP e soluÃ§Ã£o tÃ©cnica.
-3. ECOSSISTEMA: Detalhamento dos mÃ³dulos operacionais.
-4. PROVA DE VALOR: Resultados tangÃ­veis e depoimentos selecionados.
-ðŸš€ SEO: OtimizaÃ§Ã£o para palavras-chave de intenÃ§Ã£o comercial institucional.
+�x��� SE�!�"ES:
+1. HERO: Proposta de valor inquestionável + Visual Cinematic.
+2. DIAGN�STICO: Exposição das dores do ICP e solução técnica.
+3. ECOSSISTEMA: Detalhamento dos módulos operacionais.
+4. PROVA DE VALOR: Resultados tangíveis e depoimentos selecionados.
+�xa� SEO: Otimização para palavras-chave de intenção comercial institucional.
         `
     },
     'BRANDING': { 
@@ -86,20 +86,20 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'BRANDING', 
         platform: 'BRAND',
         generate: (p, obj) => `
-ðŸ’Ž PERCEPÃ‡ÃƒO: Posicionamento de Elite e Exclusividade TÃ©cnica.
-ðŸ“� NARRATIVA: Construir a imagem de ${p.company_name} como autoridade mÃ¡xima no setor.
-ðŸŽ¨ VISUAL: Paleta sÃ³bria, contrastes elegantes e iconografia proprietÃ¡ria.
+�x} PERCEP�!ÒO: Posicionamento de Elite e Exclusividade Técnica.
+�x� NARRATIVA: Construir a imagem de ${p.company_name} como autoridade máxima no setor.
+�x}� VISUAL: Paleta sóbria, contrastes elegantes e iconografia proprietária.
         `
     },
     'TRAFEGO': { 
-        name: 'EstratÃ©gia de AquisiÃ§Ã£o', 
-        clientPrefix: 'AQUISIÃ‡ÃƒO', 
+        name: 'Estratégia de Aquisição', 
+        clientPrefix: 'AQUISI�!ÒO', 
         platform: 'ADS',
         generate: (p, obj) => `
-ðŸŽ¯ OBJETIVO: AtraÃ§Ã£o de Leads Qualificados (ICP High-Ticket)
-ðŸ“¡ CANAIS: Meta Ads + LinkedIn Ads
-ðŸ“� CRIATIVOS: Foco em dor latente e prova de autoridade.
-ðŸ’° ESTRATÃ‰GIA: Funil de conscientizaÃ§Ã£o progressiva com foco em LTV.
+�x}� OBJETIVO: Atração de Leads Qualificados (ICP High-Ticket)
+�x� CANAIS: Meta Ads + LinkedIn Ads
+�x� CRIATIVOS: Foco em dor latente e prova de autoridade.
+�x� ESTRAT�0GIA: Funil de conscientização progressiva com foco em LTV.
         `
     },
     'CRM': { 
@@ -107,29 +107,29 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'CRM', 
         platform: 'CRM',
         generate: (p, obj) => `
-ðŸ“Š GESTÃƒO: InteligÃªncia de Dados aplicada ao Funil de Vendas.
-ðŸ”„ AUTOMAÃ‡ÃƒO: RÃ©guas de relacionamento baseadas no comportamento do lead.
-ðŸ“ˆ MÃ‰TRICA: Foco em Health Score e Taxa de RetenÃ§Ã£o.
+�x` GESTÒO: Inteligência de Dados aplicada ao Funil de Vendas.
+�x AUTOMA�!ÒO: Réguas de relacionamento baseadas no comportamento do lead.
+�x� M�0TRICA: Foco em Health Score e Taxa de Retenção.
         `
     },
     'AUTOMACAO': { 
         name: 'Arquitetura Operacional', 
-        clientPrefix: 'AUTOMAÃ‡ÃƒO', 
+        clientPrefix: 'AUTOMA�!ÒO', 
         platform: 'SYSTEM',
         generate: (p, obj) => `
-âš™ï¸� FLUXO: AutomaÃ§Ã£o de processos repetitivos para ganho de eficiÃªncia.
-ðŸ”— INTEGRAÃ‡ÃƒO: SincronizaÃ§Ã£o em tempo real entre vendas e operaÃ§Ã£o.
-ðŸ›¡ï¸� GOVERNANÃ‡A: SeguranÃ§a de dados e rastreabilidade total das aÃ§Ãµes.
+�a"�� FLUXO: Automação de processos repetitivos para ganho de eficiência.
+�x INTEGRA�!ÒO: Sincronização em tempo real entre vendas e operação.
+�x:��� GOVERNAN�!A: Segurança de dados e rastreabilidade total das ações.
         `
     },
     'CONSULTORIA': { 
-        name: 'DiagnÃ³stico EstratÃ©gico', 
-        clientPrefix: 'DIAGNÃ“STICO', 
+        name: 'Diagnóstico Estratégico', 
+        clientPrefix: 'DIAGN�STICO', 
         platform: 'CONSULTING',
         generate: (p, obj) => `
-ðŸ“‹ ESCOPO: AnÃ¡lise 360Âº da infraestrutura digital e operacional.
-ðŸ“‘ ENTREGA: RelatÃ³rio tÃ©cnico com pontos de atrito e oportunidades de escala.
-ðŸš€ IMPACTO: DefiniÃ§Ã£o do roadmap estratÃ©gico para os prÃ³ximos 12 meses.
+�x9 ESCOPO: Análise 360º da infraestrutura digital e operacional.
+�x ENTREGA: Relatório técnico com pontos de atrito e oportunidades de escala.
+�xa� IMPACTO: Definição do roadmap estratégico para os próximos 12 meses.
         `
     }
 };
@@ -138,23 +138,23 @@ const RESPONSIBLE_MAP = {
     'AUDIOVISUAL': 'Audiovisual',
     'REELS': 'Audiovisual',
     'NARRATIVA': 'Estrategista',
-    'DIREÃ‡ÃƒO': 'Estrategista',
+    'DIRE�!ÒO': 'Estrategista',
     'ARQUITETURA': 'Design',
     'CARROSSEL': 'Design',
     'CARD': 'Design',
     'SITE': 'Desenvolvimento Web',
-    'TRAFEGO': 'Gestor de TrÃ¡fego',
-    'ADS': 'Gestor de TrÃ¡fego',
+    'TRAFEGO': 'Gestor de Tráfego',
+    'ADS': 'Gestor de Tráfego',
     'BRANDING': 'Estrategista',
     'CRM': 'Estrategista',
-    'AUTOMAÃ‡ÃƒO': 'Sistemas',
-    'DIAGNÃ“STICO': 'Estrategista'
+    'AUTOMA�!ÒO': 'Sistemas',
+    'DIAGN�STICO': 'Estrategista'
 };
 
 export async function initEngine() {
-    sLog('Iniciando Motor de ConteÃºdo v7.0...');
+    sLog('Iniciando Motor de Conteúdo v7.0...');
     try {
-        // Expor funÃ§Ãµes globais para a UI
+        // Expor funções globais para a UI
         window.switchTab = switchTab;
         
         // Recuperar contexto salvo
@@ -175,16 +175,16 @@ export async function initEngine() {
         sLog('Carga Inicial: OK');
         setupRealtime();
 
-        // BOTÃƒO GLOBAL WA (TOP BAR)
+        // BOTÒO GLOBAL WA (TOP BAR)
         const btnGlobalWa = document.getElementById('btn-global-wa');
         if (btnGlobalWa) {
             btnGlobalWa.onclick = () => {
                 const projectFilter = document.getElementById('project-filter');
                 const selectedId = projectFilter.value;
-                if (!selectedId) return alert('Selecione um cliente especÃ­fico para enviar o lembrete direto.');
+                if (!selectedId) return alert('Selecione um cliente específico para enviar o lembrete direto.');
                 
                 const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${selectedId}`;
-                const msg = `OlÃ¡! ðŸš€%0A%0APassando para lembrar que temos conteÃºdos aguardando sua aprovaÃ§Ã£o no portal da FluxAI.%0A%0AConfira aqui seu calendÃ¡rio atualizado:%0A${portalLink}`;
+                const msg = `Olá! �xa�%0A%0APassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.%0A%0AConfira aqui seu calendário atualizado:%0A${portalLink}`;
                 window.open(`https://wa.me/?text=${msg}`, '_blank');
             };
         }
@@ -195,7 +195,7 @@ export async function initEngine() {
                 currentProject = e.target.value;
                 localStorage.setItem('fluxai_current_project_id', currentProject);
                 
-                // Mostrar/Esconder botão de cópia
+                // Mostrar/Esconder bot�o de c�pia
                 const btnCopy = document.getElementById('btn-copy-portal');
                 if (btnCopy) btnCopy.style.display = currentProject ? 'flex' : 'none';
                 
@@ -237,7 +237,7 @@ async function loadProjects() {
             throw error;
         }
 
-        // Armazenar projetos globalmente para consulta rÃ¡pida
+        // Armazenar projetos globalmente para consulta rápida
         window.allProjects = projects || [];
 
         const select = document.getElementById('project-filter');
@@ -252,7 +252,7 @@ async function loadProjects() {
             sLog(`${window.allProjects.length} Clientes Sincronizados.`);
         }
     } catch (e) {
-        sLog('Falha CrÃ­tica na Carga de Clientes: ' + e.message);
+        sLog('Falha Crítica na Carga de Clientes: ' + e.message);
         console.error(e);
     }
 }
@@ -261,7 +261,7 @@ async function loadContent() {
     const dashboard = document.querySelector('main');
     const projectFilter = document.getElementById('project-filter');
     
-    // DEFESA DE INTERFACE: Garantir que elementos bÃ¡sicos existam
+    // DEFESA DE INTERFACE: Garantir que elementos básicos existam
     const workflowDeadline = document.getElementById('workflow-deadline');
     const workflowCard = document.getElementById('workflow-card');
     const placeholder = document.getElementById('project-placeholder');
@@ -276,7 +276,7 @@ async function loadContent() {
     } else {
         const projectData = window.allProjects?.find(p => p.id === currentProject);
         if (projectData && workflowDeadline && workflowCard) {
-            // Tenta buscar o dia em diferentes possÃ­veis colunas do banco
+            // Tenta buscar o dia em diferentes possíveis colunas do banco
             const deadlineDay = projectData.next_cycle_day || projectData.planning_day || 20;
             const now = new Date();
             const currentDay = now.getDate();
@@ -299,7 +299,7 @@ async function loadContent() {
             }
         }
 
-        // RESTAURAR BOTÃ•ES DE AÃ‡ÃƒO
+        // RESTAURAR BOT�"ES DE A�!ÒO
         const copyBtn = document.getElementById('btn-copy-portal');
         if (copyBtn) copyBtn.style.display = 'flex';
         
@@ -328,7 +328,7 @@ async function loadContent() {
         renderMetrics(safeContents);
         renderContentTable(safeContents);
         
-        // Renderizar CalendÃ¡rios
+        // Renderizar Calendários
         renderCalendar('calendar-strategic-body', safeContents, 'STRATEGIC');
         renderCalendar('calendar-operational-body', safeContents, 'OPERATIONAL');
         
@@ -337,7 +337,7 @@ async function loadContent() {
         checkPublishingAlerts(contents);
         
     } catch (e) {
-        sLog('Erro ConteÃºdo: ' + e.message);
+        sLog('Erro Conteúdo: ' + e.message);
     }
 }
 
@@ -363,7 +363,7 @@ async function checkLogisticsCycle() {
         } else if (banner) {
             banner.style.display = 'none';
         }
-    } catch (e) { console.error('[LOGÃ�STICA] Erro ao verificar ciclo:', e); }
+    } catch (e) { console.error('[LOG��STICA] Erro ao verificar ciclo:', e); }
 }
 
 async function checkPublishingAlerts(contents) {
@@ -379,8 +379,8 @@ async function checkPublishingAlerts(contents) {
     });
 
     if (todayPosts.length > 0) {
-        sLog(`ðŸ“¢ ALERTA: VocÃª tem ${todayPosts.length} conteÃºdos para publicar HOJE!`);
-        // Opcional: Mostrar uma notificaÃ§Ã£o visual mais agressiva ou banner
+        sLog(`�x� ALERTA: Você tem ${todayPosts.length} conteúdos para publicar HOJE!`);
+        // Opcional: Mostrar uma notificação visual mais agressiva ou banner
         const metricSchedule = document.getElementById('metric-schedule');
         if (metricSchedule) {
             metricSchedule.style.border = '1px solid var(--os-primary)';
@@ -393,29 +393,29 @@ function renderMetrics(contents) {
     const now = new Date();
     const metrics = {
         total: contents.length,
-        approval: contents.filter(c => c.status.includes('APROVAÃ‡ÃƒO')).length,
+        approval: contents.filter(c => c.status.includes('APROVA�!ÒO')).length,
         atrasado: contents.filter(c => {
             if (c.status === 'PUBLICADO' || c.status === 'PRONTO') return false;
             const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
             const scheduled = new Date(c.scheduled_at);
-            // Atraso se passou do prazo de aprovaÃ§Ã£o OU se estÃ¡ em produÃ§Ã£o e passou da data de postagem
-            return (deadline && deadline < now) || (c.status === 'PRODUÃ‡ÃƒO' && scheduled < now);
+            // Atraso se passou do prazo de aprovação OU se está em produção e passou da data de postagem
+            return (deadline && deadline < now) || (c.status === 'PRODU�!ÒO' && scheduled < now);
         }).length,
         ready: contents.filter(c => c.status === 'PRONTO').length
     };
 
-    OS_UI.renderMetric('metric-assets', { label: 'LogÃ­stica Total', value: metrics.total, trend: 'v1.0', meta: 'Escopo' });
-    OS_UI.renderMetric('metric-approval', { label: 'Aguardando Cliente', value: metrics.approval, trend: '!', meta: 'AtenÃ§Ã£o' });
-    OS_UI.renderMetric('metric-production', { label: 'Atraso Operacional', value: metrics.atrasado, trend: 'down', meta: 'CrÃ­tico' });
-    OS_UI.renderMetric('metric-schedule', { label: 'Prontos para Postar', value: metrics.ready, trend: 'âœ”', meta: 'PublicaÃ§Ã£o' });
+    OS_UI.renderMetric('metric-assets', { label: 'Logística Total', value: metrics.total, trend: 'v1.0', meta: 'Escopo' });
+    OS_UI.renderMetric('metric-approval', { label: 'Aguardando Cliente', value: metrics.approval, trend: '!', meta: 'Atenção' });
+    OS_UI.renderMetric('metric-production', { label: 'Atraso Operacional', value: metrics.atrasado, trend: 'down', meta: 'Crítico' });
+    OS_UI.renderMetric('metric-schedule', { label: 'Prontos para Postar', value: metrics.ready, trend: '�S', meta: 'Publicação' });
 
-    // Atualizar status para ATRASADO via cÃ³digo se necessÃ¡rio (LÃ³gica em tempo real)
+    // Atualizar status para ATRASADO via código se necessário (Lógica em tempo real)
     contents.forEach(async c => {
         if (c.status !== 'ATRASADO' && c.status !== 'PUBLICADO' && c.status !== 'PRONTO') {
             const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
             if (deadline && deadline < now) {
                 // Sincronizar com DB (Opcional - pode ser apenas visual no dashboard)
-                console.warn(`[LOGÃ�STICA] Ativo ${c.title} estÃ¡ ATRASADO por prazo de aprovaÃ§Ã£o.`);
+                console.warn(`[LOG��STICA] Ativo ${c.title} está ATRASADO por prazo de aprovação.`);
             }
         }
     });
@@ -424,7 +424,7 @@ function renderMetrics(contents) {
 function renderContentTable(contents) {
     const body = document.getElementById('pipeline-table-body');
     if (!contents || contents.length === 0) {
-        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;">Nenhum conteÃºdo.</td></tr>`;
+        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px;">Nenhum conteúdo.</td></tr>`;
         return;
     }
 
@@ -440,7 +440,7 @@ function renderContentTable(contents) {
                     <div style="display:flex; align-items:center; gap:8px;">
                         <div style="font-weight: 700; color: #fff;">${c.title}</div>
                         <span style="font-size: 0.5rem; background: ${isHighRisk ? 'var(--os-danger)' : (c.metadata?.version === 'FINAL' ? 'var(--os-primary)' : '#333')}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800;">${versionLabel}</span>
-                        ${isHighRisk ? '<i class="fa-solid fa-triangle-exclamation" title="Risco Operacional: Ciclo de ajustes alto ou atraso crÃ­tico" style="color:var(--os-danger); font-size:0.7rem; animation: pulse 2s infinite;"></i>' : ''}
+                        ${isHighRisk ? '<i class="fa-solid fa-triangle-exclamation" title="Risco Operacional: Ciclo de ajustes alto ou atraso crítico" style="color:var(--os-danger); font-size:0.7rem; animation: pulse 2s infinite;"></i>' : ''}
                     </div>
                     <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;">
                         <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> ${scheduled}
@@ -461,18 +461,18 @@ function renderContentTable(contents) {
                     <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
 
                         ${c.status === 'PRONTO' ? `
-                            <button class="btn-mini" title="Ponte de PublicaÃ§Ã£o" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
+                            <button class="btn-mini" title="Ponte de Publicação" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
                                 <i class="fa-solid fa-rocket"></i>
                             </button>
                         ` : `
                             ${c.status !== 'PLANEJAMENTO' ? `
-                                <button class="btn-mini" title="ForÃ§ar ConclusÃ£o (Pular AprovaÃ§Ã£o)" onclick="window.forceReady('${c.id}')" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">
+                                <button class="btn-mini" title="Forçar Conclusão (Pular Aprovação)" onclick="window.forceReady('${c.id}')" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">
                                     <i class="fa-solid fa-circle-check"></i>
                                 </button>
                             ` : ''}
                         `}
                         ${c.metadata?.reference_url ? `
-                            <a href="${c.metadata.reference_url}" target="_blank" class="btn-mini" title="Ver ReferÃªncia" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: #3b82f6;">
+                            <a href="${c.metadata.reference_url}" target="_blank" class="btn-mini" title="Ver Referência" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: #3b82f6;">
                                 <i class="fa-solid fa-link"></i>
                             </a>
                         ` : ''}
@@ -499,8 +499,8 @@ function renderCalendar(containerId, contents, mode) {
     if (!container) return;
     container.innerHTML = '';
     
-    // Atualizar Label do MÃªs
-    const monthNames = ["Janeiro", "Fevereiro", "MarÃ§o", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+    // Atualizar Label do Mês
+    const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const label = document.getElementById('calendar-month-label');
     if (label) label.innerText = `${monthNames[currentMonth]} ${currentYear}`;
 
@@ -524,7 +524,7 @@ function renderCalendar(containerId, contents, mode) {
             
             // Filtro de visibilidade por modo
             // Filtro Estrategico Removido para sincronia total com a esteira
-            if (!isStrategic && !['PRODUÃ‡ÃƒO', 'REVISÃƒO INTERNA FINAL', 'APROVAÃ‡ÃƒO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
+            if (!isStrategic && !['PRODU�!ÒO', 'REVISÒO INTERNA FINAL', 'APROVA�!ÒO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
 
             return `
                 <div class="calendar-event" onclick="window.openApproval('${c.id}')" 
@@ -547,14 +547,14 @@ function renderCalendar(containerId, contents, mode) {
 
 function getStatusBg(status) {
     if (status === 'PLANEJAMENTO') return '#8b5cf6'; // Roxo
-    if (status === 'REVISÃƒO GESTÃƒO') return '#8b5cf6'; // Roxo
-    if (status === 'APROVAÃ‡ÃƒO PLANEJAMENTO') return '#3b82f6'; // Azul
-    if (status === 'APROVAÃ‡ÃƒO ESTRATÃ‰GICA') return '#3b82f6'; // Azul
+    if (status === 'REVISÒO GESTÒO') return '#8b5cf6'; // Roxo
+    if (status === 'APROVA�!ÒO PLANEJAMENTO') return '#3b82f6'; // Azul
+    if (status === 'APROVA�!ÒO ESTRAT�0GICA') return '#3b82f6'; // Azul
     if (status === 'AJUSTE') return '#ef4444'; // Vermelho
-    if (status === 'PRODUÃ‡ÃƒO') return '#f59e0b'; // Amarelo/Laranja
-    if (status === 'AJUSTE DE PRODUÃ‡ÃƒO') return '#ec4899'; // Rosa (Refinamento tÃ©cnico)
-    if (status === 'REVISÃƒO INTERNA FINAL') return '#ec4899';
-    if (status === 'APROVAÃ‡ÃƒO FINAL') return '#3b82f6'; // Azul
+    if (status === 'PRODU�!ÒO') return '#f59e0b'; // Amarelo/Laranja
+    if (status === 'AJUSTE DE PRODU�!ÒO') return '#ec4899'; // Rosa (Refinamento técnico)
+    if (status === 'REVISÒO INTERNA FINAL') return '#ec4899';
+    if (status === 'APROVA�!ÒO FINAL') return '#3b82f6'; // Azul
     if (status === 'PRONTO') return '#10b981'; // Verde
     if (status === 'PUBLICADO') return '#059669'; // Verde Escuro
     if (status === 'ATRASADO') return '#7f1d1d'; // Marrom/Vermelho Escuro
@@ -571,38 +571,38 @@ window.openEditModal = async (id) => {
     const supabase = getSupabase();
     const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
     if (c) {
-        const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVAÃ‡ÃƒO ESTRATÃ‰GICA' || c.status === 'REVISÃƒO GESTÃƒO';
+        const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVA�!ÒO ESTRAT�0GICA' || c.status === 'REVISÒO GESTÒO';
         const isDirector = localStorage.getItem('os_role') === 'DIRETOR';
         
-        // Mapear campos do HTML (Somente os que sÃ£o fixos)
+        // Mapear campos do HTML (Somente os que são fixos)
         document.getElementById('edit-asset-title').value = c.title;
         document.getElementById('edit-asset-ref').value = c.metadata?.reference_url || '';
         document.getElementById('edit-asset-art-final').value = c.metadata?.final_asset_url || '';
         
-        // Injetar campos de metadados no container especÃ­fico
+        // Injetar campos de metadados no container específico
         const metaGrid = document.getElementById('edit-asset-meta-fields');
         if (metaGrid) {
-        // Renderizar Roteiro e HistÃ³rico
+        // Renderizar Roteiro e Histórico
         const history = c.metadata?.history || [];
         const historyHtml = history.length > 0 ? history.map(h => `
             <div style="padding:10px; border-bottom:1px solid #222; font-size:0.7rem;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <b style="color:${h.type === 'CLIENT' ? '#60a5fa' : '#8b5cf6'}">${h.type === 'CLIENT' ? 'ðŸ“Œ AJUSTE CLIENTE' : 'ðŸ›¡ï¸� AJUSTE ESTRATÃ‰GICO'}</b>
+                    <b style="color:${h.type === 'CLIENT' ? '#60a5fa' : '#8b5cf6'}">${h.type === 'CLIENT' ? '�xR AJUSTE CLIENTE' : '�x:��� AJUSTE ESTRAT�0GICO'}</b>
                     <span style="opacity:0.5;">${new Date(h.date).toLocaleString('pt-BR')}</span>
                 </div>
                 <div style="color:#eee; line-height:1.4;">${h.note}</div>
                 <div style="font-size:0.6rem; opacity:0.4; margin-top:3px;">Por: ${h.author}</div>
             </div>
-        `).join('') : '<div style="padding:40px; text-align:center; opacity:0.3; font-size:0.7rem;">Sem histÃ³rico de ajustes atÃ© o momento.</div>';
+        `).join('') : '<div style="padding:40px; text-align:center; opacity:0.3; font-size:0.7rem;">Sem histórico de ajustes até o momento.</div>';
 
         document.getElementById('edit-asset-roadmap-container').innerHTML = `
             <div class="edit-modal-grid">
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">ROTEIRO ESTRATÃ‰GICO (PAUTA)</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">ROTEIRO ESTRAT�0GICO (PAUTA)</label>
                     <textarea id="edit-asset-caption" style="width:100%; height:320px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none; transition: border 0.3s;"></textarea>
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">HISTÃ“RICO DE AJUSTES</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">HIST�RICO DE AJUSTES</label>
                     <div id="edit-asset-history" style="height:320px; background:#050505; border:1px solid #222; border-radius:8px; overflow-y:auto; scrollbar-width: thin; padding: 5px;">
                         ${historyHtml}
                     </div>
@@ -625,12 +625,12 @@ window.openEditModal = async (id) => {
 
             metaGrid.innerHTML = `
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONSÃ�VEL</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONS��VEL</label>
                     <select id="edit-asset-responsible" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                         <option value="Design">Design</option>
                         <option value="Audiovisual">Audiovisual</option>
                         <option value="Estrategista">Estrategista</option>
-                        <option value="Gestor de TrÃ¡fego">Gestor de TrÃ¡fego</option>
+                        <option value="Gestor de Tráfego">Gestor de Tráfego</option>
                         <option value="Social Media">Social Media</option>
                     </select>
                 </div>
@@ -639,19 +639,19 @@ window.openEditModal = async (id) => {
                     <select id="edit-asset-version" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                         <option value="V1">V1 - Inicial</option>
                         <option value="V2">V2 - Ajuste 1</option>
-                        <option value="V3">V3 - Ajuste 2 (CRÃ�TICO)</option>
+                        <option value="V3">V3 - Ajuste 2 (CR��TICO)</option>
                         <option value="FINAL">FINAL - Pronto para Postar</option>
                     </select>
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRAZO DE APROVAÃ‡ÃƒO</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRAZO DE APROVA�!ÒO</label>
                     <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                 </div>
                 
                 <div style="grid-column: span 3; display:flex; gap:30px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.05); margin-top:5px;">
                      <div style="display:flex; align-items:center; gap:10px; opacity: ${isLocked ? '0.5' : '1'};">
                         <input type="checkbox" id="edit-asset-strategic-req" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.strategic_approval_required ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
-                        <label for="edit-asset-strategic-req" style="font-size:0.65rem; color:#3b82f6; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">EXIGIR APROVAÃ‡ÃƒO ESTRATÃ‰GICA?</label>
+                        <label for="edit-asset-strategic-req" style="font-size:0.65rem; color:#3b82f6; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">EXIGIR APROVA�!ÒO ESTRAT�0GICA?</label>
                      </div>
                      <div style="display:flex; align-items:center; gap:10px;">
                         <input type="checkbox" id="edit-asset-risk" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.risk ? 'checked' : ''}>
@@ -660,11 +660,11 @@ window.openEditModal = async (id) => {
                 </div>
             `;
             
-            // Setar valores apÃ³s injeÃ§Ã£o
+            // Setar valores após injeção
             document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || 'Design';
             document.getElementById('edit-asset-version').value = c.metadata?.version || 'V1';
             
-            // GovernanÃ§a de EdiÃ§Ã£o: Campos automÃ¡ticos ficam desabilitados
+            // Governança de Edição: Campos automáticos ficam desabilitados
             document.getElementById('edit-asset-responsible').disabled = true;
             document.getElementById('edit-asset-version').disabled = true;
             document.getElementById('edit-asset-responsible').style.opacity = '0.6';
@@ -682,22 +682,22 @@ window.openEditModal = async (id) => {
 
 
 
-        // Atualizar BotÃµes DinÃ¢micos
+        // Atualizar Botões Dinâmicos
         const footerActions = document.getElementById('edit-asset-footer-actions');
         if (footerActions) {
             const hasStrategic = c.metadata?.strategic_approval_required;
             
             footerActions.innerHTML = `
-                ${(c.status === 'PRODUÃ‡ÃƒO' || c.status === 'AJUSTE DE PRODUÃ‡ÃƒO') ? `
+                ${(c.status === 'PRODU�!ÒO' || c.status === 'AJUSTE DE PRODU�!ÒO') ? `
                     <button class="btn-mini" onclick="window.sendToStrategicOrFinal('${c.id}')" style="padding:10px 20px; background:#8b5cf6; color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
-                        <i class="fa-solid fa-paper-plane"></i> ${hasStrategic ? 'Finalizar e Enviar p/ AprovaÃ§Ã£o EstratÃ©gica' : 'Finalizar e Enviar'}
+                        <i class="fa-solid fa-paper-plane"></i> ${hasStrategic ? 'Finalizar e Enviar p/ Aprovação Estratégica' : 'Finalizar e Enviar'}
                     </button>
                 ` : ''}
-                ${c.status === 'APROVAÃ‡ÃƒO ESTRATÃ‰GICA' ? `
-                    <button class="btn-mini" onclick="window.strategicInternalAction('${c.id}', 'REJECT')" style="padding:10px 20px; background:var(--os-danger); color:#fff; font-weight:800; border:none;">Solicitar Ajuste (ProduÃ§Ã£o)</button>
+                ${c.status === 'APROVA�!ÒO ESTRAT�0GICA' ? `
+                    <button class="btn-mini" onclick="window.strategicInternalAction('${c.id}', 'REJECT')" style="padding:10px 20px; background:var(--os-danger); color:#fff; font-weight:800; border:none;">Solicitar Ajuste (Produção)</button>
                     <button class="btn-mini" onclick="window.strategicInternalAction('${c.id}', 'APPROVE')" style="padding:10px 20px; background:var(--os-success); color:#fff; font-weight:800; border:none;">Aprovar p/ Cliente</button>
                 ` : ''}
-                <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar AlteraÃ§Ãµes</button>
+                <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
             `;
         }
 
@@ -739,16 +739,16 @@ window.saveAssetEdit = async () => {
             metadata: newMetadata
         };
 
-        // LÃ“GICA DE TRANSIÃ‡ÃƒO DE STATUS INTELIGENTE
+        // L�GICA DE TRANSI�!ÒO DE STATUS INTELIGENTE
         if (currentAsset.status === 'AJUSTE') {
             updatePayload.status = 'PLANEJAMENTO';
-        } else if (currentAsset.status === 'AJUSTE DE PRODUÃ‡ÃƒO') {
-            updatePayload.status = 'PRODUÃ‡ÃƒO'; 
+        } else if (currentAsset.status === 'AJUSTE DE PRODU�!ÒO') {
+            updatePayload.status = 'PRODU�!ÒO'; 
         }
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', editingAssetId);
         if (error) throw error;
 
-        sLog('AlteraÃ§Ãµes salvas com sucesso.');
+        sLog('Alterações salvas com sucesso.');
         closeEditModal();
         loadContent();
     } catch (e) {
@@ -765,9 +765,9 @@ window.sendToStrategicOrFinal = async (id) => {
         const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
         
         const hasStrategic = c.metadata?.strategic_approval_required;
-        const nextStatus = hasStrategic ? 'APROVAÃ‡ÃƒO ESTRATÃ‰GICA' : 'APROVAÃ‡ÃƒO FINAL';
+        const nextStatus = hasStrategic ? 'APROVA�!ÒO ESTRAT�0GICA' : 'APROVA�!ÒO FINAL';
         
-        if (!confirm(`Confirmar envio para ${hasStrategic ? 'AprovaÃ§Ã£o EstratÃ©gica (Interna)' : 'AprovaÃ§Ã£o Final (Cliente)'}?`)) return;
+        if (!confirm(`Confirmar envio para ${hasStrategic ? 'Aprovação Estratégica (Interna)' : 'Aprovação Final (Cliente)'}?`)) return;
 
         const updatePayload = {
             status: nextStatus,
@@ -794,17 +794,17 @@ window.strategicInternalAction = async (id, action) => {
         const supabase = getSupabase();
         const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
         
-        let nextStatus = action === 'APPROVE' ? 'APROVAÃ‡ÃƒO FINAL' : 'PRODUÃ‡ÃƒO';
+        let nextStatus = action === 'APPROVE' ? 'APROVA�!ÒO FINAL' : 'PRODU�!ÒO';
         let newHistory = c.metadata?.history || [];
         
         if (action === 'REJECT') {
-            const note = prompt('Qual ajuste deve ser feito na produÃ§Ã£o?');
+            const note = prompt('Qual ajuste deve ser feito na produção?');
             if (!note) return;
             
             newHistory.push({
                 date: new Date().toISOString(),
                 type: 'STRATEGIC',
-                author: user?.name || 'GestÃ£o FluxAI',
+                author: user?.name || 'Gestão FluxAI',
                 note: note
             });
 
@@ -834,14 +834,14 @@ window.openPublishBridge = async (id) => {
     if (!c) return;
 
     const modal = document.getElementById('pub-modal-overlay');
-    if (!modal) return alert('Modal de PublicaÃ§Ã£o nÃ£o encontrado no HTML.');
+    if (!modal) return alert('Modal de Publicação não encontrado no HTML.');
 
     // Preencher dados
-    const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Data nÃ£o definida';
+    const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Data não definida';
     document.getElementById('pub-scheduled-time').innerText = scheduled;
     document.getElementById('pub-caption-preview').value = c.caption || '';
     
-    // Configurar botÃµes
+    // Configurar botões
     document.getElementById('btn-copy-caption').onclick = () => {
         const text = document.getElementById('pub-caption-preview').value;
         navigator.clipboard.writeText(text);
@@ -854,7 +854,7 @@ window.openPublishBridge = async (id) => {
 
     document.getElementById('btn-open-assets').onclick = () => {
         if (c.metadata?.final_asset_url) window.open(c.metadata.final_asset_url, '_blank');
-        else alert('Nenhum arquivo final encontrado para este conteÃºdo.');
+        else alert('Nenhum arquivo final encontrado para este conteúdo.');
     };
 
     document.getElementById('btn-open-account').onclick = () => {
@@ -865,12 +865,12 @@ window.openPublishBridge = async (id) => {
     };
 
     document.getElementById('btn-confirm-pub').onclick = async () => {
-        if (confirm('Deseja confirmar a publicaÃ§Ã£o deste conteÃºdo agora? O status serÃ¡ alterado para PUBLICADO.')) {
+        if (confirm('Deseja confirmar a publicação deste conteúdo agora? O status será alterado para PUBLICADO.')) {
             const { error } = await supabase.from('content_assets').update({ status: 'PUBLICADO' }).eq('id', id);
             if (error) return alert('Erro ao atualizar: ' + error.message);
             
             modal.style.display = 'none';
-            sLog('ConteÃºdo marcado como PUBLICADO.');
+            sLog('Conteúdo marcado como PUBLICADO.');
             loadContent();
         }
     };
@@ -903,19 +903,19 @@ window.copyToClipboard = (id) => {
     const el = document.getElementById(id);
     el.select();
     document.execCommand('copy');
-    sLog('Copiado para a Ã¡rea de transferÃªncia.');
+    sLog('Copiado para a área de transferência.');
 };
 
 window.approvePendingAssets = async () => {
     if (!currentProject) return alert('Selecione um projeto!');
-    if (!confirm('Deseja enviar todas as pautas de PLANEJAMENTO para a aprovaÃ§Ã£o do cliente?')) return;
+    if (!confirm('Deseja enviar todas as pautas de PLANEJAMENTO para a aprovação do cliente?')) return;
 
     try {
         const supabase = getSupabase();
         
         // 1. Atualizar status no banco
         const { error } = await supabase.from('content_assets')
-            .update({ status: 'APROVAÃ‡ÃƒO PLANEJAMENTO' })
+            .update({ status: 'APROVA�!ÒO PLANEJAMENTO' })
             .eq('project_id', currentProject)
             .eq('status', 'PLANEJAMENTO');
 
@@ -930,14 +930,14 @@ window.approvePendingAssets = async () => {
         const { data: assets } = await supabase.from('content_assets')
             .select('title')
             .eq('project_id', currentProject)
-            .eq('status', 'APROVAÃ‡ÃƒO PLANEJAMENTO')
+            .eq('status', 'APROVA�!ÒO PLANEJAMENTO')
             .limit(10);
 
-        let waText = `ðŸš€ *NOVO PLANEJAMENTO DISPONÃVEL - ${proj?.name || 'Projeto'}*\n\nOlÃ¡! Acabamos de liberar o novo fluxo estratÃ©gico de conteÃºdo. \n\nAcesse agora para validar roteiros e prazos:\nðŸ”— ${portalUrl}\n\n*Resumo do Lote:*\n`;
+        let waText = `�xa� *NOVO PLANEJAMENTO DISPON�VEL - ${proj?.name || 'Projeto'}*\n\nOlá! Acabamos de liberar o novo fluxo estratégico de conteúdo. \n\nAcesse agora para validar roteiros e prazos:\n�x ${portalUrl}\n\n*Resumo do Lote:*\n`;
         if (assets && assets.length > 0) {
-            assets.forEach(a => { waText += `â€¢ ${a.title}\n`; });
+            assets.forEach(a => { waText += `⬢ ${a.title}\n`; });
         }
-        waText += `\n#FluxAI #EstratÃ©giaDigital #HighTicket`;
+        waText += `\n#FluxAI #EstratégiaDigital #HighTicket`;
         
         const waTextEl = document.getElementById('share-whatsapp-text');
         if (waTextEl) waTextEl.value = waText;
@@ -945,7 +945,7 @@ window.approvePendingAssets = async () => {
         const modal = document.getElementById('modal-share-assets');
         if (modal) modal.style.display = 'flex';
 
-        sLog('Pautas enviadas para AprovaÃ§Ã£o.');
+        sLog('Pautas enviadas para Aprovação.');
         loadContent();
     } catch (e) {
         console.error('Erro ao enviar pautas:', e);
@@ -1046,15 +1046,15 @@ window.runAiPlanner = async () => {
 };
 
 window.forceReady = async (id) => {
-    if (!confirm('Deseja pular as etapas de aprovaÃ§Ã£o e marcar este ativo como PRONTO para publicaÃ§Ã£o?')) return;
+    if (!confirm('Deseja pular as etapas de aprovação e marcar este ativo como PRONTO para publicação?')) return;
     try {
         const supabase = getSupabase();
         const { error } = await supabase.from('content_assets').update({ status: 'PRONTO' }).eq('id', id);
         if (error) throw error;
-        sLog('Ativo forÃ§ado para o status PRONTO.');
+        sLog('Ativo forçado para o status PRONTO.');
         loadContent();
     } catch (e) {
-        alert('Erro ao forÃ§ar conclusÃ£o: ' + e.message);
+        alert('Erro ao forçar conclusão: ' + e.message);
     }
 };
 
@@ -1068,4 +1068,4 @@ window.deleteAsset = async (id) => {
 };
 
 initEngine();
-async function setupRealtime() { const supabase = getSupabase(); if (realtimeChannel) { supabase.removeChannel(realtimeChannel); } realtimeChannel = supabase.channel('content-updates').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'content_assets' }, (payload) => { sLog('Sincronização Realtime: Alteração detectada.'); loadContent(); }).subscribe(); }
+async function setupRealtime() { const supabase = getSupabase(); if (realtimeChannel) { supabase.removeChannel(realtimeChannel); } realtimeChannel = supabase.channel('content-updates').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'content_assets' }, (payload) => { sLog('Sincroniza��o Realtime: Altera��o detectada.'); loadContent(); }).subscribe(); }

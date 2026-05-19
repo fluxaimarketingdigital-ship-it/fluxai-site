@@ -65,26 +65,35 @@ function renderStats(contracts, payments) {
     const sevenDaysFromNow = new Date();
     sevenDaysFromNow.setDate(now.getDate() + 7);
 
+    const isFluxAI = (name) => name && name.toLowerCase().includes('fluxai');
+
     const totalExpected = payments.reduce((acc, p) => {
+        if (isFluxAI(p.contracts?.company_name) || isFluxAI(p.contracts?.client_name)) return acc;
         const amount = p.contracts?.client_name === 'Maria Aparecida' ? 800 : Number(p.amount_due);
         return acc + amount;
     }, 0);
-    const totalPaid = payments.reduce((acc, p) => acc + Number(p.amount_paid), 0);
+    const totalPaid = payments.reduce((acc, p) => {
+        if (isFluxAI(p.contracts?.company_name) || isFluxAI(p.contracts?.client_name)) return acc;
+        return acc + Number(p.amount_paid);
+    }, 0);
     const totalPending = totalExpected - totalPaid;
     
-    const activeCount = contracts.filter(c => c.status === 'ATIVO').length;
+    const activeCount = contracts.filter(c => c.status === 'ATIVO' && !isFluxAI(c.company_name) && !isFluxAI(c.client_name)).length;
     const totalContractValue = contracts.reduce((acc, c) => {
+        if (isFluxAI(c.company_name) || isFluxAI(c.client_name)) return acc;
         const val = c.client_name === 'Maria Aparecida' ? 800 : Number(c.contract_value);
         return acc + val;
     }, 0);
     const avgTicket = activeCount > 0 ? (totalContractValue / activeCount) : 0;
     
     const nextDue = payments.filter(p => {
+        if (isFluxAI(p.contracts?.company_name) || isFluxAI(p.contracts?.client_name)) return false;
         const d = new Date(p.due_date);
         return p.status !== 'PAGO' && d >= now && d <= sevenDaysFromNow;
     }).length;
 
     const riskRevenue = payments.reduce((acc, p) => {
+        if (isFluxAI(p.contracts?.company_name) || isFluxAI(p.contracts?.client_name)) return acc;
         const d = new Date(p.due_date);
         const diff = (now - d) / (1000 * 60 * 60 * 24);
         return (p.status !== 'PAGO' && diff > 5) ? acc + Number(p.amount_due) : acc;

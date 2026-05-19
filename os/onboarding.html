@@ -393,6 +393,35 @@
                                     <textarea name="contract_deliverables" class="form-control" style="height:60px;" placeholder="Ex: 12 Ativos de Conteúdo, Gestão de R$ 5k em Ads..."></textarea>
                                 </div>
 
+                                <div class="form-group" style="padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 20px;">
+                                    <label><i class="fa-solid fa-plus-circle"></i> Serviços Extras / Avulsos (Setup, Gravação, Projetos)</label>
+                                    <p style="font-size:0.6rem; opacity:0.7; margin-top:-5px; margin-bottom:10px;">Adicionados à receita deste mês, não entram na recorrência mensal.</p>
+                                    
+                                    <div class="grid-2">
+                                        <div class="form-group" style="margin-bottom:12px;">
+                                            <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Tipo de Serviço Extra</label>
+                                            <select name="finance_extra_services_type" class="form-control">
+                                                <option value="">Nenhum Serviço Extra</option>
+                                                <option value="Gravação / Captação Audiovisual">Gravação / Captação Audiovisual</option>
+                                                <option value="Criação de Site Institucional">Criação de Site Institucional</option>
+                                                <option value="Criação de Landing Page (LP)">Criação de Landing Page (LP)</option>
+                                                <option value="Criação de Apresentação Comercial">Criação de Apresentação Comercial</option>
+                                                <option value="Consultoria Estratégica / Diagnóstico">Consultoria Estratégica / Diagnóstico</option>
+                                                <option value="Identidade Visual / Branding">Identidade Visual / Branding</option>
+                                                <option value="Outro Serviço Avulso">Outro Serviço Avulso</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group" style="margin-bottom:12px;">
+                                            <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Valor Total do Extra (R$)</label>
+                                            <input type="number" name="finance_extra_services_value" class="form-control" placeholder="0.00" />
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Escopo do Serviço Extra (O que está incluso?)</label>
+                                        <textarea name="finance_extra_services_desc" class="form-control" style="height:50px;" placeholder="Ex: 4 horas de gravação presencial, edição de 10 vídeos..."></textarea>
+                                    </div>
+                                </div>
+
                                 <div class="form-group">
                                     <label>Observações Contratuais Financeiras</label>
                                     <textarea name="finance_contract_notes" class="form-control" style="height:60px;" placeholder="Ex: Nota fiscal enviada todo dia 1, cobrança proporcional no primeiro mês..."></textarea>
