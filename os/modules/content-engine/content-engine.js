@@ -934,50 +934,60 @@ window.approvePendingAssets = async () => {
             .limit(10);
 
         let waText = `ðŸš€ *NOVO PLANEJAMENTO DISPONÃ�VEL - ${proj?.name || 'Projeto'}*\n\nOlá! Acabamos de liberar o novo fluxo estratÃ©gico de conteÃºdo. \n\nAcesse agora para validar roteiros e prazos:\nðŸ”— ${portalUrl}\n\n*Resumo do Lote:*\n`;
-          const filter = document.getElementById('project-filter');
+        if (assets && assets.length > 0) {
+            assets.forEach(a => { waText += `â€¢ ${a.title}\n`; });
+        }
+        waText += `\n#FluxAI #EstratÃ©giaDigital #HighTicket`;
+        
+        const waTextEl = document.getElementById('share-whatsapp-text');
+        if (waTextEl) waTextEl.value = waText;
+
+        const modal = document.getElementById('modal-share-assets');
+        if (modal) modal.style.display = 'flex';
+
+        sLog('Pautas enviadas para Aprovação.');
+        loadContent();
+    } catch (e) {
+        console.error('Erro ao enviar pautas:', e);
+        alert('Erro ao enviar pautas: ' + e.message);
+    }
+};
+
+window.runAiPlanner = async () => {
+    const user = await OS_AUTH.check();
+    if (user?.role !== 'ADMIN' && user?.role !== 'MANAGER') return alert('Acesso negado.');
+
+    const filter = document.getElementById('project-filter');
     const selectedId = filter.value || currentProject;
-    if (!selectedId) return alert('Selecione um projeto para gerar planejamento estratégico!');
+    if (!selectedId) return alert('Selecione um projeto para gerar planejamento estratÃ©gico!');
 
     const supabase = getSupabase();
     
-    // VERIFICAÇÃO DE COTA (CONTRATO)
+    // VERIFICAÃ‡ÃƒO DE COTA (CONTRATO)
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', selectedId).single();
     const { count } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('project_id', selectedId);
     
-    // Tentar extrair número da cota de forma inteligente (Somando reels + carrossel + stories do Onboarding Smart Scope)
-    let quota = 12; // Valor padrão de fallback
-    
-    const smartScope = project.operational_activation?.smart_scope?.conteudo || project.metadata?.operational_activation?.smart_scope?.conteudo || project.metadata?.onboarding?.module_details;
-    if (smartScope) {
-        const reelsQty = parseInt(smartScope.reels || smartScope.escopo_conteudo_reels_qty) || 0;
-        const carrosselQty = parseInt(smartScope.carrossel || smartScope.escopo_conteudo_carrossel_qty) || 0;
-        const storiesQty = parseInt(smartScope.stories || smartScope.escopo_conteudo_stories_qty) || 0;
-        const totalSmart = reelsQty + carrosselQty + storiesQty;
-        if (totalSmart > 0) {
-            quota = totalSmart;
-        }
-    } else {
-        const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
-        if (quotaMatch) quota = parseInt(quotaMatch[0]);
-    }
+    // Tentar extrair nÃºmero da cota do 'content_scope' (Ex: "12 Ativos/mÃªs")
+    const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
+    const quota = quotaMatch ? parseInt(quotaMatch[0]) : 12;
 
     const remaining = quota - count;
 
     if (remaining <= 0) {
-        return alert(`Limite de Cota Atingido (${count}/${quota}).\n\nApague ativos para liberar espaço ou solicite upgrade de contrato.`);
+        return alert(`Limite de Cota Atingido (${count}/${quota}).\n\nApague ativos para liberar espaÃ§o ou solicite upgrade de contrato.`);
     }
 
-    sLog(`Iniciando Motor Estratégico (Cota: ${count}/${quota} | Disponível: ${remaining})`);
+    sLog(`Iniciando Motor EstratÃ©gico (Cota: ${count}/${quota} | DisponÃ­vel: ${remaining})`);
     
     try {
         const { AIPlanner } = await import('../../services/ai-planner.js');
         const type = document.getElementById('ai-planner-service').value;
         
-        if (confirm(`Gerar ${type === 'ALL' ? 'novo planejamento' : 'ativos de ' + type} para preencher os ${remaining} slots disponíveis no contrato?`)) {
+        if (confirm(`Gerar ${type === 'ALL' ? 'novo planejamento' : 'ativos de ' + type} para preencher os ${remaining} slots disponÃ­veis no contrato?`)) {
             const newAssets = await AIPlanner.generatePlan(currentProject, type, remaining);
             
             if (newAssets && newAssets.length > 0) {
-                // APLICAR INTELIGÊNCIA DE PRAZO E RESPONSÁVEL
+                // APLICAR INTELIGÃŠNCIA DE PRAZO E RESPONSÃ�VEL
                 const processedAssets = newAssets.map(asset => {
                     const titleUpper = asset.title.toUpperCase();
                     const type = Object.keys(RESPONSIBLE_MAP).find(k => titleUpper.includes(k)) || 'CARD';
@@ -985,24 +995,11 @@ window.approvePendingAssets = async () => {
                     const scheduledDate = new Date(asset.scheduled_at);
                     const now = new Date();
                     
-                    // Lógica Pub-2 para Planejamento/Produção Inicial
+                    // LÃ³gica Pub-2 para Planejamento/ProduÃ§Ã£o Inicial
                     let deadline = new Date(scheduledDate.getTime() - 48 * 60 * 60 * 1000);
+                    if (deadline < now) deadline = new Date(now.getTime() + 48 * 60 * 60 * 1000);
                     
-                    // Defesa Cronológica: O prazo de aprovação deve ser SEMPRE antes do horário programado de postagem
-                    if (deadline < now) {
-                        const midPoint = new Date(now.getTime() + (scheduledDate.getTime() - now.getTime()) / 2);
-                        if (midPoint > now && midPoint < scheduledDate) {
-                            deadline = midPoint;
-                        } else {
-                            deadline = new Date(scheduledDate.getTime() - 2 * 60 * 60 * 1000); // 2 horas antes do post
-                        }
-                    }
-                    
-                    if (deadline > scheduledDate) {
-                        deadline = new Date(scheduledDate.getTime() - 2 * 60 * 60 * 1000); // 2 horas antes
-                    }
-                    
-                    // Lógica de Prioridade: Apenas itens críticos de Tração e Marca são ALTA por padrão
+                    // LÃ³gica de Prioridade: Apenas itens crÃ­ticos de TraÃ§Ã£o e Marca sÃ£o ALTA por padrÃ£o
                     const priority = (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('BRANDING')) ? 'ALTA' : 'MÉDIA';
 
                     return {
@@ -1020,7 +1017,7 @@ window.approvePendingAssets = async () => {
 
                 const { error } = await supabase.from('content_assets').insert(processedAssets);
                 if (error) throw error;
-                sLog(`${processedAssets.length} Ativos de Logística Gerados.`);
+                sLog(`${processedAssets.length} Ativos de LogÃ­stica Gerados.`);
                 loadContent();
             }
         }
