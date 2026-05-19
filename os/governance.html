@@ -75,7 +75,27 @@
                             <div>[CURRENT_VERSION] : v1.0.4_OPERATIONAL</div>
                             <div>[DEPLOY_STATUS]  : SUCCESSFUL</div>
                             <div>[LAST_STABLE]   : v1.0.3_OPERATIONAL</div>
-                            <div style="margin-top: 15px; color: var(--os-primary);">>> Integridade dos módulos verificada. Nenhuma degradação detectada.</div>
+                            <div style="margin-top: 15px; color: var(--os-primary);">> Integridade dos módulos verificada. Nenhuma degradação detectada.</div>
+                        </div>
+                    </div>
+
+                    <!-- INTEGRACAO OPENAI (CHATGPT) -->
+                    <div class="os-widget" style="grid-column: span 12; border: 1px dashed var(--os-primary);">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label"><i class="fa-solid fa-brain" style="color: var(--os-primary);"></i> Integração Inteligente com OpenAI (ChatGPT)</span>
+                        </div>
+                        <div style="padding: 20px; background: rgba(0,0,0,0.1); border-radius: 4px;">
+                            <p style="font-size: 0.8rem; color: var(--os-text-muted); margin-bottom: 15px; line-height: 1.5;">
+                                Insira a sua chave secreta da OpenAI (API Key) abaixo para habilitar o Motor Estratégico com inteligência em tempo real. A chave fica salva localmente de forma segura e privada no seu navegador.
+                            </p>
+                            <div style="display: flex; gap: 15px; align-items: center;">
+                                <input type="password" id="openai-api-key" placeholder="sk-proj-..." style="flex: 1; max-width: 500px; padding: 12px 15px; background: #000; border: 1px solid var(--os-border); color: #fff; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;" />
+                                <button id="btn-save-openai-key" class="btn-action btn-approve" style="height: 40px; padding: 0 25px; border-radius: 4px;" onclick="window.saveOpenAIKey()">Salvar Chave</button>
+                                <button id="btn-delete-openai-key" class="btn-action btn-review" style="height: 40px; padding: 0 15px; border-radius: 4px; display: none;" onclick="window.deleteOpenAIKey()">Excluir</button>
+                            </div>
+                            <div id="openai-status-msg" style="margin-top: 10px; font-size: 0.75rem; color: var(--os-primary); display: none;">
+                                <i class="fa-solid fa-circle-check"></i> Chave ativa no sistema. O planejador agora está capacitado para usar inteligência em tempo real!
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -208,7 +228,47 @@
             }
         };
 
-        initPage();
+        // --- GESTAO CHAVE OPENAI (CHATGPT) ---
+        window.saveOpenAIKey = () => {
+            const key = document.getElementById('openai-api-key').value;
+            if (!key || key.trim() === '') return alert('Por favor, insira uma chave válida!');
+            if (key.startsWith('sk-') || key === '••••••••••••••••••••••••••••••••') {
+                if (key !== '••••••••••••••••••••••••••••••••') {
+                    localStorage.setItem('openai_api_key', key.trim());
+                }
+                alert('Chave da OpenAI salva com sucesso no navegador!');
+                window.location.reload();
+            } else {
+                alert('Formato inválido! Geralmente chaves OpenAI começam com "sk-".');
+            }
+        };
+
+        window.deleteOpenAIKey = () => {
+            if (confirm('Deseja realmente excluir sua chave da OpenAI?')) {
+                localStorage.removeItem('openai_api_key');
+                alert('Chave excluída com sucesso!');
+                window.location.reload();
+            }
+        };
+
+        const loadSavedOpenAIKey = () => {
+            const savedKey = localStorage.getItem('openai_api_key');
+            const keyInput = document.getElementById('openai-api-key');
+            const statusMsg = document.getElementById('openai-status-msg');
+            const deleteBtn = document.getElementById('btn-delete-openai-key');
+            if (savedKey && keyInput) {
+                keyInput.value = '••••••••••••••••••••••••••••••••';
+                if (statusMsg) statusMsg.style.display = 'block';
+                if (deleteBtn) deleteBtn.style.display = 'block';
+            }
+        };
+
+        async function runInit() {
+            await initPage();
+            loadSavedOpenAIKey();
+        }
+
+        runInit();
     </script>
 </body>
 </html>

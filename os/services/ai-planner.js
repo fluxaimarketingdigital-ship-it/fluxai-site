@@ -260,6 +260,21 @@ export const AIPlanner = {
                 daysOffset++;
             }
 
+            // Aplicando inteligência de horário de publicação estratégica premium (alternando horários de alto tráfego)
+            let targetHour = 12;
+            let targetMinute = 0;
+            if (service.platform === 'REELS' || service.platform === 'INSTAGRAM') {
+                const peakHours = [12, 18, 10, 20];
+                const peakMinutes = [0, 30, 45, 0];
+                const index = daysOffset % peakHours.length;
+                targetHour = peakHours[index];
+                targetMinute = peakMinutes[index];
+            } else {
+                targetHour = 9; // Horário comercial padrão
+                targetMinute = 0;
+            }
+            date.setHours(targetHour, targetMinute, 0, 0);
+
             const scheduledAt = date;
             const strategicDeadline = new Date(scheduledAt.getTime() - (5 * 24 * 60 * 60 * 1000));
             strategicDeadline.setHours(18, 0, 0, 0);
