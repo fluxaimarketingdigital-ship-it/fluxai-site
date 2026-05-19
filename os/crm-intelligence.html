@@ -295,13 +295,31 @@
 
             if (supabase) {
                 try {
-                    const { data, error } = await supabase.from('leads').select('*').order('updated_at', { ascending: false });
+                    const { data, error } = await supabase.from('contracts').select('*, projects(*)').order('created_at', { ascending: false });
                     if (error) throw error;
                     if (data && data.length > 0) {
-                        leads = data;
+                        leads = data.map(c => {
+                            const healthVal = c.status === 'ATIVO' ? 95 : (c.status === 'PROPOSAL' ? 70 : 40);
+                            return {
+                                company: c.company_name,
+                                name: c.client_name,
+                                value: c.contract_value || 0,
+                                healthScore: healthVal,
+                                status: c.status || 'ATIVO',
+                                lastFollowUp: new Date(c.created_at).toLocaleDateString('pt-BR'),
+                                nextAction: c.status === 'ATIVO' ? 'MONITORAR' : 'REVISAR',
+                                impact: 'R$ ' + Number(c.contract_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+                            };
+                        });
                     }
                 } catch (e) {
-                    console.warn("[CRM INTELLIGENCE] Erro no banco de dados. Usando Mock Data.", e);
+                    console.warn("[CRM INTELLIGENCE] Erro no banco de dados. Tentando leads...", e);
+                    try {
+                        const { data } = await supabase.from('leads').select('*').order('updated_at', { ascending: false });
+                        if (data && data.length > 0) {
+                            leads = data;
+                        }
+                    } catch (e2) {}
                 }
             }
 
