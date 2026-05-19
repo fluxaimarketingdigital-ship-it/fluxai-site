@@ -199,9 +199,14 @@
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <div class="os-page-title">
-                    <h1>Análise de Dados</h1>
-                    <p>Leitura estratégica e interpretação comportamental da operação.</p>
+                <div class="os-page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; animation: fadeInUp 0.4s ease both;">
+                    <div class="os-page-title" style="margin: 0;">
+                        <h1>Análise de Dados</h1>
+                        <p>Leitura estratégica e interpretação comportamental da operação.</p>
+                    </div>
+                    <button id="btn-generate-report" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.2); letter-spacing: 0.5px; text-transform: uppercase;">
+                        <i class="fa-solid fa-file-pdf" style="font-size: 0.95rem;"></i> GERAR RELATÓRIO EXECUTIVO
+                    </button>
                 </div>
 
                 <!-- CAMADA 1: MÉTRICAS DECISIONAIS -->
@@ -272,6 +277,10 @@
         import { decisionalMetrics, operationalInsights, behavioralData, socialSignals } from './data/analytics.js';
         import { getSupabase } from './services/supabase-client.js';
         
+        let currentDecisional = decisionalMetrics;
+        let currentBehavioral = behavioralData;
+        let currentSocial = socialSignals;
+
         async function initPage() {
             const user = await OS_AUTH.check('CLIENT');
             if (!user) return;
@@ -281,37 +290,42 @@
 
             await renderAnalyticsData();
             renderInsights();
+
+            const btnReport = document.getElementById('btn-generate-report');
+            if (btnReport) {
+                btnReport.addEventListener('click', generatePDFReport);
+            }
         }
 
         const renderAnalyticsData = async () => {
             const supabase = getSupabase();
             
-            let decisional = decisionalMetrics;
-            let behavioral = behavioralData;
-            let social = socialSignals;
-
             if (supabase) {
-                const { data } = await supabase.from('analytics_snapshots').select('*').order('created_at', { ascending: false }).limit(1);
-                if (data && data.length > 0) {
-                    const snap = data[0].data;
-                    if (snap.decisionalMetrics) decisional = snap.decisionalMetrics;
-                    if (snap.behavioralData) behavioral = snap.behavioralData;
-                    if (snap.socialSignals) social = snap.socialSignals;
+                try {
+                    const { data } = await supabase.from('analytics_snapshots').select('*').order('created_at', { ascending: false }).limit(1);
+                    if (data && data.length > 0) {
+                        const snap = data[0].data;
+                        if (snap.decisionalMetrics) currentDecisional = snap.decisionalMetrics;
+                        if (snap.behavioralData) currentBehavioral = snap.behavioralData;
+                        if (snap.socialSignals) currentSocial = snap.socialSignals;
+                    }
+                } catch (err) {
+                    console.warn('[ANALYTICS] Falha ao ler snapshots do banco:', err);
                 }
             }
 
             // Camada 01: Métricas Decisionais
-            OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: decisional[0].value, trend: '+1.2%', trendUp: true, meta: decisional[0].impact });
-            OS_UI.renderMetric('metric-cac', { label: 'Custo de Aquisição', value: decisional[1].value, trend: '-15%', trendUp: true, meta: decisional[1].impact });
-            OS_UI.renderMetric('metric-ltv', { label: 'LTV Projetado', value: decisional[2].value, trend: 'Estável', meta: decisional[2].impact });
-            OS_UI.renderMetric('metric-speed', { label: 'Tempo de Resposta', value: decisional[3].value, trend: '-2m', trendUp: true, meta: decisional[3].impact });
+            OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: currentDecisional[0].value, trend: '+1.2%', trendUp: true, meta: currentDecisional[0].impact });
+            OS_UI.renderMetric('metric-cac', { label: 'Custo de Aquisição', value: currentDecisional[1].value, trend: '-15%', trendUp: true, meta: currentDecisional[1].impact });
+            OS_UI.renderMetric('metric-ltv', { label: 'LTV Projetado', value: currentDecisional[2].value, trend: 'Estável', meta: currentDecisional[2].impact });
+            OS_UI.renderMetric('metric-speed', { label: 'Tempo de Resposta', value: currentDecisional[3].value, trend: '-2m', trendUp: true, meta: currentDecisional[3].impact });
 
             // Camada 02 & 03
-            document.getElementById('watch-time').innerText = behavioral.avgWatchTime;
-            document.getElementById('save-rate').innerText = behavioral.saveRate;
-            document.getElementById('social-context').innerText = social.context;
-            document.getElementById('reach').innerText = social.totalReach;
-            document.getElementById('impressions').innerText = social.impressions;
+            document.getElementById('watch-time').innerText = currentBehavioral.avgWatchTime;
+            document.getElementById('save-rate').innerText = currentBehavioral.saveRate;
+            document.getElementById('social-context').innerText = currentSocial.context;
+            document.getElementById('reach').innerText = currentSocial.totalReach;
+            document.getElementById('impressions').innerText = currentSocial.impressions;
         };
 
         const renderInsights = () => {
@@ -324,6 +338,311 @@
                     </div>
                 `).join('');
             }
+        };
+
+        const generatePDFReport = () => {
+            const dateStr = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
+            const reportWindow = window.open('', '_blank');
+            reportWindow.document.write(`
+                <!DOCTYPE html>
+                <html lang="pt-BR">
+                <head>
+                    <meta charset="UTF-8">
+                    <title>Relatório Operacional Estratégico - FluxAI Labs</title>
+                    <style>
+                        body {
+                            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+                            color: #1a1a1a;
+                            background: #fff;
+                            margin: 40px;
+                            line-height: 1.6;
+                        }
+                        .header {
+                            border-bottom: 2px solid #8e9e68;
+                            padding-bottom: 20px;
+                            margin-bottom: 30px;
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: flex-end;
+                        }
+                        .header h1 {
+                            font-size: 24px;
+                            margin: 0;
+                            color: #8e9e68;
+                            text-transform: uppercase;
+                            letter-spacing: 1px;
+                        }
+                        .header p {
+                            margin: 5px 0 0 0;
+                            color: #666;
+                            font-size: 12px;
+                        }
+                        .meta-info {
+                            font-size: 12px;
+                            color: #444;
+                            text-align: right;
+                        }
+                        .section-title {
+                            font-size: 14px;
+                            text-transform: uppercase;
+                            letter-spacing: 2px;
+                            color: #8e9e68;
+                            border-bottom: 1px solid #eee;
+                            padding-bottom: 5px;
+                            margin-top: 30px;
+                            margin-bottom: 15px;
+                            font-weight: bold;
+                        }
+                        .grid-4 {
+                            display: grid;
+                            grid-template-columns: repeat(4, 1fr);
+                            gap: 20px;
+                            margin-bottom: 30px;
+                        }
+                        .metric-card {
+                            background: #f9fbf7;
+                            border: 1px solid #e2ebd5;
+                            border-radius: 8px;
+                            padding: 15px;
+                            text-align: center;
+                        }
+                        .metric-label {
+                            font-size: 10px;
+                            text-transform: uppercase;
+                            color: #666;
+                            letter-spacing: 1px;
+                            margin-bottom: 8px;
+                            display: block;
+                        }
+                        .metric-value {
+                            font-size: 20px;
+                            font-weight: bold;
+                            color: #1a1a1a;
+                        }
+                        .grid-2 {
+                            display: grid;
+                            grid-template-columns: 1fr 1fr;
+                            gap: 30px;
+                            margin-bottom: 30px;
+                        }
+                        .table-container table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            font-size: 12px;
+                        }
+                        .table-container th, .table-container td {
+                            text-align: left;
+                            padding: 8px 12px;
+                            border-bottom: 1px solid #eee;
+                        }
+                        .table-container th {
+                            background: #f4f4f4;
+                            color: #444;
+                            text-transform: uppercase;
+                            font-size: 10px;
+                            letter-spacing: 1px;
+                        }
+                        .insight-block {
+                            background: #fff8f8;
+                            border-left: 4px solid #f59e0b;
+                            padding: 12px;
+                            margin-bottom: 15px;
+                            border-radius: 4px;
+                            font-size: 12px;
+                        }
+                        .insight-block.success {
+                            background: #f7fbf7;
+                            border-left-color: #10b981;
+                        }
+                        .insight-block h4 {
+                            margin: 0 0 5px 0;
+                            font-size: 12px;
+                            color: #1a1a1a;
+                        }
+                        .insight-block p {
+                            margin: 0;
+                            color: #555;
+                        }
+                        .footer {
+                            margin-top: 60px;
+                            border-top: 1px solid #eee;
+                            padding-top: 15px;
+                            font-size: 10px;
+                            color: #888;
+                            text-align: center;
+                        }
+                        @media print {
+                            body { margin: 0; }
+                            .no-print { display: none; }
+                        }
+                        .btn-print-action {
+                            background: #8e9e68;
+                            color: #050705;
+                            border: none;
+                            padding: 10px 20px;
+                            border-radius: 6px;
+                            font-weight: bold;
+                            cursor: pointer;
+                            font-size: 12px;
+                            box-shadow: 0 2px 8px rgba(142,158,104,0.3);
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;" class="no-print">
+                        <button class="btn-print-action" onclick="window.print()">🖨️ IMPRIMIR / SALVAR COMO PDF</button>
+                    </div>
+
+                    <div class="header">
+                        <div>
+                            <h1>FluxAI Labs</h1>
+                            <p>Relatório de Performance Operacional e Aquisição Digital</p>
+                        </div>
+                        <div class="meta-info">
+                            <strong>FluxAI OS™ Intelligence</strong><br>
+                            Gerado em: ${dateStr}<br>
+                            Status da Operação: 🟢 ATIVO
+                        </div>
+                    </div>
+
+                    <div class="section-title">Camada 01: Métricas de Decisão e Negócio</div>
+                    <div class="grid-4">
+                        <div class="metric-card">
+                            <span class="metric-label">Taxa de Retenção</span>
+                            <div class="metric-value">${currentDecisional[0].value}</div>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Custo de Aquisição (CPL)</span>
+                            <div class="metric-value">${currentDecisional[1].value}</div>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">LTV Projetado</span>
+                            <div class="metric-value">${currentDecisional[2].value}</div>
+                        </div>
+                        <div class="metric-card">
+                            <span class="metric-label">Tempo de Resposta</span>
+                            <div class="metric-value">${currentDecisional[3].value}</div>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div>
+                            <div class="section-title">Camada 02: Tráfego e Comportamento Web (Google Analytics)</div>
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Métrica GA4 (Reais)</th>
+                                            <th>Valor Registrado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Usuários Ativos</strong></td>
+                                            <td>36 usuários</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Novos Usuários</strong></td>
+                                            <td>30 novos usuários</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tempo Médio de Engajamento</strong></td>
+                                            <td>7 min 32 s</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Sessões de Acesso</strong></td>
+                                            <td>96 sessões</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div style="margin-top:20px;" class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Principais Origens de Tráfego</th>
+                                            <th>Sessões</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>vercel.com / referral (Produção)</td>
+                                            <td>42</td>
+                                        </tr>
+                                        <tr>
+                                            <td>(direct) / (none)</td>
+                                            <td>26</td>
+                                        </tr>
+                                        <tr>
+                                            <td>whatsapp / profile</td>
+                                            <td>9</td>
+                                        </tr>
+                                        <tr>
+                                            <td>facebook.com / referral</td>
+                                            <td>5</td>
+                                        </tr>
+                                        <tr>
+                                            <td>google / organic</td>
+                                            <td>5</td>
+                                        </tr>
+                                        <tr>
+                                            <td>instagram / bio</td>
+                                            <td>3</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="section-title">Camada 03: Sinais Sociais e Engajamento</div>
+                            <div class="table-container" style="margin-bottom: 20px;">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td><strong>Alcance de Contas</strong></td>
+                                            <td>${currentSocial.totalReach}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Impressões do Perfil</strong></td>
+                                            <td>${currentSocial.impressions}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Tempo de Tela (Watch Time)</strong></td>
+                                            <td>${currentBehavioral.avgWatchTime}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Taxa de Salvamento</strong></td>
+                                            <td>${currentBehavioral.saveRate}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <p style="font-size: 11px; color:#555; background:#f9f9f9; padding: 10px; border-radius: 4px; margin-bottom: 20px;">
+                                <strong>Contexto Comportamental:</strong> ${currentSocial.context}
+                            </p>
+
+                            <div class="section-title">Insights de Inteligência Operacional</div>
+                            <div class="insight-block success">
+                                <h4>PADRÃO DE RETENÇÃO IDENTIFICADO (OPORTUNIDADE)</h4>
+                                <p>Conteúdos focados em 'Previsibilidade Operacional' aumentaram diagnósticos qualificados em 22%.</p>
+                            </div>
+                            <div class="insight-block">
+                                <h4>ALERTA DE DEGRADAÇÃO OPERACIONAL (ATENÇÃO)</h4>
+                                <p>Aumento de 15% no custo de aquisição (CAC) detectado no módulo de Automação.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="footer">
+                        FLUXAI OS™ • INTELIGÊNCIA E ESTRUTURA DE CRESCIMENTO DIGITAL • FLUXAIDIGITAL.COM.BR
+                    </div>
+                </body>
+                </html>
+            `);
+            reportWindow.document.close();
         };
 
         initPage();
