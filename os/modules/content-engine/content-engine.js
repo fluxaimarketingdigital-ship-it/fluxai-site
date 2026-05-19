@@ -1,4 +1,4 @@
-import { OS_UI, OS_AUTH } from '../../js/os-core.js';
+﻿import { OS_UI, OS_AUTH } from '../../js/os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
 import { contentEngineData } from './content-engine.data.js';
 
@@ -44,7 +44,7 @@ const STRATEGIC_MATRIX = {
 ðŸŽ¬ FORMATO: Carrossel EstratÃ©gico (10 slides)
 
 ðŸ–¼ï¸� ESTRUTURA NARRATIVA:
-- Slide 01: [Gancho de Atenção] "O custo invisÃ­vel da desorganizaÃ§Ã£o estratÃ©gica."
+- Slide 01: [Gancho de AtenÃ§Ã£o] "O custo invisÃ­vel da desorganizaÃ§Ã£o estratÃ©gica."
 - Slide 02: [TensÃ£o] Por que processos manuais estÃ£o drenando sua margem de lucro.
 - Slide 03: [Conceito] A lÃ³gica da Engenharia de Processos aplicada ao marketing.
 - Slide 04: [DiferenciaÃ§Ã£o] FluxAI OS vs. GestÃ£o Tradicional.
@@ -75,7 +75,7 @@ const STRATEGIC_MATRIX = {
 
 ðŸ�—ï¸� SEÃ‡Ã•ES:
 1. HERO: Proposta de valor inquestionÃ¡vel + Visual Cinematic.
-2. DIAGNÓSTICO: ExposiÃ§Ã£o das dores do ICP e soluÃ§Ã£o tÃ©cnica.
+2. DIAGNÃ“STICO: ExposiÃ§Ã£o das dores do ICP e soluÃ§Ã£o tÃ©cnica.
 3. ECOSSISTEMA: Detalhamento dos mÃ³dulos operacionais.
 4. PROVA DE VALOR: Resultados tangÃ­veis e depoimentos selecionados.
 ðŸš€ SEO: OtimizaÃ§Ã£o para palavras-chave de intenÃ§Ã£o comercial institucional.
@@ -108,13 +108,13 @@ const STRATEGIC_MATRIX = {
         platform: 'CRM',
         generate: (p, obj) => `
 ðŸ“Š GESTÃƒO: InteligÃªncia de Dados aplicada ao Funil de Vendas.
-ðŸ”„ AUTOMAÇÃO: RÃ©guas de relacionamento baseadas no comportamento do lead.
+ðŸ”„ AUTOMAÃ‡ÃƒO: RÃ©guas de relacionamento baseadas no comportamento do lead.
 ðŸ“ˆ MÃ‰TRICA: Foco em Health Score e Taxa de RetenÃ§Ã£o.
         `
     },
     'AUTOMACAO': { 
         name: 'Arquitetura Operacional', 
-        clientPrefix: 'AUTOMAÇÃO', 
+        clientPrefix: 'AUTOMAÃ‡ÃƒO', 
         platform: 'SYSTEM',
         generate: (p, obj) => `
 âš™ï¸� FLUXO: AutomaÃ§Ã£o de processos repetitivos para ganho de eficiÃªncia.
@@ -124,7 +124,7 @@ const STRATEGIC_MATRIX = {
     },
     'CONSULTORIA': { 
         name: 'DiagnÃ³stico EstratÃ©gico', 
-        clientPrefix: 'DIAGNÓSTICO', 
+        clientPrefix: 'DIAGNÃ“STICO', 
         platform: 'CONSULTING',
         generate: (p, obj) => `
 ðŸ“‹ ESCOPO: AnÃ¡lise 360Âº da infraestrutura digital e operacional.
@@ -147,12 +147,12 @@ const RESPONSIBLE_MAP = {
     'ADS': 'Gestor de TrÃ¡fego',
     'BRANDING': 'Estrategista',
     'CRM': 'Estrategista',
-    'AUTOMAÇÃO': 'Sistemas',
-    'DIAGNÓSTICO': 'Estrategista'
+    'AUTOMAÃ‡ÃƒO': 'Sistemas',
+    'DIAGNÃ“STICO': 'Estrategista'
 };
 
 export async function initEngine() {
-    sLog('Iniciando Motor de Conteúdo v7.0...');
+    sLog('Iniciando Motor de ConteÃºdo v7.0...');
     try {
         // Expor funÃ§Ãµes globais para a UI
         window.switchTab = switchTab;
@@ -181,10 +181,10 @@ export async function initEngine() {
             btnGlobalWa.onclick = () => {
                 const projectFilter = document.getElementById('project-filter');
                 const selectedId = projectFilter.value;
-                if (!selectedId) return alert('Selecione um cliente específico para enviar o lembrete direto.');
+                if (!selectedId) return alert('Selecione um cliente especÃ­fico para enviar o lembrete direto.');
                 
                 const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${selectedId}`;
-                const msg = `Olá! ðŸš€%0A%0APassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.%0A%0AConfira aqui seu calendário atualizado:%0A${portalLink}`;
+                const msg = `OlÃ¡! ðŸš€%0A%0APassando para lembrar que temos conteÃºdos aguardando sua aprovaÃ§Ã£o no portal da FluxAI.%0A%0AConfira aqui seu calendÃ¡rio atualizado:%0A${portalLink}`;
                 window.open(`https://wa.me/?text=${msg}`, '_blank');
             };
         }
@@ -237,7 +237,7 @@ async function loadProjects() {
             throw error;
         }
 
-        // Armazenar projetos globalmente para consulta rápida
+        // Armazenar projetos globalmente para consulta rÃ¡pida
         window.allProjects = projects || [];
 
         const select = document.getElementById('project-filter');
@@ -337,7 +337,7 @@ async function loadContent() {
         checkPublishingAlerts(contents);
         
     } catch (e) {
-        sLog('Erro Conteúdo: ' + e.message);
+        sLog('Erro ConteÃºdo: ' + e.message);
     }
 }
 
@@ -379,7 +379,7 @@ async function checkPublishingAlerts(contents) {
     });
 
     if (todayPosts.length > 0) {
-        sLog(`ðŸ“¢ ALERTA: VocÃª tem ${todayPosts.length} conteúdos para publicar HOJE!`);
+        sLog(`ðŸ“¢ ALERTA: VocÃª tem ${todayPosts.length} conteÃºdos para publicar HOJE!`);
         // Opcional: Mostrar uma notificaÃ§Ã£o visual mais agressiva ou banner
         const metricSchedule = document.getElementById('metric-schedule');
         if (metricSchedule) {
@@ -398,16 +398,16 @@ function renderMetrics(contents) {
             if (c.status === 'PUBLICADO' || c.status === 'PRONTO') return false;
             const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
             const scheduled = new Date(c.scheduled_at);
-            // Atraso se passou do prazo de aprovação OU se estÃ¡ em produÃ§Ã£o e passou da data de postagem
-            return (deadline && deadline < now) || (c.status === 'PRODUÇÃO' && scheduled < now);
+            // Atraso se passou do prazo de aprovaÃ§Ã£o OU se estÃ¡ em produÃ§Ã£o e passou da data de postagem
+            return (deadline && deadline < now) || (c.status === 'PRODUÃ‡ÃƒO' && scheduled < now);
         }).length,
         ready: contents.filter(c => c.status === 'PRONTO').length
     };
 
     OS_UI.renderMetric('metric-assets', { label: 'LogÃ­stica Total', value: metrics.total, trend: 'v1.0', meta: 'Escopo' });
-    OS_UI.renderMetric('metric-approval', { label: 'Aguardando Cliente', value: metrics.approval, trend: '!', meta: 'Atenção' });
-    OS_UI.renderMetric('metric-production', { label: 'Atraso Operacional', value: metrics.atrasado, trend: 'down', meta: 'Crítico' });
-    OS_UI.renderMetric('metric-schedule', { label: 'Prontos para Postar', value: metrics.ready, trend: 'âœ”', meta: 'Publicação' });
+    OS_UI.renderMetric('metric-approval', { label: 'Aguardando Cliente', value: metrics.approval, trend: '!', meta: 'AtenÃ§Ã£o' });
+    OS_UI.renderMetric('metric-production', { label: 'Atraso Operacional', value: metrics.atrasado, trend: 'down', meta: 'CrÃ­tico' });
+    OS_UI.renderMetric('metric-schedule', { label: 'Prontos para Postar', value: metrics.ready, trend: 'âœ”', meta: 'PublicaÃ§Ã£o' });
 
     // Atualizar status para ATRASADO via cÃ³digo se necessÃ¡rio (LÃ³gica em tempo real)
     contents.forEach(async c => {
@@ -415,7 +415,7 @@ function renderMetrics(contents) {
             const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
             if (deadline && deadline < now) {
                 // Sincronizar com DB (Opcional - pode ser apenas visual no dashboard)
-                console.warn(`[LOGÃ�STICA] Ativo ${c.title} estÃ¡ ATRASADO por prazo de aprovação.`);
+                console.warn(`[LOGÃ�STICA] Ativo ${c.title} estÃ¡ ATRASADO por prazo de aprovaÃ§Ã£o.`);
             }
         }
     });
@@ -461,12 +461,12 @@ function renderContentTable(contents) {
                     <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
 
                         ${c.status === 'PRONTO' ? `
-                            <button class="btn-mini" title="Ponte de Publicação" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
+                            <button class="btn-mini" title="Ponte de PublicaÃ§Ã£o" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
                                 <i class="fa-solid fa-rocket"></i>
                             </button>
                         ` : `
                             ${c.status !== 'PLANEJAMENTO' ? `
-                                <button class="btn-mini" title="ForÃ§ar ConclusÃ£o (Pular Aprovação)" onclick="window.forceReady('${c.id}')" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">
+                                <button class="btn-mini" title="ForÃ§ar ConclusÃ£o (Pular AprovaÃ§Ã£o)" onclick="window.forceReady('${c.id}')" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">
                                     <i class="fa-solid fa-circle-check"></i>
                                 </button>
                             ` : ''}
@@ -524,7 +524,7 @@ function renderCalendar(containerId, contents, mode) {
             
             // Filtro de visibilidade por modo
             // Filtro Estrategico Removido para sincronia total com a esteira
-            if (!isStrategic && !['PRODUÇÃO', 'REVISÃƒO INTERNA FINAL', 'APROVAÃ‡ÃƒO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
+            if (!isStrategic && !['PRODUÃ‡ÃƒO', 'REVISÃƒO INTERNA FINAL', 'APROVAÃ‡ÃƒO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
 
             return `
                 <div class="calendar-event" onclick="window.openApproval('${c.id}')" 
@@ -551,8 +551,8 @@ function getStatusBg(status) {
     if (status === 'APROVAÃ‡ÃƒO PLANEJAMENTO') return '#3b82f6'; // Azul
     if (status === 'APROVAÃ‡ÃƒO ESTRATÃ‰GICA') return '#3b82f6'; // Azul
     if (status === 'AJUSTE') return '#ef4444'; // Vermelho
-    if (status === 'PRODUÇÃO') return '#f59e0b'; // Amarelo/Laranja
-    if (status === 'AJUSTE DE PRODUÇÃO') return '#ec4899'; // Rosa (Refinamento tÃ©cnico)
+    if (status === 'PRODUÃ‡ÃƒO') return '#f59e0b'; // Amarelo/Laranja
+    if (status === 'AJUSTE DE PRODUÃ‡ÃƒO') return '#ec4899'; // Rosa (Refinamento tÃ©cnico)
     if (status === 'REVISÃƒO INTERNA FINAL') return '#ec4899';
     if (status === 'APROVAÃ‡ÃƒO FINAL') return '#3b82f6'; // Azul
     if (status === 'PRONTO') return '#10b981'; // Verde
@@ -579,7 +579,7 @@ window.openEditModal = async (id) => {
         document.getElementById('edit-asset-ref').value = c.metadata?.reference_url || '';
         document.getElementById('edit-asset-art-final').value = c.metadata?.final_asset_url || '';
         
-        // Injetar campos de metadados no container específico
+        // Injetar campos de metadados no container especÃ­fico
         const metaGrid = document.getElementById('edit-asset-meta-fields');
         if (metaGrid) {
         // Renderizar Roteiro e HistÃ³rico
@@ -688,9 +688,9 @@ window.openEditModal = async (id) => {
             const hasStrategic = c.metadata?.strategic_approval_required;
             
             footerActions.innerHTML = `
-                ${(c.status === 'PRODUÇÃO' || c.status === 'AJUSTE DE PRODUÇÃO') ? `
+                ${(c.status === 'PRODUÃ‡ÃƒO' || c.status === 'AJUSTE DE PRODUÃ‡ÃƒO') ? `
                     <button class="btn-mini" onclick="window.sendToStrategicOrFinal('${c.id}')" style="padding:10px 20px; background:#8b5cf6; color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
-                        <i class="fa-solid fa-paper-plane"></i> ${hasStrategic ? 'Finalizar e Enviar p/ Aprovação EstratÃ©gica' : 'Finalizar e Enviar'}
+                        <i class="fa-solid fa-paper-plane"></i> ${hasStrategic ? 'Finalizar e Enviar p/ AprovaÃ§Ã£o EstratÃ©gica' : 'Finalizar e Enviar'}
                     </button>
                 ` : ''}
                 ${c.status === 'APROVAÃ‡ÃƒO ESTRATÃ‰GICA' ? `
@@ -742,8 +742,8 @@ window.saveAssetEdit = async () => {
         // LÃ“GICA DE TRANSIÃ‡ÃƒO DE STATUS INTELIGENTE
         if (currentAsset.status === 'AJUSTE') {
             updatePayload.status = 'PLANEJAMENTO';
-        } else if (currentAsset.status === 'AJUSTE DE PRODUÇÃO') {
-            updatePayload.status = 'PRODUÇÃO'; 
+        } else if (currentAsset.status === 'AJUSTE DE PRODUÃ‡ÃƒO') {
+            updatePayload.status = 'PRODUÃ‡ÃƒO'; 
         }
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', editingAssetId);
         if (error) throw error;
@@ -767,7 +767,7 @@ window.sendToStrategicOrFinal = async (id) => {
         const hasStrategic = c.metadata?.strategic_approval_required;
         const nextStatus = hasStrategic ? 'APROVAÃ‡ÃƒO ESTRATÃ‰GICA' : 'APROVAÃ‡ÃƒO FINAL';
         
-        if (!confirm(`Confirmar envio para ${hasStrategic ? 'Aprovação EstratÃ©gica (Interna)' : 'Aprovação Final (Cliente)'}?`)) return;
+        if (!confirm(`Confirmar envio para ${hasStrategic ? 'AprovaÃ§Ã£o EstratÃ©gica (Interna)' : 'AprovaÃ§Ã£o Final (Cliente)'}?`)) return;
 
         const updatePayload = {
             status: nextStatus,
@@ -794,7 +794,7 @@ window.strategicInternalAction = async (id, action) => {
         const supabase = getSupabase();
         const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
         
-        let nextStatus = action === 'APPROVE' ? 'APROVAÃ‡ÃƒO FINAL' : 'PRODUÇÃO';
+        let nextStatus = action === 'APPROVE' ? 'APROVAÃ‡ÃƒO FINAL' : 'PRODUÃ‡ÃƒO';
         let newHistory = c.metadata?.history || [];
         
         if (action === 'REJECT') {
@@ -834,7 +834,7 @@ window.openPublishBridge = async (id) => {
     if (!c) return;
 
     const modal = document.getElementById('pub-modal-overlay');
-    if (!modal) return alert('Modal de Publicação nÃ£o encontrado no HTML.');
+    if (!modal) return alert('Modal de PublicaÃ§Ã£o nÃ£o encontrado no HTML.');
 
     // Preencher dados
     const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : 'Data nÃ£o definida';
@@ -870,7 +870,7 @@ window.openPublishBridge = async (id) => {
             if (error) return alert('Erro ao atualizar: ' + error.message);
             
             modal.style.display = 'none';
-            sLog('Conteúdo marcado como PUBLICADO.');
+            sLog('ConteÃºdo marcado como PUBLICADO.');
             loadContent();
         }
     };
@@ -908,7 +908,7 @@ window.copyToClipboard = (id) => {
 
 window.approvePendingAssets = async () => {
     if (!currentProject) return alert('Selecione um projeto!');
-    if (!confirm('Deseja enviar todas as pautas de PLANEJAMENTO para a aprovação do cliente?')) return;
+    if (!confirm('Deseja enviar todas as pautas de PLANEJAMENTO para a aprovaÃ§Ã£o do cliente?')) return;
 
     try {
         const supabase = getSupabase();
@@ -933,7 +933,7 @@ window.approvePendingAssets = async () => {
             .eq('status', 'APROVAÃ‡ÃƒO PLANEJAMENTO')
             .limit(10);
 
-        let waText = `ðŸš€ *NOVO PLANEJAMENTO DISPONÃ�VEL - ${proj?.name || 'Projeto'}*\n\nOlá! Acabamos de liberar o novo fluxo estratÃ©gico de conteÃºdo. \n\nAcesse agora para validar roteiros e prazos:\nðŸ”— ${portalUrl}\n\n*Resumo do Lote:*\n`;
+        let waText = `ðŸš€ *NOVO PLANEJAMENTO DISPONÃVEL - ${proj?.name || 'Projeto'}*\n\nOlÃ¡! Acabamos de liberar o novo fluxo estratÃ©gico de conteÃºdo. \n\nAcesse agora para validar roteiros e prazos:\nðŸ”— ${portalUrl}\n\n*Resumo do Lote:*\n`;
         if (assets && assets.length > 0) {
             assets.forEach(a => { waText += `â€¢ ${a.title}\n`; });
         }
@@ -945,69 +945,88 @@ window.approvePendingAssets = async () => {
         const modal = document.getElementById('modal-share-assets');
         if (modal) modal.style.display = 'flex';
 
-        sLog('Pautas enviadas para Aprovação.');
+        sLog('Pautas enviadas para AprovaÃ§Ã£o.');
         loadContent();
     } catch (e) {
         console.error('Erro ao enviar pautas:', e);
         alert('Erro ao enviar pautas: ' + e.message);
     }
 };
-
 window.runAiPlanner = async () => {
     const user = await OS_AUTH.check();
     if (user?.role !== 'ADMIN' && user?.role !== 'MANAGER') return alert('Acesso negado.');
 
     const filter = document.getElementById('project-filter');
     const selectedId = filter.value || currentProject;
-    if (!selectedId) return alert('Selecione um projeto para gerar planejamento estratÃ©gico!');
+    if (!selectedId) return alert('Selecione um projeto para gerar planejamento estrategico!');
 
     const supabase = getSupabase();
     
-    // VERIFICAÃ‡ÃƒO DE COTA (CONTRATO)
+    // VERIFICACAO DE COTA DINAMICA (ONBOARDING SMART SCOPE)
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', selectedId).single();
     const { count } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('project_id', selectedId);
     
-    // Tentar extrair nÃºmero da cota do 'content_scope' (Ex: "12 Ativos/mÃªs")
-    const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
-    const quota = quotaMatch ? parseInt(quotaMatch[0]) : 12;
+    let quota = 12; // Fallback padrao
+    const smartScope = project.operational_activation?.smart_scope?.conteudo
+        || project.metadata?.operational_activation?.smart_scope?.conteudo
+        || project.metadata?.onboarding?.module_details;
+    
+    if (smartScope) {
+        const reelsQty = parseInt(smartScope.reels || smartScope.escopo_conteudo_reels_qty) || 0;
+        const carrosselQty = parseInt(smartScope.carrossel || smartScope.escopo_conteudo_carrossel_qty) || 0;
+        const totalSmart = reelsQty + carrosselQty;
+        if (totalSmart > 0) quota = totalSmart;
+    } else {
+        const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
+        if (quotaMatch) quota = parseInt(quotaMatch[0]);
+    }
 
     const remaining = quota - count;
 
     if (remaining <= 0) {
-        return alert(`Limite de Cota Atingido (${count}/${quota}).\n\nApague ativos para liberar espaÃ§o ou solicite upgrade de contrato.`);
+        return alert('Limite de Cota Atingido (' + count + '/' + quota + ').\n\nApague ativos para liberar espaco ou solicite upgrade de contrato.');
     }
 
-    sLog(`Iniciando Motor EstratÃ©gico (Cota: ${count}/${quota} | DisponÃ­vel: ${remaining})`);
+    sLog('Iniciando Motor Estrategico (Cota: ' + count + '/' + quota + ' | Disponivel: ' + remaining + ')');
     
     try {
         const { AIPlanner } = await import('../../services/ai-planner.js');
         const type = document.getElementById('ai-planner-service').value;
         
-        if (confirm(`Gerar ${type === 'ALL' ? 'novo planejamento' : 'ativos de ' + type} para preencher os ${remaining} slots disponÃ­veis no contrato?`)) {
+        if (confirm('Gerar ' + (type === 'ALL' ? 'novo planejamento' : 'ativos de ' + type) + ' para preencher os ' + remaining + ' slots disponiveis no contrato?')) {
             const newAssets = await AIPlanner.generatePlan(currentProject, type, remaining);
             
             if (newAssets && newAssets.length > 0) {
-                // APLICAR INTELIGÃŠNCIA DE PRAZO E RESPONSÃ�VEL
+                // APLICAR INTELIGENCIA DE PRAZO E RESPONSAVEL
                 const processedAssets = newAssets.map(asset => {
                     const titleUpper = asset.title.toUpperCase();
-                    const type = Object.keys(RESPONSIBLE_MAP).find(k => titleUpper.includes(k)) || 'CARD';
+                    const assetType = Object.keys(RESPONSIBLE_MAP).find(k => titleUpper.includes(k)) || 'CARD';
                     
                     const scheduledDate = new Date(asset.scheduled_at);
                     const now = new Date();
                     
-                    // LÃ³gica Pub-2 para Planejamento/ProduÃ§Ã£o Inicial
+                    // Defesa Cronologica: prazo de aprovacao SEMPRE antes do horario de postagem
                     let deadline = new Date(scheduledDate.getTime() - 48 * 60 * 60 * 1000);
-                    if (deadline < now) deadline = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+                    if (deadline < now) {
+                        deadline = new Date(now.getTime() + (scheduledDate.getTime() - now.getTime()) / 2);
+                        if (deadline.getTime() >= scheduledDate.getTime() || deadline.getTime() <= now.getTime()) {
+                            deadline = new Date(scheduledDate.getTime() - 2 * 60 * 60 * 1000);
+                        }
+                    }
                     
-                    // LÃ³gica de Prioridade: Apenas itens crÃ­ticos de TraÃ§Ã£o e Marca sÃ£o ALTA por padrÃ£o
-                    const priority = (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('BRANDING')) ? 'ALTA' : 'MÉDIA';
+                    // Logica de Prioridade Estrategica Premium
+                    const priority = asset.priority || (
+                        (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('BRANDING') ||
+                         titleUpper.includes('REELS') || titleUpper.includes('CARROSSEL') || titleUpper.includes('SITE') || titleUpper.includes('LP'))
+                        ? 'ALTA' : 'MEDIA'
+                    );
 
                     return {
                         ...asset,
                         priority: priority,
                         metadata: {
                             ...asset.metadata,
-                            responsible: RESPONSIBLE_MAP[type] || 'Design',
+                            responsible: RESPONSIBLE_MAP[assetType] || 'Design',
                             approval_deadline: deadline.toISOString(),
                             revision_cycle: 1,
                             version: 'V1'
@@ -1017,7 +1036,7 @@ window.runAiPlanner = async () => {
 
                 const { error } = await supabase.from('content_assets').insert(processedAssets);
                 if (error) throw error;
-                sLog(`${processedAssets.length} Ativos de LogÃ­stica Gerados.`);
+                sLog(processedAssets.length + ' Ativos de Logistica Gerados.');
                 loadContent();
             }
         }
@@ -1025,9 +1044,10 @@ window.runAiPlanner = async () => {
         alert('Erro ao gerar plano: ' + err.message);
     }
 };
+};
 
 window.forceReady = async (id) => {
-    if (!confirm('Deseja pular as etapas de aprovação e marcar este ativo como PRONTO para publicaÃ§Ã£o?')) return;
+    if (!confirm('Deseja pular as etapas de aprovaÃ§Ã£o e marcar este ativo como PRONTO para publicaÃ§Ã£o?')) return;
     try {
         const supabase = getSupabase();
         const { error } = await supabase.from('content_assets').update({ status: 'PRONTO' }).eq('id', id);

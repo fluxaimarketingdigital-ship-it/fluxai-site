@@ -239,7 +239,7 @@ export const AIPlanner = {
             servicesToGenerate = Array(maxToGenerate).fill(specificService);
         }
 
-        let daysOffset = 0;
+        let daysOffset = 3; // Começa sempre no mínimo 3 dias no futuro para dar folga de aprovação
 
         const openAiKey = localStorage.getItem('openai_api_key');
         
@@ -249,37 +249,54 @@ export const AIPlanner = {
             
             let date;
             let found = false;
+            let dayPosition = 0; // Identifica se é o 1º ou 2º post do mesmo dia
             
             while (!found) {
                 date = new Date(now.getFullYear(), now.getMonth(), now.getDate());
                 date.setDate(date.getDate() + daysOffset);
                 
                 const dateKey = `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
-                if (strategicDays.includes(date.getDay()) && !occupiedDates.includes(dateKey)) {
+                const occurrenceCount = occupiedDates.filter(d => d === dateKey).length;
+                
+                if (strategicDays.includes(date.getDay()) && occurrenceCount < 2) {
                     found = true;
+                    dayPosition = occurrenceCount; // 0 para o primeiro, 1 para o segundo
                     occupiedDates.push(dateKey);
+                } else {
+                    daysOffset++;
                 }
-                daysOffset++;
             }
 
             // Aplicando inteligência de horário de publicação estratégica premium (alternando horários de alto tráfego)
             let targetHour = 12;
             let targetMinute = 0;
             if (service.platform === 'REELS' || service.platform === 'INSTAGRAM') {
-                const peakHours = [12, 18, 10, 20];
-                const peakMinutes = [0, 30, 45, 0];
-                const index = daysOffset % peakHours.length;
-                targetHour = peakHours[index];
-                targetMinute = peakMinutes[index];
+                if (dayPosition === 0) {
+                    targetHour = 12; // Almoço
+                    targetMinute = 0;
+                } else {
+                    targetHour = 18; // Pico da tarde/noite
+                    targetMinute = 30;
+                }
             } else {
-                targetHour = 9; // Horário comercial padrão
-                targetMinute = 0;
+                if (dayPosition === 0) {
+                    targetHour = 9; // Horário comercial manhã
+                    targetMinute = 0;
+                } else {
+                    targetHour = 15; // Tarde
+                    targetMinute = 0;
+                }
             }
             date.setHours(targetHour, targetMinute, 0, 0);
 
             const scheduledAt = date;
-            const strategicDeadline = new Date(scheduledAt.getTime() - (5 * 24 * 60 * 60 * 1000));
-            strategicDeadline.setHours(18, 0, 0, 0);
+            
+            // Prazo de Aprovação Inteligente e Seguro: 48h antes do post, ou ponto médio se colidir no passado
+            let deadlineTime = scheduledAt.getTime() - (48 * 60 * 60 * 1000);
+            if (deadlineTime < now.getTime()) {
+                deadlineTime = now.getTime() + (scheduledAt.getTime() - now.getTime()) / 2;
+            }
+            const strategicDeadline = new Date(deadlineTime);
 
             const auditSummary = AIPlanner.auditInfrastructure(project);
             
@@ -289,8 +306,24 @@ export const AIPlanner = {
             if (openAiKey) {
                 try {
                     console.log(`[OPENAI PLANNER] Gerando pauta ao vivo para ${service.name}...`);
+                    
+                    let customContext = '';
+                    if (project.company_name && project.company_name.includes('FluxAI')) {
+                        customContext = `
+[DNA DE MARCA DA FLUXAI LABS]
+Lembre-se: O cliente é a nossa própria empresa "FluxAI Labs". Desenvolvemos e implementamos Infraestrutura Estratégica Digital para negócios, unindo tecnologia, inteligência artificial, branding e engenharia operacional de crescimento.
+Nossos pilares principais de serviço que devemos promover ativamente para educar e atrair tomadores de decisão (B2B High-Ticket) são:
+1. Arquitetura Digital Premium (Sites institucionais refinados e LPs de conversão ultra-profissionais com Portal do Cliente).
+2. Engenharia de Conteúdo no Instagram (Reels de alta autoridade, Carrosséis estratégicos focados em escala e sofisticação visual).
+3. Campanhas de Tráfego Pago Avançadas (Meta Ads e Google Ads focados em alta renda, evitando leads desqualificados).
+4. Sistemas Operacionais de Crescimento e Automação (Integração de processos, CRM Hubspot/Salesforce e Cockpits analíticos como o FluxAI OS™).
+Produza a pauta com base nessa autoridade técnica, educando a audiência de empresários sobre por que o amadorismo digital impede a escala comercial.
+`;
+                    }
+
                     const prompt = `Você é um Estrategista Digital High-Ticket de elite trabalhando na agência FluxAI.
 Você deve redigir um roteiro e pauta de conteúdo estratégico para o cliente "${project.company_name}".
+${customContext}
 
 [DIRETRIZES DO CLIENTE]
 - Público-Alvo (ICP): ${icp}
@@ -352,11 +385,13 @@ ${auditSummary}`;
 ${auditSummary}`);
             }
 
+            const priorityValue = (sKey === 'TRAFEGO' || sKey === 'LP' || sKey === 'SITE' || sKey === 'BRANDING' || sKey === 'REELS' || sKey === 'CARROSSEL') ? 'ALTA' : 'MÉDIA';
+
             contents.push({
                 project_id: projectId,
                 title: `${service.name} • Estratégico`,
                 status: 'PLANEJAMENTO',
-                priority: 'MÉDIA',
+                priority: priorityValue,
                 platform: service.platform,
                 scheduled_at: scheduledAt.toISOString(),
                 caption: captionText,
