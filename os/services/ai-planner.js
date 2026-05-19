@@ -241,9 +241,11 @@ export const AIPlanner = {
 
         let daysOffset = 0;
 
-        servicesToGenerate.forEach((sKey) => {
+        const openAiKey = localStorage.getItem('openai_api_key');
+        
+        for (const sKey of servicesToGenerate) {
             const service = AIPlanner.STRATEGIC_MATRIX[sKey];
-            if (!service) return;
+            if (!service) continue;
             
             let date;
             let found = false;
@@ -280,6 +282,75 @@ export const AIPlanner = {
             strategicDeadline.setHours(18, 0, 0, 0);
 
             const auditSummary = AIPlanner.auditInfrastructure(project);
+            
+            let captionText = "";
+            let generatedByAI = false;
+
+            if (openAiKey) {
+                try {
+                    console.log(`[OPENAI PLANNER] Gerando pauta ao vivo para ${service.name}...`);
+                    const prompt = `Você é um Estrategista Digital High-Ticket de elite trabalhando na agência FluxAI.
+Você deve redigir um roteiro e pauta de conteúdo estratégico para o cliente "${project.company_name}".
+
+[DIRETRIZES DO CLIENTE]
+- Público-Alvo (ICP): ${icp}
+- Tom de Voz: ${tone}
+- Dores a resolver: ${painPoints}
+- DNA de Marca a Transmitir: ${dnaDesired}
+- DNA de Marca a Evitar: ${dnaAnti}
+
+[FORMATO DE POST]
+- Canal/Plataforma: ${service.platform}
+- Tipo de Entrega: ${service.name}
+
+Escreva uma pauta completa de alta autoridade contendo:
+1. Objetivo Estratégico do Post (Alinhado a: ${objectives})
+2. Roteiro Direcionado (Cena por Cena ou Slide por Slide)
+3. Gancho (Hook) ultra-atraente de abertura
+4. Legenda persuasiva e sofisticada para Instagram
+5. Chamada de Ação (CTA) clara.
+
+Por favor, seja extremamente técnico, premium, inovador e direto ao ponto. Não use jargões amadores nem clichês como "Você já pensou...".
+Adicione também um sumário de auditoria no final:
+${auditSummary}`;
+
+                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${openAiKey}`
+                        },
+                        body: JSON.stringify({
+                            model: 'gpt-4o',
+                            messages: [
+                                { role: 'system', content: 'Você é um estrategista digital e copywriter sênior com foco em infoprodutos e marcas premium high-ticket.' },
+                                { role: 'user', content: prompt }
+                            ],
+                            temperature: 0.7
+                        })
+                    });
+
+                    if (response.ok) {
+                        const resData = await response.json();
+                        captionText = resData.choices[0].message.content;
+                        generatedByAI = true;
+                    } else {
+                        console.warn("[PLANNER OPENAI] Falha na requisição OpenAI. Usando modelo estratégico local.");
+                    }
+                } catch (err) {
+                    console.error("[PLANNER OPENAI] Erro ao conectar com a API da OpenAI:", err);
+                }
+            }
+
+            if (!generatedByAI) {
+                captionText = service.template
+                    .replace('[OBJ]', objectives)
+                    .replace(/\[IA\]/g, `Gerado conforme o tom ${tone} para atingir o ICP: ${icp}
+⚠️ FOCO ESTRATÉGICO: Mitigar dores de ${painPoints}.
+🧬 DNA DA MARCA: Transmitir (${dnaDesired}), Evitar estritamente (${dnaAnti}).
+
+${auditSummary}`);
+            }
 
             contents.push({
                 project_id: projectId,
@@ -288,13 +359,7 @@ export const AIPlanner = {
                 priority: 'MÉDIA',
                 platform: service.platform,
                 scheduled_at: scheduledAt.toISOString(),
-                caption: service.template
-                    .replace('[OBJ]', objectives)
-                    .replace(/\[IA\]/g, `Gerado conforme o tom ${tone} para atingir o ICP: ${icp}
-⚠️ FOCO ESTRATÉGICO: Mitigar dores de ${painPoints}.
-🧬 DNA DA MARCA: Transmitir (${dnaDesired}), Evitar estritamente (${dnaAnti}).
-
-${auditSummary}`),
+                caption: captionText,
                 metadata: {
                     responsible: service.platform === 'INSTAGRAM' ? 'Design' : 'Social Media',
                     version: 'V1',
@@ -303,7 +368,7 @@ ${auditSummary}`),
                 },
                 internal_notes: ""
             });
-        });
+        }
 
         return contents;
     }
