@@ -91,6 +91,8 @@
                     <button class="os-tab-btn active" onclick="window.switchTab('esteira')"><i class="fa-solid fa-list-check"></i> Esteira Operacional</button>
                     <button class="os-tab-btn" onclick="window.switchTab('calendario-estrategico')"><i class="fa-solid fa-calendar-days"></i> Calendário Estratégico</button>
                     <button class="os-tab-btn" onclick="window.switchTab('calendario-operacional')"><i class="fa-solid fa-clapperboard"></i> Calendário Operacional</button>
+                    <button class="os-tab-btn" onclick="window.switchTab('timeline-operacional')"><i class="fa-solid fa-timeline"></i> Timeline Operacional</button>
+                    <button class="os-tab-btn" onclick="window.switchTab('intelligence')"><i class="fa-solid fa-chart-line"></i> Content Intelligence™</button>
                 </div>
 
                 <div id="tab-esteira" class="os-widget" style="padding: 0; background: transparent; border: none;">
@@ -98,10 +100,10 @@
                         <thead>
                             <tr>
                                 <th>Ativo Estratégico</th>
-                                <th>Status</th>
+                                <th>Status Real</th>
                                 <th>Prioridade</th>
                                 <th>Plataforma</th>
-                                <th>Aprovação</th>
+                                <th>Aprovação Trilateral</th>
                                 <th style="text-align: right;">Ações</th>
                             </tr>
                         </thead>
@@ -130,39 +132,134 @@
                 <div id="tab-calendario-operacional" style="display: none;">
                     <div class="calendar-grid" id="calendar-operational-body"></div>
                 </div>
+
+                <!-- ABA TIMELINE OPERACIONAL -->
+                <div id="tab-timeline-operacional" style="display: none;">
+                    <div class="os-widget" style="padding: 30px; background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid rgba(255,255,255,0.05); padding-bottom:10px;">
+                            <h3 style="color:var(--os-primary); font-size:0.9rem; margin:0; font-weight: 800; letter-spacing: -0.3px;"><i class="fa-solid fa-clock-rotate-left"></i> RASTREABILIDADE OPERACIONAL</h3>
+                            <span style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; letter-spacing:1px;">Audit Log Feed & Cycle Time</span>
+                        </div>
+                        <div id="timeline-operational-feed" style="display:flex; flex-direction:column; gap:15px; max-height: 500px; overflow-y: auto; padding-right:10px;">
+                            <!-- Injetado via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ABA CONTENT INTELLIGENCE -->
+                <div id="tab-intelligence" style="display: none;">
+                    <div class="os-widget-grid" style="margin-bottom:30px; display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px;">
+                        <div class="os-widget" style="grid-column: span 3; text-align:center; padding: 20px 15px;">
+                            <h4 style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; margin-bottom:10px; font-weight:800; letter-spacing:1px;">Total DMs Geradas</h4>
+                            <span style="font-size:1.6rem; font-weight:900; color:#fff;" id="intel-dms">--</span>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 3; text-align:center; padding: 20px 15px;">
+                            <h4 style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; margin-bottom:10px; font-weight:800; letter-spacing:1px;">Retenção Audiovisual</h4>
+                            <span style="font-size:1.6rem; font-weight:900; color:var(--os-success);" id="intel-retention">--</span>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 3; text-align:center; padding: 20px 15px;">
+                            <h4 style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; margin-bottom:10px; font-weight:800; letter-spacing:1px;">Fadiga Narrativa</h4>
+                            <span style="font-size:1.6rem; font-weight:900; color:var(--os-warning);" id="intel-fatigue">--</span>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 3; text-align:center; padding: 20px 15px;">
+                            <h4 style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; margin-bottom:10px; font-weight:800; letter-spacing:1px;">Performance Score</h4>
+                            <span style="font-size:1.6rem; font-weight:900; color:var(--os-primary);" id="intel-performance">--</span>
+                        </div>
+                    </div>
+
+                    <div class="os-widget-grid" style="display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px;">
+                        <div class="os-widget" style="grid-column: span 8; padding:25px;">
+                            <h3 style="color:var(--os-primary); font-size:0.85rem; margin-bottom:20px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;"><i class="fa-solid fa-crown"></i> Content Intelligence™ | Ranking de Ativos</h3>
+                            <table class="pipeline-table" style="margin-top:0;">
+                                <thead>
+                                    <tr>
+                                        <th>Ativo</th>
+                                        <th>Visualizações</th>
+                                        <th>Retenção Média</th>
+                                        <th>DMs Geradas</th>
+                                        <th>Score</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="intel-ranking-body">
+                                    <!-- Injetado via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 4; padding:25px;">
+                            <h3 style="color:var(--os-primary); font-size:0.85rem; margin-bottom:20px; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;"><i class="fa-solid fa-microchip"></i> Diagnóstico de Performance IA</h3>
+                            <div id="intel-ai-diagnostic" style="font-size:0.75rem; color:#eee; line-height:1.6; font-family:'JetBrains Mono', monospace; background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:20px; border-radius:8px; height: 260px; overflow-y: auto;">
+                                <!-- Injetado via JS -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
 
     <!-- MODAL DE EDIÇÃO ESTRATÉGICA (EXCLUSIVO PLANNER) -->
     <div id="modal-edit-asset" class="os-modal">
-        <div class="os-widget" style="display:flex; flex-direction:column; max-height:90vh; width:100%; max-width:760px; padding:0; overflow:hidden;">
+        <div class="os-widget" style="display:flex; flex-direction:column; max-height:90vh; width:100%; max-width:780px; padding:0; overflow:hidden;">
             
             <!-- Cabeçalho fixo -->
-            <div style="padding:25px 30px 20px; border-bottom:1px solid var(--os-border); flex-shrink:0;">
-                <h2 style="margin:0; color: var(--os-primary); font-size: 1.2rem;">Refinamento Estratégico</h2>
+            <div style="padding:25px 30px 20px; border-bottom:1px solid var(--os-border); flex-shrink:0; display:flex; justify-content:space-between; align-items:center;">
+                <h2 style="margin:0; color: var(--os-primary); font-size: 1.2rem; font-weight:800;"><i class="fa-solid fa-pen-nib"></i> Governança de Roteiro</h2>
+                <div id="edit-asset-version-badge" style="font-family:'JetBrains Mono', monospace; font-size:0.65rem; background:rgba(255,255,255,0.05); padding:4px 10px; border-radius:4px; border:1px solid var(--os-border); color:var(--os-primary);">VERSÃO ATIVA: V1</div>
             </div>
 
             <!-- Corpo com scroll -->
             <div style="flex:1; overflow-y:auto; padding:25px 30px;">
 
-                <div style="margin-bottom: 15px;">
-                    <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px;">Título do Ativo</label>
-                    <input type="text" id="edit-asset-title" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div>
+                        <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800; text-transform:uppercase;">Título do Ativo</label>
+                        <input type="text" id="edit-asset-title" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800; text-transform:uppercase;">Seletor de Versões (Histórico)</label>
+                        <select id="edit-asset-version-selector" class="form-control" style="padding:8px 10px; background:#111; color:#fff; border-radius:4px; font-family:'JetBrains Mono', monospace; font-size:0.75rem;">
+                            <!-- Injetado via JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div id="edit-asset-lock-banner" style="display:none; background:rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); padding:10px 15px; border-radius:6px; color:#ef4444; font-size:0.7rem; margin-bottom:15px; font-family:'JetBrains Mono', monospace;">
+                    <i class="fa-solid fa-lock"></i> ESTA VERSÃO FOI CONGELADA ("SOURCE OF TRUTH"). EDITE A VERSÃO ATIVA OU CRIE UMA NOVA REVISÃO.
                 </div>
 
                 <div id="edit-asset-roadmap-container" style="margin-bottom: 15px;">
                     <!-- Preenchido via JS (Roteiro + Histórico) -->
                 </div>
 
-                <div style="margin-bottom: 15px;">
-                    <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px;">Link de Referência / Inspiração</label>
-                    <input type="url" id="edit-asset-ref" placeholder="https://..." style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+                <div class="grid-2" style="margin-bottom: 15px;">
+                    <div>
+                        <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800; text-transform:uppercase;">Link de Referência</label>
+                        <input type="url" id="edit-asset-ref" placeholder="https://..." style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+                    </div>
+                    <div>
+                        <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800; text-transform:uppercase;">LINK DO ENTREGÁVEL / ARTE FINAL</label>
+                        <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive..." style="width:100%; padding:10px; background:#000; border:1px solid var(--os-primary); color:#fff; border-radius:4px;">
+                    </div>
                 </div>
 
-                <div style="margin-bottom: 15px;">
-                    <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px;">LINK DA ARTE FINAL (PARA VALIDAÇÃO)</label>
-                    <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive / Vídeo..." style="width:100%; padding:10px; background:#000; border:1px solid var(--os-primary); color:#fff; border-radius:4px;">
+                <!-- Painel de Governança Trilateral -->
+                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--os-border); padding:20px; border-radius:8px; margin-bottom:15px;">
+                    <h4 style="margin:0 0 15px 0; color:var(--os-primary); font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-shield-halved"></i> Matriz de Governança (Aprovações Trilaterais)</h4>
+                    
+                    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
+                        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; text-align:center;">
+                            <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:8px; font-weight:800; letter-spacing:0.5px;">1. ESTRATÉGICA (NARRATIVA)</label>
+                            <input type="checkbox" id="approve-strategic" style="width:18px; height:18px; accent-color:var(--os-primary);">
+                        </div>
+                        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; text-align:center;">
+                            <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:8px; font-weight:800; letter-spacing:0.5px;">2. OPERACIONAL (TÉCNICA)</label>
+                            <input type="checkbox" id="approve-operational" style="width:18px; height:18px; accent-color:var(--os-primary);">
+                        </div>
+                        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; text-align:center;">
+                            <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:8px; font-weight:800; letter-spacing:0.5px;">3. CLIENTE (FINAL)</label>
+                            <input type="checkbox" id="approve-client" style="width:18px; height:18px; accent-color:var(--os-primary);">
+                        </div>
+                    </div>
                 </div>
 
                 <div id="edit-asset-meta-fields" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:5px;">
@@ -172,10 +269,15 @@
             </div>
 
             <!-- Rodapé fixo com botões -->
-            <div style="padding:18px 30px; border-top:1px solid var(--os-border); flex-shrink:0; display:flex; gap:10px; justify-content:flex-end; align-items:center; background:var(--os-card);">
-                <button class="btn-mini" onclick="window.closeEditModal()" style="padding:10px 20px;">Cancelar</button>
-                <div id="edit-asset-footer-actions" style="display:flex; gap:10px;">
-                    <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
+            <div style="padding:18px 30px; border-top:1px solid var(--os-border); flex-shrink:0; display:flex; gap:10px; justify-content:space-between; align-items:center; background:var(--os-card);">
+                <div>
+                    <button class="btn-mini" id="btn-rejeitar-cliente" style="background:#ef444430; border:1px solid #ef444450; color:#ef4444; padding:10px 15px; font-size:0.7rem; font-weight:800; display:none;"><i class="fa-solid fa-circle-xmark"></i> Rejeitar & Congelar V1</button>
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-mini" onclick="window.closeEditModal()" style="padding:10px 20px;">Cancelar</button>
+                    <div id="edit-asset-footer-actions" style="display:flex; gap:10px;">
+                        <button class="btn-mini" onclick="window.saveAssetEdit()" style="padding:10px 20px; background:var(--os-primary); color:#000; font-weight:800;">Salvar Alterações</button>
+                    </div>
                 </div>
             </div>
 

@@ -207,6 +207,95 @@
         }
 
         .os-widget { animation: fadeInUp 0.5s ease backwards; }
+
+        /* MODAL FIXES & STYLING */
+        .os-modal {
+            backdrop-filter: blur(10px);
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .os-modal .os-widget {
+            margin: auto;
+            max-width: 650px;
+            width: 100%;
+            position: relative;
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: block;
+            padding: 0 !important;
+            overflow: hidden;
+            border-radius: 12px;
+        }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-size: 0.65rem; text-transform: uppercase; color: var(--os-text-muted); letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--os-border); border-radius: 4px; color: #fff; font-size: 0.85rem; font-family: inherit; transition: all 0.3s; box-sizing: border-box; }
+        .form-control:focus { outline: none; border-color: var(--os-primary); box-shadow: 0 0 0 3px rgba(142,158,104,0.15); }
+        select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 15px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        /* Glass buttons */
+        .btn-glass-primary {
+            background: var(--os-primary);
+            color: #050705;
+            border: 1px solid var(--os-primary);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        .btn-glass-primary:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 4px 15px rgba(142, 158, 104, 0.3);
+        }
+        .btn-glass-secondary {
+            background: transparent;
+            color: var(--os-text-muted);
+            border: 1px solid var(--os-border);
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 800;
+            font-size: 0.8rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s;
+        }
+        .btn-glass-secondary:hover {
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .conversion-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(16, 185, 129, 0.03);
+            border: 1px dashed rgba(16, 185, 129, 0.25);
+            border-radius: 8px;
+            display: none;
+            animation: fadeInUp 0.4s ease both;
+        }
     </style>
 </head>
 <body class="os-mode">
@@ -218,9 +307,14 @@
             <header class="os-topbar"></header>
 
             <main class="os-viewport">
-                <div class="os-page-title">
-                    <h1>Inteligência de CRM</h1>
-                    <p>Gestão de ativos comerciais e saúde de relacionamento institucional.</p>
+                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: center; width: 100%; margin-bottom: 25px;">
+                    <div>
+                        <h1 style="margin:0;">Inteligência de CRM</h1>
+                        <p style="margin: 5px 0 0 0;">Gestão de ativos comerciais e saúde de relacionamento institucional.</p>
+                    </div>
+                    <button id="btn-add-lead-trigger" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.2); letter-spacing: 0.5px; text-transform: uppercase;">
+                        <i class="fa-solid fa-plus-circle"></i> Adicionar Lead
+                    </button>
                 </div>
 
                 <div class="os-widget-grid">
@@ -325,24 +419,28 @@
                         });
                     }
 
-                    // Anexar novos leads
-                    if (leadsData && leadsData.length > 0) {
-                        const newLeads = leadsData.map(l => {
-                            return {
-                                project_id: l.project_id || 'novo',
-                                company: l.company || l.name,
-                                name: l.name,
-                                value: 0,
-                                healthScore: l.health_score || 50,
-                                status: l.status || 'NOVO',
-                                lastFollowUp: new Date(l.created_at).toLocaleDateString('pt-BR'),
-                                nextAction: 'QUALIFICAR LEAD',
-                                impact: 'A DEFINIR'
-                            };
-                        });
-                        // Leads novos ficam no topo
-                        combined = [...newLeads, ...combined];
-                    }
+                    // Anexar leads locais e do banco
+                    const localLeads = JSON.parse(localStorage.getItem('fluxai_mock_leads') || '[]');
+                    const dbLeads = (leadsData || []).map(l => {
+                        return {
+                            id: l.id,
+                            project_id: l.project_id || 'novo',
+                            company: l.company || l.name,
+                            name: l.name,
+                            value: 0,
+                            healthScore: l.health_score || 50,
+                            status: l.status || 'NOVO',
+                            lastFollowUp: new Date(l.created_at).toLocaleDateString('pt-BR'),
+                            nextAction: l.status === 'NOVO' ? 'QUALIFICAR LEAD' : 'FOLLOW-UP',
+                            impact: 'A DEFINIR',
+                            phone: l.phone || '',
+                            email: l.email || '',
+                            pain_point: l.pain_point || '',
+                            internal_notes: l.internal_notes || '',
+                            temperature: l.temperature || 'MORNO'
+                        };
+                    });
+                    combined = [...localLeads, ...dbLeads, ...combined];
 
                     if (combined.length > 0) {
                         leads = combined;
@@ -399,6 +497,34 @@
                 
                 const projId = item.project_id || (companyName.includes('Maria Aparecida') ? 'p_c1' : (companyName.includes('Alves') ? 'p_c2' : 'p_c3'));
 
+                let actionHtml = '';
+                if (item.project_id === 'novo') {
+                    // Lead não convertido
+                    actionHtml = `
+                        <button class="os-action-btn btn-manage-lead-trigger" 
+                                data-id="${item.id || ''}"
+                                data-name="${item.name || ''}"
+                                data-company="${item.company || ''}"
+                                data-email="${item.email || ''}"
+                                data-phone="${item.phone || ''}"
+                                data-pain="${item.pain_point || ''}"
+                                data-status="${item.status || ''}"
+                                data-temperature="${item.temperature || ''}"
+                                data-health="${healthVal}"
+                                data-notes="${item.internal_notes || ''}"
+                                title="Gerenciar Lead" 
+                                style="background: transparent; border: none; color: #f59e0b; margin-right: 15px; font-size: 1.1rem; transition: all 0.2s; display: inline-block; cursor: pointer;">
+                            <i class="fa-solid fa-sliders"></i>
+                        </button>
+                    `;
+                } else {
+                    // Contrato ativo / Cliente
+                    actionHtml = `
+                        <a href="analytics.html?project=${projId}&input=true" class="os-action-btn" title="Lançar Métricas" style="color: var(--os-primary); margin-right: 15px; font-size: 1.1rem; transition: all 0.2s; display: inline-block;"><i class="fa-solid fa-instagram"></i></a>
+                        <a href="workspace.html?project=${projId}" class="os-action-btn" title="Acessar Workspace" style="color: #60a5fa; font-size: 1.1rem; transition: all 0.2s; display: inline-block;"><i class="fa-solid fa-briefcase"></i></a>
+                    `;
+                }
+
                 return `
                     <tr>
                         <td>
@@ -414,8 +540,7 @@
                         <td style="font-weight: 600; color: var(--os-primary); font-size: 0.75rem;">${item.nextAction || 'FOLLOW-UP'}</td>
                         <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color:#fff;">${leadValue.toString().includes('R$') ? leadValue : 'R$ ' + leadValue}</td>
                         <td style="text-align: right; white-space: nowrap;">
-                            <a href="analytics.html?project=${projId}&input=true" class="os-action-btn" title="Lançar Métricas" style="color: var(--os-primary); margin-right: 15px; font-size: 1.1rem; transition: all 0.2s; display: inline-block;"><i class="fa-solid fa-instagram"></i></a>
-                            <a href="workspace.html?project=${projId}" class="os-action-btn" title="Acessar Workspace" style="color: #60a5fa; font-size: 1.1rem; transition: all 0.2s; display: inline-block;"><i class="fa-solid fa-briefcase"></i></a>
+                            ${actionHtml}
                         </td>
                     </tr>
                 `;
@@ -460,6 +585,528 @@
         }
 
         initPage();
+
+        // ----------------- MODAL LISTENERS & LOGIC -----------------
+        const supabase = getSupabase();
+
+        // 1. Trigger de Adicionar Lead
+        const btnAddLeadTrigger = document.getElementById('btn-add-lead-trigger');
+        const addLeadModal = document.getElementById('add-lead-modal');
+        
+        if (btnAddLeadTrigger) {
+            btnAddLeadTrigger.addEventListener('click', () => {
+                document.getElementById('add-lead-form').reset();
+                addLeadModal.style.display = 'flex';
+            });
+        }
+
+        // 2. Submeter Formulário de Adicionar Lead
+        const addLeadForm = document.getElementById('add-lead-form');
+        if (addLeadForm) {
+            addLeadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const name = document.getElementById('add-lead-name').value;
+                const company = document.getElementById('add-lead-company').value;
+                const email = document.getElementById('add-lead-email').value;
+                const phone = document.getElementById('add-lead-phone').value;
+                const segment = document.getElementById('add-lead-segment').value;
+                const temperature = document.getElementById('add-lead-temperature').value;
+                const health = parseInt(document.getElementById('add-lead-health').value) || 50;
+                const pain = document.getElementById('add-lead-pain').value;
+                const notes = document.getElementById('add-lead-notes').value;
+
+                if (supabase) {
+                    try {
+                        const { data, error } = await supabase.from('crm_leads').insert([{
+                            name,
+                            company,
+                            email,
+                            phone,
+                            pain_point: pain,
+                            status: 'NOVO',
+                            temperature,
+                            health_score: health,
+                            internal_notes: notes,
+                            source: 'OPERACIONAL'
+                        }]);
+
+                        if (error) throw error;
+                        
+                        // Gravar log de auditoria
+                        await supabase.from('audit_logs').insert([{
+                            action: `Novo lead criado manualmente: ${company} (${name})`,
+                            module: 'CRM',
+                            user_role: 'ADMIN'
+                        }]);
+
+                    } catch (err) {
+                        console.error('Erro ao salvar lead no Supabase:', err);
+                        alert('Erro ao salvar lead no banco de dados. Salvando localmente como contingência.');
+                    }
+                }
+
+                // Salvar localmente
+                let localLeads = JSON.parse(localStorage.getItem('fluxai_mock_leads') || '[]');
+                localLeads.push({
+                    id: 'L-LOCAL-' + Math.floor(Math.random()*1000),
+                    project_id: 'novo',
+                    name,
+                    company,
+                    email,
+                    phone,
+                    pain_point: pain,
+                    status: 'NOVO',
+                    temperature,
+                    health_score: health,
+                    internal_notes: notes,
+                    created_at: new Date().toISOString(),
+                    lastFollowUp: new Date().toLocaleDateString('pt-BR'),
+                    nextAction: 'QUALIFICAR LEAD',
+                    impact: 'A DEFINIR'
+                });
+                localStorage.setItem('fluxai_mock_leads', JSON.stringify(localLeads));
+
+                alert('Lead adicionado com sucesso!');
+                addLeadModal.style.display = 'none';
+                await renderLeads();
+            });
+        }
+
+        // 3. Trigger de Gerenciar Lead (Event Delegation na tabela)
+        const manageLeadModal = document.getElementById('manage-lead-modal');
+        const conversionBox = document.getElementById('conversion-box');
+        
+        document.getElementById('crm-leads-body').addEventListener('click', (e) => {
+            const btn = e.target.closest('.btn-manage-lead-trigger');
+            if (!btn) return;
+
+            const id = btn.getAttribute('data-id');
+            const name = btn.getAttribute('data-name');
+            const company = btn.getAttribute('data-company');
+            const email = btn.getAttribute('data-email');
+            const phone = btn.getAttribute('data-phone');
+            const pain = btn.getAttribute('data-pain');
+            const status = btn.getAttribute('data-status');
+            const temperature = btn.getAttribute('data-temperature');
+            const health = btn.getAttribute('data-health');
+            const notes = btn.getAttribute('data-notes');
+
+            // Preencher campos informativos
+            document.getElementById('info-lead-name').innerText = name || '--';
+            document.getElementById('info-lead-company').innerText = company || '--';
+            document.getElementById('info-lead-phone').innerText = phone || '--';
+            document.getElementById('info-lead-email').innerText = email || '--';
+            document.getElementById('info-lead-pain').innerText = pain || '--';
+
+            // Preencher form de gerenciamento
+            document.getElementById('manage-lead-id').value = id;
+            document.getElementById('manage-lead-status').value = status || 'NOVO';
+            document.getElementById('manage-lead-temperature').value = temperature || 'MORNO';
+            document.getElementById('manage-lead-health').value = health || '50';
+            document.getElementById('manage-lead-notes').value = notes || '';
+
+            // Resetar bloco de conversão
+            conversionBox.style.display = 'none';
+            document.getElementById('convert-contract-value').value = '';
+            document.getElementById('convert-deliverables').value = '';
+
+            // Exibir modal
+            manageLeadModal.style.display = 'flex';
+        });
+
+        // 4. Copiar Mensagem de Abordagem Personalizada
+        const btnCopyWaMessage = document.getElementById('btn-copy-wa-message');
+        if (btnCopyWaMessage) {
+            btnCopyWaMessage.addEventListener('click', () => {
+                const name = document.getElementById('info-lead-name').innerText;
+                const company = document.getElementById('info-lead-company').innerText;
+                const pain = document.getElementById('info-lead-pain').innerText;
+
+                const msg = `Olá ${name}, tudo bem? Notei que você tem interesse em escalar a operação da ${company}.\n\nGostaria de entender um pouco mais sobre o seu desafio de: "${pain || 'Otimização operacional'}".\n\nPodemos agendar um bate-papo de 15 minutos esta semana?`;
+                
+                navigator.clipboard.writeText(msg).then(() => {
+                    alert('Mensagem copiada para a área de transferência!');
+                }).catch(err => {
+                    console.error('Erro ao copiar:', err);
+                });
+            });
+        }
+
+        // 5. Abrir WhatsApp Web
+        const btnOpenWaWeb = document.getElementById('btn-open-wa-web');
+        if (btnOpenWaWeb) {
+            btnOpenWaWeb.addEventListener('click', () => {
+                const phone = document.getElementById('info-lead-phone').innerText;
+                if (!phone || phone === '--') {
+                    alert('Número de WhatsApp inválido.');
+                    return;
+                }
+                const formattedPhone = phone.replace(/\D/g, '');
+                window.open(`https://wa.me/${formattedPhone}`, '_blank');
+            });
+        }
+
+        // 6. Revelar bloco de conversão
+        const btnRevealConversion = document.getElementById('btn-reveal-conversion');
+        if (btnRevealConversion) {
+            btnRevealConversion.addEventListener('click', () => {
+                if (conversionBox.style.display === 'none' || !conversionBox.style.display) {
+                    conversionBox.style.display = 'block';
+                    conversionBox.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    conversionBox.style.display = 'none';
+                }
+            });
+        }
+
+        // 7. Submeter Alterações Normais do Lead
+        const manageLeadForm = document.getElementById('manage-lead-form');
+        if (manageLeadForm) {
+            manageLeadForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const id = document.getElementById('manage-lead-id').value;
+                const status = document.getElementById('manage-lead-status').value;
+                const temperature = document.getElementById('manage-lead-temperature').value;
+                const health = parseInt(document.getElementById('manage-lead-health').value) || 50;
+                const notes = document.getElementById('manage-lead-notes').value;
+
+                if (supabase && id && !id.startsWith('L-LOCAL-')) {
+                    try {
+                        const { error } = await supabase.from('crm_leads').update({
+                            status,
+                            temperature,
+                            health_score: health,
+                            internal_notes: notes
+                        }).eq('id', id);
+
+                        if (error) throw error;
+
+                        await supabase.from('audit_logs').insert([{
+                            action: `Lead atualizado: status=${status}, saúde=${health}%`,
+                            module: 'CRM',
+                            user_role: 'ADMIN'
+                        }]);
+
+                    } catch (err) {
+                        console.error('Erro ao atualizar lead no Supabase:', err);
+                        alert('Erro ao salvar no Supabase. Atualizando localmente como contingência.');
+                    }
+                }
+
+                // Atualizar localmente
+                let localLeads = JSON.parse(localStorage.getItem('fluxai_mock_leads') || '[]');
+                const idx = localLeads.findIndex(l => l.id === id);
+                if (idx !== -1) {
+                    localLeads[idx] = {
+                        ...localLeads[idx],
+                        status,
+                        temperature,
+                        health_score: health,
+                        internal_notes: notes
+                    };
+                    localStorage.setItem('fluxai_mock_leads', JSON.stringify(localLeads));
+                }
+
+                alert('Alterações salvas com sucesso!');
+                manageLeadModal.style.display = 'none';
+                await renderLeads();
+            });
+        }
+
+        // 8. Confirmar Ativação e Conversão em Cliente Real
+        const btnConfirmConversion = document.getElementById('btn-confirm-conversion');
+        if (btnConfirmConversion) {
+            btnConfirmConversion.addEventListener('click', async () => {
+                const leadId = document.getElementById('manage-lead-id').value;
+                const name = document.getElementById('info-lead-name').innerText;
+                const company = document.getElementById('info-lead-company').innerText;
+                const pain = document.getElementById('info-lead-pain').innerText;
+                
+                const contractVal = parseFloat(document.getElementById('convert-contract-value').value);
+                const dueDay = parseInt(document.getElementById('convert-due-day').value) || 5;
+                const deliverables = document.getElementById('convert-deliverables').value;
+
+                if (isNaN(contractVal) || contractVal <= 0) {
+                    alert('Por favor, informe um valor de contrato válido.');
+                    return;
+                }
+
+                if (supabase) {
+                    try {
+                        // 1. Criar Projeto
+                        const { data: projData, error: projErr } = await supabase.from('projects').insert([{
+                            company_name: company,
+                            segment: 'Comercial/Geral',
+                            status: 'ATIVO',
+                            objectives: pain || 'Escalar operação digital',
+                            tone: 'Premium'
+                        }]).select().single();
+
+                        if (projErr) throw projErr;
+
+                        const newProjectId = projData.id;
+
+                        // 2. Criar Contrato
+                        const { error: contractErr } = await supabase.from('contracts').insert([{
+                            project_id: newProjectId,
+                            client_name: name,
+                            company_name: company,
+                            deliverables: deliverables || 'Ativação Operacional Integrada',
+                            contract_value: contractVal,
+                            due_day: dueDay,
+                            status: 'ATIVO'
+                        }]);
+
+                        if (contractErr) throw contractErr;
+
+                        // 3. Atualizar Lead para Convertido e associar ID do projeto
+                        if (leadId && !leadId.startsWith('L-LOCAL-')) {
+                            const { error: leadErr } = await supabase.from('crm_leads').update({
+                                status: 'CONVERTIDO',
+                                project_id: newProjectId
+                            }).eq('id', leadId);
+                            
+                            if (leadErr) throw leadErr;
+                        }
+
+                        // 4. Inserir no Log de Auditoria
+                        await supabase.from('audit_logs').insert([{
+                            action: `Lead de ${company} convertido com sucesso! Contrato de R$ ${contractVal} ativo.`,
+                            module: 'CRM',
+                            user_role: 'ADMIN'
+                        }]);
+
+                        alert(`Sucesso! Lead convertido em Cliente Ativo.\nProjeto e Contrato gerados no Supabase.`);
+
+                    } catch (err) {
+                        console.error('Erro na transação de conversão no Supabase:', err);
+                        alert('Erro ao salvar transação no banco de dados. Simulando conversão local...');
+                    }
+                } else {
+                    // Simulação Offline / LocalStorage
+                    const mockProjId = 'p_local_' + Math.random().toString(36).substring(2, 7);
+                    
+                    // Salvar no mock de contratos locais
+                    let localContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+                    localContracts.push({
+                        id: 'C-LOCAL-' + Math.floor(Math.random()*1000),
+                        project_id: mockProjId,
+                        client_name: name,
+                        company_name: company,
+                        deliverables: deliverables || 'Ativação Operacional Integrada',
+                        contract_value: contractVal,
+                        due_day: dueDay,
+                        status: 'ATIVO',
+                        created_at: new Date().toISOString()
+                    });
+                    localStorage.setItem('fluxai_mock_contracts', JSON.stringify(localContracts));
+
+                    // Salvar no mock de projetos locais
+                    let localProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+                    localProjects.push({
+                        id: mockProjId,
+                        company_name: company,
+                        status: 'ATIVO',
+                        tone: 'Premium',
+                        objectives: pain || 'Ativação'
+                    });
+                    localStorage.setItem('fluxai_mock_projects', JSON.stringify(localProjects));
+
+                    // Atualizar lead local
+                    let localLeads = JSON.parse(localStorage.getItem('fluxai_mock_leads') || '[]');
+                    const idx = localLeads.findIndex(l => l.id === leadId);
+                    if (idx !== -1) {
+                        localLeads[idx].status = 'CONVERTIDO';
+                        localLeads[idx].project_id = mockProjId;
+                        localStorage.setItem('fluxai_mock_leads', JSON.stringify(localLeads));
+                    }
+
+                    alert(`Sucesso! Lead convertido localmente.\nProjeto (${mockProjId}) e Contrato de R$ ${contractVal} criados no LocalStorage.`);
+                }
+
+                manageLeadModal.style.display = 'none';
+                await renderLeads();
+            });
+        }
     </script>
+
+    <!-- MODAL: ADICIONAR LEAD MANUAL -->
+    <div id="add-lead-modal" class="os-modal">
+        <div class="os-widget" style="max-width: 600px; width: 100%;">
+            <!-- Header -->
+            <div style="padding: 25px 30px; border-bottom: 1px solid var(--os-border); display: flex; justify-content: space-between; align-items: center; background: rgba(15, 18, 15, 0.95);">
+                <div>
+                    <h2 style="margin: 0; color: var(--os-primary); font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-user-plus"></i> Novo Registro de Lead
+                    </h2>
+                    <p style="margin: 5px 0 0 0; font-size: 0.75rem; color: var(--os-text-muted);">Adicione um lead manualmente vindo de indicação, reuniões ou WhatsApp.</p>
+                </div>
+                <button onclick="document.getElementById('add-lead-modal').style.display='none'" style="background: transparent; border: none; color: var(--os-text-muted); cursor: pointer; font-size: 1.5rem;">&times;</button>
+            </div>
+            <!-- Body -->
+            <form id="add-lead-form" style="padding: 30px; background: rgba(10, 12, 10, 0.95); margin: 0;">
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Nome do Contato</label>
+                        <input type="text" id="add-lead-name" class="form-control" placeholder="Ex: João Silva" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Nome da Empresa / Marca</label>
+                        <input type="text" id="add-lead-company" class="form-control" placeholder="Ex: Silva Indústria" required />
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>E-mail</label>
+                        <input type="email" id="add-lead-email" class="form-control" placeholder="Ex: joao@silva.com" />
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp / Telefone</label>
+                        <input type="text" id="add-lead-phone" class="form-control" placeholder="Ex: 5582993051282" required />
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Segmento de Mercado</label>
+                        <input type="text" id="add-lead-segment" class="form-control" placeholder="Ex: Industrial, Saúde, B2B" />
+                    </div>
+                    <div class="form-group">
+                        <label>Temperatura Inicial</label>
+                        <select id="add-lead-temperature" class="form-control">
+                            <option value="FRIO">Frio</option>
+                            <option value="MORNO" selected>Morno</option>
+                            <option value="QUENTE">Quente</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Principal Ponto de Dor (Pain Point)</label>
+                    <textarea id="add-lead-pain" class="form-control" rows="3" placeholder="Qual o maior problema comercial ou operacional do lead?"></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Health Score de Partida (%)</label>
+                    <input type="number" id="add-lead-health" class="form-control" min="0" max="100" value="50" />
+                </div>
+                <div class="form-group">
+                    <label>Notas Operacionais Internas</label>
+                    <textarea id="add-lead-notes" class="form-control" rows="3" placeholder="Insira anotações relevantes sobre o lead comercial."></textarea>
+                </div>
+                <!-- Footer -->
+                <div style="padding-top: 20px; border-top: 1px solid var(--os-border); display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" onclick="document.getElementById('add-lead-modal').style.display='none'" class="btn-glass-secondary">Cancelar</button>
+                    <button type="submit" class="btn-glass-primary">Adicionar Registro</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: GERENCIAR E EDITAR LEAD + CONVERSÃO -->
+    <div id="manage-lead-modal" class="os-modal">
+        <div class="os-widget" style="max-width: 650px; width: 100%;">
+            <!-- Header -->
+            <div style="padding: 25px 30px; border-bottom: 1px solid var(--os-border); display: flex; justify-content: space-between; align-items: center; background: rgba(15, 18, 15, 0.95);">
+                <div>
+                    <h2 style="margin: 0; color: var(--os-primary); font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-sliders"></i> Gerenciar Operação de Lead
+                    </h2>
+                    <p style="margin: 5px 0 0 0; font-size: 0.75rem; color: var(--os-text-muted);">Atualize o status ou promova este lead a um cliente ativo no ecossistema.</p>
+                </div>
+                <button onclick="document.getElementById('manage-lead-modal').style.display='none'" style="background: transparent; border: none; color: var(--os-text-muted); cursor: pointer; font-size: 1.5rem;">&times;</button>
+            </div>
+            <!-- Body -->
+            <div style="padding: 30px; background: rgba(10, 12, 10, 0.95); max-height: 70vh; overflow-y: auto;">
+                <!-- Lead details card -->
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); padding: 18px; border-radius: 8px; margin-bottom: 25px; font-size: 0.8rem; line-height: 1.6;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div><strong style="color:var(--os-primary)">Nome:</strong> <span id="info-lead-name">--</span></div>
+                        <div><strong style="color:var(--os-primary)">Empresa:</strong> <span id="info-lead-company">--</span></div>
+                        <div><strong style="color:var(--os-primary)">WhatsApp:</strong> <span id="info-lead-phone">--</span></div>
+                        <div><strong style="color:var(--os-primary)">Email:</strong> <span id="info-lead-email">--</span></div>
+                    </div>
+                    <div style="margin-top: 10px;"><strong style="color:var(--os-primary)">Ponto de Dor:</strong> <span id="info-lead-pain">--</span></div>
+                </div>
+
+                <form id="manage-lead-form" style="margin: 0;">
+                    <input type="hidden" id="manage-lead-id" />
+                    
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Status Operacional</label>
+                            <select id="manage-lead-status" class="form-control">
+                                <option value="NOVO">Novo</option>
+                                <option value="QUALIFICADO">Qualificado</option>
+                                <option value="EM NEGOCIAÇÃO">Em Negociação</option>
+                                <option value="PERDIDO">Perdido</option>
+                                <option value="CONVERTIDO" disabled>Convertido em Cliente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Temperatura</label>
+                            <select id="manage-lead-temperature" class="form-control">
+                                <option value="FRIO">Frio</option>
+                                <option value="MORNO">Morno</option>
+                                <option value="QUENTE">Quente</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Health Score (%)</label>
+                        <input type="number" id="manage-lead-health" class="form-control" min="0" max="100" />
+                    </div>
+                    <div class="form-group">
+                        <label>Notas Operacionais Internas</label>
+                        <textarea id="manage-lead-notes" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <!-- Botão de Copiar / Abrir WhatsApp Assistente -->
+                    <div style="display: flex; gap: 10px; margin-bottom: 25px;">
+                        <button type="button" id="btn-copy-wa-message" class="btn-glass-secondary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <i class="fa-solid fa-copy"></i> Copiar Mensagem de Abordagem
+                        </button>
+                        <button type="button" id="btn-open-wa-web" class="btn-glass-secondary" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--os-primary); border-color: var(--os-primary);">
+                            <i class="fa-brands fa-whatsapp"></i> Abrir WhatsApp Web
+                        </button>
+                    </div>
+
+                    <!-- Botão para Expandir Caixa de Conversão -->
+                    <button type="button" id="btn-reveal-conversion" class="btn-glass-primary" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 10px; background: rgba(16, 185, 129, 0.15); border-color: #10b981; color: #10b981; font-weight: 800; margin-bottom: 10px;">
+                        <i class="fa-solid fa-award"></i> CONVERTER EM CLIENTE (ATIVAR CONTRATO)
+                    </button>
+
+                    <!-- Caixa de Conversão -->
+                    <div id="conversion-box" class="conversion-box">
+                        <h3 style="margin: 0 0 15px 0; font-size: 0.9rem; color: #fff; font-weight: 800; display: flex; align-items: center; gap: 8px;">
+                            <i class="fa-solid fa-file-signature" style="color: #10b981;"></i> Configuração de Novo Contrato e Projeto
+                        </h3>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Valor Mensal do Contrato (R$)</label>
+                                <input type="number" id="convert-contract-value" class="form-control" placeholder="Ex: 5000" min="0" />
+                            </div>
+                            <div class="form-group">
+                                <label>Dia de Vencimento do Boleto</label>
+                                <input type="number" id="convert-due-day" class="form-control" value="5" min="1" max="31" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Entregáveis do Contrato (Deliverables)</label>
+                            <textarea id="convert-deliverables" class="form-control" rows="2" placeholder="Ex: Gestão de Tráfego, Produção Editorial, Command Center"></textarea>
+                        </div>
+                        <button type="button" id="btn-confirm-conversion" class="btn-glass-primary" style="width: 100%; background: #10b981; border-color: #10b981; color: #050705;">
+                            CONFIRMAR E GERAR CONTRATO OPERACIONAL 🚀
+                        </button>
+                    </div>
+
+                    <!-- Footer Salvar Alterações Normais -->
+                    <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--os-border); display: flex; gap: 10px; justify-content: flex-end;">
+                        <button type="button" onclick="document.getElementById('manage-lead-modal').style.display='none'" class="btn-glass-secondary">Cancelar</button>
+                        <button type="submit" class="btn-glass-primary">Salvar Alterações</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

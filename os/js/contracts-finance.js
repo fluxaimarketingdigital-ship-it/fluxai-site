@@ -87,13 +87,14 @@ async function loadFinanceData() {
     
     if (supabase) {
         try {
-            const { data: contracts, error: cErr } = await supabase.from('contracts').select('*').order('created_at', { ascending: false });
-            const { data: payments, error: pErr } = await supabase.from('payments').select('*, contracts(client_name, company_name, project_id)').order('due_date', { ascending: true });
+            const { data: contracts, error: cErr } = await supabase.from('contracts').select('*, projects(is_billing_exempt)').order('created_at', { ascending: false });
+            const { data: payments, error: pErr } = await supabase.from('payments_ledger').select('*, contracts(client_name, company_name, project_id, projects(is_billing_exempt))').order('due_date', { ascending: true });
 
             if (cErr || pErr) throw cErr || pErr;
 
-            const activeContracts = contracts || [];
-            const activePayments = payments || [];
+            // Filtra removendo os projetos isentos (ex: FluxAI Labs)
+            const activeContracts = (contracts || []).filter(c => !c.projects?.is_billing_exempt);
+            const activePayments = (payments || []).filter(p => !p.contracts?.projects?.is_billing_exempt);
 
             renderStats(activeContracts, activePayments);
             renderPayments(activePayments);

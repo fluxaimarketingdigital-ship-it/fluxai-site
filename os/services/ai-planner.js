@@ -1,3 +1,5 @@
+import { KnowledgeCore } from '/os/js/os-knowledge-core.js';
+
 export const AIPlanner = {
     /**
      * Matriz Estratégica por Tipo de Serviço (Portfólio FluxAI)
@@ -326,75 +328,62 @@ export const AIPlanner = {
             let captionText = "";
             let generatedByAI = false;
 
-            if (openAiKey) {
+            // ── KNOWLEDGE CORE™ INTEGRATION ──────────────────────────────
+            // Usa o Context Engine para montar o contexto correto do cliente
+            // antes de chamar a IA, com regras éticas do nicho, contrato e extras.
+
+            const kcContext = await KnowledgeCore.buildContext({
+                projectId,
+                module: 'content-engine',
+                action: 'GENERATE_CONTENT_PLAN',
+                userRole: 'ADMIN'
+            });
+
+            if (openAiKey && kcContext) {
                 try {
-                    console.log(`[OPENAI PLANNER] Gerando pauta ao vivo para ${service.name}...`);
-                    
-                    let customContext = '';
-                    if (project.company_name && project.company_name.includes('FluxAI')) {
-                        customContext = `
-[DNA DE MARCA DA FLUXAI LABS]
-Lembre-se: O cliente é a nossa própria empresa "FluxAI Labs". Desenvolvemos e implementamos Infraestrutura Estratégica Digital para negócios, unindo tecnologia, inteligência artificial, branding e engenharia operacional de crescimento.
-Nossos pilares principais de serviço que devemos promover ativamente para educar e atrair tomadores de decisão (B2B High-Ticket) são:
-1. Arquitetura Digital Premium (Sites institucionais refinados e LPs de conversão ultra-profissionais com Portal do Cliente).
-2. Engenharia de Conteúdo no Instagram (Reels de alta autoridade, Carrosséis estratégicos focados em escala e sofisticação visual).
-3. Campanhas de Tráfego Pago Avançadas (Meta Ads e Google Ads focados em alta renda, evitando leads desqualificados).
-4. Sistemas Operacionais de Crescimento e Automação (Integração de processos, CRM Hubspot/Salesforce e Cockpits analíticos como o FluxAI OS™).
-Produza a pauta com base nessa autoridade técnica, educando a audiência de empresários sobre por que o amadorismo digital impede a escala comercial.
-`;
-                    }
+                    console.log(`[KNOWLEDGE CORE] Gerando pauta com contexto real para ${service.name}...`);
 
-                    const prompt = `Você é um Estrategista Digital High-Ticket de elite trabalhando na agência FluxAI.
-Você deve redigir um roteiro e pauta de conteúdo estratégico para o cliente "${project.company_name}".
-${customContext}
+                    const kcResult = await KnowledgeCore.ask(
+                        kcContext,
+                        'GENERATE_CONTENT_PLAN',
+                        {
+                            month: new Date().toLocaleString('pt-BR', { month: 'long', year: 'numeric' }),
+                            platform: service.platform,
+                            objective: objectives,
+                            qty: 1,
+                            funnel: sKey === 'REELS' || sKey === 'CARROSSEL' ? 'Topo + Meio' : 'Meio + Fundo'
+                        }
+                    );
 
-[DIRETRIZES DO CLIENTE]
-- Público-Alvo (ICP): ${icp}
-- Tom de Voz: ${tone}
-- Dores a resolver: ${painPoints}
-- DNA de Marca a Transmitir: ${dnaDesired}
-- DNA de Marca a Evitar: ${dnaAnti}
-
-[FORMATO DE POST]
-- Canal/Plataforma: ${service.platform}
-- Tipo de Entrega: ${service.name}
-
-Escreva uma pauta completa de alta autoridade contendo:
-1. Objetivo Estratégico do Post (Alinhado a: ${objectives})
-2. Roteiro Direcionado (Cena por Cena ou Slide por Slide)
-3. Gancho (Hook) ultra-atraente de abertura
-4. Legenda persuasiva e sofisticada para Instagram
-5. Chamada de Ação (CTA) clara.
-
-Por favor, seja extremamente técnico, premium, inovador e direto ao ponto. Não use jargões amadores nem clichês como "Você já pensou...".
-Adicione também um sumário de auditoria no final:
-${auditSummary}`;
-
-                    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': `Bearer ${openAiKey}`
-                        },
-                        body: JSON.stringify({
-                            model: 'gpt-4o',
-                            messages: [
-                                { role: 'system', content: 'Você é um estrategista digital e copywriter sênior com foco em infoprodutos e marcas premium high-ticket.' },
-                                { role: 'user', content: prompt }
-                            ],
-                            temperature: 0.7
-                        })
-                    });
-
-                    if (response.ok) {
-                        const resData = await response.json();
-                        captionText = resData.choices[0].message.content;
+                    if (kcResult && !kcResult.error && kcResult.content) {
+                        // Tentar parsear JSON retornado pelo template
+                        try {
+                            const parsed = JSON.parse(kcResult.content);
+                            const firstPauta = parsed.pautas?.[0];
+                            if (firstPauta) {
+                                captionText = [
+                                    `🎯 OBJETIVO: ${firstPauta.objetivo || objectives}`,
+                                    `💻 FORMATO: ${firstPauta.formato || service.name}`,
+                                    `🔥 GANCHO: ${firstPauta.gancho || ''}`,
+                                    ``,
+                                    firstPauta.copy_resumida || '',
+                                    ``,
+                                    `🚀 CTA: ${firstPauta.cta || ''}`,
+                                    firstPauta.observacoes ? `\n⚠️ ${firstPauta.observacoes}` : ''
+                                ].filter(Boolean).join('\n');
+                            } else {
+                                captionText = kcResult.content;
+                            }
+                        } catch (_) {
+                            // Resposta não é JSON — usar como texto puro
+                            captionText = kcResult.content;
+                        }
                         generatedByAI = true;
-                    } else {
-                        console.warn("[PLANNER OPENAI] Falha na requisição OpenAI. Usando modelo estratégico local.");
+                    } else if (kcResult.error) {
+                        console.warn('[KNOWLEDGE CORE] Erro na chamada IA:', kcResult.error);
                     }
                 } catch (err) {
-                    console.error("[PLANNER OPENAI] Erro ao conectar com a API da OpenAI:", err);
+                    console.error('[KNOWLEDGE CORE] Erro inesperado:', err);
                 }
             }
 

@@ -1,32 +1,54 @@
 /**
- * FLUXAI OS™ CORE ENGINE v1.0.0
- * Gestão de Componentes Operacionais e Estados Globais
+ * FLUXAI OS™ CORE ENGINE v2.0.0
+ * Gestão de Componentes Operacionais, RBAC e Estado Global
  */
+import { OSState } from '/os/js/os-state.js';
 
 export const OS_CONFIG = {
     brand: "FLUXAI OS™",
-    version: "v1.0.4_OPERATIONAL",
+    version: "v2.0.0_CONSOLIDATED",
     status: "ESTÁVEL"
+};
+
+// Projeto interno da FluxAI Labs (INTERNAL_WORKSPACE)
+export const FLUXAI_LABS_PROJECT = {
+    id: 'proj_fluxai_labs_master',
+    company_name: 'FluxAI Labs',
+    segment: 'Agência de Marketing Digital & Tecnologia',
+    workspace_type: 'INTERNAL_WORKSPACE',
+    is_billing_exempt: true,
+    metadata: {
+        is_test_environment: true,
+        allow_benchmark: true,
+        dna: {
+            desired_patterns: ['Autoridade Técnica', 'Inovação', 'Resultados Reais'],
+            anti_patterns: ['Promessas Vazias', 'Linguagem Genérica', 'Discurso de Guru']
+        },
+        tone_of_voice: 'Técnico, direto, confiável, premium, sem exageros'
+    }
 };
 
 // COMPONENTES REUTILIZÁVEIS
 export const OS_UI = {
     /**
-     * Renderiza a Sidebar filtrada por RBAC
+     * Renderiza a Sidebar filtrada por RBAC e Contexto (Master / Labs / Cliente)
      */
     renderSidebar: (activeModule, userRole = 'CLIENT') => {
+        const context = OSState.get('activeContext') || 'MASTER';
+
+        // contexts: em quais contextos o item aparece
         const navItems = [
-            { id: 'command-center', label: 'Centro de Comando', icon: 'fa-gauge-high', group: 'Núcleo Estratégico', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'onboarding', label: 'Onboarding Estratégico', icon: 'fa-address-card', group: 'Núcleo Estratégico', roles: ['ADMIN'] },
-            { id: 'content-engine', label: 'Motor de Conteúdo', icon: 'fa-pen-nib', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'crm-intelligence', label: 'Inteligência de CRM', icon: 'fa-users-gear', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'automation-hub', label: 'Central de Automação', icon: 'fa-robot', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'analytics', label: 'Análise de Dados', icon: 'fa-chart-line', group: 'Módulos Operacionais', roles: ['ADMIN', 'OPERATOR'] },
-            { id: 'client-portal', label: 'Portal do Cliente', icon: 'fa-briefcase', group: 'Interface de Valor', roles: ['ADMIN', 'CLIENT'] },
-            { id: 'contracts-finance', label: 'Contratos & Financeiro', icon: 'fa-file-invoice-dollar', group: 'Governança', roles: ['ADMIN'] },
-            { id: 'governance', label: 'Governança', icon: 'fa-user-shield', group: 'Governança', roles: ['ADMIN'] },
-            { id: 'governance-users', label: 'Gestão de Usuários', icon: 'fa-users-cog', group: 'Governança', roles: ['ADMIN'] },
-            { id: 'govos', label: 'GovOS', icon: 'fa-shield-halved', group: 'Governança', roles: ['ADMIN'] }
+            { id: 'command-center',   label: 'Centro de Comando',     icon: 'fa-gauge-high',          group: 'Núcleo Estratégico',    roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'onboarding',       label: 'Onboarding Estratégico',icon: 'fa-address-card',         group: 'Núcleo Estratégico',    roles: ['ADMIN'],             contexts: ['MASTER'] },
+            { id: 'content-engine',   label: 'Motor de Conteúdo',     icon: 'fa-pen-nib',             group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS','CLIENT'] },
+            { id: 'crm-intelligence', label: 'Inteligência de CRM',   icon: 'fa-users-gear',          group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },
+            { id: 'automation-hub',   label: 'Central de Automação',  icon: 'fa-robot',               group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },
+            { id: 'analytics',        label: 'Análise de Dados',      icon: 'fa-chart-line',          group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'fluxai-labs',      label: 'FluxAI Labs',           icon: 'fa-flask',               group: 'Workspace Interno',     roles: ['ADMIN'],             contexts: ['MASTER','LABS'], permission: 'fluxai-labs-workspace' },
+            { id: 'client-portal',    label: 'Portal do Cliente',     icon: 'fa-briefcase',           group: 'Interface de Valor',    roles: ['ADMIN', 'CLIENT'],   contexts: ['MASTER','CLIENT'] },
+            { id: 'contracts-finance',label: 'Contratos & Financeiro',icon: 'fa-file-invoice-dollar', group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
+            { id: 'governance',       label: 'Governança',            icon: 'fa-user-shield',         group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
+            { id: 'governance-users', label: 'Gestão de Usuários',    icon: 'fa-users-cog',           group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
         ];
 
         let html = `
@@ -37,21 +59,35 @@ export const OS_UI = {
 
         let currentGroup = "";
         navItems.forEach(item => {
-            // Filtro de RBAC: só exibe se o usuário tiver o cargo permitido
+            // 1. Filtro de papel (RBAC)
             if (!item.roles.includes(userRole)) return;
-
-            // Filtro de Permissões Granulares (se definido na sessão)
+            // 2. Filtro de contexto
+            if (item.contexts && !item.contexts.includes(context)) return;
+            // 3. Filtro de permissão granular
             const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
-            if (session.permissions && session.permissions.length > 0) {
+            if (item.permission) {
+                if (session.permissions && !session.permissions.includes(item.permission)) return;
+            } else if (session.permissions && session.permissions.length > 0) {
                 if (!session.permissions.includes(item.id)) return;
             }
 
             if (item.group !== currentGroup) {
                 currentGroup = item.group;
-                html += `<span class="os-nav-label">${currentGroup}</span>`;
+                const groupIcon = item.group === 'Workspace Interno' ? ' ⚡' : '';
+                html += `<span class="os-nav-label">${currentGroup}${groupIcon}</span>`;
             }
+
+            let href;
+            if (item.id === 'client-portal') {
+                const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
+                href = `client-portal.html?project_id=${pid}`;
+            } else {
+                href = `${item.id}.html`;
+            }
+
+            const isLabs = item.id === 'fluxai-labs';
             html += `
-                <a href="${item.id === 'client-portal' ? 'client-portal.html?project_id=' + (localStorage.getItem('fluxai_current_project_id') || '') : item.id + '.html'}" class="os-nav-link ${activeModule === item.id ? 'active' : ''}">
+                <a href="${href}" class="os-nav-link ${activeModule === item.id ? 'active' : ''}" ${isLabs ? 'style="color:rgba(167,139,250,0.9);"' : ''}>
                     <i class="fa-solid ${item.icon}"></i> ${item.label}
                 </a>`;
         });
@@ -61,7 +97,7 @@ export const OS_UI = {
             <div class="os-sidebar-footer">
                 <a href="../pages/fluxai-os.html" class="os-nav-link"><i class="fa-solid fa-arrow-left"></i> Sair da Interface</a>
             </div>`;
-        
+
         document.querySelector('.os-sidebar').innerHTML = html;
     },
 
@@ -75,21 +111,70 @@ export const OS_UI = {
 
     /**
      * Renderiza a Topbar padrão
+    /**
+     * Renderiza a Topbar com seletor de contexto Master / Labs / Cliente
+     * e badges de alertas operacionais.
      */
-    renderTopbar: (moduleTitle) => {
+    renderTopbar: async () => {
+        const user = await OS_AUTH.check();
+        if (!user) return;
+
+        const initials = (user.full_name || user.email || '??')
+            .split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+
+        const context = OSState.get('activeContext') || 'MASTER';
+        const activeProject = OSState.get('activeProject');
+        const isSuperAdmin = ['SUPER_ADMIN', 'ADMIN'].includes(user.role);
+
+        // --- Seletor de Contexto ---
+        const btnStyle = (active, color) =>
+            `font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid ${active ? color : 'var(--os-border)'}; background:${active ? color : 'rgba(255,255,255,0.04)'}; color:${active ? (color === 'var(--os-primary)' ? '#000' : '#fff') : 'var(--os-text-muted)'}; cursor:pointer; font-weight:800; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;`;
+
+        const contextSwitcher = isSuperAdmin ? `
+            <div style="display:flex; align-items:center; gap:5px; margin-left:18px;">
+                <button onclick="window.__OSSetContext('MASTER')" title="Visão global" style="${btnStyle(context==='MASTER','var(--os-primary)')}">
+                    <i class="fa-solid fa-bolt"></i> Master
+                </button>
+                <button onclick="window.__OSSetContext('LABS')" title="Workspace interno FluxAI" style="${btnStyle(context==='LABS','rgba(139,92,246,0.9)')}">
+                    <i class="fa-solid fa-flask"></i> Labs
+                </button>
+                ${context === 'CLIENT' && activeProject ? `
+                <span style="font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid var(--os-primary); background:rgba(142,158,104,0.1); color:var(--os-primary); font-weight:800; text-transform:uppercase; letter-spacing:1px;">
+                    <i class="fa-solid fa-briefcase"></i> ${activeProject.company_name || 'Cliente'}
+                </span>` : ''}
+            </div>` : '';
+
+        // --- Badges de Alertas ---
+        const pending = OSState.get('pendingApprovals') || 0;
+        const finAlerts = (OSState.get('financialAlerts') || []).length;
+        const approvalBadge = pending > 0 ? `<span style="background:var(--os-warning);color:#000;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:8px;">${pending} APROVAÇÕES</span>` : '';
+        const financeBadge = finAlerts > 0 ? `<span style="background:var(--os-danger);color:#fff;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:4px;">${finAlerts} ALERTA${finAlerts>1?'S':''}</span>` : '';
+
         const html = `
-            <div class="os-topbar-left">
-                <div class="os-status-indicator">
-                    <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}
-                </div>
+            <div class="os-topbar-left" style="display:flex;align-items:center;">
+                <div class="os-status-indicator"><span class="os-dot"></span> ${OS_CONFIG.status}</div>
+                ${contextSwitcher}${approvalBadge}${financeBadge}
             </div>
             <div class="os-topbar-right">
-                <div class="os-user-profile">
-                    <div class="os-avatar">FL</div>
-                    <span>Admin FluxAI</span>
+                <div class="os-user-profile" id="user-profile-menu" style="cursor:pointer;">
+                    <div class="os-avatar">${initials}</div>
+                    <span>${user.full_name || user.email}</span>
+                    <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;margin-left:8px;opacity:0.5;"></i>
                 </div>
             </div>`;
+
         document.querySelector('.os-topbar').innerHTML = html;
+
+        document.getElementById('user-profile-menu')?.addEventListener('click', () => {
+            if (confirm('Deseja encerrar a sessão operacional?')) OS_AUTH.logout();
+        });
+
+        // Função global de troca de contexto
+        window.__OSSetContext = (ctx) => {
+            OSState.setContext(ctx);
+            OS_UI.renderSidebar(null, user.role);
+            OS_UI.renderTopbar();
+        };
     },
 
     /**

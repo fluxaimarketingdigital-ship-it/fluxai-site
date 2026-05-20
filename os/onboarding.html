@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FluxAI OS™ | Ativação Estratégica</title>
+    <title>FluxAI OS™ | Ativação Operacional</title>
     <link rel="stylesheet" href="/src/styles/os/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root { --os-step-active: var(--os-primary); --os-step-inactive: rgba(255,255,255,0.1); }
-        .wizard-container { max-width: 900px; margin: 0 auto; padding-bottom: 100px; }
+        .wizard-container { max-width: 900px; margin: 0 auto; padding-bottom: 120px; }
         .step-indicator { display: flex; justify-content: space-between; margin-bottom: 50px; position: relative; padding: 0 20px; }
         .step-indicator::before { content: ''; position: absolute; top: 15px; left: 40px; right: 40px; height: 2px; background: var(--os-step-inactive); z-index: 0; }
         .step-item { position: relative; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 10px; cursor: pointer; }
@@ -48,12 +48,34 @@
         .btn-next:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(107,122,69,0.3); }
 
         .sub-fields { margin-top: 15px; padding-left: 20px; border-left: 2px solid var(--os-primary); display: none; }
-        .badge-priority { padding: 4px 10px; border-radius: 4px; font-size: 0.6rem; font-weight: 800; background: var(--os-primary); margin-left: 10px; }
-
+        
+        /* Overlay de Deploy Cinematic */
+        #deploy-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; }
+        .deploy-box { max-width: 500px; width: 90%; text-align: center; font-family: 'JetBrains Mono', monospace; }
+        .deploy-progress { width: 100%; height: 2px; background: rgba(255,255,255,0.05); margin: 30px 0; position: relative; overflow: hidden; }
+        .deploy-bar { height: 100%; width: 0%; background: var(--os-primary); transition: width 0.3s ease; box-shadow: 0 0 10px var(--os-primary); }
+        .deploy-log { font-size: 0.75rem; color: var(--os-primary); text-align: left; height: 120px; overflow-y: hidden; border: 1px solid var(--os-border); background: rgba(0,0,0,0.5); padding: 15px; border-radius: 6px; line-height: 1.6; }
+        
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body class="os-mode">
+
+    <!-- Overlay de Deploy Visual (Cinematic) -->
+    <div id="deploy-overlay">
+        <div class="deploy-box">
+            <h2 style="color: #fff; font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px; margin-bottom: 5px;">ATIVANDO ECOSSISTEMA</h2>
+            <p style="color: var(--os-text-muted); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px;">FluxAI OS™ Operational Provisioning</p>
+            
+            <div class="deploy-progress">
+                <div class="deploy-bar" id="deploy-bar"></div>
+            </div>
+            
+            <div class="deploy-log" id="deploy-logs">
+                > Inicializando provisionamento de infraestrutura...
+            </div>
+        </div>
+    </div>
 
     <div class="os-shell">
         <aside class="os-sidebar"></aside>
@@ -64,6 +86,7 @@
             <main class="os-viewport">
                 <div class="wizard-container">
                     
+                    <!-- Indicadores do Wizard -->
                     <div class="step-indicator">
                         <div class="step-item active" data-step="1">
                             <div class="step-dot">1</div>
@@ -71,19 +94,19 @@
                         </div>
                         <div class="step-item" data-step="2">
                             <div class="step-dot">2</div>
-                            <span class="step-label">Diagnóstico</span>
+                            <span class="step-label">Digital</span>
                         </div>
                         <div class="step-item" data-step="3">
                             <div class="step-dot">3</div>
-                            <span class="step-label">Estratégia</span>
+                            <span class="step-label">Serviços</span>
                         </div>
                         <div class="step-item" data-step="4">
                             <div class="step-dot">4</div>
-                            <span class="step-label">Escopo</span>
+                            <span class="step-label">Conteúdo</span>
                         </div>
                         <div class="step-item" data-step="5">
                             <div class="step-dot">5</div>
-                            <span class="step-label">Contrato</span>
+                            <span class="step-label">Assets</span>
                         </div>
                         <div class="step-item" data-step="6">
                             <div class="step-dot">6</div>
@@ -96,11 +119,12 @@
                     </div>
 
                     <form id="onboardingForm">
+                        
                         <!-- ETAPA 1: IDENTIDADE -->
                         <div class="onboarding-step active" id="step-1">
                             <div class="form-section">
                                 <h2><i class="fa-solid fa-id-card"></i> Identidade do Cliente</h2>
-                                <p>Dados institucionais e administrativos do novo ativo FluxAI.</p>
+                                <p>Dados institucionais, marca e posicionamento de mercado.</p>
                                 
                                 <div class="grid-2">
                                     <div class="form-group">
@@ -109,402 +133,331 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Empresa / Marca</label>
-                                        <input type="text" name="company_name" class="form-control" placeholder="Nome Fantasia" required />
+                                        <input type="text" name="company_name" class="form-control" placeholder="Nome Fantasia da Marca" required />
                                     </div>
                                 </div>
 
                                 <div class="grid-2">
                                     <div class="form-group">
-                                        <label>@Instagram principal</label>
-                                        <input type="text" name="client_instagram_handle" class="form-control" placeholder="@usuario" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Site Institucional</label>
-                                        <input type="url" name="client_website" class="form-control" placeholder="https://..." />
-                                    </div>
-                                </div>
-
-                                <div class="grid-2">
-                                    <div class="form-group">
-                                        <label>Cidade / Estado</label>
-                                        <input type="text" name="client_location" class="form-control" placeholder="Ex: São Paulo, SP" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Ticket Médio</label>
-                                        <input type="text" name="client_average_ticket" class="form-control" placeholder="Ex: R$ 5.000,00" />
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label>Principal Produto/Serviço</label>
-                                    <input type="text" name="client_primary_offering" class="form-control" placeholder="Carro-chefe da empresa" />
-                                </div>
-
-                                <div class="grid-2">
-                                    <div class="form-group">
-                                        <label>Segmento de Atuação</label>
-                                        <select name="segment" class="form-control">
+                                        <label>Nicho / Segmento</label>
+                                        <select name="segment" class="form-control" required>
                                             <option value="">Selecione...</option>
-                                            <option value="SAUDE">Saúde / Profissionais Especializados</option>
-                                            <option value="GASTRONOMIA">Gastronomia / Eventos</option>
-                                            <option value="CONSTRUCAO">Construção Civil / Imóveis</option>
-                                            <option value="LOCAL_PREMIUM">Serviços Locais Premium</option>
-                                            <option value="EDUCACAO">Educação / Cursos</option>
-                                            <option value="CONSULTORIA">Consultoria / B2B</option>
-                                            <option value="TECNOLOGIA">Tecnologia / SaaS</option>
-                                            <option value="GOVERNO">Governo / Setor Público</option>
-                                            <option value="OUTRO">Outro Segmento</option>
+                                            <option value="SAUDE">Saúde / Médicos / Especializados</option>
+                                            <option value="DIREITO">Advocacia / Jurídico de Elite</option>
+                                            <option value="FINANCAS">Finanças / Wealth Advisors</option>
+                                            <option value="TECNOLOGIA">Tecnologia / B2B / SaaS</option>
+                                            <option value="CONSULTORIA">Consultoria Corporativa</option>
+                                            <option value="ESTETICA">Estética / Clínicas Premium</option>
+                                            <option value="OUTRO">Outro Segmento High-Ticket</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Área de Atendimento</label>
-                                        <select name="service_area" class="form-control">
-                                            <option value="LOCAL">Local / Cidade</option>
-                                            <option value="REGIONAL">Regional / Estado</option>
-                                            <option value="NACIONAL">Nacional</option>
-                                            <option value="ONLINE">Digital / Online</option>
+                                        <label>Objetivo Principal</label>
+                                        <select name="objective" class="form-control" required>
+                                            <option value="">Selecione...</option>
+                                            <option value="AUTHORITY">Posicionamento de Autoridade Absoluta</option>
+                                            <option value="LEADS">Geração de Leads Qualificados (Inbound)</option>
+                                            <option value="ACQUISITION">Aquisição Direta & High-Ticket</option>
+                                            <option value="REBRANDING">Reposicionamento / Rebranding Digital</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Descrição Breve da Atuação</label>
-                                    <textarea name="business_description" class="form-control" placeholder="O que a marca faz exatamente?"></textarea>
+                                    <label>Proposta de Valor Única</label>
+                                    <input type="text" name="value_proposition" class="form-control" placeholder="Ex: Aceleração de crescimento sem agências tradicionais." required />
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Diferenciais Competitivos</label>
+                                    <textarea name="differentiators" class="form-control" placeholder="O que faz a marca ser única em relação aos concorrentes de mercado?" style="height:60px;" required></textarea>
+                                </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Tom de Voz da Marca</label>
+                                        <input type="text" name="voice_tone" class="form-control" placeholder="Ex: Soberano, Técnico, Sofisticado, Altivo" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Posicionamento Editorial</label>
+                                        <input type="text" name="editorial_positioning" class="form-control" placeholder="Ex: Educação profunda e combate a amadorismos." required />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ETAPA 2: DIAGNÓSTICO -->
+                        <!-- ETAPA 2: ESTRUTURA DIGITAL -->
                         <div class="onboarding-step" id="step-2">
                             <div class="form-section">
-                                <h2><i class="fa-solid fa-stethoscope"></i> Diagnóstico de Maturidade</h2>
-                                <p>Entendendo o momento atual para evitar erros operacionais.</p>
+                                <h2><i class="fa-solid fa-network-wired"></i> Canais e Infraestrutura Digital</h2>
+                                <p>Mapeamento de ativos, domínios e redes corporativas existentes.</p>
 
                                 <div class="form-group">
-                                    <label>Maturidade Digital Atual</label>
-                                    <select name="digital_maturity" class="form-control">
-                                        <option value="START">Iniciando presença digital agora</option>
-                                        <option value="NO_STRATEGY">Já vende, mas sem estrutura estratégica</option>
-                                        <option value="NO_CONVERSION">Tem audiência, mas baixa conversão</option>
-                                        <option value="WEAK_POSITION">Tem operação, mas posicionamento fraco</option>
-                                        <option value="SCALING">Consolidada e precisa escalar</option>
-                                        <option value="REPOSITIONING">Precisa de reposicionamento completo</option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Pontos de Atenção / Sensibilidade</label>
+                                    <label>Canais Digitais a Sincronizar</label>
                                     <div class="checkbox-card-grid">
-                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="urgency" /> Urgência Alta</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="bad_history" /> Histórico Ruim c/ Agências</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="rigorous_approval" /> Aprovação Rigorosa</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="legal_restriction" /> Restrições Legais/Éticas</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="risks" value="commercial_issue" /> Problema Comercial Interno</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="infra_active_platforms" value="Instagram" checked /> Instagram</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="infra_active_platforms" value="Meta Business" /> Meta Business</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="infra_active_platforms" value="WhatsApp" /> WhatsApp</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="infra_active_platforms" value="Website" /> Website</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="infra_active_platforms" value="Google Business" /> Google Business</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="infra_active_platforms" value="TikTok" /> TikTok</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="infra_active_platforms" value="LinkedIn" /> LinkedIn</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="infra_active_platforms" value="Domain" /> Domínio / DNS</label>
                                     </div>
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Qual problema precisa ser resolvido primeiro?</label>
-                                    <textarea name="primary_pain" class="form-control" placeholder="A dor latente que motivou a contratação..."></textarea>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Instagram principal (@)</label>
+                                        <input type="text" name="client_instagram_handle" class="form-control" placeholder="@marca" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Website Oficial (URL)</label>
+                                        <input type="url" name="client_website" class="form-control" placeholder="https://www.marca.com" />
+                                    </div>
                                 </div>
 
-                                <div class="form-group" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
-                                    <label style="color:#ef4444;"><i class="fa-solid fa-triangle-exclamation"></i> Dores Recorrentes & Gargalos de Mercado</label>
-                                    <p style="font-size: 0.75rem; margin-top:-5px; margin-bottom:15px; color:var(--os-text-muted);">Isso ajuda a IA a mapear riscos de churn e criar narrativas precisas de conversão.</p>
-                                    <div class="checkbox-card-grid">
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="indicação" /> Dependência excessiva de indicação</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="retenção" /> Baixa retenção de clientes</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="conteúdo" /> Conteúdo sem resultado</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="posicionamento" /> Falta de posicionamento</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="descentralização" /> Operação descentralizada</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="previsibilidade" /> Falta de previsibilidade comercial</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="percepção" /> Baixa percepção de valor</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="dependência_manual" /> Dependência do operacional/manual</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="aprovação" /> Dificuldade em aprovar conteúdo</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="pain_points" value="preço" /> Concorrência por preço</label>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Domínio / Servidor DNS</label>
+                                        <input type="text" name="domain_dns" class="form-control" placeholder="Ex: GoDaddy, Cloudflare, Registro.br" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>WhatsApp Comercial</label>
+                                        <input type="text" name="whatsapp_comercial" class="form-control" placeholder="+55 (11) 99999-9999" />
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ETAPA 3: ESTRATÉGIA -->
+                        <!-- ETAPA 3: SERVIÇOS CONTRATADOS -->
                         <div class="onboarding-step" id="step-3">
                             <div class="form-section">
-                                <h2><i class="fa-solid fa-brain"></i> Memória IA & Contexto</h2>
-                                <p>Alimentando a inteligência central com o DNA da marca.</p>
+                                <h2><i class="fa-solid fa-layer-group"></i> Escopo & Ativação de Módulos</h2>
+                                <p>Ativação instantânea de serviços contratados e configurações operacionais.</p>
 
                                 <div class="form-group">
-                                    <label>ICP (Perfil do Cliente Ideal)</label>
-                                    <textarea name="icp_details" class="form-control" placeholder="Ex: Mulheres 30-45, classe A, buscam agilidade e status..."></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Objetivos Estratégicos (90 Dias)</label>
+                                    <label>Módulos de Crescimento Operacional</label>
                                     <div class="checkbox-card-grid">
-                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="authority" /> Aumentar Autoridade</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="leads" /> Gerar Leads Qualificados</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="premium_perc" /> Percepção Premium</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="sales" /> Vender Consultoria/Serviços</label>
-                                        <label class="checkbox-card"><input type="checkbox" name="goals" value="ops_org" /> Organizar Operação Digital</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="modules" value="conteudo" checked /> Instagram & Conteúdo</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="modules" value="trafego" /> Tráfego Pago (Ads)</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="modules" value="branding" /> Branding & ID Visual</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="modules" value="crm" /> CRM & comercial</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="modules" value="seo" /> Orgânico & SEO</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="modules" value="automacao" /> Automação & IA</label>
                                     </div>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Tom de Voz Desejado</label>
-                                    <input type="text" name="voice_tone" class="form-control" placeholder="Ex: Soberano, Técnico, Acolhedor, Disruptivo" />
-                                </div>
-
-                                <div class="form-group" style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
-                                    <label><i class="fa-solid fa-ban"></i> O que a marca NÃO quer transmitir?</label>
-                                    <div class="checkbox-card-grid" style="margin-bottom:15px; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_anti_patterns" value="barato" /> Barato</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_anti_patterns" value="amador" /> Amador</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_anti_patterns" value="popular" /> Popular</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_anti_patterns" value="agressivo" /> Agressivo</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_anti_patterns" value="genérico" /> Genérico</label>
-                                    </div>
-                                    <input type="text" name="dna_anti_patterns_custom" class="form-control" placeholder="Outras características indesejadas..." />
-                                </div>
-
-                                <div class="form-group">
-                                    <label><i class="fa-solid fa-gem"></i> Como quer ser percebida?</label>
-                                    <div class="checkbox-card-grid" style="margin-bottom:15px; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));">
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_desired_patterns" value="premium" /> Premium</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_desired_patterns" value="técnica" /> Técnica</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_desired_patterns" value="sofisticada" /> Sofisticada</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_desired_patterns" value="humana" /> Humana</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_desired_patterns" value="moderna" /> Moderna</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_desired_patterns" value="acessível" /> Acessível</label>
-                                        <label class="checkbox-card" style="padding:10px;"><input type="checkbox" name="dna_desired_patterns" value="institucional" /> Institucional</label>
-                                    </div>
-                                    <input type="text" name="dna_desired_patterns_custom" class="form-control" placeholder="Outras características desejadas..." />
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Quem são os concorrentes diretos?</label>
-                                    <textarea name="dna_competitors" class="form-control" style="height:60px;" placeholder="Isso ajuda a IA a criar diferenciação e posicionamento único."></textarea>
-                                </div>
-
-                                <div class="form-group">
-                                    <label>Quais temas NÃO devem ser usados de forma alguma?</label>
-                                    <textarea name="dna_forbidden_themes" class="form-control" style="height:60px;" placeholder="Ex: política, polêmicas locais, gírias, religião..."></textarea>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- ETAPA 4: ESCOPO -->
-                        <div class="onboarding-step" id="step-4">
-                            <div class="form-section">
-                                <h2><i class="fa-solid fa-layer-group"></i> Escopo Contratado</h2>
-                                <p>Módulos de infraestrutura ativados para este cliente.</p>
-
-                                <div class="checkbox-card-grid">
-                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="conteudo" /> Engenharia de Conteúdo</label>
-                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="branding" /> Posicionamento & ID</label>
-                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="trafego" /> Aquisição Paga</label>
-                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="site" /> Infraestrutura Digital</label>
-                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="crm" /> CRM & Comercial</label>
-                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="automacao" /> Automação & Fluxos</label>
-                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="govos" /> GovOS™ Intelligence</label>
-                                    <label class="checkbox-card"><input type="checkbox" name="modules" value="seo" /> Presença Orgânica & SEO</label>
                                 </div>
 
                                 <div id="dynamic-module-fields" style="margin-top: 30px;">
-                                    <!-- Campos dinâmicos aparecerão aqui -->
+                                    <!-- Campos dinâmicos injetados por JavaScript -->
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ETAPA 5: CONTRATO -->
+                        <!-- ETAPA 4: CONTEÚDO E DNA -->
+                        <div class="onboarding-step" id="step-4">
+                            <div class="form-section">
+                                <h2><i class="fa-solid fa-brain"></i> Alinhamento Narrativo & Conteúdo</h2>
+                                <p>Definindo as diretrizes profundas que guiarão o motor de IA e a mesa de criação.</p>
+
+                                <div class="form-group">
+                                    <label>Pilares Editoriais (Temas Principais)</label>
+                                    <textarea name="editorial_pillars" class="form-control" placeholder="Pilar 1: Autoridade Técnica, Pilar 2: Educacional profundo, Pilar 3: Estudo de Caso" style="height:60px;" required></textarea>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Dores do ICP (Problemas que resolvemos)</label>
+                                    <textarea name="pain_points" class="form-control" placeholder="Quais são as dores comerciais latentes do seu cliente ideal?" style="height:60px;" required></textarea>
+                                </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Objeções Comuns do Cliente</label>
+                                        <input type="text" name="objections" class="form-control" placeholder="Ex: 'Preço caro', 'Falta de tempo'" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Chamada de Ação (CTA) Padrão</label>
+                                        <input type="text" name="ideal_cta" class="form-control" placeholder="Ex: 'Comente PIVOT para acessar o diagnóstico'" required />
+                                    </div>
+                                </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Linguagem Permitida / Padrões Desejados</label>
+                                        <input type="text" name="desired_language" class="form-control" placeholder="Ex: 'Eficiência', 'Arquitetura', 'Clareza'" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Linguagem Proibida / Termos indesejados</label>
+                                        <input type="text" name="forbidden_language" class="form-control" placeholder="Ex: 'Diquinhas', 'Glow', 'Chavões de marketing'" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Referências Visuais / Concorrentes Diretos</label>
+                                    <input type="text" name="references" class="form-control" placeholder="Link de perfis referência ou concorrentes diretos" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- ETAPA 5: GESTÃO DE ASSETS -->
                         <div class="onboarding-step" id="step-5">
                             <div class="form-section">
-                                <h2><i class="fa-solid fa-file-invoice-dollar"></i> Governança Financeira</h2>
-                                <p>Dados de contrato e prazos operacionais.</p>
-
-                                <div class="grid-2">
-                                    <div class="form-group">
-                                        <label>Valor Mensal (Recorrência)</label>
-                                        <input type="number" name="monthly_fee" class="form-control" placeholder="0.00" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Dia do Vencimento</label>
-                                        <input type="number" name="payment_day" class="form-control" placeholder="05" />
-                                    </div>
-                                </div>
-
-                                <div class="grid-2">
-                                    <div class="form-group">
-                                        <label>Método de Pagamento</label>
-                                        <select name="finance_payment_method" class="form-control">
-                                            <option value="">Selecione...</option>
-                                            <option value="Pix">Pix</option>
-                                            <option value="Cartão">Cartão de Crédito</option>
-                                            <option value="Boleto">Boleto</option>
-                                            <option value="Transferência">Transferência Bancária</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Contrato Assinado?</label>
-                                        <select name="finance_contract_signed" class="form-control">
-                                            <option value="Pendente">Pendente</option>
-                                            <option value="Sim">Sim, assinado</option>
-                                            <option value="Não">Não</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="grid-2">
-                                    <div class="form-group">
-                                        <label>Data de Início do Contrato</label>
-                                        <input type="date" name="finance_start_date" class="form-control" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Tempo Mínimo de Fidelidade</label>
-                                        <select name="finance_min_duration" class="form-control">
-                                            <option value="Sem fidelidade">Sem fidelidade</option>
-                                            <option value="3 meses">3 meses</option>
-                                            <option value="6 meses">6 meses</option>
-                                            <option value="12 meses">12 meses</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div class="grid-2">
-                                    <div class="form-group">
-                                        <label>Cláusula de Reajuste</label>
-                                        <input type="text" name="finance_readjustment" class="form-control" placeholder="Ex: IPCA Anual, Sem reajuste" />
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Responsável Financeiro</label>
-                                        <input type="text" name="finance_responsible" class="form-control" placeholder="Nome/Contato financeiro" />
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label>Status Financeiro Inicial</label>
-                                    <select name="finance_status" class="form-control">
-                                        <option value="ATIVO">Ativo (Setup Pago)</option>
-                                        <option value="PENDENTE">Pendente de Setup</option>
-                                    </select>
-                                </div>
+                                <h2><i class="fa-solid fa-folder-open"></i> Assets e Materiais da Marca</h2>
+                                <p>Compartilhamento de arquivos, manuais e repositórios de dados.</p>
 
                                 <div class="form-group">
-                                    <label>Entregas Mensais Acordadas</label>
-                                    <textarea name="contract_deliverables" class="form-control" style="height:60px;" placeholder="Ex: 12 Ativos de Conteúdo, Gestão de R$ 5k em Ads..."></textarea>
+                                    <label>Link Geral da Pasta em Nuvem (Drive/Dropbox)</label>
+                                    <input type="url" name="asset_drive_link" class="form-control" placeholder="https://drive.google.com/..." required />
                                 </div>
 
-                                <div class="form-group" style="padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); margin-top: 20px;">
-                                    <label><i class="fa-solid fa-plus-circle"></i> Serviços Extras / Avulsos (Setup, Gravação, Projetos)</label>
-                                    <p style="font-size:0.6rem; opacity:0.7; margin-top:-5px; margin-bottom:10px;">Adicionados à receita deste mês, não entram na recorrência mensal.</p>
-                                    
-                                    <div class="grid-2">
-                                        <div class="form-group" style="margin-bottom:12px;">
-                                            <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Tipo de Serviço Extra</label>
-                                            <select id="finance_extra_services_type" name="finance_extra_services_type" class="form-control">
-                                                <option value="">Nenhum Serviço Extra</option>
-                                                <optgroup label="FLUXAI (Agência & Marketing)">
-                                                    <option value="[FluxAI] Gravação / Captação Audiovisual">Gravação / Captação Audiovisual (Rec. R$ 400)</option>
-                                                    <option value="[FluxAI] Produção de Reels Extra (Unidade)">Produção de Reels Extra - Unidade (Rec. R$ 100)</option>
-                                                    <option value="[FluxAI] Produção de Carrosséis Extra (Unidade)">Produção de Carrosséis Extra - Unidade (Rec. R$ 80)</option>
-                                                    <option value="[FluxAI] Apresentação Comercial / Pitch Deck">Apresentação Comercial / Pitch Deck (Rec. R$ 500)</option>
-                                                    <option value="[FluxAI] Branding & Identidade Visual Express">Branding & Identidade Visual Express (Rec. R$ 1.200)</option>
-                                                    <option value="[FluxAI] Gestão de Anúncios Meta Ads">Gestão de Anúncios Meta Ads (Rec. R$ 600)</option>
-                                                </optgroup>
-                                                <optgroup label="FLUXAI LABS (Tecnologia & Sistemas)">
-                                                    <option value="[FluxAI Labs] Automação de Processos (Make / n8n)">Automação de Processos - Make/n8n (Rec. R$ 800)</option>
-                                                    <option value="[FluxAI Labs] Landing Page (LP) de Alta Conversão">Landing Page (LP) de Alta Conversão (Rec. R$ 1.500)</option>
-                                                    <option value="[FluxAI Labs] Site Institucional Completo">Site Institucional Completo (Rec. R$ 2.500)</option>
-                                                    <option value="[FluxAI Labs] Arquitetura de CRM & Pipeline de Vendas">Arquitetura de CRM & Pipeline (Rec. R$ 900)</option>
-                                                    <option value="[FluxAI Labs] Chatbot de IA & Agente de Triagem">Chatbot de IA & Agente de Triagem (Rec. R$ 1.200)</option>
-                                                    <option value="[FluxAI Labs] Dashboard de Analytics Personalizado">Dashboard de Analytics Personalizado (Rec. R$ 1.000)</option>
-                                                </optgroup>
-                                                <option value="Outro Serviço Avulso">Outro Serviço Avulso (Customizado)</option>
-                                            </select>
-                                        </div>
-                                        <div class="form-group" style="margin-bottom:12px;">
-                                            <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Valor Total do Extra (R$)</label>
-                                            <input type="number" id="finance_extra_services_value" name="finance_extra_services_value" class="form-control" placeholder="0.00" />
-                                        </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Logotipos da Marca (Vetor/PNG)</label>
+                                        <input type="text" name="asset_logos" class="form-control" placeholder="Ex: Na pasta /Logos do Drive" />
                                     </div>
                                     <div class="form-group">
-                                        <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Escopo do Serviço Extra (O que está incluso?)</label>
-                                        <textarea id="finance_extra_services_desc" name="finance_extra_services_desc" class="form-control" style="height:50px;" placeholder="Ex: 4 horas de gravação presencial, edição de 10 vídeos..."></textarea>
+                                        <label>Manual da Identidade Visual</label>
+                                        <input type="text" name="asset_brand_guidelines" class="form-control" placeholder="Ex: Na pasta /Brandbook" />
+                                    </div>
+                                </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Repositório de Vídeos Brutos (Raw Footages)</label>
+                                        <input type="text" name="asset_videos" class="form-control" placeholder="Ex: Na pasta /Videos_Briefing" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Banco de Fotos de Apoio</label>
+                                        <input type="text" name="asset_photos" class="form-control" placeholder="Ex: Na pasta /Fotos_Institucionais" />
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Observações Contratuais Financeiras</label>
-                                    <textarea name="finance_contract_notes" class="form-control" style="height:60px;" placeholder="Ex: Nota fiscal enviada todo dia 1, cobrança proporcional no primeiro mês..."></textarea>
+                                    <label>Documentação Adicional (Briefings, Certificados, Prêmios)</label>
+                                    <input type="text" name="asset_documents" class="form-control" placeholder="Outros documentos e referências importantes na nuvem" />
                                 </div>
                             </div>
                         </div>
 
-                        <!-- ETAPA 6: OPERAÇÃO -->
+                        <!-- ETAPA 6: MATRIZ OPERACIONAL E FINANCEIRO -->
                         <div class="onboarding-step" id="step-6">
                             <div class="form-section">
-                                <h2><i class="fa-solid fa-gears"></i> Pontes Operacionais</h2>
-                                <p>Acessos, links e fluxos de aprovação.</p>
+                                <h2><i class="fa-solid fa-sliders"></i> Pontes Operacionais & Contrato</h2>
+                                <p>SLA, responsáveis de pilar, governança financeira e entregas.</p>
 
-                                <div class="form-group" style="padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                    <label><i class="fa-solid fa-users"></i> Responsáveis Internos (Bridges)</label>
-                                    <div class="grid-2">
-                                        <div class="form-group" style="margin-bottom:12px;">
-                                            <label style="font-size:0.55rem; color:var(--os-text-muted);">Comercial / Vendas</label>
-                                            <input type="text" name="responsible_comercial" class="form-control" placeholder="Nome e cargo" />
-                                        </div>
-                                        <div class="form-group" style="margin-bottom:12px;">
-                                            <label style="font-size:0.55rem; color:var(--os-text-muted);">Marketing / Marca</label>
-                                            <input type="text" name="responsible_marketing" class="form-control" placeholder="Nome e cargo" />
-                                        </div>
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Frequência Semanal de Postagem</label>
+                                        <select name="post_frequency" class="form-control">
+                                            <option value="3x">3 Ativos por Semana (Instagram)</option>
+                                            <option value="5x">5 Ativos por Semana (Avançado)</option>
+                                            <option value="7x">Diário (Posicionamento Intenso)</option>
+                                        </select>
                                     </div>
-                                    <div class="grid-2">
-                                        <div class="form-group" style="margin-bottom:12px;">
-                                            <label style="font-size:0.55rem; color:var(--os-text-muted);">Financeiro</label>
-                                            <input type="text" name="responsible_financeiro" class="form-control" placeholder="Nome e cargo" />
-                                        </div>
-                                        <div class="form-group" style="margin-bottom:12px;">
-                                            <label style="font-size:0.55rem; color:var(--os-text-muted);">Aprovação (Final)</label>
-                                            <input type="text" name="approval_responsible" class="form-control" placeholder="Nome do aprovador" />
-                                        </div>
-                                    </div>
-                                    <div class="grid-2">
-                                        <div class="form-group" style="margin-bottom:0;">
-                                            <label style="font-size:0.55rem; color:var(--os-text-muted);">Operação do Dia a Dia</label>
-                                            <input type="text" name="responsible_operacao" class="form-control" placeholder="Nome e cargo" />
-                                        </div>
-                                        <div class="form-group" style="margin-bottom:0;">
-                                            <label style="font-size:0.55rem; color:var(--os-text-muted);">WhatsApp do Decisor</label>
-                                            <input type="text" name="whatsapp_decisor" class="form-control" placeholder="+55..." />
-                                        </div>
+                                    <div class="form-group">
+                                        <label>SLA Acordado para Resposta / Ajustes</label>
+                                        <select name="sla_minutes" class="form-control">
+                                            <option value="30">SLA Ultra Rápido: Até 30 min</option>
+                                            <option value="60">SLA Premium: Até 60 min (Recomendado)</option>
+                                            <option value="180">SLA Padrão: Até 3 horas</option>
+                                            <option value="360">SLA Comercial: Até 6 horas</option>
+                                        </select>
                                     </div>
                                 </div>
 
-                                <div class="form-group" style="margin-top: 20px;">
-                                    <label><i class="fa-solid fa-key"></i> Matriz de Acessos Necessários</label>
-                                    <div class="checkbox-card-grid" style="grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));">
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Instagram" /> Instagram</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Meta Business" /> Meta Business</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Google" /> Google</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Domínio" /> Domínio</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Hospedagem" /> Hospedagem</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Analytics" /> Analytics</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Tag Manager" /> Tag Manager</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Canva" /> Canva</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="Drive" /> Drive</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="CRM" /> CRM</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem;"><input type="checkbox" name="required_accesses" value="WhatsApp API" /> WhatsApp API</label>
+                                <div class="grid-2" style="border-top:1px solid rgba(255,255,255,0.05); padding-top:20px; margin-top:10px;">
+                                    <div class="form-group">
+                                        <label>Aprovador Final (Pelo Cliente)</label>
+                                        <input type="text" name="approval_responsible" class="form-control" placeholder="Nome do Decisor no Cliente" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>WhatsApp do Decisor</label>
+                                        <input type="text" name="whatsapp_decisor" class="form-control" placeholder="+55..." required />
                                     </div>
                                 </div>
 
-                                <div class="form-group">
-                                    <label>Pasta de Arquivos (Drive/Canva)</label>
-                                    <input type="url" name="assets_link" class="form-control" placeholder="https://..." />
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Responsável Comercial FluxAI</label>
+                                        <input type="text" name="responsible_comercial" class="form-control" placeholder="Executivo responsável" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Responsável Estratégico (Marketing)</label>
+                                        <input type="text" name="responsible_marketing" class="form-control" placeholder="Estrategista de Marca" />
+                                    </div>
                                 </div>
 
-                                <div class="form-group" style="margin-top:20px; padding:20px; background:rgba(107,122,69,0.05); border:1px dashed var(--os-primary); border-radius:8px;">
-                                    <label><i class="fa-solid fa-calendar-plus"></i> Logística de Renovação</label>
-                                    <p style="font-size:0.6rem; opacity:0.7; margin-bottom:10px;">Dia do mês para gerar o planejamento do mês seguinte:</p>
-                                    <input type="number" name="next_cycle_day" class="form-control" placeholder="Ex: 25" min="1" max="28" style="font-size:1.5rem; text-align:center; font-weight:800; border-color:var(--os-primary);" />
+                                <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:20px; margin-top:10px;">
+                                    <h3 style="font-size:0.85rem; color:var(--os-primary); margin-bottom:15px; text-transform:uppercase; font-weight:800;">Governança Financeira</h3>
+                                    
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Recorrência Mensal (Fee Fixo)</label>
+                                            <input type="number" name="monthly_fee" class="form-control" placeholder="Ex: 5000" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Dia do Vencimento</label>
+                                            <input type="number" name="payment_day" class="form-control" placeholder="05" min="1" max="28" required />
+                                        </div>
+                                    </div>
+
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Método de Pagamento</label>
+                                            <select name="finance_payment_method" class="form-control">
+                                                <option value="Pix">Pix</option>
+                                                <option value="Cartão">Cartão de Crédito</option>
+                                                <option value="Boleto">Boleto Bancário</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Contrato Assinado?</label>
+                                            <select name="finance_contract_signed" class="form-control">
+                                                <option value="Sim">Sim, assinado</option>
+                                                <option value="Não">Pendente de assinatura</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Data de Início da Operação</label>
+                                            <input type="date" name="finance_start_date" class="form-control" required />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Ciclo de Fidelidade do Contrato</label>
+                                            <select name="finance_min_duration" class="form-control">
+                                                <option value="3 meses">3 Meses de setup e tração</option>
+                                                <option value="6 meses">6 Meses (Recomendado)</option>
+                                                <option value="12 meses">12 Meses (Parceria estrutural)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <!-- Serviços Extras Adicionais -->
+                                    <div style="background:rgba(255,255,255,0.01); border:1px dashed var(--os-border); border-radius:8px; padding:15px; margin-top:15px;">
+                                        <label style="color:var(--os-primary); font-size:0.6rem; font-weight:800; display:block; margin-bottom:10px;">SERVIÇOS AVULSOS / SETUP DE ATIVAÇÃO</label>
+                                        <div class="grid-2">
+                                            <div class="form-group" style="margin-bottom:0;">
+                                                <label style="font-size:0.55rem; color:var(--os-text-muted);">Serviço Adicional</label>
+                                                <select id="finance_extra_services_type" name="finance_extra_services_type" class="form-control">
+                                                    <option value="">Nenhum Serviço Extra</option>
+                                                    <option value="[FluxAI] Gravação / Captação Audiovisual">Gravação Audiovisual (R$ 400)</option>
+                                                    <option value="[FluxAI] Branding & Identidade Visual Express">Branding & ID Express (R$ 1.200)</option>
+                                                    <option value="[FluxAI Labs] Landing Page (LP) de Alta Conversão">Landing Page Premium (R$ 1.500)</option>
+                                                    <option value="[FluxAI Labs] Automação de Processos (Make / n8n)">Automação de Pipeline (R$ 800)</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group" style="margin-bottom:0;">
+                                                <label style="font-size:0.55rem; color:var(--os-text-muted);">Valor do Serviço Extra (R$)</label>
+                                                <input type="number" id="finance_extra_services_value" name="finance_extra_services_value" class="form-control" placeholder="0.00" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group" style="margin-top:10px; margin-bottom:0;">
+                                            <label style="font-size:0.55rem; color:var(--os-text-muted);">Escopo e Entregáveis do Setup</label>
+                                            <textarea id="finance_extra_services_desc" name="finance_extra_services_desc" class="form-control" style="height:40px;" placeholder="Detalhamento das entregas extras..."></textarea>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -512,64 +465,62 @@
                         <!-- ETAPA 7: ATIVAÇÃO -->
                         <div class="onboarding-step" id="step-7">
                             <div class="form-section">
-                                <h2><i class="fa-solid fa-bolt"></i> Ativação do Ecossistema</h2>
-                                <p>Definições finais para o disparo da operação.</p>
+                                <h2><i class="fa-solid fa-bolt"></i> Ativação da Infraestrutura Operacional</h2>
+                                <p>Definições de risco inicial e consolidação da IA estratégica.</p>
 
                                 <div class="grid-2">
                                     <div class="form-group">
-                                        <label>Risco Operacional Atual</label>
+                                        <label>Risco Operacional de Inicialização</label>
                                         <select name="activation_operational_risk" class="form-control">
-                                            <option value="Baixo">Baixo Risco</option>
-                                            <option value="Médio">Médio Risco (Atenção a gargalos)</option>
-                                            <option value="Alto">Alto Risco (Crítico)</option>
+                                            <option value="Baixo">Baixo (Infraestrutura alinhada e acessos prontos)</option>
+                                            <option value="Médio">Médio (Aguardando liberação de chaves/acessos)</option>
+                                            <option value="Alto">Alto (Pendência de contrato ou prazos curtíssimos)</option>
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Pilar de Prioridade Máxima</label>
+                                        <label>Pilar de Foco Crítico (30 Dias)</label>
                                         <select name="priority_30d" class="form-control">
-                                            <option value="AUTORIDADE">Autoridade (Conteúdo & ID)</option>
-                                            <option value="AQUISIÇÃO">Aquisição (Leads & Tráfego)</option>
-                                            <option value="RETENÇÃO">Retenção (Base & LTV)</option>
-                                            <option value="ESTRUTURA">Estrutura (Site & Operação)</option>
-                                            <option value="REPOSICIONAMENTO">Reposicionamento de Marca</option>
-                                            <option value="AUTOMAÇÃO">Automação e Escalabilidade</option>
+                                            <option value="AUTORIDADE">Construção de Autoridade (Módulo de Conteúdo)</option>
+                                            <option value="AQUISIÇÃO">Inbound e Aquisição Comercial (Módulo Tráfego/CRM)</option>
+                                            <option value="ESTRUTURA">Estrutura Técnica Web e Pixel (Módulo Site)</option>
+                                            <option value="REBRANDING">Reposicionamento Rápido de Posicionamento</option>
                                         </select>
-                                    </div>
-                                </div>
-
-                                <div class="form-group" style="padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                                    <label><i class="fa-solid fa-triangle-exclamation"></i> Dependências Pendentes (Impeditivos)</label>
-                                    <div class="checkbox-card-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem; color:#ef4444; border-color:#ef444450;"><input type="checkbox" name="activation_dependencies" value="Falta Acesso Meta" /> Falta Acesso Meta</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem; color:#ef4444; border-color:#ef444450;"><input type="checkbox" name="activation_dependencies" value="Falta Aprovação Contrato" /> Falta Aprovação Contrato</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem; color:#ef4444; border-color:#ef444450;"><input type="checkbox" name="activation_dependencies" value="Falta Material Briefing" /> Falta Material Briefing</label>
-                                        <label class="checkbox-card" style="padding:8px; font-size:0.75rem; color:#ef4444; border-color:#ef444450;"><input type="checkbox" name="activation_dependencies" value="Falta Gravação Inicial" /> Falta Gravação Inicial</label>
                                     </div>
                                 </div>
 
                                 <div class="form-group">
-                                    <label>Primeira Entrega de Impacto (Quick Win)</label>
-                                    <textarea name="first_delivery" class="form-control" placeholder="O que será entregue nos primeiros 7 dias?"></textarea>
+                                    <label>Impeditivos ou Dependências de Acesso</label>
+                                    <div class="checkbox-card-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
+                                        <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Acesso Instagram" /> Acesso Instagram</label>
+                                        <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Acesso Gerenciador Meta" /> Acesso BM Meta</label>
+                                        <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Acesso Dominio DNS" /> DNS do Domínio</label>
+                                        <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Contrato Assinado" /> Contrato Físico</label>
+                                    </div>
                                 </div>
 
-                                <!-- IA Auto-generated Roadmap Container (hidden initially) -->
-                                <div id="ia-roadmap-container" style="display:none; background: rgba(0,0,0,0.3); border: 1px solid var(--os-primary); border-radius: 12px; padding: 25px; margin-bottom: 30px; position:relative; overflow:hidden;">
-                                    <div style="position:absolute; top:0; left:0; right:0; height:4px; background:var(--os-primary);"></div>
-                                    <h3 style="margin-top:0; color:var(--os-primary); display:flex; align-items:center; gap:10px;"><i class="fa-solid fa-robot"></i> Roadmap Operacional de 30 Dias (Gerado via IA)</h3>
-                                    <div id="ia-roadmap-content" style="font-size:0.85rem; color:#fff; line-height:1.6;"></div>
+                                <div class="form-group">
+                                    <label>Primeira Entrega Crítica (Quick Win de 7 Dias)</label>
+                                    <input type="text" name="first_delivery" class="form-control" placeholder="Ex: Definição do Manual de Pautas + 3 primeiros roteiros V1 estruturados." required />
                                 </div>
 
-                                <div style="background: rgba(107,122,69,0.1); padding: 25px; border-radius: 12px; border: 1px dashed var(--os-primary); text-align: center;">
-                                    <h3 style="color: var(--os-primary); margin-top: 0;">Pronto para Ativar?</h3>
-                                    <p style="margin-bottom: 20px;">Ao clicar, o sistema irá criar o workspace, alimentar a memória da IA e notificar a equipe.</p>
-                                    <button type="submit" class="btn-save" style="max-width: 300px; margin: 0 auto;">
-                                        ATIVAR ECOSSISTEMA
+                                <!-- Container de Visualização de Roadmap IA (Gerado ao carregar etapa 7) -->
+                                <div id="ia-roadmap-container" style="display:none; background: rgba(107, 122, 69, 0.05); border: 1px solid var(--os-primary); border-radius: 8px; padding: 20px; margin-bottom: 30px;">
+                                    <h3 style="margin-top:0; color:var(--os-primary); display:flex; align-items:center; gap:8px; font-size:0.9rem;"><i class="fa-solid fa-robot"></i> Roadmap Operacional IA (Planejado)</h3>
+                                    <div id="ia-roadmap-content" style="font-size:0.75rem; color:#eee; line-height:1.6; font-family:'JetBrains Mono', monospace;"></div>
+                                </div>
+
+                                <div style="background: rgba(107,122,69,0.1); padding: 30px; border-radius: 12px; border: 1px dashed var(--os-primary); text-align: center;">
+                                    <h3 style="color: var(--os-primary); margin-top: 0; font-size:1.1rem; font-weight:800;">ATIVAR ECOSSISTEMA OPERACIONAL</h3>
+                                    <p style="margin-bottom: 25px; font-size:0.8rem; color:var(--os-text-muted);">Ao submeter, a FluxAI OS™ criará o workspace com toda a matriz estratégica, proverá a mesa editorial inicial com pautas inteligentes e gerará o usuário de portal do cliente.</p>
+                                    <button type="submit" class="btn-save" style="max-width: 350px; margin: 0 auto; display:flex; align-items:center; justify-content:center; gap:10px;">
+                                        <i class="fa-solid fa-rocket"></i> DISPARAR INFRAESTRUTURA
                                     </button>
                                 </div>
                             </div>
                         </div>
                     </form>
 
+                    <!-- Wizard Rodapé -->
                     <div class="wizard-footer">
                         <button class="btn-wizard btn-prev" id="btn-prev" style="visibility: hidden;">
                             <i class="fa-solid fa-arrow-left"></i> Anterior
@@ -590,4 +541,3 @@
     <script type="module" src="/os/js/onboarding.js"></script>
 </body>
 </html>
-
