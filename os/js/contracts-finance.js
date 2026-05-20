@@ -41,13 +41,63 @@ async function loadFinanceData() {
     const now = new Date();
     const nextWeek = new Date(now); nextWeek.setDate(now.getDate() + 5);
     
+    // Inicializar mockProjects no localStorage para persistência cadastral
+    let mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects'));
+    if (!mockProjects) {
+        mockProjects = [
+            { 
+                id: "p_c1", 
+                company_name: "Nutrição & Consultoria Alimentar",
+                segment: "Saúde & Nutrição",
+                digital_infrastructure: {
+                    operational_links: {
+                        instagram: "https://instagram.com/maria.nutri",
+                        website: "https://marianutricao.com.br",
+                        canva: "https://canva.com/design/maria-premium",
+                        drive: "https://drive.google.com/drive/maria-folder",
+                        whatsapp: "5511999999999"
+                    }
+                }
+            },
+            { 
+                id: "p_c2", 
+                company_name: "Alves Odonto Premium",
+                segment: "Odontologia de Alta Performance",
+                digital_infrastructure: {
+                    operational_links: {
+                        instagram: "https://instagram.com/alves.odonto",
+                        website: "https://alvesodontologia.com.br",
+                        canva: "https://canva.com/design/alves-premium",
+                        drive: "https://drive.google.com/drive/alves-folder",
+                        whatsapp: "5511888888888"
+                    }
+                }
+            },
+            { 
+                id: "p_c3", 
+                company_name: "Apex Educacional",
+                segment: "Educação Executiva",
+                digital_infrastructure: {
+                    operational_links: {
+                        instagram: "https://instagram.com/instituto.apex",
+                        website: "https://apexeducacional.com.br",
+                        canva: "https://canva.com/design/apex-premium",
+                        drive: "https://drive.google.com/drive/apex-folder",
+                        whatsapp: "5511777777777"
+                    }
+                }
+            }
+        ];
+        localStorage.setItem('fluxai_mock_projects', JSON.stringify(mockProjects));
+    }
+
     // Inicializar mockContracts no localStorage para persistência interativa
     let mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts'));
     if (!mockContracts) {
         mockContracts = [
-            { id: "c1", client_name: "Maria Aparecida", company_name: "Nutrição & Consultoria Alimentar", deliverables: "2 carrosséis + 2 reels/mês", contract_value: 800, status: "ATIVO", created_at: "2026-05-10T00:00:00Z", due_day: 4 },
-            { id: "c2", client_name: "Dr. Roberto Alves", company_name: "Alves Odonto Premium", deliverables: "Gestão de Tráfego + CRM", contract_value: 5000, status: "ATIVO", created_at: "2025-03-15T00:00:00Z", due_day: 15 },
-            { id: "c3", client_name: "Instituto Apex", company_name: "Apex Educacional", deliverables: "Governança Full-Stack", contract_value: 8500, status: "ATIVO", created_at: "2024-11-20T00:00:00Z", due_day: 10 }
+            { id: "c1", project_id: "p_c1", client_name: "Maria Aparecida", company_name: "Nutrição & Consultoria Alimentar", deliverables: "2 carrosséis + 2 reels/mês", contract_value: 800, status: "ATIVO", created_at: "2026-05-10T00:00:00Z", due_day: 4 },
+            { id: "c2", project_id: "p_c2", client_name: "Dr. Roberto Alves", company_name: "Alves Odonto Premium", deliverables: "Gestão de Tráfego + CRM", contract_value: 5000, status: "ATIVO", created_at: "2025-03-15T00:00:00Z", due_day: 15 },
+            { id: "c3", project_id: "p_c3", client_name: "Instituto Apex", company_name: "Apex Educacional", deliverables: "Governança Full-Stack", contract_value: 8500, status: "ATIVO", created_at: "2024-11-20T00:00:00Z", due_day: 10 }
         ];
         localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
     }
@@ -66,6 +116,9 @@ async function loadFinanceData() {
     // Vincular referências
     mockPayments.forEach(p => {
         p.contracts = mockContracts.find(c => c.id === p.contract_id);
+        if (p.contracts) {
+            p.contracts.projects = mockProjects.find(pr => pr.id === p.contracts.project_id);
+        }
     });
 
     renderStats(mockContracts, mockPayments);
@@ -236,6 +289,62 @@ function renderContracts(contracts) {
     }).join('');
 }
 
+// Helpers de Resiliência de Cadastro & Links Operacionais
+function getProjectLinks(project) {
+    if (!project) return {};
+    return project.links || 
+           project.digital_infrastructure?.operational_links || 
+           project.metadata?.digital_infrastructure?.operational_links || 
+           {};
+}
+
+function updateProjectLinks(project, updatedLinks) {
+    if (!project) return {};
+    
+    project.links = updatedLinks;
+    
+    if (!project.digital_infrastructure) {
+        project.digital_infrastructure = {};
+    }
+    project.digital_infrastructure.operational_links = updatedLinks;
+    
+    if (!project.metadata) {
+        project.metadata = {};
+    }
+    if (!project.metadata.digital_infrastructure) {
+        project.metadata.digital_infrastructure = {};
+    }
+    project.metadata.digital_infrastructure.operational_links = updatedLinks;
+    
+    return project;
+}
+
+// Controle de Abas do Modal
+window.switchTab = (tabName) => {
+    const tabs = document.querySelectorAll('.tab-btn');
+    const sections = document.querySelectorAll('.tab-content-section');
+    
+    tabs.forEach(btn => {
+        if (btn.getAttribute('onclick').includes(tabName)) {
+            btn.classList.add('active');
+        } else {
+            btn.classList.remove('active');
+        }
+    });
+    
+    sections.forEach(sec => {
+        if (sec.id === `tab-content-${tabName}`) {
+            sec.style.display = 'block';
+        } else {
+            sec.style.display = 'none';
+        }
+    });
+};
+
+window.closeEditContractModal = () => {
+    document.getElementById('edit-contract-modal').style.display = 'none';
+};
+
 window.editContract = async (contractId) => {
     const supabase = getSupabase();
     let c = null;
@@ -259,52 +368,188 @@ window.editContract = async (contractId) => {
         return;
     }
 
-    const newValue = prompt('Novo Valor Mensal (R$):', c.contract_value);
-    const newDeliverables = prompt('Novas Entregas (Escopo):', c.deliverables);
-    const newDueDay = prompt('Novo Dia de Vencimento:', c.due_day || 5);
-
-    if (newValue !== null && newDeliverables !== null && newDueDay !== null) {
-        if (supabase && !contractId.startsWith('c')) {
-            try {
-                const { error } = await supabase.from('contracts').update({
-                    contract_value: Number(newValue),
-                    deliverables: newDeliverables,
-                    due_day: Number(newDueDay)
-                }).eq('id', contractId);
-
-                if (error) throw error;
-                alert('Contrato atualizado com sucesso!');
-                loadFinanceData();
-            } catch (error) {
-                alert('Erro ao atualizar no banco: ' + error.message);
-            }
-        } else {
-            // Mock update
-            const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-            const idx = mockContracts.findIndex(x => x.id === contractId);
-            if (idx !== -1) {
-                mockContracts[idx].contract_value = Number(newValue);
-                mockContracts[idx].deliverables = newDeliverables;
-                mockContracts[idx].due_day = Number(newDueDay);
-                localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
-
-                // Também atualizar os pagamentos simulados referentes a este contrato
-                const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
-                mockPayments.forEach(p => {
-                    if (p.contract_id === contractId) {
-                        p.amount_due = Number(newValue);
-                        if (p.status === 'PAGO') {
-                            p.amount_paid = Number(newValue);
-                        }
-                    }
-                });
-                localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
-
-                alert('Contrato atualizado localmente com sucesso!');
-                loadFinanceData();
-            }
+    // Buscar projeto correspondente para obter links e segmentos
+    let project = null;
+    if (supabase && c.project_id && !c.project_id.startsWith('p_')) {
+        try {
+            const { data } = await supabase.from('projects').select('*').eq('id', c.project_id).single();
+            project = data;
+        } catch (e) {
+            console.warn('[FINANCE] Erro ao buscar projeto no Supabase. Buscando nos mocks.', e);
         }
     }
+
+    if (!project && c.project_id) {
+        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+        project = mockProjects.find(x => x.id === c.project_id);
+    }
+
+    // Preencher campos recorrentes
+    document.getElementById('edit-contract-id').value = c.id;
+    document.getElementById('edit-project-id').value = c.project_id || '';
+    document.getElementById('edit-monthly-fee').value = c.contract_value;
+    document.getElementById('edit-payment-day').value = c.due_day || 5;
+    document.getElementById('edit-contract-deliverables').value = c.deliverables || '';
+
+    // Limpar campos extras (evitar manter entradas anteriores)
+    document.getElementById('edit-extra-type').value = '';
+    document.getElementById('edit-extra-value').value = '';
+    document.getElementById('edit-extra-desc').value = '';
+
+    // Preencher campos de cadastro
+    document.getElementById('edit-brand-name').value = project ? project.company_name : (c.company_name || '');
+    document.getElementById('edit-brand-segment').value = project ? (project.segment || '') : '';
+
+    const links = getProjectLinks(project);
+    document.getElementById('edit-link-instagram').value = links.instagram || '';
+    document.getElementById('edit-link-whatsapp').value = links.whatsapp || '';
+    document.getElementById('edit-link-drive').value = links.drive || '';
+    document.getElementById('edit-link-canva').value = links.canva || '';
+    document.getElementById('edit-link-website').value = links.website || '';
+
+    // Exibir o modal
+    document.getElementById('edit-contract-modal').style.display = 'flex';
+    window.switchTab('contrato'); // Começa focado nos dados do Contrato
+};
+
+window.saveContractEdit = async () => {
+    const contractId = document.getElementById('edit-contract-id').value;
+    const projectId = document.getElementById('edit-project-id').value;
+    
+    const monthlyFee = Number(document.getElementById('edit-monthly-fee').value);
+    const paymentDay = Number(document.getElementById('edit-payment-day').value);
+    let deliverables = document.getElementById('edit-contract-deliverables').value;
+
+    const brandName = document.getElementById('edit-brand-name').value;
+    const brandSegment = document.getElementById('edit-brand-segment').value;
+
+    // Extra / Avulso
+    const extraType = document.getElementById('edit-extra-type').value;
+    const extraValue = Number(document.getElementById('edit-extra-value').value) || 0;
+    const extraDesc = document.getElementById('edit-extra-desc').value;
+
+    // Links
+    const updatedLinks = {
+        instagram: document.getElementById('edit-link-instagram').value,
+        whatsapp: document.getElementById('edit-link-whatsapp').value,
+        drive: document.getElementById('edit-link-drive').value,
+        canva: document.getElementById('edit-link-canva').value,
+        website: document.getElementById('edit-link-website').value
+    };
+
+    // Caso haja um serviço extra válido, anexa ao escopo
+    let extraAdded = false;
+    if (extraValue > 0 && extraType) {
+        deliverables += `\n[EXTRA]: ${extraType} - ${extraDesc}`;
+        extraAdded = true;
+    }
+
+    const supabase = getSupabase();
+
+    if (supabase && !contractId.startsWith('c')) {
+        try {
+            // 1. Atualizar o Contrato recorrente
+            const { error: cErr } = await supabase.from('contracts').update({
+                contract_value: monthlyFee,
+                deliverables: deliverables,
+                due_day: paymentDay,
+                company_name: brandName
+            }).eq('id', contractId);
+
+            if (cErr) throw cErr;
+
+            // 2. Atualizar o Cadastro & Links no Projeto
+            if (projectId) {
+                const { data: existingProject } = await supabase.from('projects').select('*').eq('id', projectId).single();
+                
+                let updatedProj = updateProjectLinks(existingProject || {}, updatedLinks);
+                updatedProj.company_name = brandName;
+                updatedProj.segment = brandSegment;
+
+                const { error: pErr } = await supabase.from('projects').update(updatedProj).eq('id', projectId);
+                if (pErr) throw pErr;
+            }
+
+            // 3. Se houver serviço extra, cria um faturamento imediato pendente para hoje
+            if (extraAdded) {
+                const { error: payErr } = await supabase.from('payments').insert([{
+                    contract_id: contractId,
+                    amount_due: extraValue,
+                    due_date: new Date().toISOString(),
+                    status: 'PENDENTE',
+                    payment_method: 'Pix'
+                }]);
+                if (payErr) throw payErr;
+                
+                await logAction(`Extra lançado: ${extraType} (R$ ${extraValue})`, contractId);
+            }
+
+            await logAction('Contrato e cadastro atualizados via modal premium de governança', contractId);
+            alert('Atualizações gravadas no Supabase com sucesso!');
+        } catch (error) {
+            alert('Erro ao salvar no banco de dados: ' + error.message);
+            return;
+        }
+    } else {
+        // MOCK PERSISTENCE (Resiliência offline localStorage)
+        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+        const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
+
+        // 1. Atualizar o Contrato nos mocks
+        const cIdx = mockContracts.findIndex(x => x.id === contractId);
+        if (cIdx !== -1) {
+            mockContracts[cIdx].contract_value = monthlyFee;
+            mockContracts[cIdx].deliverables = deliverables;
+            mockContracts[cIdx].due_day = paymentDay;
+            mockContracts[cIdx].company_name = brandName;
+            localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
+        }
+
+        // 2. Atualizar Projeto nos mocks
+        const pIdx = mockProjects.findIndex(x => x.id === projectId);
+        if (pIdx !== -1) {
+            mockProjects[pIdx].company_name = brandName;
+            mockProjects[pIdx].segment = brandSegment;
+            updateProjectLinks(mockProjects[pIdx], updatedLinks);
+            localStorage.setItem('fluxai_mock_projects', JSON.stringify(mockProjects));
+        } else if (projectId) {
+            const newProj = {
+                id: projectId,
+                company_name: brandName,
+                segment: brandSegment
+            };
+            updateProjectLinks(newProj, updatedLinks);
+            mockProjects.push(newProj);
+            localStorage.setItem('fluxai_mock_projects', JSON.stringify(mockProjects));
+        }
+
+        // 3. Atualizar faturamentos recorrentes em aberto para refletir novo valor se mudou
+        mockPayments.forEach(p => {
+            if (p.contract_id === contractId && p.status !== 'PAGO' && !p.id.includes('extra')) {
+                p.amount_due = monthlyFee;
+            }
+        });
+
+        // 4. Se adicionou serviço extra, lança lançamento avulso para hoje
+        if (extraAdded) {
+            const newPayment = {
+                id: 'p_extra_' + Date.now(),
+                contract_id: contractId,
+                amount_due: extraValue,
+                due_date: new Date().toISOString(),
+                status: 'PENDENTE',
+                payment_method: 'Pix'
+            };
+            mockPayments.push(newPayment);
+        }
+
+        localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
+        alert('Contrato e cadastro atualizados localmente com sucesso!');
+    }
+
+    window.closeEditContractModal();
+    loadFinanceData();
 };
 
 window.sendWhatsAppBilling = async (paymentId) => {
@@ -317,8 +562,9 @@ window.sendWhatsAppBilling = async (paymentId) => {
             const { data } = await supabase.from('payments').select('*, contracts(client_name, company_name, project_id)').eq('id', paymentId).single();
             p = data;
             if (p) {
-                const { data: project } = await supabase.from('projects').select('links').eq('id', p.contracts.project_id).single();
-                whatsapp = project?.links?.whatsapp || '';
+                const { data: project } = await supabase.from('projects').select('*').eq('id', p.contracts.project_id).single();
+                const links = getProjectLinks(project);
+                whatsapp = links.whatsapp || '';
             }
         } catch (e) {
             console.warn(e);
@@ -328,10 +574,13 @@ window.sendWhatsAppBilling = async (paymentId) => {
     if (!p) {
         const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
         const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
         p = mockPayments.find(x => x.id === paymentId);
         if (p) {
             p.contracts = mockContracts.find(c => c.id === p.contract_id);
-            whatsapp = '5511999999999'; // Default mock number
+            const project = mockProjects.find(pr => pr.id === p.contracts?.project_id);
+            const links = getProjectLinks(project);
+            whatsapp = links.whatsapp || '5511999999999';
         }
     }
 

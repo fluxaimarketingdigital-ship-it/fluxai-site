@@ -45,6 +45,22 @@
         .alert-content { flex: 1; }
         .alert-content h4 { font-size: 0.8rem; margin: 0; color: #fff; }
         .alert-content p { font-size: 0.7rem; color: var(--os-text-muted); margin: 2px 0 0 0; }
+
+        /* Modal Form Control Styles */
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.7rem; text-transform: uppercase; color: var(--os-text-muted); letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--os-border); border-radius: 4px; color: #fff; font-size: 0.85rem; font-family: inherit; transition: all 0.3s; box-sizing: border-box; }
+        .form-control:focus { outline: none; border-color: var(--os-primary); box-shadow: 0 0 0 3px rgba(107,122,69,0.1); }
+        select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 15px; }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
+
+        .tab-btn { opacity: 0.7; border-bottom: 2px solid transparent; background: transparent; border: none; color: var(--os-text-muted); font-size: 0.8rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; transition: all 0.2s; padding: 15px 20px; }
+        .tab-btn:hover { opacity: 1; color: #fff; }
+        .tab-btn.active { opacity: 1; color: var(--os-primary) !important; border-bottom-color: var(--os-primary) !important; }
     </style>
 </head>
 <body class="os-mode">
@@ -248,6 +264,160 @@
                     </div>
                 </div>
             </main>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO DE CONTRATO, CADASTRO & SERVIÇOS EXTRAS -->
+    <div id="edit-contract-modal" class="os-modal">
+        <div class="os-widget" style="display:flex; flex-direction:column; max-height:90vh; width:100%; max-width:850px; padding:0; overflow:hidden; border-radius: 8px;">
+            
+            <!-- Cabeçalho fixo -->
+            <div style="padding:25px 30px 20px; border-bottom:1px solid var(--os-border); flex-shrink:0; display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <h2 style="margin:0; color: var(--os-primary); font-size: 1.25rem; font-weight:800; letter-spacing:-0.5px;">Governança de Escopo & Contrato</h2>
+                    <p style="margin: 5px 0 0 0; font-size: 0.75rem; color: var(--os-text-muted);">Edite termos recorrentes, dados cadastrais ou lance serviços adicionais avulsos para este mês.</p>
+                </div>
+                <button onclick="window.closeEditContractModal()" style="background:transparent; border:none; color:var(--os-text-muted); cursor:pointer; font-size:1.2rem; transition: color 0.2s;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--os-text-muted)'">&times;</button>
+            </div>
+
+            <!-- Abas de Navegação -->
+            <div style="display:flex; gap:10px; border-bottom:1px solid var(--os-border); padding:0 30px; flex-shrink:0; background:rgba(255,255,255,0.01);">
+                <button type="button" class="tab-btn active" onclick="window.switchTab('contrato')">
+                    <i class="fa-solid fa-file-invoice-dollar"></i> Contrato & Extras
+                </button>
+                <button type="button" class="tab-btn" onclick="window.switchTab('cadastro')">
+                    <i class="fa-solid fa-address-card"></i> Cadastro & Links
+                </button>
+            </div>
+
+            <!-- Corpo com scroll -->
+            <form id="edit-contract-form" onsubmit="event.preventDefault(); window.saveContractEdit();" style="display:flex; flex-direction:column; flex:1; overflow:hidden; margin:0;">
+                <input type="hidden" id="edit-contract-id" />
+                <input type="hidden" id="edit-project-id" />
+                
+                <div style="flex:1; overflow-y:auto; padding:30px;">
+                    
+                    <!-- ABA 1: CONTRATO & EXTRAS -->
+                    <div id="tab-content-contrato" class="tab-content-section" style="display:block;">
+                        <div style="display:grid; grid-template-columns: 1.1fr 0.9fr; gap:30px;">
+                            
+                            <!-- Coluna 1: Dados Recorrentes -->
+                            <div>
+                                <h3 style="font-size:0.8rem; text-transform:uppercase; color:#fff; letter-spacing:1px; margin-top:0; margin-bottom:20px; border-left:3px solid var(--os-primary); padding-left:10px;">
+                                    Contrato Recorrente (Mensal)
+                                </h3>
+                                
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Valor Mensal (R$)</label>
+                                        <input type="number" step="0.01" id="edit-monthly-fee" class="form-control" required />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Dia do Vencimento</label>
+                                        <input type="number" min="1" max="31" id="edit-payment-day" class="form-control" required />
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Entregas Mensais Acordadas</label>
+                                    <textarea id="edit-contract-deliverables" class="form-control" style="height:120px; resize:vertical;" placeholder="Ex: 2 carrosséis + 2 reels/mês" required></textarea>
+                                </div>
+                            </div>
+                            
+                            <!-- Coluna 2: Serviços Extras / Avulsos -->
+                            <div style="background: rgba(107, 122, 69, 0.03); border: 1px solid rgba(107, 122, 69, 0.15); padding: 20px; border-radius: 6px;">
+                                <h3 style="font-size:0.8rem; text-transform:uppercase; color:var(--os-primary); letter-spacing:1px; margin-top:0; margin-bottom:10px; display:flex; align-items:center; gap:8px;">
+                                    <i class="fa-solid fa-plus-circle"></i> Inserir Serviço Extra / Avulso
+                                </h3>
+                                <p style="font-size:0.65rem; color: var(--os-text-muted); margin-top:-5px; margin-bottom:20px; line-height:1.4;">
+                                    Lançamentos extras entram na receita faturada deste mês e geram cobrança adicional automática (Pix/Boleto). Não alteram a recorrência mensal básica.
+                                </p>
+                                
+                                <div class="form-group">
+                                    <label>Tipo de Serviço Extra</label>
+                                    <select id="edit-extra-type" class="form-control">
+                                        <option value="">Nenhum Serviço Extra</option>
+                                        <option value="Gravação / Captação Audiovisual">Gravação / Captação Audiovisual</option>
+                                        <option value="Criação de Site Institucional">Criação de Site Institucional</option>
+                                        <option value="Criação de Landing Page (LP)">Criação de Landing Page (LP)</option>
+                                        <option value="Criação de Apresentação Comercial">Criação de Apresentação Comercial</option>
+                                        <option value="Consultoria Estratégica / Diagnóstico">Consultoria Estratégica / Diagnóstico</option>
+                                        <option value="Identidade Visual / Branding">Identidade Visual / Branding</option>
+                                        <option value="Outro Serviço Avulso">Outro Serviço Avulso</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label>Valor do Extra (R$)</label>
+                                    <input type="number" step="0.01" id="edit-extra-value" class="form-control" placeholder="0.00" />
+                                </div>
+                                
+                                <div class="form-group" style="margin-bottom:0;">
+                                    <label>Escopo do Extra (O que está incluso?)</label>
+                                    <textarea id="edit-extra-desc" class="form-control" style="height:90px; resize:vertical;" placeholder="Ex: Captação presencial de 4h, edição de 8 vídeos Reels com legenda..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- ABA 2: CADASTRO & LINKS -->
+                    <div id="tab-content-cadastro" class="tab-content-section" style="display:none;">
+                        <div style="max-width:700px; margin: 0 auto;">
+                            <h3 style="font-size:0.8rem; text-transform:uppercase; color:#fff; letter-spacing:1px; margin-top:0; margin-bottom:20px; border-left:3px solid var(--os-primary); padding-left:10px;">
+                                Cadastro & Ativos Digitais da Marca
+                            </h3>
+                            
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label>Nome da Marca / Empresa</label>
+                                    <input type="text" id="edit-brand-name" class="form-control" required />
+                                </div>
+                                <div class="form-group">
+                                    <label>Segmento de Atuação</label>
+                                    <input type="text" id="edit-brand-segment" class="form-control" placeholder="Ex: Saúde e Bem-Estar, Advocacia..." required />
+                                </div>
+                            </div>
+                            
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label><i class="fa-brands fa-instagram"></i> Link do Instagram</label>
+                                    <input type="url" id="edit-link-instagram" class="form-control" placeholder="https://instagram.com/..." />
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fa-brands fa-whatsapp"></i> WhatsApp de Contato</label>
+                                    <input type="text" id="edit-link-whatsapp" class="form-control" placeholder="Ex: 5511999999999" />
+                                </div>
+                            </div>
+                            
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label><i class="fa-solid fa-folder-open"></i> Pasta do Google Drive</label>
+                                    <input type="url" id="edit-link-drive" class="form-control" placeholder="https://drive.google.com/..." />
+                                </div>
+                                <div class="form-group">
+                                    <label><i class="fa-solid fa-palette"></i> Workspace do Canva</label>
+                                    <input type="url" id="edit-link-canva" class="form-control" placeholder="https://canva.com/..." />
+                                </div>
+                            </div>
+                            
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label><i class="fa-solid fa-globe"></i> Website Institucional</label>
+                                <input type="url" id="edit-link-website" class="form-control" placeholder="https://..." />
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <!-- Rodapé fixo com botões -->
+                <div style="padding:18px 30px; border-top:1px solid var(--os-border); flex-shrink:0; display:flex; gap:10px; justify-content:flex-end; align-items:center; background:var(--os-card);">
+                    <button type="button" class="btn-mini" onclick="window.closeEditContractModal()" style="padding:10px 20px; height:auto; width:auto; border-radius:4px;">Cancelar</button>
+                    <button type="submit" class="btn-mini" style="padding:10px 25px; height:auto; width:auto; background:var(--os-primary); color:#000; font-weight:800; border-radius:4px; border-color:var(--os-primary);">
+                        Salvar Alterações
+                    </button>
+                </div>
+            </form>
+
         </div>
     </div>
 
