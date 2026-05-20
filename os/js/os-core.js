@@ -65,9 +65,6 @@ export const OS_UI = {
             <nav class="os-sidebar-nav">`;
 
         let currentGroup = "";
-        const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
-        const sessionRole = session.role || userRole;
-
         navItems.forEach(item => {
             // 1. Filtro de papel (RBAC)
             if (!item.roles.includes(userRole)) return;
