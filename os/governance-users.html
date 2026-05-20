@@ -543,7 +543,10 @@
                         <button class="btn-card-action btn-card-reset" onclick="window.resetUserPassword('${u.id}')" title="Resetar senha para fluxai@2026">
                             <i class="fa-solid fa-key"></i> Resetar Senha
                         </button>
-                        <button class="btn-card-action btn-card-delete" onclick="window.deleteUser('${u.id}')" title="Excluir Usuário">
+                        <button class="btn-card-action" onclick="window.toggleContractStatus('${u.id}', '${u.email}')" title="Ativar / Inativar Contrato" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; gap: 6px; display:flex; align-items:center;">
+                            <i class="fa-solid fa-toggle-on"></i> Ativar/Inativar
+                        </button>
+                        <button class="btn-card-action btn-card-delete" onclick="window.deleteUser('${u.id}', '${u.email}')" title="Excluir Usuário">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -660,13 +663,57 @@
             }
         };
 
-        window.deleteUser = (userId) => {
-            if(confirm('Tem certeza que deseja excluir esta credencial de forma irreversível do painel de governança?')) {
+        window.deleteUser = async (userId, userEmail) => {
+            if(confirm('Excluir PERMANENTEMENTE este cliente/usuário do sistema?')) {
+                // Remove do localStorage
                 const mockUsers = getMockUsers();
                 const filtered = mockUsers.filter(u => u.id !== userId);
                 saveMockUsers(filtered);
-                showToast('Credencial removida com sucesso.');
-                renderUsers();
+
+                // Remove do Supabase
+                try {
+                    const supabase = getSupabase();
+                    if (supabase) {
+                        // Deleta governance_user
+                        await supabase.from('governance_users').delete().eq('id', userId);
+                        // Deleta projetos vinculados ao email
+                        if (userEmail) {
+                            const { data: projs } = await supabase.from('projects').select('id').eq('client_email', userEmail);
+                            if (projs && projs.length > 0) {
+                                const ids = projs.map(p => p.id);
+                                await supabase.from('contracts').delete().in('project_id', ids);
+                                await supabase.from('content_assets').delete().in('project_id', ids);
+                                await supabase.from('projects').delete().in('id', ids);
+                            }
+                        }
+                    }
+                } catch(err) {
+                    console.warn('[GOV] Erro ao deletar no Supabase:', err);
+                }
+
+                showToast('Cliente removido do sistema.');
+                await renderUsers();
+            }
+        };
+
+        window.toggleContractStatus = async (userId, userEmail) => {
+            try {
+                const supabase = getSupabase();
+                if (supabase && userEmail) {
+                    const { data: projs } = await supabase.from('projects').select('id, status').eq('client_email', userEmail);
+                    if (projs && projs.length > 0) {
+                        const proj = projs[0];
+                        const newStatus = proj.status === 'ATIVO' ? 'INATIVO' : 'ATIVO';
+                        await supabase.from('projects').update({ status: newStatus }).eq('id', proj.id);
+                        await supabase.from('contracts').update({ status: newStatus }).eq('project_id', proj.id);
+                        showToast(`Contrato ${newStatus === 'ATIVO' ? '✅ Ativado' : '⛔ Inativado'} com sucesso!`);
+                        return;
+                    }
+                }
+                showToast('Contrato não encontrado no banco de dados.');
+            } catch(err) {
+                console.warn('[GOV] Erro ao atualizar status:', err);
+                showToast('Erro ao atualizar status. Verifique o Supabase.');
             }
         };
 
