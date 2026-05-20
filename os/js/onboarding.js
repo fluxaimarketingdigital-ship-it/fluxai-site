@@ -1,6 +1,6 @@
 import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
 import { getSupabase } from '/os/services/supabase-client.js';
-import { createPayment, calcFirstDueDate, generateInitialPautas, dispatchEvent, activateExtraService } from '/os/js/os-integration.js';
+import { dispatchEvent } from '/os/js/os-integration.js';
 
 let currentStep = 1;
 const totalSteps = 7;
