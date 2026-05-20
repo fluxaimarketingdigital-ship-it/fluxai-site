@@ -395,7 +395,7 @@
                             <option value="2026-06">JUNHO 2026</option>
                         </select>
                         <button id="btn-input-metrics" style="background: rgba(142, 158, 104, 0.1); border: 1px solid var(--os-primary); color: var(--os-primary); padding: 12px 20px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.1);">
-                            <i class="fa-solid fa-plus-circle"></i> LANÇAR MÉTRICAS INSTAGRAM
+                            <i class="fa-solid fa-plus-circle"></i> LANÇAR MÉTRICAS MULTICANAL
                         </button>
                         <button id="btn-generate-report" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.2); letter-spacing: 0.5px; text-transform: uppercase;">
                             <i class="fa-solid fa-file-pdf" style="font-size: 0.95rem;"></i> GERAR RELATÓRIO EXECUTIVO
@@ -906,6 +906,9 @@
                     <button type="button" class="modal-tab-btn" data-modal-tab="gsc">
                         <i class="fa-solid fa-magnifying-glass"></i> Search Console
                     </button>
+                    <button type="button" class="modal-tab-btn" data-modal-tab="meta">
+                        <i class="fa-solid fa-rectangle-ad"></i> Meta Ads
+                    </button>
                 </div>
 
                 <div style="flex:1; overflow-y:auto; padding:30px;">
@@ -999,12 +1002,42 @@
                         </div>
                     </div>
 
+                    <!-- PAINEL 4: META ADS -->
+                    <div id="modal-panel-meta" class="modal-panel">
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-dollar-sign"></i> Investimento Mensal</label>
+                                <input type="text" id="metric-meta-spent" class="form-control" placeholder="Ex: R$ 3.000,00" required />
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-user-plus"></i> Leads Gerados (Inbound)</label>
+                                <input type="text" id="metric-meta-leads" class="form-control" placeholder="Ex: 184" required />
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-tags"></i> Custo por Lead (CPL)</label>
+                                <input type="text" id="metric-meta-cpl" class="form-control" placeholder="Ex: R$ 16,30" required />
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fa-solid fa-chart-pie"></i> ROAS Projetado</label>
+                                <input type="text" id="metric-meta-roas" class="form-control" placeholder="Ex: 3.4x" required />
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <!-- Rodapé fixo com botões -->
                 <div style="padding:18px 30px; border-top:1px solid var(--os-border); flex-shrink:0; display:flex; gap:10px; justify-content:flex-end; align-items:center; background: rgba(15, 18, 15, 0.95);">
                     <button type="button" onclick="window.closeMetricsModal()" style="background: transparent; border: 1px solid var(--os-border); color: var(--os-text-muted); padding: 10px 20px; font-size: 0.8rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s;" onmouseover="this.style.color='#fff'; this.style.borderColor='rgba(255,255,255,0.2)'" onmouseout="this.style.color='var(--os-text-muted)'; this.style.borderColor='var(--os-border)'">Cancelar</button>
-                    <button type="submit" style="background: var(--os-primary); border: 1px solid var(--os-primary); color: #000; padding: 10px 25px; font-size: 0.8rem; font-weight: 800; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.st    <script type="module">
+                    <button type="submit" style="background: var(--os-primary); border: 1px solid var(--os-primary); color: #000; padding: 10px 25px; font-size: 0.8rem; font-weight: 800; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='brightness(1)'">Salvar Métricas</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script type="module">
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { decisionalMetrics, operationalInsights, behavioralData, socialSignals } from './data/analytics.js';
         import { getSupabase } from './services/supabase-client.js';
@@ -1073,25 +1106,42 @@
             return `${mins}m ${secs.toString().padStart(2, '0')}s`;
         }
 
+        function parseCurrency(val) {
+            if (!val) return 0;
+            let str = val.toString().toLowerCase().trim();
+            str = str.replace('r$', '').replace(/\./g, '').replace(',', '.').trim();
+            return parseFloat(str) || 0;
+        }
+        
+        function formatCurrency(val) {
+            return "R$ " + val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function parseROAS(val) {
+            if (!val) return 0;
+            let str = val.toString().toLowerCase().replace('x', '').trim();
+            return parseFloat(str) || 0;
+        }
+
         // Mocks e fallbacks coerentes de acordo com o segmento
         const defaultMetrics = {
             p_c1: { // Maria Aparecida Nutricionista
-                "2026-05": { reach: "12.4k", impressions: "45.8k", saveRate: "18.4%", watchTime: "1:15", followers: "+180", profileViews: "850", engagement: "7.2%", ga_activeUsers: "36", ga_newUsers: "30", ga_engagement: "7m 32s", ga_sessions: "96", gsc_clicks: "120", gsc_impressions: "4.5k", gsc_ctr: "2.7%", gsc_position: "14.2" },
-                "2026-04": { reach: "10.2k", impressions: "38.5k", saveRate: "16.1%", watchTime: "1:08", followers: "+140", profileViews: "720", engagement: "6.8%", ga_activeUsers: "31", ga_newUsers: "25", ga_engagement: "7m 10s", ga_sessions: "82", gsc_clicks: "105", gsc_impressions: "4.0k", gsc_ctr: "2.6%", gsc_position: "14.8" },
-                "2026-03": { reach: "9.5k", impressions: "35.1k", saveRate: "15.8%", watchTime: "1:05", followers: "+120", profileViews: "680", engagement: "6.5%", ga_activeUsers: "28", ga_newUsers: "22", ga_engagement: "6m 55s", ga_sessions: "75", gsc_clicks: "95", gsc_impressions: "3.7k", gsc_ctr: "2.5%", gsc_position: "15.1" },
-                "2026-06": { reach: "14.1k", impressions: "52.0k", saveRate: "19.0%", watchTime: "1:22", followers: "+220", profileViews: "980", engagement: "7.8%", ga_activeUsers: "42", ga_newUsers: "36", ga_engagement: "8m 02s", ga_sessions: "110", gsc_clicks: "145", gsc_impressions: "5.2k", gsc_ctr: "2.8%", gsc_position: "13.5" }
+                "2026-05": { reach: "12.4k", impressions: "45.8k", saveRate: "18.4%", watchTime: "1:15", followers: "+180", profileViews: "850", engagement: "7.2%", ga_activeUsers: "36", ga_newUsers: "30", ga_engagement: "7m 32s", ga_sessions: "96", gsc_clicks: "120", gsc_impressions: "4.5k", gsc_ctr: "2.7%", gsc_position: "14.2", meta_spent: "R$ 0,00", meta_leads: "0", meta_cpl: "R$ 0,00", meta_roas: "0.0x" },
+                "2026-04": { reach: "10.2k", impressions: "38.5k", saveRate: "16.1%", watchTime: "1:08", followers: "+140", profileViews: "720", engagement: "6.8%", ga_activeUsers: "31", ga_newUsers: "25", ga_engagement: "7m 10s", ga_sessions: "82", gsc_clicks: "105", gsc_impressions: "4.0k", gsc_ctr: "2.6%", gsc_position: "14.8", meta_spent: "R$ 0,00", meta_leads: "0", meta_cpl: "R$ 0,00", meta_roas: "0.0x" },
+                "2026-03": { reach: "9.5k", impressions: "35.1k", saveRate: "15.8%", watchTime: "1:05", followers: "+120", profileViews: "680", engagement: "6.5%", ga_activeUsers: "28", ga_newUsers: "22", ga_engagement: "6m 55s", ga_sessions: "75", gsc_clicks: "95", gsc_impressions: "3.7k", gsc_ctr: "2.5%", gsc_position: "15.1", meta_spent: "R$ 0,00", meta_leads: "0", meta_cpl: "R$ 0,00", meta_roas: "0.0x" },
+                "2026-06": { reach: "14.1k", impressions: "52.0k", saveRate: "19.0%", watchTime: "1:22", followers: "+220", profileViews: "980", engagement: "7.8%", ga_activeUsers: "42", ga_newUsers: "36", ga_engagement: "8m 02s", ga_sessions: "110", gsc_clicks: "145", gsc_impressions: "5.2k", gsc_ctr: "2.8%", gsc_position: "13.5", meta_spent: "R$ 0,00", meta_leads: "0", meta_cpl: "R$ 0,00", meta_roas: "0.0x" }
             },
             p_c2: { // Alves Odonto Premium
-                "2026-05": { reach: "85.2k", impressions: "280.4k", saveRate: "9.1%", watchTime: "3:45", followers: "+450", profileViews: "2.1k", engagement: "4.5%", ga_activeUsers: "245", ga_newUsers: "198", ga_engagement: "4m 12s", ga_sessions: "680", gsc_clicks: "2.4k", gsc_impressions: "110k", gsc_ctr: "2.2%", gsc_position: "18.5" },
-                "2026-04": { reach: "78.4k", impressions: "260.1k", saveRate: "8.7%", watchTime: "3:30", followers: "+390", profileViews: "1.9k", engagement: "4.2%", ga_activeUsers: "220", ga_newUsers: "175", ga_engagement: "4m 02s", ga_sessions: "610", gsc_clicks: "2.1k", gsc_impressions: "98k", gsc_ctr: "2.1%", gsc_position: "19.1" },
-                "2026-03": { reach: "72.1k", impressions: "240.5k", saveRate: "8.2%", watchTime: "3:20", followers: "+320", profileViews: "1.7k", engagement: "4.0%", ga_activeUsers: "195", ga_newUsers: "150", ga_engagement: "3m 52s", ga_sessions: "540", gsc_clicks: "1.8k", gsc_impressions: "88k", gsc_ctr: "2.0%", gsc_position: "19.8" },
-                "2026-06": { reach: "92.0k", impressions: "305.0k", saveRate: "9.5%", watchTime: "3:55", followers: "+510", profileViews: "2.3k", engagement: "4.8%", ga_activeUsers: "270", ga_newUsers: "220", ga_engagement: "4m 25s", ga_sessions: "750", gsc_clicks: "2.8k", gsc_impressions: "125k", gsc_ctr: "2.3%", gsc_position: "17.8" }
+                "2026-05": { reach: "85.2k", impressions: "280.4k", saveRate: "9.1%", watchTime: "3:45", followers: "+450", profileViews: "2.1k", engagement: "4.5%", ga_activeUsers: "245", ga_newUsers: "198", ga_engagement: "4m 12s", ga_sessions: "680", gsc_clicks: "2.4k", gsc_impressions: "110k", gsc_ctr: "2.2%", gsc_position: "18.5", meta_spent: "R$ 3.000,00", meta_leads: "184", meta_cpl: "R$ 16,30", meta_roas: "3.4x" },
+                "2026-04": { reach: "78.4k", impressions: "260.1k", saveRate: "8.7%", watchTime: "3:30", followers: "+390", profileViews: "1.9k", engagement: "4.2%", ga_activeUsers: "220", ga_newUsers: "175", ga_engagement: "4m 02s", ga_sessions: "610", gsc_clicks: "2.1k", gsc_impressions: "98k", gsc_ctr: "2.1%", gsc_position: "19.1", meta_spent: "R$ 2.800,00", meta_leads: "160", meta_cpl: "R$ 17,50", meta_roas: "3.2x" },
+                "2026-03": { reach: "72.1k", impressions: "240.5k", saveRate: "8.2%", watchTime: "3:20", followers: "+320", profileViews: "1.7k", engagement: "4.0%", ga_activeUsers: "195", ga_newUsers: "150", ga_engagement: "3m 52s", ga_sessions: "540", gsc_clicks: "1.8k", gsc_impressions: "88k", gsc_ctr: "2.0%", gsc_position: "19.8", meta_spent: "R$ 2.500,00", meta_leads: "140", meta_cpl: "R$ 17,85", meta_roas: "3.0x" },
+                "2026-06": { reach: "92.0k", impressions: "305.0k", saveRate: "9.5%", watchTime: "3:55", followers: "+510", profileViews: "2.3k", engagement: "4.8%", ga_activeUsers: "270", ga_newUsers: "220", ga_engagement: "4m 25s", ga_sessions: "750", gsc_clicks: "2.8k", gsc_impressions: "125k", gsc_ctr: "2.3%", gsc_position: "17.8", meta_spent: "R$ 3.500,00", meta_leads: "210", meta_cpl: "R$ 16,66", meta_roas: "3.6x" }
             },
             p_c3: { // Apex Educacional
-                "2026-05": { reach: "160.5k", impressions: "580.2k", saveRate: "15.8%", watchTime: "12:30", followers: "+1.8k", profileViews: "6.2k", engagement: "6.1%", ga_activeUsers: "1.8k", ga_newUsers: "1.4k", ga_engagement: "11m 45s", ga_sessions: "5.4k", gsc_clicks: "12.5k", gsc_impressions: "420k", gsc_ctr: "2.9%", gsc_position: "11.2" },
-                "2026-04": { reach: "145.2k", impressions: "520.8k", saveRate: "14.9%", watchTime: "11:45", followers: "+1.5k", profileViews: "5.5k", engagement: "5.8%", ga_activeUsers: "1.6k", ga_newUsers: "1.2k", ga_engagement: "11m 20s", ga_sessions: "4.8k", gsc_clicks: "11.0k", gsc_impressions: "380k", gsc_ctr: "2.8%", gsc_position: "11.8" },
-                "2026-03": { reach: "138.1k", impressions: "490.5k", saveRate: "14.5%", watchTime: "11:20", followers: "+1.3k", profileViews: "5.2k", engagement: "5.5%", ga_activeUsers: "1.5k", ga_newUsers: "1.1k", ga_engagement: "11m 05s", ga_sessions: "4.4k", gsc_clicks: "10.2k", gsc_impressions: "350k", gsc_ctr: "2.7%", gsc_position: "12.1" },
-                "2026-06": { reach: "175.0k", impressions: "630.0k", saveRate: "16.5%", watchTime: "13:10", followers: "+2.1k", profileViews: "6.8k", engagement: "6.5%", ga_activeUsers: "2.1k", ga_newUsers: "1.6k", ga_engagement: "12m 10s", ga_sessions: "6.2k", gsc_clicks: "14.2k", gsc_impressions: "480k", gsc_ctr: "3.0%", gsc_position: "10.5" }
+                "2026-05": { reach: "160.5k", impressions: "580.2k", saveRate: "15.8%", watchTime: "12:30", followers: "+1.8k", profileViews: "6.2k", engagement: "6.1%", ga_activeUsers: "1.8k", ga_newUsers: "1.4k", ga_engagement: "11m 45s", ga_sessions: "5.4k", gsc_clicks: "12.5k", gsc_impressions: "420k", gsc_ctr: "2.9%", gsc_position: "11.2", meta_spent: "R$ 8.500,00", meta_leads: "420", meta_cpl: "R$ 20,20", meta_roas: "4.8x" },
+                "2026-04": { reach: "145.2k", impressions: "520.8k", saveRate: "14.9%", watchTime: "11:45", followers: "+1.5k", profileViews: "5.5k", engagement: "5.8%", ga_activeUsers: "1.6k", ga_newUsers: "1.2k", ga_engagement: "11m 20s", ga_sessions: "4.8k", gsc_clicks: "11.0k", gsc_impressions: "380k", gsc_ctr: "2.8%", gsc_position: "11.8", meta_spent: "R$ 8.000,00", meta_leads: "380", meta_cpl: "R$ 21,05", meta_roas: "4.5x" },
+                "2026-03": { reach: "138.1k", impressions: "490.5k", saveRate: "14.5%", watchTime: "11:20", followers: "+1.3k", profileViews: "5.2k", engagement: "5.5%", ga_activeUsers: "1.5k", ga_newUsers: "1.1k", ga_engagement: "11m 05s", ga_sessions: "4.4k", gsc_clicks: "10.2k", gsc_impressions: "350k", gsc_ctr: "2.7%", gsc_position: "12.1", meta_spent: "R$ 7.500,00", meta_leads: "350", meta_cpl: "R$ 21,42", meta_roas: "4.2x" },
+                "2026-06": { reach: "175.0k", impressions: "630.0k", saveRate: "16.5%", watchTime: "13:10", followers: "+2.1k", profileViews: "6.8k", engagement: "6.5%", ga_activeUsers: "2.1k", ga_newUsers: "1.6k", ga_engagement: "12m 10s", ga_sessions: "6.2k", gsc_clicks: "14.2k", gsc_impressions: "480k", gsc_ctr: "3.0%", gsc_position: "10.5", meta_spent: "R$ 9.000,00", meta_leads: "450", meta_cpl: "R$ 20,00", meta_roas: "5.0x" }
             }
         };
 
@@ -1191,7 +1241,13 @@
                 gsc_clicks: document.getElementById('metric-gsc-clicks').value,
                 gsc_impressions: document.getElementById('metric-gsc-impressions').value,
                 gsc_ctr: document.getElementById('metric-gsc-ctr').value,
-                gsc_position: document.getElementById('metric-gsc-position').value
+                gsc_position: document.getElementById('metric-gsc-position').value,
+
+                // Meta Ads
+                meta_spent: document.getElementById('metric-meta-spent').value,
+                meta_leads: document.getElementById('metric-meta-leads').value,
+                meta_cpl: document.getElementById('metric-meta-cpl').value,
+                meta_roas: document.getElementById('metric-meta-roas').value
             };
 
             localStorage.setItem('fluxai_instagram_metrics', JSON.stringify(storedMetrics));
@@ -1203,7 +1259,7 @@
             }
 
             window.closeMetricsModal();
-            alert(`Todos os 15 indicadores de ${month} gravados com sucesso no banco de dados operacional!`);
+            alert(`Todos os indicadores de ${month} gravados com sucesso no banco de dados operacional!`);
         };
 
         function getMetricsForClientAndMonth(projectId, month) {
@@ -1236,7 +1292,12 @@
                 gsc_clicks: (seed * 1).toFixed(1) + "k",
                 gsc_impressions: (seed * 38).toFixed(0) + "k",
                 gsc_ctr: projectId === 'p_c1' ? "2.7%" : (projectId === 'p_c2' ? "2.2%" : "2.9%"),
-                gsc_position: projectId === 'p_c1' ? "14.2" : (projectId === 'p_c2' ? "18.5" : "11.2")
+                gsc_position: projectId === 'p_c1' ? "14.2" : (projectId === 'p_c2' ? "18.5" : "11.2"),
+
+                meta_spent: projectId === 'p_c1' ? "R$ 0,00" : (projectId === 'p_c2' ? "R$ 3.000,00" : "R$ 8.500,00"),
+                meta_leads: projectId === 'p_c1' ? "0" : (projectId === 'p_c2' ? "184" : "420"),
+                meta_cpl: projectId === 'p_c1' ? "R$ 0,00" : (projectId === 'p_c2' ? "R$ 16,30" : "R$ 20,20"),
+                meta_roas: projectId === 'p_c1' ? "0.0x" : (projectId === 'p_c2' ? "3.4x" : "4.8x")
             };
         }
 
@@ -1471,6 +1532,11 @@
                 document.getElementById('metric-gsc-impressions').value = metrics.gsc_impressions || '';
                 document.getElementById('metric-gsc-ctr').value = metrics.gsc_ctr || '';
                 document.getElementById('metric-gsc-position').value = metrics.gsc_position || '';
+
+                document.getElementById('metric-meta-spent').value = metrics.meta_spent || '';
+                document.getElementById('metric-meta-leads').value = metrics.meta_leads || '';
+                document.getElementById('metric-meta-cpl').value = metrics.meta_cpl || '';
+                document.getElementById('metric-meta-roas').value = metrics.meta_roas || '';
             }
 
             // Ativar evento de troca de abas principais da página
@@ -1594,6 +1660,11 @@
                 let totalGSCCTR = 0;
                 let totalGSCPosition = 0;
 
+                let totalMetaSpent = 0;
+                let totalMetaLeads = 0;
+                let totalMetaRoas = 0;
+                let metaAdsActiveCount = 0;
+
                 const count = mockProjects.length;
 
                 mockProjects.forEach(proj => {
@@ -1615,6 +1686,14 @@
                     totalGSCImpressions += parseK(m.gsc_impressions);
                     totalGSCCTR += parsePercent(m.gsc_ctr);
                     totalGSCPosition += parseFloat(m.gsc_position) || 0;
+
+                    const spentVal = parseCurrency(m.meta_spent);
+                    totalMetaSpent += spentVal;
+                    totalMetaLeads += parseFloat(m.meta_leads) || 0;
+                    if (spentVal > 0) {
+                        totalMetaRoas += parseROAS(m.meta_roas);
+                        metaAdsActiveCount++;
+                    }
                 });
 
                 metrics = {
@@ -1634,7 +1713,12 @@
                     gsc_clicks: formatK(totalGSCClicks),
                     gsc_impressions: formatK(totalGSCImpressions),
                     gsc_ctr: formatPercent(totalGSCCTR / count),
-                    gsc_position: (totalGSCPosition / count).toFixed(1)
+                    gsc_position: (totalGSCPosition / count).toFixed(1),
+
+                    meta_spent: formatCurrency(totalMetaSpent),
+                    meta_leads: Math.round(totalMetaLeads).toString(),
+                    meta_cpl: totalMetaLeads > 0 ? formatCurrency(totalMetaSpent / totalMetaLeads) : "R$ 0,00",
+                    meta_roas: (metaAdsActiveCount > 0 ? (totalMetaRoas / metaAdsActiveCount).toFixed(1) : "0.0") + "x"
                 };
             } else {
                 metrics = getMetricsForClientAndMonth(activeProjectId, month);
@@ -1743,6 +1827,12 @@
             if (document.getElementById('gsc-impressions')) document.getElementById('gsc-impressions').innerText = metrics.gsc_impressions;
             if (document.getElementById('gsc-ctr')) document.getElementById('gsc-ctr').innerText = metrics.gsc_ctr;
             if (document.getElementById('gsc-position')) document.getElementById('gsc-position').innerText = metrics.gsc_position;
+
+            // Renderizar Aba Meta Ads
+            if (document.getElementById('ads-spent')) document.getElementById('ads-spent').innerText = metrics.meta_spent;
+            if (document.getElementById('ads-leads')) document.getElementById('ads-leads').innerText = metrics.meta_leads;
+            if (document.getElementById('ads-cpl')) document.getElementById('ads-cpl').innerText = metrics.meta_cpl;
+            if (document.getElementById('ads-roas')) document.getElementById('ads-roas').innerText = metrics.meta_roas;
 
             // Renderizar posts no grid de performance
             const performanceGrid = document.getElementById('ig-performance-grid');
