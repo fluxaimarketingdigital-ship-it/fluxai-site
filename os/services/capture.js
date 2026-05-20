@@ -28,6 +28,7 @@ export const LeadCapture = {
                 phone: formData.get('phone') || '',
                 company: formData.get('company') || '',
                 pain_point: formData.get('pain_point') || '',
+                internal_notes: formData.get('internal_notes') || '',
                 source: 'WEBSITE',
                 status: 'NOVO',
                 temperature: 'MORNO',

@@ -571,12 +571,12 @@
             <p style="margin-top: 20px; font-size: 0.95rem; opacity: 0.8;">Preencha as informações abaixo para avaliarmos seu cenário atual e identificarmos se existe aderência estratégica para implementação do FluxAI OS™.</p>
           </div>
           <div class="cta-form-side">
-            <form id="diagnosticoForm" class="contact-form">
+            <form id="fluxai-lead-form" class="contact-form">
               <div class="form-block">
                 <span class="block-label">Identificação</span>
-                <input type="text" id="nome" name="nome" placeholder="Nome / Empresa" required />
-                <input type="tel" id="whatsapp" name="whatsapp" placeholder="WhatsApp (ex: 71 9999-9999)" required />
-                <input type="text" id="instagram" name="instagram" placeholder="Instagram ou Site" required />
+                <input type="text" id="nome" name="name" placeholder="Nome / Empresa" required />
+                <input type="tel" id="whatsapp" name="phone" placeholder="WhatsApp (ex: 71 9999-9999)" required />
+                <input type="text" id="instagram" name="company" placeholder="Instagram ou Site" required />
               </div>
 
               <div class="form-block">
@@ -591,7 +591,7 @@
                   <option value="Outros">Outros</option>
                 </select>
 
-                <select id="gargalo" name="gargalo" required>
+                <select id="gargalo" name="pain_point" required>
                   <option value="" disabled selected>Qual é o maior gargalo hoje?</option>
                   <option value="Baixa geração de demanda">Baixa geração de demanda</option>
                   <option value="Falta de posicionamento">Falta de posicionamento</option>
@@ -602,7 +602,7 @@
                   <option value="Escala operacional">Escala operacional</option>
                 </select>
 
-                <textarea id="desafio" name="desafio" placeholder="Descreva brevemente seu cenário atual" required></textarea>
+                <textarea id="desafio" name="internal_notes" placeholder="Descreva brevemente seu cenário atual" required></textarea>
               </div>
 
               <button type="submit" class="btn btn-primary btn-full">
@@ -714,6 +714,10 @@
 
   <script type="module" src="/src/scripts/script.js"></script>
   <script type="module" src="/src/scripts/dashboard.js"></script>
+  
+  <!-- Ingestão Direta de Leads para o CRM Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="/os/services/capture.js"></script>
 
   <!-- Welcome Pop-up Removido por UX Authority -->
 
