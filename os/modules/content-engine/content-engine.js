@@ -217,19 +217,11 @@ async function loadProjects() {
             });
         }
     } catch (e) {
-        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-        window.allProjects = mockProjects;
-        localStorage.setItem('fluxai_supabase_projects', JSON.stringify(mockProjects));
-
+        console.warn('Erro ao carregar projetos reais:', e);
+        window.allProjects = [];
         const select = document.getElementById('project-filter');
         if (select) {
-            select.innerHTML = '<option value="">Todos os Projetos</option>';
-            window.allProjects.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.innerText = p.company_name || p.name;
-                select.appendChild(opt);
-            });
+            select.innerHTML = '<option value="">Sem projetos cadastrados</option>';
         }
     }
 }
