@@ -40,6 +40,12 @@ export const OS_UI = {
             // Filtro de RBAC: só exibe se o usuário tiver o cargo permitido
             if (!item.roles.includes(userRole)) return;
 
+            // Filtro de Permissões Granulares (se definido na sessão)
+            const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+            if (session.permissions && session.permissions.length > 0) {
+                if (!session.permissions.includes(item.id)) return;
+            }
+
             if (item.group !== currentGroup) {
                 currentGroup = item.group;
                 html += `<span class="os-nav-label">${currentGroup}</span>`;
@@ -120,6 +126,34 @@ export const OS_AUTH = {
      * @param {string} requiredRole - Cargo mínimo exigido para a página
      */
     check: async (requiredRole = null) => {
+        // 1. Tentar carregar sessão local do localStorage
+        const localSession = localStorage.getItem('fluxai_session');
+        if (localSession) {
+            try {
+                const sessionData = JSON.parse(localSession);
+                const user = {
+                    id: sessionData.id || 'mock-id',
+                    role: sessionData.role || 'CLIENT',
+                    full_name: sessionData.name || 'Usuário Local',
+                    email: sessionData.email || 'local@fluxai.com',
+                    project_id: sessionData.project_id || null,
+                    permissions: sessionData.permissions || []
+                };
+
+                // Validação de RBAC
+                if (requiredRole && user.role !== 'ADMIN') {
+                    if (user.role !== requiredRole) {
+                        console.error('[AUTH] Acesso Negado. Nível insuficiente.');
+                        window.location.href = 'access-denied.html';
+                        return null;
+                    }
+                }
+                return user;
+            } catch (err) {
+                console.error('[AUTH] Erro ao ler fluxai_session', err);
+            }
+        }
+
         const supabase = getSupabase();
         if (!supabase) {
             console.warn('[AUTH] Supabase offline ou CDN ausente. Ativando Bypass Mock User.');
@@ -159,11 +193,17 @@ export const OS_AUTH = {
      * Logout Seguro
      */
     logout: async () => {
+        localStorage.removeItem('fluxai_session');
+        localStorage.removeItem('fluxai_current_project_id');
         const supabase = getSupabase();
         if (supabase) {
-            await supabase.auth.signOut();
-            window.location.href = 'login.html';
+            try {
+                await supabase.auth.signOut();
+            } catch (err) {
+                console.warn('[AUTH] Erro no logout Supabase', err);
+            }
         }
+        window.location.href = 'login.html';
     }
 };
 
@@ -179,12 +219,16 @@ OS_UI.renderTopbar = async () => {
     const currentProjectId = localStorage.getItem('fluxai_current_project_id');
     let activeClientHtml = "";
     let activeProj = null;
-    if (currentProjectId) {
+    if (currentProjectId && currentProjectId !== 'todos') {
         const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
         activeProj = mockProjects.find(p => p.id === currentProjectId);
         if (activeProj) {
             activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: ${activeProj.company_name.toUpperCase()}</span>`;
+        } else {
+            activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
         }
+    } else {
+        activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
     }
 
     const html = `
@@ -211,32 +255,34 @@ OS_UI.renderTopbar = async () => {
     };
 
     // Sincronizar dinamicamente o título principal de qualquer tela com o nome do cliente ativo
-    if (activeProj) {
-        setTimeout(() => {
-            const h1 = document.querySelector('.os-page-title h1, .os-viewport h1, .os-page-header h1, #portal-title, .portal-header h1');
-            if (h1) {
-                // Prevenir duplicações
-                const existing = h1.querySelector('.os-client-badge-inline');
-                if (existing) existing.remove();
+    setTimeout(() => {
+        const h1 = document.querySelector('.os-page-title h1, .os-viewport h1, .os-page-header h1, #portal-title, .portal-header h1');
+        if (h1) {
+            // Prevenir duplicações
+            const existing = h1.querySelector('.os-client-badge-inline');
+            if (existing) existing.remove();
 
-                const badge = document.createElement('span');
-                badge.className = 'os-client-badge-inline';
-                badge.style.display = 'inline-block';
-                badge.style.marginLeft = '12px';
-                badge.style.padding = '4px 12px';
-                badge.style.borderRadius = '20px';
-                badge.style.fontSize = '0.7rem';
-                badge.style.letterSpacing = '1px';
-                badge.style.background = 'rgba(142, 158, 104, 0.12)';
-                badge.style.color = 'var(--os-primary, #8e9e68)';
-                badge.style.border = '1px solid rgba(142, 158, 104, 0.3)';
-                badge.style.verticalAlign = 'middle';
-                badge.style.fontWeight = '800';
-                badge.style.textTransform = 'uppercase';
+            const badge = document.createElement('span');
+            badge.className = 'os-client-badge-inline';
+            badge.style.display = 'inline-block';
+            badge.style.marginLeft = '12px';
+            badge.style.padding = '4px 12px';
+            badge.style.borderRadius = '20px';
+            badge.style.fontSize = '0.7rem';
+            badge.style.letterSpacing = '1px';
+            badge.style.background = 'rgba(142, 158, 104, 0.12)';
+            badge.style.color = 'var(--os-primary, #8e9e68)';
+            badge.style.border = '1px solid rgba(142, 158, 104, 0.3)';
+            badge.style.verticalAlign = 'middle';
+            badge.style.fontWeight = '800';
+            badge.style.textTransform = 'uppercase';
+            if (activeProj) {
                 badge.innerHTML = `<i class="fa-solid fa-user-tie"></i> CLIENTE: ${activeProj.company_name.toUpperCase()}`;
-                h1.appendChild(badge);
+            } else {
+                badge.innerHTML = `<i class="fa-solid fa-user-tie"></i> CLIENTE: TODOS OS CLIENTES`;
             }
-        }, 120);
-    }
+            h1.appendChild(badge);
+        }
+    }, 120);
 };
 

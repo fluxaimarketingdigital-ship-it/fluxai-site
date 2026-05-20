@@ -778,6 +778,9 @@ async function handleOnboarding(e) {
             throw new Error('Falha crítica: Não foi possível obter o ID do projeto inserido.');
         }
 
+        // Persistir sempre localmente para sincronia e governança do painel mock
+        registerLocalMockProjectAndUser(data, raw);
+
         btn.innerHTML = '<i class="fa-solid fa-check"></i> ECOSSISTEMA ATIVADO!';
         btn.style.background = '#10b981';
         
@@ -789,18 +792,97 @@ async function handleOnboarding(e) {
         }, 2000);
 
     } catch (error) {
-        console.warn('[ONBOARDING] Erro no Supabase ou Offline. Executando Bypass Visual de Sucesso para demonstração.', error);
+        console.warn('[ONBOARDING] Erro no Supabase ou Offline. Executando salvamento local mock completo.', error);
         
+        // Salvar localmente no catch para garantir funcionamento off-line perfeito
+        registerLocalMockProjectAndUser(data, raw);
+
         btn.innerHTML = '<i class="fa-solid fa-check-double"></i> MOCK: ECOSSISTEMA ATIVADO!';
         btn.style.background = '#10b981';
         btn.style.boxShadow = '0 0 15px rgba(16,185,129,0.4)';
         
         // Resumo de Ativação (Simulado)
-        alert(`[SIMULAÇÃO OFFLINE]\nCLIENTE ATIVADO: ${data.company_name}\nNÚCLEO: ${data.metadata.onboarding.modules.join(', ')}\nPRIORIDADE: ${data.metadata.onboarding.activation.priority}`);
+        alert(`[SIMULAÇÃO OFFLINE]\nCLIENTE ATIVADO: ${data.company_name}\nNÚCLEO: ${data.metadata.onboarding.modules.join(', ')}\nPRIORIDADE: ${data.metadata.onboarding.activation.priority}\n\nLogin e senha padrão gerados na Gestão de Usuários.`);
 
         setTimeout(() => {
             window.location.href = '/os/command-center.html';
         }, 2000);
+    }
+}
+
+function registerLocalMockProjectAndUser(data, raw) {
+    try {
+        const projectId = "p_" + Date.now();
+        const contractId = "c_" + Date.now();
+        const userId = "u_" + Date.now();
+
+        // 1. Persistir no mockProjects
+        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+        const newProj = {
+            id: projectId,
+            company_name: data.company_name,
+            segment: data.segment,
+            digital_infrastructure: data.digital_infrastructure,
+            metadata: data.metadata
+        };
+        mockProjects.push(newProj);
+        localStorage.setItem('fluxai_mock_projects', JSON.stringify(mockProjects));
+
+        // 2. Persistir no mockContracts
+        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+        const extraValue = Number(raw.finance_extra_services_value) || 0;
+        let finalDeliverables = raw.contract_deliverables || '';
+        if (extraValue > 0) {
+            finalDeliverables += `\n[EXTRA]: ${raw.finance_extra_services_type} - ${raw.finance_extra_services_desc}`;
+        }
+        const newContract = {
+            id: contractId,
+            project_id: projectId,
+            client_name: raw.responsible_name,
+            company_name: raw.company_name,
+            deliverables: finalDeliverables,
+            contract_value: Number(raw.monthly_fee) || 0,
+            status: raw.finance_status || 'ATIVO',
+            created_at: new Date().toISOString(),
+            due_day: Number(raw.payment_day) || 5
+        };
+        mockContracts.push(newContract);
+        localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
+
+        // 3. Persistir no mockPayments se houver extra
+        if (extraValue > 0) {
+            const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
+            mockPayments.push({
+                id: "pay_" + Date.now(),
+                contract_id: contractId,
+                amount_due: extraValue,
+                due_date: new Date().toISOString().split('T')[0],
+                status: 'PENDENTE',
+                payment_method: raw.finance_payment_method || 'Pix'
+            });
+            localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
+        }
+
+        // 4. Persistir no mockUsers
+        const mockUsers = JSON.parse(localStorage.getItem('fluxai_mock_users') || '[]');
+        const handle = raw.client_instagram_handle || "";
+        const email = handle ? handle.replace('@', '').trim().toLowerCase() + "@fluxai.com" : raw.responsible_name.toLowerCase().replace(/[^a-z0-9]/g, '') + "@fluxai.com";
+        
+        mockUsers.push({
+            id: userId,
+            project_id: projectId,
+            full_name: raw.responsible_name,
+            email: email,
+            password: "fluxai@2026", // senha padrão
+            role: "CLIENT",
+            permissions: ["client-portal"],
+            needsPasswordChange: true
+        });
+        localStorage.setItem('fluxai_mock_users', JSON.stringify(mockUsers));
+        
+        console.log('[ONBOARDING] Mock persistido localmente com sucesso!', { projectId, userId, email });
+    } catch (e) {
+        console.error('[ONBOARDING] Erro ao salvar mock no localStorage', e);
     }
 }
 

@@ -67,7 +67,7 @@
 
         <form class="login-form" id="loginForm">
             <div class="form-group">
-                <label>E-mail do Operador</label>
+                <label>E-mail do Operador / Cliente</label>
                 <input type="email" id="username" class="form-control" placeholder="seu@email.com" required />
             </div>
             <div class="form-group">
@@ -83,23 +83,114 @@
         </div>
     </div>
 
+    <!-- Modal de Redefinição de Senha Obrigatória no Primeiro Acesso -->
+    <div id="passwordResetModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(10px); z-index: 1000; align-items: center; justify-content: center; padding: 20px;">
+        <div class="login-card" style="border: 1px solid var(--os-primary); box-shadow: 0 0 25px rgba(142, 158, 104, 0.2);">
+            <div class="login-header">
+                <div class="login-brand" style="color: var(--os-primary); text-shadow: 0 0 10px rgba(142, 158, 104, 0.4);">
+                    PRIMEIRO ACESSO
+                </div>
+                <p style="color: #fff; font-size: 0.95rem; margin-top: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Atualize sua Chave de Acesso</p>
+                <p style="color: var(--os-text-muted); font-size: 0.75rem; margin-top: 8px; line-height: 1.4;">Por motivos de segurança corporativa, você deve definir uma senha pessoal robusta antes de prosseguir.</p>
+            </div>
+            <form class="login-form" id="passwordResetForm">
+                <input type="hidden" id="resetUserId" />
+                <div class="form-group">
+                    <label>Nova Senha Pessoal</label>
+                    <input type="password" id="newPassword" class="form-control" placeholder="Mínimo 6 caracteres" required minlength="6" />
+                </div>
+                <div class="form-group">
+                    <label>Confirmar Nova Senha</label>
+                    <input type="password" id="confirmNewPassword" class="form-control" placeholder="••••••••" required minlength="6" />
+                </div>
+                <button type="submit" class="btn-login" style="background: var(--os-primary); color: #000; font-weight: 800;">SALVAR E ENTRAR NO PAINEL <i class="fa-solid fa-check"></i></button>
+            </form>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
         import { getSupabase } from './services/supabase-client.js';
+
+        // Inicializador de usuários locais
+        const getMockUsers = () => {
+            let mock = localStorage.getItem('fluxai_mock_users');
+            if (!mock) {
+                const initialMock = [
+                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', password: 'fluxai@2026', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] },
+                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', password: 'fluxai@2026', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] },
+                    { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', password: 'fluxai@2026', role: 'CLIENT', needsPasswordChange: false, permissions: ['client-portal'] }
+                ];
+                localStorage.setItem('fluxai_mock_users', JSON.stringify(initialMock));
+                return initialMock;
+            }
+            return JSON.parse(mock);
+        };
+
+        const updateMockUserPassword = (userId, newPassword) => {
+            const mockUsers = getMockUsers();
+            const index = mockUsers.findIndex(u => u.id === userId);
+            if (index !== -1) {
+                mockUsers[index].password = newPassword;
+                mockUsers[index].needsPasswordChange = false;
+                localStorage.setItem('fluxai_mock_users', JSON.stringify(mockUsers));
+                return mockUsers[index];
+            }
+            return null;
+        };
+
+        // Força semente inicial de usuários locais
+        getMockUsers();
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
             const originalText = btn.innerHTML;
             
-            const email = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
+            const email = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
 
             // Feedback Visual
             btn.innerHTML = 'VALIDANDO... <i class="fa-solid fa-spinner fa-spin"></i>';
             btn.disabled = true;
 
+            // 1. Verificar primeiro autenticação local na chave mock
+            const mockUsers = getMockUsers();
+            const localUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
+
+            if (localUser) {
+                if (localUser.password === password) {
+                    if (localUser.needsPasswordChange) {
+                        // Exibir Modal de redefinição
+                        document.getElementById('resetUserId').value = localUser.id;
+                        document.getElementById('passwordResetModal').style.display = 'flex';
+                        
+                        // Resetar botão para estado normal
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        return;
+                    }
+
+                    // Autenticação local concluída com sucesso!
+                    logUserIn(localUser);
+                    return;
+                } else {
+                    alert('Chave de Acesso incorreta para esta credencial.');
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+            }
+
+            // 2. Se não achou local, tenta Supabase se configurado
             const supabase = getSupabase();
+            if (!supabase) {
+                alert('Falha na Autenticação: Credencial não encontrada localmente e Supabase offline.');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                return;
+            }
+
             const { data, error } = await supabase.auth.signInWithPassword({
                 email: email,
                 password: password
@@ -121,23 +212,75 @@
                     const userRole = profile?.role || 'CLIENT';
                     const userName = profile?.full_name || data.user.email;
 
-                    // Registrar sessão no formato esperado pelo OS_AUTH (Síncrono)
-                    localStorage.setItem('fluxai_session', JSON.stringify({
-                        role: userRole, 
-                        name: userName,
-                        loginTime: new Date().toISOString()
-                    }));
-                    window.location.href = 'command-center.html';
+                    const finalUser = {
+                        id: data.user.id,
+                        full_name: userName,
+                        email: email,
+                        role: userRole,
+                        permissions: userRole === 'ADMIN' ? ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] : ['client-portal']
+                    };
+
+                    logUserIn(finalUser);
                 } catch (profileErr) {
                     console.error('[LOGIN_PROFILE_ERROR]', profileErr);
                     // Fallback seguro caso o perfil falhe
-                    localStorage.setItem('fluxai_session', JSON.stringify({
-                        role: 'CLIENT', 
-                        name: data.user.email,
-                        loginTime: new Date().toISOString()
-                    }));
-                    window.location.href = 'command-center.html';
+                    logUserIn({
+                        id: data.user.id,
+                        full_name: data.user.email,
+                        email: email,
+                        role: 'CLIENT',
+                        permissions: ['client-portal']
+                    });
                 }
+            }
+        });
+
+        // Função utilitária para registrar a sessão e redirecionar de acordo com a regra de negócios
+        function logUserIn(user) {
+            localStorage.setItem('fluxai_session', JSON.stringify({
+                id: user.id,
+                role: user.role, 
+                name: user.full_name,
+                email: user.email,
+                loginTime: new Date().toISOString(),
+                project_id: user.project_id || null,
+                permissions: user.permissions || []
+            }));
+
+            // Sincronizar projeto ativo no localStorage se for cliente
+            if (user.role === 'CLIENT' && user.project_id) {
+                localStorage.setItem('fluxai_current_project_id', user.project_id);
+                window.location.href = `client-portal.html?project_id=${user.project_id}`;
+            } else {
+                // Admins/Operators podem ter um projeto selecionado ou ir para Centro de Comando
+                window.location.href = 'command-center.html';
+            }
+        }
+
+        // Submissão do formulário de redefinição de senha
+        document.getElementById('passwordResetForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const userId = document.getElementById('resetUserId').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+
+            if (newPassword !== confirmNewPassword) {
+                alert('As senhas não coincidem. Digite novamente.');
+                return;
+            }
+
+            if (newPassword === 'fluxai@2026') {
+                alert('Por favor, escolha uma senha diferente da padrão provisória.');
+                return;
+            }
+
+            const updatedUser = updateMockUserPassword(userId, newPassword);
+            if (updatedUser) {
+                alert('Chave de Acesso pessoal salva com sucesso! Seja bem-vindo ao FluxAI OS™.');
+                document.getElementById('passwordResetModal').style.display = 'none';
+                logUserIn(updatedUser);
+            } else {
+                alert('Erro ao atualizar senha local.');
             }
         });
     </script>
