@@ -297,10 +297,19 @@
 
             if (supabase) {
                 try {
-                    const { data, error } = await supabase.from('contracts').select('*, projects(*)').order('created_at', { ascending: false });
-                    if (error) throw error;
-                    if (data && data.length > 0) {
-                        leads = data.map(c => {
+                    // Buscar contratos ativos
+                    const { data: contractsData, error: errC } = await supabase.from('contracts').select('*, projects(*)').order('created_at', { ascending: false });
+                    if (errC) throw errC;
+                    
+                    // Buscar novos leads
+                    const { data: leadsData, error: errL } = await supabase.from('crm_leads').select('*').order('created_at', { ascending: false });
+                    if (errL) throw errL;
+
+                    let combined = [];
+
+                    // Mapear contratos (clientes existentes)
+                    if (contractsData && contractsData.length > 0) {
+                        combined = contractsData.map(c => {
                             const healthVal = c.status === 'ATIVO' ? 95 : (c.status === 'PROPOSAL' ? 70 : 40);
                             return {
                                 project_id: c.project_id || (c.projects ? c.projects.id : 'p_c1'),
@@ -314,6 +323,29 @@
                                 impact: 'R$ ' + Number(c.contract_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
                             };
                         });
+                    }
+
+                    // Anexar novos leads
+                    if (leadsData && leadsData.length > 0) {
+                        const newLeads = leadsData.map(l => {
+                            return {
+                                project_id: l.project_id || 'novo',
+                                company: l.company || l.name,
+                                name: l.name,
+                                value: 0,
+                                healthScore: l.health_score || 50,
+                                status: l.status || 'NOVO',
+                                lastFollowUp: new Date(l.created_at).toLocaleDateString('pt-BR'),
+                                nextAction: 'QUALIFICAR LEAD',
+                                impact: 'A DEFINIR'
+                            };
+                        });
+                        // Leads novos ficam no topo
+                        combined = [...newLeads, ...combined];
+                    }
+
+                    if (combined.length > 0) {
+                        leads = combined;
                         loadedFromDb = true;
                     }
                 } catch (e) {
