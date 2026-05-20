@@ -51,29 +51,55 @@
             const user = await OS_AUTH.check('ADMIN');
             if (!user) return;
 
-            OS_UI.renderSidebar('governance', user.role);
+            OS_UI.renderSidebar('governance-users', user.role);
             await OS_UI.renderTopbar();
 
             await renderUsers();
         }
 
+        const getMockUsers = () => {
+            let mock = localStorage.getItem('fluxai_mock_users');
+            if (!mock) {
+                const initialMock = [
+                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', role: 'ADMIN' },
+                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', role: 'OPERATOR' },
+                    { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', role: 'CLIENT' }
+                ];
+                localStorage.setItem('fluxai_mock_users', JSON.stringify(initialMock));
+                return initialMock;
+            }
+            return JSON.parse(mock);
+        };
+
+        const saveMockUsers = (users) => {
+            localStorage.setItem('fluxai_mock_users', JSON.stringify(users));
+        };
+
         const renderUsers = async () => {
             const container = document.getElementById('users-container');
             const supabase = getSupabase();
-            
-            const { data: users, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .order('full_name');
+            let users = [];
 
-            if (error) {
-                container.innerHTML = `<p class="os-text-danger">Erro ao carregar identidades: ${error.message}</p>`;
-                return;
+            if (supabase) {
+                try {
+                    const { data, error } = await supabase
+                        .from('profiles')
+                        .select('*')
+                        .order('full_name');
+                    
+                    if (error) throw error;
+                    users = data || [];
+                } catch (e) {
+                    console.warn('[GOVERNANCE] Erro ao carregar Supabase. Usando local mock.', e);
+                    users = getMockUsers();
+                }
+            } else {
+                users = getMockUsers();
             }
 
             container.innerHTML = '';
             users.forEach(u => {
-                const initials = u.full_name ? u.full_name.split(' ').map(n => n[0]).join('').substring(0,2) : '??';
+                const initials = u.full_name ? u.full_name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : '??';
                 const card = document.createElement('div');
                 card.className = 'user-card';
                 card.innerHTML = `
@@ -101,21 +127,35 @@
             
             btn.innerText = '...';
             
-            const { error } = await supabase
-                .from('profiles')
-                .update({ role: newRole })
-                .eq('id', userId);
+            if (supabase && !userId.startsWith('u')) {
+                try {
+                    const { error } = await supabase
+                        .from('profiles')
+                        .update({ role: newRole })
+                        .eq('id', userId);
 
-            if (error) {
-                alert('Erro ao atualizar: ' + error.message);
-                btn.innerText = originalText;
+                    if (error) throw error;
+
+                    await supabase.from('audit_logs').insert({
+                        action: `Alterado cargo de usuário para ${newRole}`,
+                        module: 'governance'
+                    });
+                } catch (error) {
+                    alert('Erro ao atualizar no banco de dados: ' + error.message);
+                    btn.innerText = originalText;
+                    return;
+                }
             } else {
-                await supabase.from('audit_logs').insert({
-                    action: `Alterado cargo de usuário para ${newRole}`,
-                    module: 'governance'
-                });
-                renderUsers();
+                // Mock update
+                const mockUsers = getMockUsers();
+                const userIndex = mockUsers.findIndex(u => u.id === userId);
+                if (userIndex !== -1) {
+                    mockUsers[userIndex].role = newRole;
+                    saveMockUsers(mockUsers);
+                }
             }
+            
+            await renderUsers();
         };
 
         initPage();

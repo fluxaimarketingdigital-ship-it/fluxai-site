@@ -15,49 +15,64 @@ async function initFinance() {
 
 async function loadFinanceData() {
     const supabase = getSupabase();
-    if (!supabase) return;
+    
+    if (supabase) {
+        try {
+            const { data: contracts, error: cErr } = await supabase.from('contracts').select('*').order('created_at', { ascending: false });
+            const { data: payments, error: pErr } = await supabase.from('payments').select('*, contracts(client_name, company_name, project_id)').order('due_date', { ascending: true });
 
-    try {
-        const { data: contracts, error: cErr } = await supabase.from('contracts').select('*').order('created_at', { ascending: false });
-        const { data: payments, error: pErr } = await supabase.from('payments').select('*, contracts(client_name, company_name, project_id)').order('due_date', { ascending: true });
+            if (cErr || pErr) throw cErr || pErr;
 
-        if (cErr || pErr) throw cErr || pErr;
+            const activeContracts = contracts || [];
+            const activePayments = payments || [];
 
-        const activeContracts = contracts || [];
-        const activePayments = payments || [];
-
-        renderStats(activeContracts, activePayments);
-        renderPayments(activePayments);
-        renderContracts(activeContracts);
-        renderContractHealth(activeContracts, activePayments);
-        renderOperationalAlerts(activeContracts, activePayments);
-
-    } catch (error) {
-        console.warn('[FINANCE] Erro na API ou Offline. Carregando Dados Simulados Premium.', error);
-        
-        // MOCK DATA DE ALTO PADRÃO PARA DEMONSTRAÇÃO
-        const now = new Date();
-        const nextWeek = new Date(now); nextWeek.setDate(now.getDate() + 5);
-        const lastWeek = new Date(now); lastWeek.setDate(now.getDate() - 3);
-
-        const mockContracts = [
-            { id: "c1", client_name: "Maria Aparecida", company_name: "Clínica Vida Saúde", deliverables: "Plano Content High-Ticket (8 Ativos)", contract_value: 3500, status: "ATIVO", created_at: "2025-01-10T00:00:00Z" },
-            { id: "c2", client_name: "Dr. Roberto Alves", company_name: "Alves Odonto Premium", deliverables: "Gestão de Tráfego + CRM", contract_value: 5000, status: "ATIVO", created_at: "2025-03-15T00:00:00Z" },
-            { id: "c3", client_name: "Instituto Apex", company_name: "Apex Educacional", deliverables: "Governança Full-Stack", contract_value: 8500, status: "ATIVO", created_at: "2024-11-20T00:00:00Z" }
-        ];
-
-        const mockPayments = [
-            { id: "p1", contract_id: "c1", amount_due: 3500, due_date: lastWeek.toISOString(), status: "PENDENTE", payment_method: "Pix", contracts: mockContracts[0] },
-            { id: "p2", contract_id: "c2", amount_due: 5000, due_date: nextWeek.toISOString(), status: "PENDENTE", payment_method: "Boleto", contracts: mockContracts[1] },
-            { id: "p3", contract_id: "c3", amount_due: 8500, amount_paid: 8500, due_date: "2026-05-10T00:00:00Z", status: "PAGO", payment_method: "Pix", contracts: mockContracts[2] }
-        ];
-
-        renderStats(mockContracts, mockPayments);
-        renderPayments(mockPayments);
-        renderContracts(mockContracts);
-        renderContractHealth(mockContracts, mockPayments);
-        renderOperationalAlerts(mockContracts, mockPayments);
+            renderStats(activeContracts, activePayments);
+            renderPayments(activePayments);
+            renderContracts(activeContracts);
+            renderContractHealth(activeContracts, activePayments);
+            renderOperationalAlerts(activeContracts, activePayments);
+            return;
+        } catch (error) {
+            console.warn('[FINANCE] Erro na API do Supabase. Carregando Dados Simulados Premium.', error);
+        }
     }
+
+    // SUPABASE OFFLINE OU RETORNOU ERRO -> USAR DADOS SIMULADOS DO LOCALSTORAGE PARA FIDELIDADE PREMIUM
+    const now = new Date();
+    const nextWeek = new Date(now); nextWeek.setDate(now.getDate() + 5);
+    
+    // Inicializar mockContracts no localStorage para persistência interativa
+    let mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts'));
+    if (!mockContracts) {
+        mockContracts = [
+            { id: "c1", client_name: "Maria Aparecida", company_name: "Nutrição & Consultoria Alimentar", deliverables: "2 carrosséis + 2 reels/mês", contract_value: 800, status: "ATIVO", created_at: "2026-05-10T00:00:00Z", due_day: 4 },
+            { id: "c2", client_name: "Dr. Roberto Alves", company_name: "Alves Odonto Premium", deliverables: "Gestão de Tráfego + CRM", contract_value: 5000, status: "ATIVO", created_at: "2025-03-15T00:00:00Z", due_day: 15 },
+            { id: "c3", client_name: "Instituto Apex", company_name: "Apex Educacional", deliverables: "Governança Full-Stack", contract_value: 8500, status: "ATIVO", created_at: "2024-11-20T00:00:00Z", due_day: 10 }
+        ];
+        localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
+    }
+
+    // Inicializar mockPayments no localStorage para persistência interativa
+    let mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments'));
+    if (!mockPayments) {
+        mockPayments = [
+            { id: "p1", contract_id: "c1", amount_due: 800, due_date: "2026-06-04T00:00:00Z", status: "PAGO", payment_method: "Pix" },
+            { id: "p2", contract_id: "c2", amount_due: 5000, due_date: nextWeek.toISOString(), status: "PENDENTE", payment_method: "Boleto" },
+            { id: "p3", contract_id: "c3", amount_due: 8500, amount_paid: 8500, due_date: "2026-05-10T00:00:00Z", status: "PAGO", payment_method: "Pix" }
+        ];
+        localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
+    }
+
+    // Vincular referências
+    mockPayments.forEach(p => {
+        p.contracts = mockContracts.find(c => c.id === p.contract_id);
+    });
+
+    renderStats(mockContracts, mockPayments);
+    renderPayments(mockPayments);
+    renderContracts(mockContracts);
+    renderContractHealth(mockContracts, mockPayments);
+    renderOperationalAlerts(mockContracts, mockPayments);
 }
 
 function renderStats(contracts, payments) {
@@ -69,20 +84,18 @@ function renderStats(contracts, payments) {
 
     const totalExpected = payments.reduce((acc, p) => {
         if (isFluxAI(p.contracts?.company_name) || isFluxAI(p.contracts?.client_name)) return acc;
-        const amount = p.contracts?.client_name === 'Maria Aparecida' ? 800 : Number(p.amount_due);
-        return acc + amount;
+        return acc + Number(p.amount_due || 0);
     }, 0);
     const totalPaid = payments.reduce((acc, p) => {
         if (isFluxAI(p.contracts?.company_name) || isFluxAI(p.contracts?.client_name)) return acc;
-        return acc + Number(p.amount_paid);
+        return acc + Number(p.amount_paid || 0);
     }, 0);
     const totalPending = totalExpected - totalPaid;
     
     const activeCount = contracts.filter(c => c.status === 'ATIVO' && !isFluxAI(c.company_name) && !isFluxAI(c.client_name)).length;
     const totalContractValue = contracts.reduce((acc, c) => {
         if (isFluxAI(c.company_name) || isFluxAI(c.client_name)) return acc;
-        const val = c.client_name === 'Maria Aparecida' ? 800 : Number(c.contract_value);
-        return acc + val;
+        return acc + Number(c.contract_value || 0);
     }, 0);
     const avgTicket = activeCount > 0 ? (totalContractValue / activeCount) : 0;
     
@@ -193,8 +206,8 @@ function renderContracts(contracts) {
         const startDate = new Date(c.created_at).toLocaleDateString('pt-BR');
         const renewalDate = new Date(new Date(c.created_at).setMonth(new Date(c.created_at).getMonth() + 6)).toLocaleDateString('pt-BR');
 
-        const val = c.client_name === 'Maria Aparecida' ? 800 : c.contract_value;
-        const deliverables = c.client_name === 'Maria Aparecida' ? '2 carrosséis + 2 reels/mês' : (c.deliverables || 'N/A');
+        const val = c.contract_value;
+        const deliverables = c.deliverables || 'N/A';
 
         return `
             <tr>
@@ -225,37 +238,104 @@ function renderContracts(contracts) {
 
 window.editContract = async (contractId) => {
     const supabase = getSupabase();
-    const { data: c } = await supabase.from('contracts').select('*').eq('id', contractId).single();
-    if (!c) return;
+    let c = null;
+
+    if (supabase && !contractId.startsWith('c')) {
+        try {
+            const { data } = await supabase.from('contracts').select('*').eq('id', contractId).single();
+            c = data;
+        } catch (e) {
+            console.warn('[FINANCE] Erro ao buscar no Supabase. Buscando nos mocks.', e);
+        }
+    }
+
+    if (!c) {
+        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+        c = mockContracts.find(x => x.id === contractId);
+    }
+
+    if (!c) {
+        alert('Contrato não encontrado.');
+        return;
+    }
 
     const newValue = prompt('Novo Valor Mensal (R$):', c.contract_value);
     const newDeliverables = prompt('Novas Entregas (Escopo):', c.deliverables);
-    const newDueDay = prompt('Novo Dia de Vencimento:', c.due_day);
+    const newDueDay = prompt('Novo Dia de Vencimento:', c.due_day || 5);
 
-    if (newValue && newDeliverables && newDueDay) {
-        const { error } = await supabase.from('contracts').update({
-            contract_value: newValue,
-            deliverables: newDeliverables,
-            due_day: newDueDay
-        }).eq('id', contractId);
+    if (newValue !== null && newDeliverables !== null && newDueDay !== null) {
+        if (supabase && !contractId.startsWith('c')) {
+            try {
+                const { error } = await supabase.from('contracts').update({
+                    contract_value: Number(newValue),
+                    deliverables: newDeliverables,
+                    due_day: Number(newDueDay)
+                }).eq('id', contractId);
 
-        if (error) {
-            alert('Erro ao atualizar: ' + error.message);
+                if (error) throw error;
+                alert('Contrato atualizado com sucesso!');
+                loadFinanceData();
+            } catch (error) {
+                alert('Erro ao atualizar no banco: ' + error.message);
+            }
         } else {
-            alert('Contrato atualizado com sucesso!');
-            loadFinanceData();
+            // Mock update
+            const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+            const idx = mockContracts.findIndex(x => x.id === contractId);
+            if (idx !== -1) {
+                mockContracts[idx].contract_value = Number(newValue);
+                mockContracts[idx].deliverables = newDeliverables;
+                mockContracts[idx].due_day = Number(newDueDay);
+                localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
+
+                // Também atualizar os pagamentos simulados referentes a este contrato
+                const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
+                mockPayments.forEach(p => {
+                    if (p.contract_id === contractId) {
+                        p.amount_due = Number(newValue);
+                        if (p.status === 'PAGO') {
+                            p.amount_paid = Number(newValue);
+                        }
+                    }
+                });
+                localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
+
+                alert('Contrato atualizado localmente com sucesso!');
+                loadFinanceData();
+            }
         }
     }
 };
 
 window.sendWhatsAppBilling = async (paymentId) => {
     const supabase = getSupabase();
-    const { data: p } = await supabase.from('payments').select('*, contracts(client_name, company_name, project_id)').eq('id', paymentId).single();
-    if (!p) return;
+    let p = null;
+    let whatsapp = '';
 
-    // Buscar telefone no projeto
-    const { data: project } = await supabase.from('projects').select('links').eq('id', p.contracts.project_id).single();
-    const whatsapp = project?.links?.whatsapp || '';
+    if (supabase && !paymentId.startsWith('p')) {
+        try {
+            const { data } = await supabase.from('payments').select('*, contracts(client_name, company_name, project_id)').eq('id', paymentId).single();
+            p = data;
+            if (p) {
+                const { data: project } = await supabase.from('projects').select('links').eq('id', p.contracts.project_id).single();
+                whatsapp = project?.links?.whatsapp || '';
+            }
+        } catch (e) {
+            console.warn(e);
+        }
+    }
+
+    if (!p) {
+        const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
+        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+        p = mockPayments.find(x => x.id === paymentId);
+        if (p) {
+            p.contracts = mockContracts.find(c => c.id === p.contract_id);
+            whatsapp = '5511999999999'; // Default mock number
+        }
+    }
+
+    if (!p) return;
 
     const msg = `Olá, ${p.contracts.client_name}. Tudo bem?\n\nPassando para lembrar que o pagamento referente ao serviço na FluxAI OS™ vence em ${new Date(p.due_date).toLocaleDateString('pt-BR')}, no valor de ${formatCurrency(p.amount_due)}.\n\nQualquer dúvida, fico à disposição.`;
     window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
@@ -268,19 +348,36 @@ window.markAsPaid = async (paymentId, amount) => {
     const receipt = prompt('Link do Comprovante (opcional):', '');
 
     const supabase = getSupabase();
-    const { error } = await supabase.from('payments').update({
-        status: 'PAGO',
-        amount_paid: amount,
-        payment_method: method,
-        receipt_url: receipt,
-        paid_at: new Date().toISOString()
-    }).eq('id', paymentId);
+    if (supabase && !paymentId.startsWith('p')) {
+        try {
+            const { error } = await supabase.from('payments').update({
+                status: 'PAGO',
+                amount_paid: amount,
+                payment_method: method,
+                receipt_url: receipt,
+                paid_at: new Date().toISOString()
+            }).eq('id', paymentId);
 
-    if (error) {
-        alert('Erro ao registrar pagamento: ' + error.message);
+            if (error) throw error;
+            await logAction(`Pagamento registrado via ${method}`, paymentId);
+            loadFinanceData();
+        } catch (error) {
+            alert('Erro ao registrar pagamento: ' + error.message);
+        }
     } else {
-        await logAction(`Pagamento registrado via ${method}`, paymentId);
-        loadFinanceData();
+        // Mock update
+        const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
+        const idx = mockPayments.findIndex(p => p.id === paymentId);
+        if (idx !== -1) {
+            mockPayments[idx].status = 'PAGO';
+            mockPayments[idx].amount_paid = amount;
+            mockPayments[idx].payment_method = method;
+            mockPayments[idx].receipt_url = receipt;
+            mockPayments[idx].paid_at = new Date().toISOString();
+            localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
+            alert('Pagamento registrado localmente!');
+            loadFinanceData();
+        }
     }
 };
 
