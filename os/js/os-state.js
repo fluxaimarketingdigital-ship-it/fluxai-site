@@ -103,6 +103,14 @@ export const OSState = {
         if (legacyProjectId && !_state.activeProjectId) {
             _state.activeProjectId = legacyProjectId;
         }
+        // ADMIN sempre inicia em MASTER — nunca mantém contexto LABS gravado
+        try {
+            const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+            if (session.role === 'ADMIN') {
+                _state.activeContext = 'MASTER';
+                localStorage.setItem('fluxai_state_activeContext', JSON.stringify('MASTER'));
+            }
+        } catch(_) {}
     },
 
     /**

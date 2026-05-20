@@ -34,7 +34,14 @@ export const OS_UI = {
      * Renderiza a Sidebar filtrada por RBAC e Contexto (Master / Labs / Cliente)
      */
     renderSidebar: (activeModule, userRole = 'CLIENT') => {
-        const context = OSState.get('activeContext') || 'MASTER';
+        const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+        const sessionRole = session.role || userRole;
+
+        // ADMIN sempre inicia no contexto MASTER
+        if (sessionRole === 'ADMIN' && !OSState.get('activeContext')) {
+            OSState.setContext('MASTER');
+        }
+        const context = OSState.get('activeContext') || (sessionRole === 'ADMIN' ? 'MASTER' : 'CLIENT');
 
         // contexts: em quais contextos o item aparece
         const navItems = [
