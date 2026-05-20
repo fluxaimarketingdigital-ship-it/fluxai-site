@@ -24,7 +24,7 @@ export const CRMIntelligence = {
         try {
             if (supabase) {
                 // Tenta buscar do Supabase
-                const { data, error } = await supabase.from('leads').select('*').order('updated_at', { ascending: false });
+                const { data, error } = await supabase.from('crm_leads').select('*').order('created_at', { ascending: false });
                 
                 if (error) throw error;
                 

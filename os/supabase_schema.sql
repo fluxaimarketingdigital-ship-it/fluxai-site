@@ -121,3 +121,48 @@ CREATE POLICY "Allow All on projects" ON projects FOR ALL USING (true) WITH CHEC
 CREATE POLICY "Allow All on contracts" ON contracts FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow All on content_assets" ON content_assets FOR ALL USING (true) WITH CHECK (true);
 CREATE POLICY "Allow All on audit_logs" ON audit_logs FOR ALL USING (true) WITH CHECK (true);
+
+-- =====================================================================================
+-- PARTE 4: TABELAS DE CRM E GOVERNANÇA (FASE 3)
+-- =====================================================================================
+
+-- 5. TABELA DE CRM LEADS (CAPTAÇÃO E INTELIGÊNCIA COMERCIAL)
+CREATE TABLE IF NOT EXISTS crm_leads (
+    id UUID DEFAULT extensions.uuid_generate_v4() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    name TEXT NOT NULL,
+    company TEXT,
+    email TEXT,
+    phone TEXT,
+    pain_point TEXT,
+    status TEXT DEFAULT 'NOVO', -- NOVO, QUALIFICADO, EM NEGOCIAÇÃO, GANHO, PERDIDO
+    temperature TEXT DEFAULT 'MORNO', -- QUENTE, MORNO, FRIO
+    health_score INTEGER DEFAULT 50,
+    source TEXT DEFAULT 'WEBSITE',
+    utm_source TEXT,
+    utm_campaign TEXT,
+    internal_notes TEXT,
+    project_id UUID REFERENCES projects(id) ON DELETE SET NULL
+);
+
+-- 6. TABELA DE USUÁRIOS E GOVERNANÇA (OPERADORES DO OS)
+CREATE TABLE IF NOT EXISTS governance_users (
+    id UUID DEFAULT extensions.uuid_generate_v4() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    name TEXT NOT NULL,
+    email TEXT UNIQUE NOT NULL,
+    role TEXT DEFAULT 'CLIENT', -- ADMIN, OPERATOR, CLIENT
+    status TEXT DEFAULT 'ACTIVE',
+    avatar TEXT,
+    permissions JSONB DEFAULT '[]'::jsonb,
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE
+);
+
+ALTER TABLE crm_leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE governance_users ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Allow All on crm_leads" ON crm_leads;
+DROP POLICY IF EXISTS "Allow All on governance_users" ON governance_users;
+
+CREATE POLICY "Allow All on crm_leads" ON crm_leads FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow All on governance_users" ON governance_users FOR ALL USING (true) WITH CHECK (true);

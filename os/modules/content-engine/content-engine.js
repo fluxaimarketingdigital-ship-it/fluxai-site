@@ -211,6 +211,23 @@ export async function initEngine() {
             };
         }
 
+        const btnConfigOpenai = document.getElementById('btn-config-openai');
+        if (btnConfigOpenai) {
+            btnConfigOpenai.onclick = () => {
+                const currentKey = localStorage.getItem('openai_api_key') || '';
+                const newKey = prompt('Insira sua Chave de API da OpenAI (sk-...):\n\nIsso permitirá que o FluxAI OS crie pautas reais com GPT-4o.', currentKey);
+                if (newKey !== null) {
+                    if (newKey.trim() === '') {
+                        localStorage.removeItem('openai_api_key');
+                        alert('Chave OpenAI removida. O sistema usará os modelos estáticos (fallback).');
+                    } else {
+                        localStorage.setItem('openai_api_key', newKey.trim());
+                        alert('Chave OpenAI salva com sucesso! O Motor de Conteúdo agora possui Inteligência Artificial real.');
+                    }
+                }
+            };
+        }
+
     } catch (err) {
         sLog('ERRO NO MOTOR: ' + err.message);
         console.error(err);

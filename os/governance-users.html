@@ -446,10 +446,27 @@
             localStorage.setItem('fluxai_mock_users', JSON.stringify(users));
         };
 
+        const fetchUsers = async () => {
+            try {
+                const supabase = getSupabase();
+                if (supabase) {
+                    const { data, error } = await supabase.from('governance_users').select('*');
+                    if (!error && data && data.length > 0) {
+                        return data.map(u => ({
+                            id: u.id, full_name: u.name, email: u.email, password: 'fluxai@2026', role: u.role, permissions: u.permissions || []
+                        }));
+                    }
+                }
+            } catch (e) {
+                console.warn('[GOV] Fallback local para usuários', e);
+            }
+            return getMockUsers();
+        };
+
         // Renderização dos Usuários com Grid e Grid de Permissões
         const renderUsers = async () => {
             const container = document.getElementById('users-container');
-            const mockUsers = getMockUsers();
+            const mockUsers = await fetchUsers();
             
             container.innerHTML = '';
             
@@ -535,13 +552,13 @@
         };
 
         // Manipula adição de novo Colaborador
-        const handleAddUser = (e) => {
+        const handleAddUser = async (e) => {
             e.preventDefault();
             const fullName = document.getElementById('newFullName').value.trim();
             const email = document.getElementById('newEmail').value.trim();
             const role = document.getElementById('newRole').value;
 
-            const mockUsers = getMockUsers();
+            const mockUsers = await fetchUsers();
             if (mockUsers.some(u => u.email.toLowerCase() === email.toLowerCase())) {
                 alert('Este email de login já está em uso.');
                 return;
@@ -562,13 +579,28 @@
                 needsPasswordChange: true
             };
 
-            mockUsers.push(newCollab);
-            saveMockUsers(mockUsers);
+            try {
+                const supabase = getSupabase();
+                if (supabase) {
+                    await supabase.from('governance_users').insert([{
+                        name: fullName,
+                        email: email,
+                        role: role,
+                        permissions: defaultPermissions
+                    }]);
+                } else {
+                    mockUsers.push(newCollab);
+                    saveMockUsers(mockUsers);
+                }
+            } catch (err) {
+                mockUsers.push(newCollab);
+                saveMockUsers(mockUsers);
+            }
 
             showToast('Colaborador ativado e credenciais geradas!');
             document.getElementById('addUserForm').reset();
             document.getElementById('addUserModal').style.display = 'none';
-            renderUsers();
+            await renderUsers();
         };
 
         // Ações Globais Interativas (anexadas ao window para facilidade no HTML gerado)
