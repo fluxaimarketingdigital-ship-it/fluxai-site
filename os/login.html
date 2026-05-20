@@ -120,8 +120,8 @@
             let mock = localStorage.getItem('fluxai_mock_users');
             if (!mock) {
                 const initialMock = [
-                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', password: 'fluxai@2026', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] },
-                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', password: 'fluxai@2026', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] },
+                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', password: 'fluxai@2026', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] },
+                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', password: 'fluxai@2026', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] },
                     { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', password: 'fluxai@2026', role: 'CLIENT', needsPasswordChange: false, permissions: ['client-portal'] }
                 ];
                 localStorage.setItem('fluxai_mock_users', JSON.stringify(initialMock));
@@ -220,7 +220,8 @@
                         full_name: userName,
                         email: email,
                         role: userRole,
-                        permissions: userRole === 'ADMIN' ? ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] : ['client-portal']
+                        permissions: userRole === 'ADMIN' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] : 
+                                     userRole === 'OPERATOR' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] : ['client-portal']
                     };
 
                     logUserIn(finalUser);
