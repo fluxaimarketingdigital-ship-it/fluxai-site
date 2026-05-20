@@ -256,35 +256,5 @@ OS_UI.renderTopbar = async () => {
         }
     };
 
-    // Sincronizar dinamicamente o título principal de qualquer tela com o nome do cliente ativo
-    setTimeout(() => {
-        const h1 = document.querySelector('.os-page-title h1, .os-viewport h1, .os-page-header h1, #portal-title, .portal-header h1');
-        if (h1) {
-            // Prevenir duplicações
-            const existing = h1.querySelector('.os-client-badge-inline');
-            if (existing) existing.remove();
-
-            const badge = document.createElement('span');
-            badge.className = 'os-client-badge-inline';
-            badge.style.display = 'inline-block';
-            badge.style.marginLeft = '12px';
-            badge.style.padding = '4px 12px';
-            badge.style.borderRadius = '20px';
-            badge.style.fontSize = '0.7rem';
-            badge.style.letterSpacing = '1px';
-            badge.style.background = 'rgba(142, 158, 104, 0.12)';
-            badge.style.color = 'var(--os-primary, #8e9e68)';
-            badge.style.border = '1px solid rgba(142, 158, 104, 0.3)';
-            badge.style.verticalAlign = 'middle';
-            badge.style.fontWeight = '800';
-            badge.style.textTransform = 'uppercase';
-            if (activeProj) {
-                badge.innerHTML = `<i class="fa-solid fa-user-tie"></i> CLIENTE: ${activeProj.company_name.toUpperCase()}`;
-            } else {
-                badge.innerHTML = `<i class="fa-solid fa-user-tie"></i> CLIENTE: TODOS OS CLIENTES`;
-            }
-            h1.appendChild(badge);
-        }
-    }, 120);
 };
 
