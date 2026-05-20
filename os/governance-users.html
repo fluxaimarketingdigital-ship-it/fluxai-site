@@ -401,6 +401,7 @@
         
         const MODULES_METADATA = [
             { id: 'command-center', label: 'Centro de Comando' },
+            { id: 'onboarding', label: 'Onboarding Estratégico' },
             { id: 'content-engine', label: 'Motor de Conteúdo' },
             { id: 'crm-intelligence', label: 'Inteligência de CRM' },
             { id: 'analytics', label: 'Análise de Dados' },
@@ -566,8 +567,8 @@
 
             // Módulos padrão baseados no cargo
             const defaultPermissions = role === 'ADMIN' 
-                ? ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] 
-                : ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'];
+                ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] 
+                : ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'];
 
             const newCollab = {
                 id: 'u_' + Date.now(),
