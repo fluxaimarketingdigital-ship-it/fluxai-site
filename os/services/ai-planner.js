@@ -399,13 +399,19 @@ ${auditSummary}`;
             }
 
             if (!generatedByAI) {
-                captionText = service.template
-                    .replace('[OBJ]', objectives)
-                    .replace(/\[IA\]/g, `Gerado conforme o tom ${tone} para atingir o ICP: ${icp}
+                const baseText = service.template
+                    .replace(/\[OBJ\]/g, objectives)
+                    .replace(/\[IA\]/g, `[Pendente de Estruturação com IA - Tom: ${tone}]`);
+                
+                captionText = `${baseText}
+
+=========================================
+[CONTEXTO ESTRATÉGICO DA MARCA]
+ICP: ${icp}
 ⚠️ FOCO ESTRATÉGICO: Mitigar dores de ${painPoints}.
 🧬 DNA DA MARCA: Transmitir (${dnaDesired}), Evitar estritamente (${dnaAnti}).
 
-${auditSummary}`);
+${auditSummary}`;
             }
 
             const priorityValue = (sKey === 'TRAFEGO' || sKey === 'LP' || sKey === 'SITE' || sKey === 'BRANDING' || sKey === 'REELS' || sKey === 'CARROSSEL') ? 'ALTA' : 'MÉDIA';
