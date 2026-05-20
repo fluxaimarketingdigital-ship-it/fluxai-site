@@ -253,6 +253,47 @@
         .analytics-table tr:hover {
             background: rgba(255,255,255,0.01);
         }
+
+        /* MODAL FIXES */
+        .os-modal {
+            backdrop-filter: blur(10px);
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 9999;
+            overflow-y: auto;
+            padding: 20px;
+            box-sizing: border-box;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .os-modal .os-widget {
+            margin: auto;
+            max-width: 650px;
+            width: 100%;
+            position: relative;
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: block;
+        }
+
+        /* Form styling inside modal */
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-group label { display: block; font-size: 0.65rem; text-transform: uppercase; color: var(--os-text-muted); letter-spacing: 1px; font-weight: 700; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--os-border); border-radius: 4px; color: #fff; font-size: 0.85rem; font-family: inherit; transition: all 0.3s; box-sizing: border-box; }
+        .form-control:focus { outline: none; border-color: var(--os-primary); box-shadow: 0 0 0 3px rgba(142,158,104,0.15); }
+        select.form-control { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='white'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 15px center; background-size: 15px; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body class="os-mode">
@@ -269,9 +310,23 @@
                         <h1>Análise de Dados</h1>
                         <p>Leitura estratégica e interpretação comportamental da operação.</p>
                     </div>
-                    <button id="btn-generate-report" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.2); letter-spacing: 0.5px; text-transform: uppercase;">
-                        <i class="fa-solid fa-file-pdf" style="font-size: 0.95rem;"></i> GERAR RELATÓRIO EXECUTIVO
-                    </button>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <select id="analytics-project-filter" style="background: rgba(0, 0, 0, 0.5); border: 1px solid var(--os-border); color: #fff; padding: 11px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; outline: none; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(142, 158, 104, 0.5)'" onmouseout="this.style.borderColor='var(--os-border)'">
+                            <option value="">SELECIONE UM CLIENTE</option>
+                        </select>
+                        <select id="analytics-month-filter" style="background: rgba(0, 0, 0, 0.5); border: 1px solid var(--os-border); color: #fff; padding: 11px 16px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; cursor: pointer; outline: none; transition: border-color 0.2s;" onmouseover="this.style.borderColor='rgba(142, 158, 104, 0.5)'" onmouseout="this.style.borderColor='var(--os-border)'">
+                            <option value="2026-03">MARÇO 2026</option>
+                            <option value="2026-04">ABRIL 2026</option>
+                            <option value="2026-05" selected>MAIO 2026</option>
+                            <option value="2026-06">JUNHO 2026</option>
+                        </select>
+                        <button id="btn-input-metrics" style="background: rgba(142, 158, 104, 0.1); border: 1px solid var(--os-primary); color: var(--os-primary); padding: 12px 20px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.1);">
+                            <i class="fa-solid fa-plus-circle"></i> LANÇAR MÉTRICAS INSTAGRAM
+                        </button>
+                        <button id="btn-generate-report" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.2); letter-spacing: 0.5px; text-transform: uppercase;">
+                            <i class="fa-solid fa-file-pdf" style="font-size: 0.95rem;"></i> GERAR RELATÓRIO EXECUTIVO
+                        </button>
+                    </div>
                 </div>
 
                 <!-- PLATFORM SELECTOR TABS -->
@@ -457,9 +512,26 @@
                             <span style="font-size: 0.7rem; color: var(--os-text-muted);">Estável nos Reels</span>
                         </div>
 
+                        <!-- Row 2: Engajamento & Audiência -->
+                        <div class="os-widget" style="grid-column: span 4;">
+                            <span class="mini-label">Seguidores Ganhos</span>
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; margin: 10px 0;" id="ig-followers">+1.2k</div>
+                            <span style="font-size: 0.7rem; color: var(--os-success);"><i class="fa-solid fa-user-plus"></i> Crescimento de audiência</span>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 4;">
+                            <span class="mini-label">Visitas ao Perfil</span>
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; margin: 10px 0;" id="ig-profile-views">4.5k</div>
+                            <span style="font-size: 0.7rem; color: var(--os-success);"><i class="fa-solid fa-eye"></i> Visualizações diretas</span>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 4;">
+                            <span class="mini-label">Taxa de Engajamento</span>
+                            <div style="font-size: 2.2rem; font-weight: 800; color: #fff; font-family: 'JetBrains Mono', monospace; margin: 10px 0;" id="ig-engagement-rate">5.8%</div>
+                            <span style="font-size: 0.7rem; color: var(--os-success);"><i class="fa-solid fa-bolt"></i> Alta interatividade de nicho</span>
+                        </div>
+
                         <div class="os-widget" style="grid-column: span 12;">
                             <span class="os-widget-label">Análise de Performance de Conteúdos no Instagram</span>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
+                            <div id="ig-performance-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-top: 15px;">
                                 <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--os-border); border-radius: 8px; padding: 15px;">
                                     <span class="os-badge" style="background: rgba(142,158,104,0.1); color: var(--os-primary); margin-bottom: 10px;">REELS #01</span>
                                     <h5 style="margin: 0 0 10px 0; font-size: 0.85rem; color: #fff;">Sistemas de Crescimento</h5>
@@ -691,24 +763,431 @@
         </div>
     </div>
 
+    <!-- MODAL DE LANÇAMENTO DE MÉTRICAS DO INSTAGRAM -->
+    <div id="input-metrics-modal" class="os-modal">
+        <div class="os-widget" style="display:flex; flex-direction:column; max-height:90vh; width:100%; max-width:650px; padding:0; overflow:hidden; border-radius: 8px; margin: auto; position: relative;">
+            
+            <!-- Cabeçalho fixo -->
+            <div style="padding:25px 30px 20px; border-bottom:1px solid var(--os-border); flex-shrink:0; display:flex; justify-content:space-between; align-items:center; background: rgba(15, 18, 15, 0.95);">
+                <div>
+                    <h2 style="margin:0; color: var(--os-primary); font-size: 1.25rem; font-weight:800; letter-spacing:-0.5px; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-brands fa-instagram" style="font-size: 1.4rem;"></i> Lançar Métricas Mensais (Instagram)
+                    </h2>
+                    <p style="margin: 5px 0 0 0; font-size: 0.75rem; color: var(--os-text-muted);">Insira os indicadores de performance do Instagram do cliente para o mês selecionado.</p>
+                </div>
+                <button onclick="window.closeMetricsModal()" style="background:transparent; border:none; color:var(--os-text-muted); cursor:pointer; font-size:1.5rem; transition: color 0.2s; line-height: 1;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--os-text-muted)'">&times;</button>
+            </div>
+
+            <!-- Corpo com scroll -->
+            <form id="metrics-entry-form" onsubmit="event.preventDefault(); window.saveInstagramMetrics();" style="display:flex; flex-direction:column; flex:1; overflow:hidden; margin:0; background: rgba(10, 12, 10, 0.95);">
+                <div style="flex:1; overflow-y:auto; padding:30px;">
+                    
+                    <div style="background: rgba(142, 158, 104, 0.03); border: 1px solid rgba(142, 158, 104, 0.1); padding: 15px; border-radius: 6px; margin-bottom: 25px; display: flex; align-items: center; gap: 12px;">
+                        <i class="fa-solid fa-circle-info" style="color: var(--os-primary); font-size: 1.2rem;"></i>
+                        <span style="font-size: 0.75rem; color: var(--os-text-muted); line-height: 1.4;">
+                            Métricas inseridas serão gravadas no banco de dados operacional e atualizarão os relatórios executivos e gráficos em tempo real.
+                        </span>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>Cliente / Projeto</label>
+                            <select id="modal-metric-project-id" class="form-control" required style="background: rgba(0,0,0,0.6); border: 1px solid var(--os-border); color: #fff; padding: 12px; border-radius: 4px; font-size: 0.85rem; width: 100%;">
+                                <option value="">Selecione o Cliente</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Mês de Referência</label>
+                            <select id="modal-metric-month" class="form-control" required style="background: rgba(0,0,0,0.6); border: 1px solid var(--os-border); color: #fff; padding: 12px; border-radius: 4px; font-size: 0.85rem; width: 100%;">
+                                <option value="2026-05">Maio de 2026 (Atual)</option>
+                                <option value="2026-06">Junho de 2026</option>
+                                <option value="2026-04">Abril de 2026</option>
+                                <option value="2026-03">Março de 2026</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-users"></i> Contas Alcançadas</label>
+                            <input type="text" id="metric-ig-reach" class="form-control" placeholder="Ex: 148k ou 148.000" required />
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-eye"></i> Impressões do Perfil</label>
+                            <input type="text" id="metric-ig-impressions" class="form-control" placeholder="Ex: 512k ou 512.000" required />
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-bookmark"></i> Taxa de Salvamento (%)</label>
+                            <input type="text" id="metric-ig-save-rate" class="form-control" placeholder="Ex: 14.2%" required />
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-clock"></i> Tempo Médio de Tela (Watch Time)</label>
+                            <input type="text" id="metric-ig-watch-time" class="form-control" placeholder="Ex: 9:15" required />
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-user-plus"></i> Seguidores Ganhos</label>
+                            <input type="text" id="metric-ig-followers" class="form-control" placeholder="Ex: +1.2k ou 1.200" required />
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fa-solid fa-user-check"></i> Visitas ao Perfil</label>
+                            <input type="text" id="metric-ig-profile-views" class="form-control" placeholder="Ex: 4.5k ou 4.500" required />
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label><i class="fa-solid fa-percent"></i> Taxa de Engajamento (%)</label>
+                        <input type="text" id="metric-ig-engagement" class="form-control" placeholder="Ex: 5.8%" required />
+                    </div>
+
+                </div>
+
+                <!-- Rodapé fixo com botões -->
+                <div style="padding:18px 30px; border-top:1px solid var(--os-border); flex-shrink:0; display:flex; gap:10px; justify-content:flex-end; align-items:center; background: rgba(15, 18, 15, 0.95);">
+                    <button type="button" onclick="window.closeMetricsModal()" style="background: transparent; border: 1px solid var(--os-border); color: var(--os-text-muted); padding: 10px 20px; font-size: 0.8rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s;" onmouseover="this.style.color='#fff'; this.style.borderColor='rgba(255,255,255,0.2)'" onmouseout="this.style.color='var(--os-text-muted)'; this.style.borderColor='var(--os-border)'">Cancelar</button>
+                    <button type="submit" style="background: var(--os-primary); border: 1px solid var(--os-primary); color: #000; padding: 10px 25px; font-size: 0.8rem; font-weight: 800; border-radius: 4px; cursor: pointer; text-transform: uppercase; transition: all 0.2s;" onmouseover="this.style.filter='brightness(1.1)'" onmouseout="this.style.filter='none'">
+                        Gravar Indicadores
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
     <script type="module">
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { decisionalMetrics, operationalInsights, behavioralData, socialSignals } from './data/analytics.js';
         import { getSupabase } from './services/supabase-client.js';
-        
+
+        // Mocks e fallbacks coerentes de acordo com o segmento
+        const defaultMetrics = {
+            p_c1: { // Maria Aparecida Nutricionista
+                "2026-05": { reach: "12.4k", impressions: "45.8k", saveRate: "18.4%", watchTime: "1:15", followers: "+180", profileViews: "850", engagement: "7.2%" },
+                "2026-04": { reach: "10.2k", impressions: "38.5k", saveRate: "16.1%", watchTime: "1:08", followers: "+140", profileViews: "720", engagement: "6.8%" },
+                "2026-03": { reach: "9.5k", impressions: "35.1k", saveRate: "15.8%", watchTime: "1:05", followers: "+120", profileViews: "680", engagement: "6.5%" },
+                "2026-06": { reach: "14.1k", impressions: "52.0k", saveRate: "19.0%", watchTime: "1:22", followers: "+220", profileViews: "980", engagement: "7.8%" }
+            },
+            p_c2: { // Alves Odonto Premium
+                "2026-05": { reach: "85.2k", impressions: "280.4k", saveRate: "9.1%", watchTime: "3:45", followers: "+450", profileViews: "2.1k", engagement: "4.5%" },
+                "2026-04": { reach: "78.4k", impressions: "260.1k", saveRate: "8.7%", watchTime: "3:30", followers: "+390", profileViews: "1.9k", engagement: "4.2%" },
+                "2026-03": { reach: "72.1k", impressions: "240.5k", saveRate: "8.2%", watchTime: "3:20", followers: "+320", profileViews: "1.7k", engagement: "4.0%" },
+                "2026-06": { reach: "92.0k", impressions: "305.0k", saveRate: "9.5%", watchTime: "3:55", followers: "+510", profileViews: "2.3k", engagement: "4.8%" }
+            },
+            p_c3: { // Apex Educacional
+                "2026-05": { reach: "160.5k", impressions: "580.2k", saveRate: "15.8%", watchTime: "12:30", followers: "+1.8k", profileViews: "6.2k", engagement: "6.1%" },
+                "2026-04": { reach: "145.2k", impressions: "520.8k", saveRate: "14.9%", watchTime: "11:45", followers: "+1.5k", profileViews: "5.5k", engagement: "5.8%" },
+                "2026-03": { reach: "138.1k", impressions: "490.5k", saveRate: "14.5%", watchTime: "11:20", followers: "+1.3k", profileViews: "5.2k", engagement: "5.5%" },
+                "2026-06": { reach: "175.0k", impressions: "630.0k", saveRate: "16.5%", watchTime: "13:10", followers: "+2.1k", profileViews: "6.8k", engagement: "6.5%" }
+            }
+        };
+
+        const defaultContentPerformance = {
+            p_c1: [
+                { badge: "REELS", title: "Rotina Alimentar Real", subtitle: "Planejamento de compras da semana", views: "5.4k views", saves: "320 salves" },
+                { badge: "CARROSSEL", title: "Alimentação Prática", subtitle: "Substituições inteligentes e baratas", views: "4.2k views", saves: "410 salves" },
+                { badge: "STORIES DE TRAÇÃO", title: "Bastidores Consultoria", subtitle: "Organização de estoque de consultório local", views: "680 views", saves: "24 replies" }
+            ],
+            p_c2: [
+                { badge: "REELS", title: "Lentes de Contato", subtitle: "O segredo do sorriso natural", views: "32k views", saves: "180 salves" },
+                { badge: "CARROSSEL", title: "Saúde Bucal Executiva", subtitle: "Prevenção de bruxismo corporativo", views: "15k views", saves: "310 salves" },
+                { badge: "STORIES DE TRAÇÃO", title: "Bastidores Clínica", subtitle: "Tecnologia de escaneamento 3D", views: "1.4k views", saves: "32 replies" }
+            ],
+            p_c3: [
+                { badge: "REELS", title: "MBA de Gestão", subtitle: "Estrutura ágil de escala de times", views: "48k views", saves: "820 salves" },
+                { badge: "CARROSSEL", title: "Liderança no Século XXI", subtitle: "Diferença entre gerenciar e liderar", views: "30k views", saves: "940 salves" },
+                { badge: "STORIES DE TRAÇÃO", title: "Aulas Executivas", subtitle: "Networking de abertura do novo cohort", views: "2.8k views", saves: "75 replies" }
+            ]
+        };
+
         let currentDecisional = decisionalMetrics;
         let currentBehavioral = behavioralData;
         let currentSocial = socialSignals;
+
+        // Expor funções fechamento/salvamento do modal para o escopo global
+        window.closeMetricsModal = () => {
+            document.getElementById('input-metrics-modal').style.display = 'none';
+        };
+
+        window.saveInstagramMetrics = () => {
+            const projId = document.getElementById('modal-metric-project-id').value;
+            const month = document.getElementById('modal-metric-month').value;
+            if (!projId || !month) return;
+
+            const storedMetrics = JSON.parse(localStorage.getItem('fluxai_instagram_metrics') || '{}');
+            if (!storedMetrics[projId]) storedMetrics[projId] = {};
+
+            storedMetrics[projId][month] = {
+                reach: document.getElementById('metric-ig-reach').value,
+                impressions: document.getElementById('metric-ig-impressions').value,
+                saveRate: document.getElementById('metric-ig-save-rate').value,
+                watchTime: document.getElementById('metric-ig-watch-time').value,
+                followers: document.getElementById('metric-ig-followers').value,
+                profileViews: document.getElementById('metric-ig-profile-views').value,
+                engagement: document.getElementById('metric-ig-engagement').value
+            };
+
+            localStorage.setItem('fluxai_instagram_metrics', JSON.stringify(storedMetrics));
+            
+            // Se o projeto salvo for o ativo, atualiza a tela na hora
+            const activeProjId = document.getElementById('analytics-project-filter').value;
+            if (activeProjId === projId) {
+                renderAnalyticsData();
+            }
+
+            window.closeMetricsModal();
+            alert(`Métricas de ${month} gravadas com sucesso para o cliente selecionado!`);
+        };
+
+        function getMetricsForClientAndMonth(projectId, month) {
+            const customStore = JSON.parse(localStorage.getItem('fluxai_instagram_metrics') || '{}');
+            if (customStore[projectId] && customStore[projectId][month]) {
+                return customStore[projectId][month];
+            }
+            if (defaultMetrics[projectId] && defaultMetrics[projectId][month]) {
+                return defaultMetrics[projectId][month];
+            }
+            
+            // Fallback genérico calculado
+            const seed = projectId === 'p_c1' ? 1.2 : (projectId === 'p_c2' ? 8.5 : 15);
+            return {
+                reach: (seed * 10).toFixed(1) + "k",
+                impressions: (seed * 35).toFixed(1) + "k",
+                saveRate: projectId === 'p_c1' ? "18.0%" : (projectId === 'p_c2' ? "9.0%" : "15.0%"),
+                watchTime: projectId === 'p_c1' ? "1:10" : (projectId === 'p_c2' ? "3:40" : "12:00"),
+                followers: "+" + Math.floor(seed * 150),
+                profileViews: Math.floor(seed * 700).toString(),
+                engagement: projectId === 'p_c1' ? "7.0%" : (projectId === 'p_c2' ? "4.5%" : "6.0%")
+            };
+        }
 
         async function initPage() {
             const user = await OS_AUTH.check('CLIENT');
             if (!user) return;
 
             OS_UI.renderSidebar('analytics', user.role);
-            await OS_UI.renderTopbar();
+            
+            // Garantir que mockProjects está inicializado no localStorage para sincronia total
+            let mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects'));
+            if (!mockProjects || !mockProjects[0] || !mockProjects[0].metadata || !mockProjects[0].metadata.dna) {
+                mockProjects = [
+                    { 
+                        id: "p_c1", 
+                        company_name: "Maria Aparecida Nutricionista & Consultora Alimentar",
+                        segment: "Nutrição Clínica + Consultoria Alimentar",
+                        digital_infrastructure: {
+                            operational_links: {
+                                instagram: "https://www.instagram.com/mariaaparecida.nutri",
+                                website: "",
+                                canva: "https://drive.google.com/drive/folders/1K__Y4QTCfJ_4cnr54iocJyhFEDsPa5iZ?usp=drive_link",
+                                drive: "https://drive.google.com/drive/folders/14stjSxP6piUM2w0gFmRS-v9H2zjFIE0P?usp=drive_link",
+                                whatsapp: "5582993051282"
+                            }
+                        },
+                        metadata: {
+                            dna: {
+                                desired_patterns: ["Alimentação Real", "Rotina Prática", "Saúde Sustentável", "Orientação Humanizada"],
+                                anti_patterns: ["Terrorismo Nutricional", "Estética Fitness Genérica", "Promessas Milagrosas", "Sensacionalismo", "Antes e Depois Proibido", "Publicidade Antiética"],
+                                forbidden_themes: "Promessas de emagrecimento rápido, antes e depois, propaganda irregular, terrorismo nutricional, associação indevida com marcas, publicidade antiética, discurso alarmista, recomendações irresponsáveis"
+                            },
+                            tone_of_voice: "Humano, técnico, confiável, acolhedor, sofisticado, claro, sem terrorismo alimentar, sem radicalismo",
+                            strategic_roadmap: {
+                                semana_1: "organização estratégica, alinhamento da marca, análise do Instagram, definição de pilares editoriais, definição da linguagem visual, alinhamento ético CFN",
+                                semana_2: "primeiros conteúdos, construção de autoridade, otimização de bio, organização editorial, início da percepção premium",
+                                semana_3: "fortalecimento regional, conteúdo educativo estratégico, conteúdo humanizado, aproximação com empresas locais, estruturação de narrativa profissional",
+                                semana_4: "análise de métricas, ajustes de posicionamento, melhoria de retenção, consolidação da presença digital, evolução da autoridade"
+                            },
+                            cfn_rules: "Respeito ético profissional, comunicação responsável, ausência de promessas milagrosas, ausência de sensacionalismo, ausência de publicidade irregular, ausência de associação inadequada com marcas/suplementos, comunicação humanizada e técnica, valorização da autonomia alimentar, posicionamento profissional premium."
+                        }
+                    },
+                    { 
+                        id: "p_c2", 
+                        company_name: "Alves Odonto Premium",
+                        segment: "Odontologia de Alta Performance",
+                        digital_infrastructure: {
+                            operational_links: {
+                                instagram: "https://instagram.com/alves.odonto",
+                                website: "https://alvesodontologia.com.br",
+                                canva: "https://canva.com/design/alves-premium",
+                                drive: "https://drive.google.com/drive/alves-folder",
+                                whatsapp: "5511888888888"
+                            }
+                        },
+                        metadata: {
+                            dna: {
+                                desired_patterns: ["Estética Natural", "Alta Performance Oral", "Tecnologia 3D", "Confiança Premium"],
+                                anti_patterns: ["Amadorismo", "Preços Populares", "Promessas Indevidas de Indolor", "Venda Agressiva"],
+                                forbidden_themes: "Propaganda de tratamento indolor sem base, promessas de resultados milagrosos, fotos antes e depois antiéticas, descontos agressivos na saúde"
+                            },
+                            tone_of_voice: "Altamente profissional, técnico, elite, acolhedor, limpo, científico porém acessível",
+                            strategic_roadmap: {
+                                semana_1: "Estrutura clínica, pilares de tecnologia, alinhamento visual",
+                                semana_2: "Bastidores de atendimento, depoimentos e casos éticos",
+                                semana_3: "Tecnologia 3D na prática, autoridade regional",
+                                semana_4: "Otimização de conversão de implantes e lentes, métricas"
+                            },
+                            cfn_rules: "Respeito às diretrizes do CFO (Conselho Federal de Odontologia), sem sensacionalismo ou mercantilização da saúde dental, valorização de diagnósticos reais."
+                        }
+                    },
+                    { 
+                        id: "p_c3", 
+                        company_name: "Apex Educacional",
+                        segment: "Educação Executiva",
+                        digital_infrastructure: {
+                            operational_links: {
+                                instagram: "https://instagram.com/instituto.apex",
+                                website: "https://apexeducacional.com.br",
+                                canva: "https://canva.com/design/apex-premium",
+                                drive: "https://drive.google.com/drive/apex-folder",
+                                whatsapp: "5511777777777"
+                            }
+                        },
+                        metadata: {
+                            dna: {
+                                desired_patterns: ["Educação Executiva", "Networking Executivo", "Escala de Times", "Alta LTV"],
+                                anti_patterns: ["Linguagem de Cursos Baratos", "Fórmulas Mágicas de Enriquecimento", "Amadorismo", "Gatilhos Mentais Agressivos"],
+                                forbidden_themes: "Esquemas de enriquecimento rápido, hacks genéricos de carreira, promessas de faturamento sem embasamento, gírias excessivas"
+                            },
+                            tone_of_voice: "Executivo, afiado, autoritário, educativo, altamente profissional, analítico, confiável",
+                            strategic_roadmap: {
+                                semana_1: "Posicionamento executivo, pilares de gestão e liderança",
+                                semana_2: "Networking e depoimentos corporativos de sucesso",
+                                semana_3: "Estudos de caso corporativos de alta escala",
+                                semana_4: "Ofertas de turmas, captação e análise de LTV"
+                            },
+                            cfn_rules: "Integridade educacional e conformidade com as diretrizes do MEC para ensino de alta performance corporativa."
+                        }
+                    }
+                ];
+                localStorage.setItem('fluxai_mock_projects', JSON.stringify(mockProjects));
+            }
 
+            // Popular Filtros de Clientes
+            const projectFilter = document.getElementById('analytics-project-filter');
+            const modalProjectFilter = document.getElementById('modal-metric-project-id');
+            
+            if (projectFilter && modalProjectFilter) {
+                projectFilter.innerHTML = "";
+                modalProjectFilter.innerHTML = `<option value="">Selecione o Cliente</option>`;
+                
+                mockProjects.forEach(proj => {
+                    const opt1 = document.createElement('option');
+                    opt1.value = proj.id;
+                    opt1.innerText = proj.company_name.toUpperCase();
+                    projectFilter.appendChild(opt1);
+
+                    const opt2 = document.createElement('option');
+                    opt2.value = proj.id;
+                    opt2.innerText = proj.company_name.toUpperCase();
+                    modalProjectFilter.appendChild(opt2);
+                });
+            }
+
+            // Recuperar projeto atual e mês a partir de parâmetros de URL ou localStorage com fallback
+            const params = new URLSearchParams(window.location.search);
+            const urlProjId = params.get('project_id') || params.get('project');
+            const urlMonth = params.get('month');
+            const triggerInput = params.get('input') === 'true';
+
+            let currentProjectId = localStorage.getItem('fluxai_current_project_id');
+            if (urlProjId && mockProjects.some(p => p.id === urlProjId)) {
+                currentProjectId = urlProjId;
+                localStorage.setItem('fluxai_current_project_id', urlProjId);
+            } else if (!currentProjectId || !mockProjects.some(p => p.id === currentProjectId)) {
+                currentProjectId = "p_c1";
+                localStorage.setItem('fluxai_current_project_id', currentProjectId);
+            }
+
+            if (projectFilter) {
+                projectFilter.value = currentProjectId;
+            }
+
+            const monthFilter = document.getElementById('analytics-month-filter');
+            let currentMonthVal = localStorage.getItem('fluxai_current_month');
+            if (urlMonth) {
+                currentMonthVal = urlMonth;
+                localStorage.setItem('fluxai_current_month', urlMonth);
+            } else if (!currentMonthVal) {
+                currentMonthVal = "2026-05";
+                localStorage.setItem('fluxai_current_month', currentMonthVal);
+            }
+            if (monthFilter) {
+                monthFilter.value = currentMonthVal;
+            }
+
+            await OS_UI.renderTopbar();
             await renderAnalyticsData();
-            renderInsights();
+
+            // Adicionar Listener ao Filtro Principal de Projetos
+            if (projectFilter) {
+                projectFilter.addEventListener('change', async (e) => {
+                    const val = e.target.value;
+                    localStorage.setItem('fluxai_current_project_id', val);
+                    await OS_UI.renderTopbar();
+                    await renderAnalyticsData();
+                });
+            }
+
+            // Adicionar Listener ao Filtro Principal de Meses
+            if (monthFilter) {
+                monthFilter.addEventListener('change', async (e) => {
+                    const val = e.target.value;
+                    localStorage.setItem('fluxai_current_month', val);
+                    await OS_UI.renderTopbar();
+                    await renderAnalyticsData();
+                });
+            }
+
+            // Configurar botões de Métricas
+            const btnInput = document.getElementById('btn-input-metrics');
+            if (btnInput) {
+                btnInput.addEventListener('click', () => {
+                    const activeProjId = localStorage.getItem('fluxai_current_project_id') || 'p_c1';
+                    const activeMonth = document.getElementById('modal-metric-month').value || '2026-05';
+                    
+                    document.getElementById('modal-metric-project-id').value = activeProjId;
+                    
+                    // Preencher campos
+                    const metrics = getMetricsForClientAndMonth(activeProjId, activeMonth);
+                    document.getElementById('metric-ig-reach').value = metrics.reach;
+                    document.getElementById('metric-ig-impressions').value = metrics.impressions;
+                    document.getElementById('metric-ig-save-rate').value = metrics.saveRate;
+                    document.getElementById('metric-ig-watch-time').value = metrics.watchTime;
+                    document.getElementById('metric-ig-followers').value = metrics.followers;
+                    document.getElementById('metric-ig-profile-views').value = metrics.profileViews;
+                    document.getElementById('metric-ig-engagement').value = metrics.engagement;
+
+                    document.getElementById('input-metrics-modal').style.display = 'flex';
+                });
+            }
+
+            // Atualizar campos do modal se mudar o cliente/mês dentro dele
+            if (modalProjectFilter) {
+                modalProjectFilter.addEventListener('change', updateModalFields);
+            }
+            const modalMonthFilter = document.getElementById('modal-metric-month');
+            if (modalMonthFilter) {
+                modalMonthFilter.addEventListener('change', updateModalFields);
+            }
+
+            function updateModalFields() {
+                const projId = document.getElementById('modal-metric-project-id').value;
+                const month = document.getElementById('modal-metric-month').value;
+                if (!projId || !month) return;
+                
+                const metrics = getMetricsForClientAndMonth(projId, month);
+                document.getElementById('metric-ig-reach').value = metrics.reach;
+                document.getElementById('metric-ig-impressions').value = metrics.impressions;
+                document.getElementById('metric-ig-save-rate').value = metrics.saveRate;
+                document.getElementById('metric-ig-watch-time').value = metrics.watchTime;
+                document.getElementById('metric-ig-followers').value = metrics.followers;
+                document.getElementById('metric-ig-profile-views').value = metrics.profileViews;
+                document.getElementById('metric-ig-engagement').value = metrics.engagement;
+            }
 
             // Ativar evento de troca de abas
             const tabs = document.querySelectorAll('.tab-btn');
@@ -737,90 +1216,135 @@
             if (btnReport) {
                 btnReport.addEventListener('click', generatePDFReport);
             }
+
+            // Se solicitado via URL, abre o modal de inserção de métricas automaticamente
+            if (triggerInput) {
+                setTimeout(() => {
+                    if (btnInput) btnInput.click();
+                }, 250);
+            }
         }
 
         const renderAnalyticsData = async () => {
-            const supabase = getSupabase();
-            let snap = null;
+            const activeProjectId = localStorage.getItem('fluxai_current_project_id') || 'p_c1';
+            const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+            const activeProject = mockProjects.find(p => p.id === activeProjectId) || mockProjects[0] || { company_name: "Maria Aparecida Nutricionista & Consultora Alimentar", segment: "Nutrição Clínica + Consultoria Alimentar" };
             
-            if (supabase) {
-                try {
-                    const { data } = await supabase.from('analytics_snapshots').select('*').order('timestamp', { ascending: false }).limit(1);
-                    if (data && data.length > 0) {
-                        snap = data[0].data;
-                        if (snap.decisionalMetrics) currentDecisional = snap.decisionalMetrics;
-                        if (snap.behavioralData) currentBehavioral = snap.behavioralData;
-                        if (snap.socialSignals) currentSocial = snap.socialSignals;
-                    }
-                } catch (err) {
-                    console.warn('[ANALYTICS] Falha ao ler snapshots do banco:', err);
-                }
+            const month = localStorage.getItem('fluxai_current_month') || "2026-05"; // Mês ativo no dashboard principal
+            const metrics = getMetricsForClientAndMonth(activeProjectId, month);
+
+            // Definir métricas decisionais personalizadas por segmento
+            let activeDecisionalMetrics = [];
+            let activeSocialContext = "";
+            let activeInsights = [];
+
+            if (activeProjectId === 'p_c1') {
+                activeDecisionalMetrics = [
+                    { label: "Taxa de Retenção", value: "96.5%", status: "ativo", impact: "Excelente LTV de Consultório" },
+                    { label: "CAC (Aquisição)", value: "R$ 150", status: "ativo", impact: "Altamente Orgânico CFN" },
+                    { label: "LTV Projetado", value: "R$ 9.6k", status: "ativo", impact: "Valor Vitalício Médio" },
+                    { label: "Tempo de Resposta", value: "8m", status: "ativo", impact: "Alta Prontidão WhatsApp" }
+                ];
+                activeSocialContext = "Sinais de forte tração regional e alto engajamento em salvamentos de guias alimentares práticos.";
+                activeInsights = [
+                    { id: "INS-01", title: "Autoridade Ética CFN", desc: "Conteúdos educativos sem terrorismo nutricional e 100% alinhados com o CFN geraram aumento de 28% no agendamento de consultas diretas.", type: "oportunidade" },
+                    { id: "INS-02", title: "Parcerias Locais", desc: "Recomenda-se aumentar posts focados em consultoria alimentar para empresas regionais de Porto de Pedras para expandir autoridade corporativa.", type: "oportunidade" }
+                ];
+            } else if (activeProjectId === 'p_c2') {
+                activeDecisionalMetrics = [
+                    { label: "Taxa de Retenção", value: "92.4%", status: "ativo", impact: "Fidelidade Odonto Premium" },
+                    { label: "CAC (Aquisição)", value: "R$ 480", status: "atenção", impact: "Eficiência Meta Ads" },
+                    { label: "LTV Projetado", value: "R$ 45k", status: "ativo", impact: "Alta Reabilitação Oral" },
+                    { label: "Tempo de Resposta", value: "12m", status: "ativo", impact: "Agilidade Comercial" }
+                ];
+                activeSocialContext = "Tração qualificada em agendamento de implantes, facetas estéticas e clareamento dental.";
+                activeInsights = [
+                    { id: "INS-01", title: "Previsibilidade de Conversão", desc: "Vídeos mostrando a tecnologia digital 3D de escaneamento intraoral elevaram o fechamento de planos de tratamento estéticos em 22%.", type: "oportunidade" },
+                    { id: "INS-02", title: "Tempo de Resposta de Leads", desc: "Leads gerados aos finais de semana sofrem maior tempo de resposta, gerando leve fricção no funil inbound.", type: "atenção" }
+                ];
+            } else {
+                activeDecisionalMetrics = [
+                    { label: "Taxa de Retenção", value: "94.2%", status: "ativo", impact: "Matrículas Corporativas B2B" },
+                    { label: "CAC (Aquisição)", value: "R$ 650", status: "atenção", impact: "Competição de Leilões Executivos" },
+                    { label: "LTV Projetado", value: "R$ 85k", status: "ativo", impact: "Valor do Pipeline Executivo" },
+                    { label: "Tempo de Resposta", value: "15m", status: "ativo", impact: "SLA Operacional SLA" }
+                ];
+                activeSocialContext = "Forte autoridade acadêmica corporativa e captação de leads de alta gerência empresariais.";
+                activeInsights = [
+                    { id: "INS-01", title: "MBA Cohort de Vendas", desc: "Webinars focados em metodologias ágeis de gestão e tomadas de decisão escaláveis impulsionaram inscrições orgânicas em 35%.", type: "oportunidade" },
+                    { id: "INS-02", title: "Elevação do CAC no Meta Ads", desc: "Custo por Lead subiu ligeiramente no Meta devido à sazonalidade e concorrência direta no nicho de pós-graduação executiva.", type: "atenção" }
+                ];
             }
 
-            // Camada 01: Métricas Decisionais
-            OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: currentDecisional[0].value, trend: '+1.2%', trendUp: true, meta: currentDecisional[0].impact });
-            OS_UI.renderMetric('metric-cac', { label: 'Custo de Aquisição', value: currentDecisional[1].value, trend: '-15%', trendUp: true, meta: currentDecisional[1].impact });
-            OS_UI.renderMetric('metric-ltv', { label: 'LTV Projetado', value: currentDecisional[2].value, trend: 'Estável', meta: currentDecisional[2].impact });
-            OS_UI.renderMetric('metric-speed', { label: 'Tempo de Resposta', value: currentDecisional[3].value, trend: '-2m', trendUp: true, meta: currentDecisional[3].impact });
+            // Sincronizar variáveis globais para o PDF
+            currentDecisional = activeDecisionalMetrics;
+            currentBehavioral = { avgWatchTime: metrics.watchTime, saveRate: metrics.saveRate, depthOfInteraction: "Forte", recurrence: "65%" };
+            currentSocial = { totalReach: metrics.reach, impressions: metrics.impressions, context: activeSocialContext };
 
-            // Camada 02 & 03
-            document.getElementById('watch-time').innerText = currentBehavioral.avgWatchTime;
-            document.getElementById('save-rate').innerText = currentBehavioral.saveRate;
-            document.getElementById('social-context').innerText = currentSocial.context;
-            document.getElementById('reach').innerText = currentSocial.totalReach;
-            document.getElementById('impressions').innerText = currentSocial.impressions;
+            // Renderizar Decisão & Negócio
+            OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: activeDecisionalMetrics[0].value, trend: '+1.2%', trendUp: true, meta: activeDecisionalMetrics[0].impact });
+            OS_UI.renderMetric('metric-cac', { label: 'Custo de Aquisição', value: activeDecisionalMetrics[1].value, trend: '-15%', trendUp: true, meta: activeDecisionalMetrics[1].impact });
+            OS_UI.renderMetric('metric-ltv', { label: 'LTV Projetado', value: activeDecisionalMetrics[2].value, trend: 'Estável', meta: activeDecisionalMetrics[2].impact });
+            OS_UI.renderMetric('metric-speed', { label: 'Tempo de Resposta', value: activeDecisionalMetrics[3].value, trend: '-2m', trendUp: true, meta: activeDecisionalMetrics[3].impact });
 
-            // Extração de dados das plataformas com fallback seguro
-            const ga = snap?.googleAnalytics || { activeUsers: 36, newUsers: 30, avgEngagementTime: '7m 32s', sessions: 96 };
-            const ig = snap?.instagram || { reach: currentSocial.totalReach, impressions: currentSocial.impressions, saveRate: currentBehavioral.saveRate, watchTime: currentBehavioral.avgWatchTime };
-            const gsc = snap?.searchConsole || { clicks: '1.2k', impressions: '45k', ctr: '2.7%', position: '14.2' };
-            const meta = snap?.metaAds || { spent: 'R$ 3.000,00', leads: 184, cpl: 'R$ 16,30', roas: '3.4x' };
-            const wa = snap?.whatsapp || { inbound: 340, solved: 310, conversions: 22, rate: '6.4%' };
+            document.getElementById('watch-time').innerText = metrics.watchTime;
+            document.getElementById('save-rate').innerText = metrics.saveRate;
+            document.getElementById('social-context').innerText = activeSocialContext;
+            document.getElementById('reach').innerText = metrics.reach;
+            document.getElementById('impressions').innerText = metrics.impressions;
 
-            // Preencher Google Analytics Tab
-            if (document.getElementById('ga-active-users')) document.getElementById('ga-active-users').innerText = ga.activeUsers;
-            if (document.getElementById('ga-new-users')) document.getElementById('ga-new-users').innerText = ga.newUsers;
-            if (document.getElementById('ga-engagement')) document.getElementById('ga-engagement').innerText = ga.avgEngagementTime;
-            if (document.getElementById('ga-sessions')) document.getElementById('ga-sessions').innerText = ga.sessions;
-
-            // Preencher Instagram Tab
-            if (document.getElementById('ig-reach')) document.getElementById('ig-reach').innerText = ig.reach;
-            if (document.getElementById('ig-impressions')) document.getElementById('ig-impressions').innerText = ig.impressions;
-            if (document.getElementById('ig-save-rate')) document.getElementById('ig-save-rate').innerText = ig.saveRate;
-            if (document.getElementById('ig-watch-time')) document.getElementById('ig-watch-time').innerText = ig.watchTime;
-
-            // Preencher Search Console Tab
-            if (document.getElementById('gsc-clicks')) document.getElementById('gsc-clicks').innerText = gsc.clicks;
-            if (document.getElementById('gsc-impressions')) document.getElementById('gsc-impressions').innerText = gsc.impressions;
-            if (document.getElementById('gsc-ctr')) document.getElementById('gsc-ctr').innerText = gsc.ctr;
-            if (document.getElementById('gsc-position')) document.getElementById('gsc-position').innerText = gsc.position;
-
-            // Preencher Meta Ads Tab
-            if (document.getElementById('ads-spent')) document.getElementById('ads-spent').innerText = meta.spent;
-            if (document.getElementById('ads-leads')) document.getElementById('ads-leads').innerText = meta.leads;
-            if (document.getElementById('ads-cpl')) document.getElementById('ads-cpl').innerText = meta.cpl;
-            if (document.getElementById('ads-roas')) document.getElementById('ads-roas').innerText = meta.roas;
-
-            // Preencher WhatsApp Tab
-            if (document.getElementById('wa-inbound')) document.getElementById('wa-inbound').innerText = wa.inbound;
-            if (document.getElementById('wa-solved')) document.getElementById('wa-solved').innerText = wa.solved;
-            if (document.getElementById('wa-conversions')) document.getElementById('wa-conversions').innerText = wa.conversions;
-            if (document.getElementById('wa-rate')) document.getElementById('wa-rate').innerText = wa.rate;
-        };
-
-        const renderInsights = () => {
+            // Renderizar Feed de Insights
             const insightsBody = document.getElementById('insights-container');
             if (insightsBody) {
-                insightsBody.innerHTML = operationalInsights.map(insight => `
+                insightsBody.innerHTML = activeInsights.map(insight => `
                     <div class="insight-card ${insight.type}">
                         <h4>${insight.title.toUpperCase()}</h4>
                         <p>${insight.desc}</p>
                     </div>
                 `).join('');
             }
+
+            // Renderizar Aba Instagram
+            if (document.getElementById('ig-reach')) document.getElementById('ig-reach').innerText = metrics.reach;
+            if (document.getElementById('ig-impressions')) document.getElementById('ig-impressions').innerText = metrics.impressions;
+            if (document.getElementById('ig-save-rate')) document.getElementById('ig-save-rate').innerText = metrics.saveRate;
+            if (document.getElementById('ig-watch-time')) document.getElementById('ig-watch-time').innerText = metrics.watchTime;
+            if (document.getElementById('ig-followers')) document.getElementById('ig-followers').innerText = metrics.followers;
+            if (document.getElementById('ig-profile-views')) document.getElementById('ig-profile-views').innerText = metrics.profileViews;
+            if (document.getElementById('ig-engagement-rate')) document.getElementById('ig-engagement-rate').innerText = metrics.engagement;
+
+            // Renderizar os posts no grid de performance
+            const performanceGrid = document.getElementById('ig-performance-grid');
+            if (performanceGrid) {
+                const posts = defaultContentPerformance[activeProjectId] || defaultContentPerformance['p_c1'];
+                performanceGrid.innerHTML = posts.map(post => `
+                    <div style="background: rgba(255,255,255,0.01); border: 1px solid var(--os-border); border-radius: 8px; padding: 15px; transition: all 0.3s;" onmouseover="this.style.borderColor='rgba(142,158,104,0.4)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.borderColor='var(--os-border)'; this.style.transform='translateY(0)'">
+                        <span class="os-badge" style="background: rgba(142,158,104,0.1); color: var(--os-primary); margin-bottom: 10px; font-weight: 800; font-size: 0.65rem; text-transform: uppercase;">${post.badge}</span>
+                        <h5 style="margin: 0 0 10px 0; font-size: 0.85rem; color: #fff; font-weight: 700;">${post.title}</h5>
+                        <p style="font-size: 0.7rem; color: var(--os-text-muted); margin: 0 0 15px 0;">${post.subtitle}</p>
+                        <div style="display:flex; justify-content: space-between; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace; color: var(--os-primary);">
+                            <span>👁️ ${post.views}</span>
+                            <span>💾 ${post.saves}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
         };
 
         const generatePDFReport = () => {
+            const activeProjectId = localStorage.getItem('fluxai_current_project_id') || 'p_c1';
+            const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+            const activeProject = mockProjects.find(p => p.id === activeProjectId) || { company_name: "MARIA APARECIDA NUTRICIONISTA & CONSULTORA ALIMENTAR" };
+            
+            const monthVal = localStorage.getItem('fluxai_current_month') || "2026-05";
+            const monthNames = {
+                "2026-03": "MARÇO 2026",
+                "2026-04": "ABRIL 2026",
+                "2026-05": "MAIO 2026",
+                "2026-06": "JUNHO 2026"
+            };
+            const monthLabel = monthNames[monthVal] || monthVal;
+            
             const dateStr = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' });
             const reportWindow = window.open('', '_blank');
             reportWindow.document.write(`
@@ -828,7 +1352,7 @@
                 <html lang="pt-BR">
                 <head>
                     <meta charset="UTF-8">
-                    <title>Relatório Operacional Estratégico - FluxAI Labs</title>
+                    <title>Relatório Operacional Estratégico - ${activeProject.company_name}</title>
                     <style>
                         body {
                             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -975,8 +1499,8 @@
 
                     <div class="header">
                         <div>
-                            <h1>FluxAI Labs</h1>
-                            <p>Relatório de Performance Operacional e Aquisição Digital</p>
+                            <h1>${activeProject.company_name}</h1>
+                             <p>Relatório de Performance Operacional e Aquisição Digital — Mês de Referência: <b>${monthLabel}</b></p>
                         </div>
                         <div class="meta-info">
                             <strong>FluxAI OS™ Intelligence</strong><br>
@@ -1106,12 +1630,12 @@
 
                             <div class="section-title">Insights de Inteligência Operacional</div>
                             <div class="insight-block success">
-                                <h4>PADRÃO DE RETENÇÃO IDENTIFICADO (OPORTUNIDADE)</h4>
-                                <p>Conteúdos focados em 'Previsibilidade Operacional' aumentaram diagnósticos qualificados em 22%.</p>
+                                <h4>${currentDecisional[0].label === "Taxa de Retenção" && activeProjectId === "p_c1" ? "AUTORIDADE ÉTICA CFN" : "PADRÃO DE RETENÇÃO IDENTIFICADO (OPORTUNIDADE)"}</h4>
+                                <p>${currentDecisional[0].label === "Taxa de Retenção" && activeProjectId === "p_c1" ? "Conteúdos educativos sem terrorismo nutricional geraram aumento de 28% no agendamento de consultas diretas." : "Conteúdos focados em 'Previsibilidade Operacional' aumentaram diagnósticos qualificados em 22%."}</p>
                             </div>
                             <div class="insight-block">
-                                <h4>ALERTA DE DEGRADAÇÃO OPERACIONAL (ATENÇÃO)</h4>
-                                <p>Aumento de 15% no custo de aquisição (CAC) detectado no módulo de Automação.</p>
+                                <h4>${currentDecisional[0].label === "Taxa de Retenção" && activeProjectId === "p_c1" ? "RETENÇÃO OPERACIONAL REGIONAL" : "ALERTA DE DEGRADAÇÃO OPERACIONAL (ATENÇÃO)"}</h4>
+                                <p>${currentDecisional[0].label === "Taxa de Retenção" && activeProjectId === "p_c1" ? "Necessidade de estreitar relacionamento com mercados e clínicas locais em Porto de Pedras para ampliar indicações." : "Aumento de 15% no custo de aquisição (CAC) detectado no módulo de Automação."}</p>
                             </div>
                         </div>
                     </div>

@@ -243,6 +243,7 @@
                                         <th>Último Contato</th>
                                         <th>Próxima Ação Crítica</th>
                                         <th>Impacto Comercial</th>
+                                        <th style="text-align: right;">Ações Operacionais</th>
                                     </tr>
                                 </thead>
                                 <tbody id="crm-leads-body">
@@ -292,6 +293,7 @@
             const supabase = getSupabase();
             
             let leads = crmLeadsData;
+            let loadedFromDb = false;
 
             if (supabase) {
                 try {
@@ -301,6 +303,7 @@
                         leads = data.map(c => {
                             const healthVal = c.status === 'ATIVO' ? 95 : (c.status === 'PROPOSAL' ? 70 : 40);
                             return {
+                                project_id: c.project_id || (c.projects ? c.projects.id : 'p_c1'),
                                 company: c.company_name,
                                 name: c.client_name,
                                 value: c.contract_value || 0,
@@ -311,15 +314,38 @@
                                 impact: 'R$ ' + Number(c.contract_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
                             };
                         });
+                        loadedFromDb = true;
                     }
                 } catch (e) {
-                    console.warn("[CRM INTELLIGENCE] Erro no banco de dados. Tentando leads...", e);
-                    try {
-                        const { data } = await supabase.from('leads').select('*').order('updated_at', { ascending: false });
-                        if (data && data.length > 0) {
-                            leads = data;
-                        }
-                    } catch (e2) {}
+                    console.warn("[CRM INTELLIGENCE] Erro no banco de dados. Tentando local contracts...", e);
+                }
+            }
+
+            if (!loadedFromDb) {
+                // Tenta carregar do localStorage (suporte total aos 3 clientes offline)
+                const localContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+                if (localContracts && localContracts.length > 0) {
+                    leads = localContracts.map(c => {
+                        const healthVal = c.status === 'ATIVO' ? 95 : (c.status === 'PROPOSAL' ? 70 : 40);
+                        return {
+                            project_id: c.project_id || 'p_c1',
+                            company: c.company_name,
+                            name: c.client_name,
+                            value: c.contract_value || 0,
+                            healthScore: healthVal,
+                            status: c.status || 'ATIVO',
+                            lastFollowUp: new Date(c.created_at).toLocaleDateString('pt-BR'),
+                            nextAction: c.status === 'ATIVO' ? 'MONITORAR' : 'REVISAR',
+                            impact: 'R$ ' + Number(c.contract_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
+                        };
+                    });
+                } else {
+                    leads = crmLeadsData.map(l => ({
+                        ...l,
+                        project_id: l.id === 'L-1024' ? 'p_c1' : (l.id === 'L-1025' ? 'p_c2' : 'p_c3'),
+                        company: l.name,
+                        name: l.contact
+                    }));
                 }
             }
 
@@ -337,8 +363,10 @@
                 
                 const healthClass = healthVal > 80 ? '' : (healthVal > 50 ? 'warning' : 'danger');
                 const statusName = item.status || 'ATIVO';
-                const tempClass = statusName === 'PROPOSAL' || statusName === 'QUENTE' ? 'quente' : (statusName === 'MORNA' ? 'morna' : 'fria');
+                const tempClass = statusName === 'PROPOSAL' || statusName === 'QUENTE' || statusName === 'ATIVO' ? 'quente' : (statusName === 'MORNA' ? 'morna' : 'fria');
                 
+                const projId = item.project_id || (companyName.includes('Maria Aparecida') ? 'p_c1' : (companyName.includes('Alves') ? 'p_c2' : 'p_c3'));
+
                 return `
                     <tr>
                         <td>
@@ -353,6 +381,10 @@
                         <td style="font-size: 0.75rem; color: var(--os-text-muted);">${item.lastFollowUp || 'HOJE'}</td>
                         <td style="font-weight: 600; color: var(--os-primary); font-size: 0.75rem;">${item.nextAction || 'FOLLOW-UP'}</td>
                         <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color:#fff;">${leadValue.toString().includes('R$') ? leadValue : 'R$ ' + leadValue}</td>
+                        <td style="text-align: right; white-space: nowrap;">
+                            <a href="analytics.html?project=${projId}&input=true" class="os-action-btn" title="Lançar Métricas" style="color: var(--os-primary); margin-right: 15px; font-size: 1.1rem; transition: all 0.2s; display: inline-block;"><i class="fa-solid fa-instagram"></i></a>
+                            <a href="workspace.html?project=${projId}" class="os-action-btn" title="Acessar Workspace" style="color: #60a5fa; font-size: 1.1rem; transition: all 0.2s; display: inline-block;"><i class="fa-solid fa-briefcase"></i></a>
+                        </td>
                     </tr>
                 `;
             }).join('');

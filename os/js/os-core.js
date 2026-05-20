@@ -175,10 +175,22 @@ OS_UI.renderTopbar = async () => {
 
     const initials = user.full_name ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
     
+    // Mapear projeto ativo na topbar
+    const currentProjectId = localStorage.getItem('fluxai_current_project_id');
+    let activeClientHtml = "";
+    let activeProj = null;
+    if (currentProjectId) {
+        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+        activeProj = mockProjects.find(p => p.id === currentProjectId);
+        if (activeProj) {
+            activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: ${activeProj.company_name.toUpperCase()}</span>`;
+        }
+    }
+
     const html = `
         <div class="os-topbar-left">
             <div class="os-status-indicator">
-                <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}
+                <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}${activeClientHtml}
             </div>
         </div>
         <div class="os-topbar-right">
@@ -197,4 +209,34 @@ OS_UI.renderTopbar = async () => {
             OS_AUTH.logout();
         }
     };
+
+    // Sincronizar dinamicamente o título principal de qualquer tela com o nome do cliente ativo
+    if (activeProj) {
+        setTimeout(() => {
+            const h1 = document.querySelector('.os-page-title h1, .os-viewport h1, .os-page-header h1, #portal-title, .portal-header h1');
+            if (h1) {
+                // Prevenir duplicações
+                const existing = h1.querySelector('.os-client-badge-inline');
+                if (existing) existing.remove();
+
+                const badge = document.createElement('span');
+                badge.className = 'os-client-badge-inline';
+                badge.style.display = 'inline-block';
+                badge.style.marginLeft = '12px';
+                badge.style.padding = '4px 12px';
+                badge.style.borderRadius = '20px';
+                badge.style.fontSize = '0.7rem';
+                badge.style.letterSpacing = '1px';
+                badge.style.background = 'rgba(142, 158, 104, 0.12)';
+                badge.style.color = 'var(--os-primary, #8e9e68)';
+                badge.style.border = '1px solid rgba(142, 158, 104, 0.3)';
+                badge.style.verticalAlign = 'middle';
+                badge.style.fontWeight = '800';
+                badge.style.textTransform = 'uppercase';
+                badge.innerHTML = `<i class="fa-solid fa-user-tie"></i> CLIENTE: ${activeProj.company_name.toUpperCase()}`;
+                h1.appendChild(badge);
+            }
+        }, 120);
+    }
 };
+

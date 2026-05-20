@@ -130,7 +130,7 @@
                 const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
                 
                 let eventsHtml = dayContents.map(c => `
-                    <div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')">
+                    <div class="calendar-event" onclick="window.open('approval.html?id=${c.id}', '_blank')">
                         <span class="event-status" style="background:${getStatusColor(c.status)}"></span>
                         ${c.title}
                     </div>

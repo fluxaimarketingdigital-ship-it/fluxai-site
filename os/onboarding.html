@@ -400,25 +400,35 @@
                                     <div class="grid-2">
                                         <div class="form-group" style="margin-bottom:12px;">
                                             <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Tipo de Serviço Extra</label>
-                                            <select name="finance_extra_services_type" class="form-control">
+                                            <select id="finance_extra_services_type" name="finance_extra_services_type" class="form-control">
                                                 <option value="">Nenhum Serviço Extra</option>
-                                                <option value="Gravação / Captação Audiovisual">Gravação / Captação Audiovisual</option>
-                                                <option value="Criação de Site Institucional">Criação de Site Institucional</option>
-                                                <option value="Criação de Landing Page (LP)">Criação de Landing Page (LP)</option>
-                                                <option value="Criação de Apresentação Comercial">Criação de Apresentação Comercial</option>
-                                                <option value="Consultoria Estratégica / Diagnóstico">Consultoria Estratégica / Diagnóstico</option>
-                                                <option value="Identidade Visual / Branding">Identidade Visual / Branding</option>
-                                                <option value="Outro Serviço Avulso">Outro Serviço Avulso</option>
+                                                <optgroup label="FLUXAI (Agência & Marketing)">
+                                                    <option value="[FluxAI] Gravação / Captação Audiovisual">Gravação / Captação Audiovisual (Rec. R$ 400)</option>
+                                                    <option value="[FluxAI] Produção de Reels Extra (Unidade)">Produção de Reels Extra - Unidade (Rec. R$ 100)</option>
+                                                    <option value="[FluxAI] Produção de Carrosséis Extra (Unidade)">Produção de Carrosséis Extra - Unidade (Rec. R$ 80)</option>
+                                                    <option value="[FluxAI] Apresentação Comercial / Pitch Deck">Apresentação Comercial / Pitch Deck (Rec. R$ 500)</option>
+                                                    <option value="[FluxAI] Branding & Identidade Visual Express">Branding & Identidade Visual Express (Rec. R$ 1.200)</option>
+                                                    <option value="[FluxAI] Gestão de Anúncios Meta Ads">Gestão de Anúncios Meta Ads (Rec. R$ 600)</option>
+                                                </optgroup>
+                                                <optgroup label="FLUXAI LABS (Tecnologia & Sistemas)">
+                                                    <option value="[FluxAI Labs] Automação de Processos (Make / n8n)">Automação de Processos - Make/n8n (Rec. R$ 800)</option>
+                                                    <option value="[FluxAI Labs] Landing Page (LP) de Alta Conversão">Landing Page (LP) de Alta Conversão (Rec. R$ 1.500)</option>
+                                                    <option value="[FluxAI Labs] Site Institucional Completo">Site Institucional Completo (Rec. R$ 2.500)</option>
+                                                    <option value="[FluxAI Labs] Arquitetura de CRM & Pipeline de Vendas">Arquitetura de CRM & Pipeline (Rec. R$ 900)</option>
+                                                    <option value="[FluxAI Labs] Chatbot de IA & Agente de Triagem">Chatbot de IA & Agente de Triagem (Rec. R$ 1.200)</option>
+                                                    <option value="[FluxAI Labs] Dashboard de Analytics Personalizado">Dashboard de Analytics Personalizado (Rec. R$ 1.000)</option>
+                                                </optgroup>
+                                                <option value="Outro Serviço Avulso">Outro Serviço Avulso (Customizado)</option>
                                             </select>
                                         </div>
                                         <div class="form-group" style="margin-bottom:12px;">
                                             <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Valor Total do Extra (R$)</label>
-                                            <input type="number" name="finance_extra_services_value" class="form-control" placeholder="0.00" />
+                                            <input type="number" id="finance_extra_services_value" name="finance_extra_services_value" class="form-control" placeholder="0.00" />
                                         </div>
                                     </div>
                                     <div class="form-group">
                                         <label style="font-size:0.55rem; color:var(--os-text-muted); display:block; margin-bottom:5px;">Escopo do Serviço Extra (O que está incluso?)</label>
-                                        <textarea name="finance_extra_services_desc" class="form-control" style="height:50px;" placeholder="Ex: 4 horas de gravação presencial, edição de 10 vídeos..."></textarea>
+                                        <textarea id="finance_extra_services_desc" name="finance_extra_services_desc" class="form-control" style="height:50px;" placeholder="Ex: 4 horas de gravação presencial, edição de 10 vídeos..."></textarea>
                                     </div>
                                 </div>
 

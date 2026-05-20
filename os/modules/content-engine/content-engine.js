@@ -191,7 +191,7 @@ export async function initEngine() {
 
         // Listeners
         if (filter) {
-            filter.onchange = (e) => {
+            filter.onchange = async (e) => {
                 currentProject = e.target.value;
                 localStorage.setItem('fluxai_current_project_id', currentProject);
                 
@@ -199,6 +199,7 @@ export async function initEngine() {
                 const btnCopy = document.getElementById('btn-copy-portal');
                 if (btnCopy) btnCopy.style.display = currentProject ? 'flex' : 'none';
                 
+                await OS_UI.renderTopbar();
                 loadContent();
             };
         }
@@ -252,8 +253,23 @@ async function loadProjects() {
             sLog(`${window.allProjects.length} Clientes Sincronizados.`);
         }
     } catch (e) {
-        sLog('Falha Crítica na Carga de Clientes: ' + e.message);
+        sLog('Falha Crítica na Carga de Clientes: ' + e.message + '. Carregando Mocks do LocalStorage...');
         console.error(e);
+        
+        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+        window.allProjects = mockProjects;
+
+        const select = document.getElementById('project-filter');
+        if (select) {
+            select.innerHTML = '<option value="">Todos os Projetos</option>';
+            window.allProjects.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.innerText = p.company_name || p.name;
+                select.appendChild(opt);
+            });
+            sLog(`${window.allProjects.length} Clientes Sincronizados (Mocks).`);
+        }
     }
 }
 
@@ -334,10 +350,95 @@ async function loadContent() {
         
         // NOVO: Verificar Alerta de Ciclo
         checkLogisticsCycle();
-        checkPublishingAlerts(contents);
+        checkPublishingAlerts(safeContents);
         
     } catch (e) {
-        sLog('Erro Conteúdo: ' + e.message);
+        sLog('Erro Conteúdo: ' + e.message + '. Iniciando Fallback LocalStorage Mocks...');
+        
+        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+        let projectAssets = mockAssets;
+        if (currentProject) {
+            projectAssets = mockAssets.filter(item => item && item.project_id === currentProject);
+        }
+        
+        // Se estiver vazio e for Maria Aparecida, geramos os mocks padrão para que a esteira não fique vazia
+        if (projectAssets.length === 0 && currentProject === 'p_c1') {
+            projectAssets = [
+                {
+                    id: "m_a1",
+                    project_id: "p_c1",
+                    title: "Direção Audiovisual (Reels): Organização Alimentar Real",
+                    status: "APROVAÇÃO PLANEJAMENTO",
+                    caption: "🎯 OBJETIVO: Fortalecer autoridade regional e combater o terrorismo nutricional.\n\n🎬 HOOK: Você não precisa comer comida sem graça para ter saúde.\n\n💬 FALAS: No consultório, o que eu mais vejo são pessoas cansadas de radicalismo...\n\n✨ CTA: Comente ROTINA para acessar meu guia prático de alimentos regionais.",
+                    scheduled_at: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-05T12:00:00.000Z`,
+                    platform: "REELS",
+                    priority: "MÉDIA",
+                    metadata: { responsible: "Audiovisual", version: "V1", approval_deadline: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-04T18:00:00.000Z` }
+                },
+                {
+                    id: "m_a2",
+                    project_id: "p_c1",
+                    title: "Estrutura Narrativa (Carrossel): Substituições Inteligentes",
+                    status: "APROVAÇÃO PLANEJAMENTO",
+                    caption: "🎯 OBJETIVO: Oferecer educação alimentar prática com alimentos acessíveis.\n\nSlide 1: Substituições saudáveis de verdade e baratas.\n\nSlide 2: Em vez de ingredientes caros importados, use raízes locais e peixes frescos.\n\n✨ CTA: Compartilhe este post com quem precisa de mais praticidade na cozinha.",
+                    scheduled_at: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-12T15:00:00.000Z`,
+                    platform: "CARROSSEL",
+                    priority: "MÉDIA",
+                    metadata: { responsible: "Design", version: "V1", approval_deadline: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-10T18:00:00.000Z` }
+                },
+                {
+                    id: "m_a3",
+                    project_id: "p_c1",
+                    title: "Direção Audiovisual (Reels): Bastidores da Nutrição Humana",
+                    status: "PRODUÇÃO",
+                    caption: "🎯 OBJETIVO: Humanizar a marca e gerar conexão com pacientes locais.\n\n🎬 HOOK: O que acontece nos bastidores de um consultório de nutrição real?\n\n💬 FALAS: Meu trabalho vai muito além de prescrever dietas. É escuta ativa...\n\n✨ CTA: Agende sua consulta pelo WhatsApp no link da Bio.",
+                    scheduled_at: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-19T18:00:00.000Z`,
+                    platform: "REELS",
+                    priority: "MÉDIA",
+                    metadata: { responsible: "Audiovisual", version: "V1", approval_deadline: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-17T18:00:00.000Z` }
+                },
+                {
+                    id: "m_a4",
+                    project_id: "p_c1",
+                    title: "Estrutura Narrativa (Carrossel): Ética CFN na Nutrição",
+                    status: "PRONTO",
+                    caption: "🎯 OBJETIVO: Construir autoridade ética premium, explicando porque não fazemos antes e depois.\n\nSlide 1: Por que sua saúde vale mais que uma foto de 'antes e depois'.\n\nSlide 2: De acordo com o Conselho Federal de Nutrição, a imagem corporal é privada e de responsabilidade ética...\n\n✨ CTA: Agende seu acompanhamento ético pelo WhatsApp.",
+                    scheduled_at: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-26T09:00:00.000Z`,
+                    platform: "CARROSSEL",
+                    priority: "ALTA",
+                    metadata: { responsible: "Design", version: "V1", approval_deadline: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-24T18:00:00.000Z` }
+                }
+            ];
+            const allMocks = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+            const filteredOthers = allMocks.filter(c => c.project_id !== currentProject);
+            localStorage.setItem('fluxai_mock_assets', JSON.stringify([...filteredOthers, ...projectAssets]));
+        }
+        
+        renderMetrics(projectAssets);
+        renderContentTable(projectAssets);
+        
+        // Renderizar Calendários
+        renderCalendar('calendar-strategic-body', projectAssets, 'STRATEGIC');
+        renderCalendar('calendar-operational-body', projectAssets, 'OPERATIONAL');
+        
+        // Tentar verificar alerta de ciclo localmente
+        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+        const pData = mockProjects.find(p => p.id === currentProject);
+        const banner = document.getElementById('cycle-alert-banner');
+        const dateEl = document.getElementById('cycle-alert-date');
+        
+        if (pData?.metadata?.onboarding?.next_cycle_day && banner && dateEl) {
+            const now = new Date();
+            const nextMonthIndex = now.getMonth() + 1;
+            const targetMonth = nextMonthIndex > 11 ? 0 : nextMonthIndex;
+            const monthNames = ["JAN", "FEV", "MAR", "ABR", "MAI", "JUN", "JUL", "AGO", "SET", "OUT", "NOV", "DEZ"];
+            dateEl.innerText = `${String(pData.metadata.onboarding.next_cycle_day).padStart(2, '0')}/${monthNames[targetMonth]}`;
+            banner.style.display = 'block';
+        } else if (banner) {
+            banner.style.display = 'none';
+        }
+
+        checkPublishingAlerts(projectAssets);
     }
 }
 
@@ -562,7 +663,7 @@ function getStatusBg(status) {
 }
 
 window.openApproval = (id) => {
-    window.open(`/os/approval.html?id=${id}`, '_blank');
+    window.open(`approval.html?id=${id}`, '_blank');
 };
 
 let editingAssetId = null;

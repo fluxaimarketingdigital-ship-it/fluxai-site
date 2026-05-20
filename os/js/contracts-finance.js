@@ -11,6 +11,75 @@ async function initFinance() {
     await loadFinanceData();
 
     document.getElementById('btn-sync-finance').onclick = loadFinanceData;
+
+    // Ativar auto-preenchimento inteligente de escopo e preço para Serviços Extras
+    const selectExtra = document.getElementById('edit-extra-type');
+    if (selectExtra) {
+        selectExtra.addEventListener('change', () => {
+            const val = selectExtra.value;
+            const extraValField = document.getElementById('edit-extra-value');
+            const extraDescField = document.getElementById('edit-extra-desc');
+            
+            const SERVICES_CATALOG = {
+                "[FluxAI] Gravação / Captação Audiovisual": {
+                    value: 400,
+                    desc: "Captação presencial (até 4h de gravação) com equipamento profissional de áudio e vídeo, direção de cena para gravação de Reels e captação de materiais institucionais brutas."
+                },
+                "[FluxAI] Produção de Reels Extra (Unidade)": {
+                    value: 100,
+                    desc: "Roteirização técnica de 1 Reels extra (incluindo gancho forte, copy fluida e CTA clara), edição dinâmica premium com cortes precisos, legendas animadas sincronizadas e inserção de efeitos sonoros."
+                },
+                "[FluxAI] Produção de Carrosséis Extra (Unidade)": {
+                    value: 80,
+                    desc: "Pesquisa de pauta, roteiro em slides (até 8 slides) focado em storytelling, design visual premium corporativo sob a identidade da marca, criação de legenda de alta retenção e capa atraente."
+                },
+                "[FluxAI] Apresentação Comercial / Pitch Deck": {
+                    value: 500,
+                    desc: "Estruturação de narrativa de vendas (Pitch), design de apresentação corporativa premium (até 12 slides) no Canva ou PDF, diagramação limpa, focada em conversão para empresas e parceiros locais."
+                },
+                "[FluxAI] Branding & Identidade Visual Express": {
+                    value: 1200,
+                    desc: "Criação de logotipo principal, submark, paleta de cores institucional estratégica, tipografias recomendadas, manual básico de aplicação da marca e templates editáveis para posts e stories."
+                },
+                "[FluxAI] Gestão de Anúncios Meta Ads": {
+                    value: 600,
+                    desc: "Criação de conta de anúncios/gerenciador de negócios, configuração de pixel de rastreamento, pesquisa de público-alvo qualificado regional, criação de 2 campanhas de anúncios (Tráfego/Mensagens) e relatório quinzenal."
+                },
+                "[FluxAI Labs] Automação de Processos (Make / n8n)": {
+                    value: 800,
+                    desc: "Desenvolvimento de fluxos automatizados integrando WhatsApp, Planilhas, CRM e Email. Inclui tratamento de erros, webhook instantâneo, otimização de execução de tarefas e até 3 integrações ativas."
+                },
+                "[FluxAI Labs] Landing Page (LP) de Alta Conversão": {
+                    value: 1500,
+                    desc: "Criação de Landing Page com design premium responsivo, copy com técnicas de copywriting/venda, integração com WhatsApp ou formulários, pixel do Meta/Google instalado, SEO básico e hospedagem otimizada."
+                },
+                "[FluxAI Labs] Site Institucional Completo": {
+                    value: 2500,
+                    desc: "Desenvolvimento de site institucional estruturado em seções (Home, Sobre, Serviços, Depoimentos, Contato), design exclusivo, blog interno básico, otimização de velocidade, SEO On-Page avançado e integradores de contato."
+                },
+                "[FluxAI Labs] Arquitetura de CRM & Pipeline de Vendas": {
+                    value: 900,
+                    desc: "Estruturação completa de pipeline de funil de vendas (Prospecção, Qualificação, Apresentação, Fechamento) no CRM, automação de etapas para envio de propostas, tags e treinamento de equipe operacional."
+                },
+                "[FluxAI Labs] Chatbot de IA & Agente de Triagem": {
+                    value: 1200,
+                    desc: "Treinamento de agente inteligente de Inteligência Artificial para qualificar e realizar a triagem inicial de leads no WhatsApp ou Instagram Direct, integrado a banco de respostas do profissional."
+                },
+                "[FluxAI Labs] Dashboard de Analytics Personalizado": {
+                    value: 1000,
+                    desc: "Modelagem de dados operacionais e financeiros, integração com fontes de dados (Meta Ads/Google Sheets), gráficos iterativos corporativos no Looker Studio ou FluxAI OS Engine."
+                }
+            };
+            
+            if (val && SERVICES_CATALOG[val]) {
+                extraValField.value = SERVICES_CATALOG[val].value;
+                extraDescField.value = SERVICES_CATALOG[val].desc;
+            } else {
+                extraValField.value = '';
+                extraDescField.value = '';
+            }
+        });
+    }
 }
 
 async function loadFinanceData() {
@@ -43,20 +112,35 @@ async function loadFinanceData() {
     
     // Inicializar mockProjects no localStorage para persistência cadastral
     let mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects'));
-    if (!mockProjects) {
+    if (!mockProjects || !mockProjects[0] || !mockProjects[0].metadata || !mockProjects[0].metadata.dna) {
         mockProjects = [
             { 
                 id: "p_c1", 
-                company_name: "Nutrição & Consultoria Alimentar",
-                segment: "Saúde & Nutrição",
+                company_name: "Maria Aparecida Nutricionista & Consultora Alimentar",
+                segment: "Nutrição Clínica + Consultoria Alimentar",
                 digital_infrastructure: {
                     operational_links: {
-                        instagram: "https://instagram.com/maria.nutri",
-                        website: "https://marianutricao.com.br",
-                        canva: "https://canva.com/design/maria-premium",
-                        drive: "https://drive.google.com/drive/maria-folder",
-                        whatsapp: "5511999999999"
+                        instagram: "https://www.instagram.com/mariaaparecida.nutri",
+                        website: "",
+                        canva: "https://drive.google.com/drive/folders/1K__Y4QTCfJ_4cnr54iocJyhFEDsPa5iZ?usp=drive_link",
+                        drive: "https://drive.google.com/drive/folders/14stjSxP6piUM2w0gFmRS-v9H2zjFIE0P?usp=drive_link",
+                        whatsapp: "5582993051282"
                     }
+                },
+                metadata: {
+                    dna: {
+                        desired_patterns: ["Alimentação Real", "Rotina Prática", "Saúde Sustentável", "Orientação Humanizada"],
+                        anti_patterns: ["Terrorismo Nutricional", "Estética Fitness Genérica", "Promessas Milagrosas", "Sensacionalismo", "Antes e Depois Proibido", "Publicidade Antiética"],
+                        forbidden_themes: "Promessas de emagrecimento rápido, antes e depois, propaganda irregular, terrorismo nutricional, associação indevida com marcas, publicidade antiética, discurso alarmista, recomendações irresponsáveis"
+                    },
+                    tone_of_voice: "Humano, técnico, confiável, acolhedor, sofisticado, claro, sem terrorismo alimentar, sem radicalismo",
+                    strategic_roadmap: {
+                        semana_1: "organização estratégica, alinhamento da marca, análise do Instagram, definição de pilares editoriais, definição da linguagem visual, alinhamento ético CFN",
+                        semana_2: "primeiros conteúdos, construção de autoridade, otimização de bio, organização editorial, início da percepção premium",
+                        semana_3: "fortalecimento regional, conteúdo educativo estratégico, conteúdo humanizado, aproximação com empresas locais, estruturação de narrativa profissional",
+                        semana_4: "análise de métricas, ajustes de posicionamento, melhoria de retenção, consolidação da presença digital, evolução da autoridade"
+                    },
+                    cfn_rules: "Respeito ético profissional, comunicação responsável, ausência de promessas milagrosas, ausência de sensacionalismo, ausência de publicidade irregular, ausência de associação inadequada com marcas/suplementos, comunicação humanizada e técnica, valorização da autonomia alimentar, posicionamento profissional premium."
                 }
             },
             { 
@@ -71,6 +155,21 @@ async function loadFinanceData() {
                         drive: "https://drive.google.com/drive/alves-folder",
                         whatsapp: "5511888888888"
                     }
+                },
+                metadata: {
+                    dna: {
+                        desired_patterns: ["Estética Natural", "Alta Performance Oral", "Tecnologia 3D", "Confiança Premium"],
+                        anti_patterns: ["Amadorismo", "Preços Populares", "Promessas Indevidas de Indolor", "Venda Agressiva"],
+                        forbidden_themes: "Propaganda de tratamento indolor sem base, promessas de resultados milagrosos, fotos antes e depois antiéticas, descontos agressivos na saúde"
+                    },
+                    tone_of_voice: "Altamente profissional, técnico, elite, acolhedor, limpo, científico porém acessível",
+                    strategic_roadmap: {
+                        semana_1: "Estrutura clínica, pilares de tecnologia, alinhamento visual",
+                        semana_2: "Bastidores de atendimento, depoimentos e casos éticos",
+                        semana_3: "Tecnologia 3D na prática, autoridade regional",
+                        semana_4: "Otimização de conversão de implantes e lentes, métricas"
+                    },
+                    cfn_rules: "Respeito às diretrizes do CFO (Conselho Federal de Odontologia), sem sensacionalismo ou mercantilização da saúde dental, valorização de diagnósticos reais."
                 }
             },
             { 
@@ -85,6 +184,21 @@ async function loadFinanceData() {
                         drive: "https://drive.google.com/drive/apex-folder",
                         whatsapp: "5511777777777"
                     }
+                },
+                metadata: {
+                    dna: {
+                        desired_patterns: ["Educação Executiva", "Networking Executivo", "Escala de Times", "Alta LTV"],
+                        anti_patterns: ["Linguagem de Cursos Baratos", "Fórmulas Mágicas de Enriquecimento", "Amadorismo", "Gatilhos Mentais Agressivos"],
+                        forbidden_themes: "Esquemas de enriquecimento rápido, hacks genéricos de carreira, promessas de faturamento sem embasamento, gírias excessivas"
+                    },
+                    tone_of_voice: "Executivo, afiado, autoritário, educativo, altamente profissional, analítico, confiável",
+                    strategic_roadmap: {
+                        semana_1: "Posicionamento executivo, pilares de gestão e liderança",
+                        semana_2: "Networking e depoimentos corporativos de sucesso",
+                        semana_3: "Estudos de caso corporativos de alta escala",
+                        semana_4: "Ofertas de turmas, captação e análise de LTV"
+                    },
+                    cfn_rules: "Integridade educacional e conformidade com as diretrizes do MEC para ensino de alta performance corporativa."
                 }
             }
         ];
@@ -93,9 +207,9 @@ async function loadFinanceData() {
 
     // Inicializar mockContracts no localStorage para persistência interativa
     let mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts'));
-    if (!mockContracts) {
+    if (!mockContracts || (mockContracts[0] && mockContracts[0].client_name === "Maria Aparecida")) {
         mockContracts = [
-            { id: "c1", project_id: "p_c1", client_name: "Maria Aparecida", company_name: "Nutrição & Consultoria Alimentar", deliverables: "2 carrosséis + 2 reels/mês", contract_value: 800, status: "ATIVO", created_at: "2026-05-10T00:00:00Z", due_day: 4 },
+            { id: "c1", project_id: "p_c1", client_name: "Maria Aparecida da Silva", company_name: "Maria Aparecida Nutricionista & Consultora Alimentar", deliverables: "2 carrosséis + 2 reels/mês", contract_value: 800, status: "ATIVO", created_at: "2026-05-10T00:00:00Z", due_day: 5 },
             { id: "c2", project_id: "p_c2", client_name: "Dr. Roberto Alves", company_name: "Alves Odonto Premium", deliverables: "Gestão de Tráfego + CRM", contract_value: 5000, status: "ATIVO", created_at: "2025-03-15T00:00:00Z", due_day: 15 },
             { id: "c3", project_id: "p_c3", client_name: "Instituto Apex", company_name: "Apex Educacional", deliverables: "Governança Full-Stack", contract_value: 8500, status: "ATIVO", created_at: "2024-11-20T00:00:00Z", due_day: 10 }
         ];
@@ -276,6 +390,12 @@ function renderContracts(contracts) {
                 <td>${renewalDate}</td>
                 <td>
                     <div class="action-btns" style="justify-content: flex-end;">
+                        <a href="/os/analytics.html?project=${c.project_id}&input=true" class="btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Lançar Métricas Instagram">
+                            <i class="fa-brands fa-instagram"></i>
+                        </a>
+                        <a href="/os/workspace.html?project=${c.project_id}" class="btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Ver Workspace Cliente">
+                            <i class="fa-solid fa-briefcase"></i>
+                        </a>
                         <button class="btn-mini" title="Abrir Contrato" onclick="window.generateContractDoc('${c.id}')">
                             <i class="fa-solid fa-file-pdf"></i>
                         </button>

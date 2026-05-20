@@ -84,33 +84,242 @@
         async function initStrategic() {
             const statusEl = document.getElementById('client-name');
             const params = new URLSearchParams(window.location.search);
-            const projectId = params.get('project');
+            const projectId = params.get('project') || params.get('project_id') || localStorage.getItem('fluxai_current_project_id') || 'p_c1';
 
             if (!projectId) { statusEl.innerText = "Link Inválido"; return; }
-            
-            // Verificação de segurança da biblioteca
+
+            function ensureMockAssetsExist() {
+                const now = new Date();
+                const currentYear = now.getFullYear();
+                const currentMonth = now.getMonth();
+                const monthStr = String(currentMonth + 1).padStart(2, '0');
+
+                const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+                
+                // Mocks para Maria Aparecida (p_c1)
+                if (!mockAssets.some(a => a.project_id === 'p_c1')) {
+                    mockAssets.push(
+                        {
+                            id: "m_a1",
+                            project_id: "p_c1",
+                            title: "Direção Audiovisual (Reels): Organização Alimentar Real",
+                            status: "PUBLICADO",
+                            caption: "🎯 OBJETIVO: Fortalecer autoridade regional e combater o terrorismo nutricional.\n\n🎬 HOOK: Você não precisa comer comida sem graça para ter saúde.\n\n💬 FALAS: No consultório, o que eu mais vejo são pessoas cansadas de radicalismo...\n\n✨ CTA: Comente ROTINA para acessar meu guia prático de alimentos regionais.",
+                            scheduled_at: `${currentYear}-${monthStr}-05T12:00:00.000Z`,
+                            platform: "REELS",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Audiovisual", version: "V1" }
+                        },
+                        {
+                            id: "m_a2",
+                            project_id: "p_c1",
+                            title: "Estrutura Narrativa (Carrossel): Substituições Inteligentes",
+                            status: "PRONTO",
+                            caption: "🎯 OBJETIVO: Oferecer educação alimentar prática com alimentos acessíveis.\n\nSlide 1: Substituições saudáveis de verdade e baratas.\n\nSlide 2: Em vez de ingredientes caros importados, use raízes locais e peixes frescos.\n\n✨ CTA: Compartilhe este post com quem precisa de mais praticidade na cozinha.",
+                            scheduled_at: `${currentYear}-${monthStr}-12T15:00:00.000Z`,
+                            platform: "CARROSSEL",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Design", version: "V1" }
+                        },
+                        {
+                            id: "m_a3",
+                            project_id: "p_c1",
+                            title: "Direção Audiovisual (Reels): Bastidores da Nutrição Humana",
+                            status: "PLANEJAMENTO",
+                            caption: "🎯 OBJETIVO: Humanizar a marca e gerar conexão com pacientes locais.\n\n🎬 HOOK: O que acontece nos bastidores de um consultório de nutrição real?\n\n💬 FALAS: Meu trabalho vai muito além de prescrever dietas. É escuta ativa...\n\n✨ CTA: Agende sua consulta pelo WhatsApp no link da Bio.",
+                            scheduled_at: `${currentYear}-${monthStr}-19T18:00:00.000Z`,
+                            platform: "REELS",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Audiovisual", version: "V1" }
+                        },
+                        {
+                            id: "m_a4",
+                            project_id: "p_c1",
+                            title: "Estrutura Narrativa (Carrossel): Ética CFN na Nutrição",
+                            status: "PRONTO",
+                            caption: "🎯 OBJETIVO: Construir autoridade ética premium, explicando porque não fazemos antes e depois.\n\nSlide 1: Por que sua saúde vale mais que uma foto de 'antes e depois'.\n\nSlide 2: De acordo com o Conselho Federal de Nutrição, a imagem corporal é privada e de responsabilidade ética...\n\n✨ CTA: Agende seu acompanhamento ético pelo WhatsApp.",
+                            scheduled_at: `${currentYear}-${monthStr}-26T09:00:00.000Z`,
+                            platform: "CARROSSEL",
+                            priority: "ALTA",
+                            metadata: { responsible: "Design", version: "V1" }
+                        }
+                    );
+                }
+
+                // Mocks para Alves Odonto Premium (p_c2)
+                if (!mockAssets.some(a => a.project_id === 'p_c2')) {
+                    mockAssets.push(
+                        {
+                            id: "m_b1",
+                            project_id: "p_c2",
+                            title: "Direção Audiovisual (Reels): Estética Natural do Sorriso",
+                            status: "PUBLICADO",
+                            caption: "🎯 OBJETIVO: Posicionar a clínica como referência de alto padrão e estética odontológica natural.\n\n🎬 HOOK: Sorriso bonito de verdade não parece artificial.\n\n💬 FALAS: As lentes de contato modernas focam na preservação da estrutura dental...\n\n✨ CTA: Clique no link da bio para agendar sua avaliação estética.",
+                            scheduled_at: `${currentYear}-${monthStr}-04T10:00:00.000Z`,
+                            platform: "REELS",
+                            priority: "ALTA",
+                            metadata: { responsible: "Audiovisual", version: "V1" }
+                        },
+                        {
+                            id: "m_b2",
+                            project_id: "p_c2",
+                            title: "Estrutura Narrativa (Carrossel): Prevenção do Bruxismo Corporativo",
+                            status: "PRONTO",
+                            caption: "🎯 OBJETIVO: Conscientizar o público corporativo sobre dores causadas pelo bruxismo e apresentar soluções.\n\nSlide 1: O estresse do dia a dia está destruindo o seu sorriso?\n\nSlide 2: Dores de cabeça ao acordar ou dentes desgastados são sinais claros...\n\n✨ CTA: Compartilhe com quem vive estressado no escritório.",
+                            scheduled_at: `${currentYear}-${monthStr}-10T14:00:00.000Z`,
+                            platform: "CARROSSEL",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Design", version: "V1" }
+                        },
+                        {
+                            id: "m_b3",
+                            project_id: "p_c2",
+                            title: "Direção Audiovisual (Reels): Tecnologia de Escaneamento 3D",
+                            status: "PLANEJAMENTO",
+                            caption: "🎯 OBJETIVO: Mostrar a modernidade dos procedimentos sem causar desconforto.\n\n🎬 HOOK: Diga adeus aos moldes desconfortáveis de massinha.\n\n💬 FALAS: Com o escaneamento intraoral, em menos de 5 minutos temos uma cópia digital perfeita...\n\n✨ CTA: Conheça a odontologia digital da Alves Odonto.",
+                            scheduled_at: `${currentYear}-${monthStr}-18T16:00:00.000Z`,
+                            platform: "REELS",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Audiovisual", version: "V1" }
+                        },
+                        {
+                            id: "m_b4",
+                            project_id: "p_c2",
+                            title: "Estrutura Narrativa (Carrossel): O Valor de um Check-up Preventivo",
+                            status: "PLANEJAMENTO",
+                            caption: "🎯 OBJETIVO: Educar sobre a importância de evitar tratamentos de emergência caros através da prevenção.\n\nSlide 1: O segredo para economizar na cadeira do dentista.\n\nSlide 2: Check-ups preventivos ajudam a diagnosticar cáries e problemas em estágio inicial...\n\n✨ CTA: Agende sua limpeza preventiva anual pelo WhatsApp.",
+                            scheduled_at: `${currentYear}-${monthStr}-24T09:00:00.000Z`,
+                            platform: "CARROSSEL",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Design", version: "V1" }
+                        }
+                    );
+                }
+
+                // Mocks para Apex Educacional (p_c3)
+                if (!mockAssets.some(a => a.project_id === 'p_c3')) {
+                    mockAssets.push(
+                        {
+                            id: "m_c1",
+                            project_id: "p_c3",
+                            title: "Direção Audiovisual (Reels): Escala de Times com Agilidade",
+                            status: "PUBLICADO",
+                            caption: "🎯 OBJETIVO: Atrair tomadores de decisão de grandes empresas demonstrando metodologia prática.\n\n🎬 HOOK: Como grandes equipes produzem 3x mais sem burn-out?\n\n💬 FALAS: O segredo não é trabalhar mais horas, mas sim estruturar micro-ciclos ágeis...\n\n✨ CTA: Escreva GESTÃO para receber nosso infográfico gratuito.",
+                            scheduled_at: `${currentYear}-${monthStr}-03T18:00:00.000Z`,
+                            platform: "REELS",
+                            priority: "ALTA",
+                            metadata: { responsible: "Audiovisual", version: "V1" }
+                        },
+                        {
+                            id: "m_c2",
+                            project_id: "p_c3",
+                            title: "Estrutura Narrativa (Carrossel): Liderança no Século XXI",
+                            status: "PRONTO",
+                            caption: "🎯 OBJETIVO: Desafiar dogmas de liderança tradicional e promover cursos executivos.\n\nSlide 1: Você é chefe ou você é líder?\n\nSlide 2: Chefes monitoram horas trabalhadas; líderes engajam talentos por propósito...\n\n✨ CTA: Conheça nosso MBA incompany de Gestão Estratégica.",
+                            scheduled_at: `${currentYear}-${monthStr}-09T10:00:00.000Z`,
+                            platform: "CARROSSEL",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Design", version: "V1" }
+                        },
+                        {
+                            id: "m_c3",
+                            project_id: "p_c3",
+                            title: "Direção Audiovisual (Reels): Networking de Alto Impacto",
+                            status: "PLANEJAMENTO",
+                            caption: "🎯 OBJETIVO: Criar desejo de pertencimento através do prestígio da comunidade Apex.\n\n🎬 HOOK: Quem senta na mesa com você define sua próxima promoção.\n\n💬 FALAS: No último encontro do nosso cohort corporativo, conectamos mais de 50 diretores...\n\n✨ CTA: Candidate-se ao próximo cohort pelo link da bio.",
+                            scheduled_at: `${currentYear}-${monthStr}-17T17:00:00.000Z`,
+                            platform: "REELS",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Audiovisual", version: "V1" }
+                        },
+                        {
+                            id: "m_c4",
+                            project_id: "p_c3",
+                            title: "Estrutura Narrativa (Carrossel): O Custo Oculto da Falta de Treinamento",
+                            status: "PLANEJAMENTO",
+                            caption: "🎯 OBJETIVO: Demonstrar o ROI de treinamento corporativo para equipes de vendas e operações.\n\nSlide 1: Quanto custa a falta de treinamento na sua equipe?\n\nSlide 2: Uma equipe despreparada aumenta o churn e reduz em até 40% a satisfação do cliente...\n\n✨ CTA: Solicite um diagnóstico corporativo sem custos para seu time.",
+                            scheduled_at: `${currentYear}-${monthStr}-23T11:00:00.000Z`,
+                            platform: "CARROSSEL",
+                            priority: "MÉDIA",
+                            metadata: { responsible: "Design", version: "V1" }
+                        }
+                    );
+                }
+
+                localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+                return mockAssets;
+            }
+
             if (!window.supabase) {
-                statusEl.innerText = "❌ Erro: Motor de IA não carregou. Recarregue a página.";
+                console.warn('[STRATEGIC] Supabase não carregado. Ativando fallback local.');
+                loadLocalFallback();
                 return;
             }
 
             try {
                 statusEl.innerText = "🔌 Conectando ao Banco...";
-                const { data: project } = await supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle();
+                const { data: project, error: pErr } = await supabase.from('projects').select('company_name').eq('id', projectId).maybeSingle();
+                if (pErr) throw pErr;
+
                 if (project) {
                     statusEl.innerText = project.company_name;
                     document.getElementById('client-initials').innerText = project.company_name.substring(0, 2).toUpperCase();
+                    appendClientBadge(project.company_name);
                 }
 
                 statusEl.innerText = "📅 Sincronizando Estratégia...";
-                const { data: contents } = await supabase.from('content_assets').select('*').eq('project_id', projectId).order('scheduled_at', { ascending: true });
-                
-                statusEl.innerText = project ? project.company_name : "Planejamento Estratégico";
-                renderCalendar(contents || []);
-                updateStats(contents || []);
+                const { data: contents, error: cErr } = await supabase.from('content_assets').select('*').eq('project_id', projectId).order('scheduled_at', { ascending: true });
+                if (cErr) throw cErr;
+
+                if (contents && contents.length > 0) {
+                    statusEl.innerText = project ? project.company_name : "Planejamento Estratégico";
+                    renderCalendar(contents);
+                    updateStats(contents);
+                } else {
+                    loadLocalFallback();
+                }
             } catch (err) {
-                console.error(err);
-                statusEl.innerText = "Erro na conexão. Recarregue.";
+                console.warn('[STRATEGIC] Falha na conexão ou consulta Supabase. Carregando dados locais...', err);
+                loadLocalFallback();
+            }
+
+            function loadLocalFallback() {
+                const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+                const activeProject = mockProjects.find(p => p.id === projectId) || { company_name: "Planejamento Estratégico" };
+                
+                statusEl.innerText = activeProject.company_name;
+                document.getElementById('client-initials').innerText = activeProject.company_name.substring(0, 2).toUpperCase();
+                appendClientBadge(activeProject.company_name);
+
+                const mockAssets = ensureMockAssetsExist();
+                const projectAssets = mockAssets.filter(item => item.project_id === projectId);
+                
+                renderCalendar(projectAssets);
+                updateStats(projectAssets);
+            }
+
+            function appendClientBadge(companyName) {
+                const titleBlock = statusEl.parentElement;
+                if (titleBlock) {
+                    const existingBadge = titleBlock.querySelector('.os-client-badge-inline');
+                    if (existingBadge) existingBadge.remove();
+
+                    const badge = document.createElement('span');
+                    badge.className = 'os-client-badge-inline';
+                    badge.style.display = 'inline-block';
+                    badge.style.marginTop = '8px';
+                    badge.style.padding = '4px 12px';
+                    badge.style.borderRadius = '20px';
+                    badge.style.fontSize = '0.7rem';
+                    badge.style.letterSpacing = '1px';
+                    badge.style.background = 'rgba(142, 158, 104, 0.12)';
+                    badge.style.color = 'var(--os-primary, #8e9e68)';
+                    badge.style.border = '1px solid rgba(142, 158, 104, 0.3)';
+                    badge.style.fontWeight = '800';
+                    badge.style.textTransform = 'uppercase';
+                    badge.innerHTML = `<i class="fa-solid fa-user-tie"></i> CLIENTE: ${companyName.toUpperCase()}`;
+                    titleBlock.appendChild(badge);
+                }
             }
         }
 
@@ -127,7 +336,7 @@
             for (let day = 1; day <= daysInMonth; day++) {
                 const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
                 const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
-                let eventsHtml = dayContents.map(c => `<div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')">${formatClientTitle(c.title)}</div>`).join('');
+                let eventsHtml = dayContents.map(c => `<div class="calendar-event" onclick="window.open('approval.html?id=${c.id}', '_blank')">${formatClientTitle(c.title)}</div>`).join('');
                 container.innerHTML += `<div class="calendar-day"><div class="day-number">${day}</div>${eventsHtml}</div>`;
             }
         }

@@ -731,6 +731,251 @@
                 };
 
             } catch (err) {
+                console.warn('[APPROVAL] Supabase offline/error. Iniciando Fallback LocalStorage Mocks...', err);
+                const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+                const c = mockAssets.find(item => item.id === id);
+                if (!c) {
+                    document.getElementById('loading-state').innerText = 'Ativo simulado não encontrado no LocalStorage.';
+                    return;
+                }
+
+                // Renderizar o cabeçalho e demais informações usando o objeto "c"
+                // Mostrar a marca do cliente
+                const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+                const activeProject = mockProjects.find(p => p.id === c.project_id) || { company_name: "MARIA APARECIDA NUTRICIONISTA & CONSULTORA ALIMENTAR" };
+                const companyNameUpper = activeProject.company_name.toUpperCase();
+                document.getElementById('portal-subtitle').innerText = `PORTAL DE APROVAÇÃO: ${companyNameUpper}`;
+                
+                const currentStatus = (c.status || '').toUpperCase();
+                const allowedStatus = ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL'];
+                
+                if (!allowedStatus.includes(currentStatus)) {
+                    document.getElementById('loading-state').style.display = 'none';
+                    document.getElementById('main-ui').style.display = 'none';
+                    
+                    if (currentStatus === 'AJUSTE') {
+                        document.getElementById('success-title').innerText = 'Ajuste em Andamento';
+                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:#60a5fa;">Seu Pedido de Ajuste:</strong><br>${c.internal_notes}</div>` : '';
+                        document.getElementById('success-message').innerHTML = `✅ Seus apontamentos foram recebidos e nossa equipe já está aplicando os ajustes no planejamento.<br><br>Assim que estiver pronto, você receberá acesso para uma nova rodada de aprovação. ${feedbackMsg}`;
+                    } else if (currentStatus === 'PRODUÇÃO') {
+                        document.getElementById('success-title').innerText = 'Em Produção';
+                        document.getElementById('success-message').innerHTML = `🎬 <b>Planejamento Aprovado com sucesso!</b><br><br>Nossa equipe técnica já recebeu o briefing e está em fase de <b>Produção Audiovisual / Design</b>.<br><br>Você receberá uma notificação assim que a arte final estiver pronta para sua validação.`;
+                    } else if (currentStatus === 'AJUSTE DE PRODUÇÃO') {
+                        document.getElementById('success-title').innerText = 'Arte em Ajuste';
+                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(236,72,153,0.08); border:1px solid rgba(236,72,153,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:#ec4899;">Suas Observações:</strong><br>${c.internal_notes}</div>` : '';
+                        document.getElementById('success-message').innerHTML = `🎨 Nossa equipe de design está refinando a arte final com base nos seus apontamentos. Em breve estará disponível para sua aprovação. ${feedbackMsg}`;
+                    } else if (currentStatus === 'PRONTO' || currentStatus === 'PUBLICADO') {
+                        document.getElementById('success-title').innerText = currentStatus === 'PUBLICADO' ? '🚀 Publicado!' : '✅ Conteúdo Finalizado!';
+                        document.getElementById('success-message').innerText = currentStatus === 'PUBLICADO' ? 'Este conteúdo foi publicado nas plataformas conforme planejado. Acompanhe os resultados no seu dashboard.' : 'Este ativo foi aprovado e está pronto para publicação. Acompanhe o calendário para ver a data programada.';
+                    } else {
+                        document.getElementById('success-title').innerText = 'Em Preparação Estratégica';
+                        document.getElementById('success-message').innerHTML = `Nossa equipe está finalizando os últimos ajustes estratégicos neste conteúdo para garantir a máxima qualidade antes de enviar para sua aprovação.<br><br>Em breve você receberá acesso para revisar e aprovar.`;
+                    }
+                    
+                    const actionsContainer = document.getElementById('success-actions');
+                    if (actionsContainer && !document.getElementById('btn-return-portal')) {
+                        const btn = document.createElement('button');
+                        btn.id = 'btn-return-portal';
+                        btn.className = 'btn-return';
+                        btn.innerHTML = 'VOLTAR AO CALENDÁRIO';
+                        btn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
+                        actionsContainer.appendChild(btn);
+                    }
+                    document.getElementById('success-ui').style.display = 'block';
+                    return;
+                }
+
+                const isFinalArt = currentStatus === 'APROVAÇÃO FINAL';
+                document.getElementById('main-ui').style.display = 'block';
+
+                if (isFinalArt) {
+                    document.getElementById('portal-subtitle').innerText = `REVISÃO DE ARTE FINAL: ${companyNameUpper}`;
+                    document.getElementById('asset-body-title').innerText = 'Arte Finalizada';
+                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE FINAL';
+                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
+                } else {
+                    document.getElementById('asset-body-title').innerText = 'Aprovação de Planejamento';
+                }
+
+                let prefix = 'POST', obj = 'Estratégia';
+                try {
+                    const titleParts = formatClientTitle(c.title);
+                    prefix = titleParts.prefix;
+                    obj = titleParts.obj;
+                } catch (e) {}
+
+                document.getElementById('meta-obj').innerText = obj;
+                document.getElementById('meta-format').innerText = prefix;
+                document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
+                
+                const refLink = c.metadata?.reference_url;
+                document.getElementById('meta-reference').innerHTML = refLink ? `<a href="${refLink}" target="_blank" style="color:var(--os-primary); text-decoration:none;"><i class="fa-solid fa-link"></i> Ver Referência</a>` : '<span style="opacity:0.3;">Não enviada</span>';
+                
+                const deadlineEl = document.getElementById('meta-deadline-highlight');
+                if (c.metadata?.approval_deadline) {
+                    const d = new Date(c.metadata.approval_deadline);
+                    const formatted = d.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' / ' + d.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+                    deadlineEl.innerText = formatted;
+                } else {
+                    deadlineEl.innerText = 'S/ Prazo';
+                }
+
+                const pubDate = new Date(c.scheduled_at);
+                const pubFormatted = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + pubDate.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
+                document.getElementById('meta-time').innerText = pubFormatted;
+                
+                let roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
+                roadmap = roadmap
+                    .replace(/🎯 OBJETIVO:/g, '<b style="color:var(--os-primary);">🎯 OBJETIVO:</b>')
+                    .replace(/🎬 HOOK:/g, '<br><b style="color:var(--os-primary);">🎬 HOOK:</b>')
+                    .replace(/💬 FALAS:/g, '<br><b style="color:var(--os-primary);">💬 FALAS:</b>')
+                    .replace(/✨ CTA:/g, '<br><b style="color:var(--os-primary);">✨ CTA:</b>')
+                    .replace(/\n/g, '<br>');
+                
+                if (isFinalArt && c.metadata?.final_asset_url) {
+                    document.getElementById('asset-caption').innerHTML = `
+                        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 40px 30px; border-radius: 12px; text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 20px;">
+                            <i class="fa-solid fa-file-circle-check" style="font-size: 4rem; color: #8b5cf6; display: block;"></i>
+                            <h3 style="color: #fff; margin: 0; font-size: 1.2rem;">A Arte Final está pronta!</h3>
+                            <a href="${c.metadata.final_asset_url}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 35px; border-radius: 8px; font-weight: 800; text-decoration: none;">
+                                <i class="fa-solid fa-eye"></i> VISUALIZAR ARTE FINAL
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    document.getElementById('asset-caption').innerHTML = roadmap;
+                }
+                
+                const badge = document.getElementById('status-badge-container');
+                badge.innerHTML = isFinalArt ? `<span class="status-badge" style="background:rgba(139, 92, 246,0.15); color:#a78bfa; border:1px solid rgba(139,92,246,0.5);">AGUARDANDO SUA APROVAÇÃO</span>` : `<span class="status-badge" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.5);">AGUARDANDO SUA APROVAÇÃO</span>`;
+
+                // INJETAR MATRIZ DE AJUSTE
+                const schema = ADJUSTMENT_SCHEMA[prefix] || ADJUSTMENT_SCHEMA['REELS'];
+                const matrixContainer = document.getElementById('adjustment-matrix-container');
+                let matrixHtml = '';
+
+                if (schema.sections) {
+                    schema.sections.forEach(sec => {
+                        matrixHtml += `<span class="section-label">${sec.title}</span><div class="check-grid">`;
+                        sec.items.forEach(item => {
+                            matrixHtml += `
+                                <label class="check-item">
+                                    <input type="checkbox" class="adj-check" data-cat="${sec.title}" value="${item}">
+                                    <span>${item}</span>
+                                </label>
+                            `;
+                        });
+                        matrixHtml += `</div>`;
+                    });
+                }
+
+                if (schema.micro) {
+                    matrixHtml += `<span class="section-label" style="color:#60a5fa; border-color:rgba(96,165,250,0.2);">Microajustes Inteligentes</span><div class="micro-grid">`;
+                    schema.micro.forEach(m => {
+                        matrixHtml += `
+                            <div class="micro-item">
+                                <label>${m.title}</label>
+                                <div class="radio-group" data-nuance="${m.title}">
+                                    ${m.items.map(opt => `<div class="radio-opt" data-val="${opt}">${opt}</div>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    matrixHtml += `</div>`;
+                }
+                matrixContainer.innerHTML = matrixHtml;
+
+                document.querySelectorAll('.radio-opt').forEach(opt => {
+                    opt.onclick = function() {
+                        const parent = this.parentElement;
+                        parent.querySelectorAll('.radio-opt').forEach(r => r.classList.remove('active'));
+                        this.classList.add('active');
+                    };
+                });
+
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('content-data').style.display = 'block';
+
+                const showFinalSuccess = (title, message) => {
+                    document.getElementById('main-ui').style.display = 'none';
+                    document.getElementById('success-title').innerText = title;
+                    document.getElementById('success-message').innerText = message;
+                    
+                    const actionsContainer = document.getElementById('success-actions');
+                    actionsContainer.innerHTML = '';
+                    const btnReturn = document.createElement('button');
+                    btnReturn.className = 'btn-return';
+                    btnReturn.innerHTML = 'VOLTAR AO CALENDÁRIO';
+                    btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
+                    actionsContainer.appendChild(btnReturn);
+                    
+                    document.getElementById('success-ui').style.display = 'block';
+                };
+
+                document.getElementById('btn-approve-action').onclick = async () => {
+                    const btn = document.getElementById('btn-approve-action');
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+                    btn.disabled = true;
+
+                    let nextStatus = 'PRODUÇÃO';
+                    if (currentStatus === 'APROVAÇÃO FINAL') nextStatus = 'PRONTO';
+                    
+                    // Atualizar no localStorage
+                    c.status = nextStatus;
+                    if (nextStatus === 'PRODUÇÃO') {
+                        c.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
+                    }
+                    localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+                    
+                    showFinalSuccess(nextStatus === 'PRONTO' ? 'Conteúdo Finalizado!' : 'Planejamento Aprovado!', 'A pauta seguiu para a próxima etapa.');
+                };
+
+                document.getElementById('btn-reject-action').onclick = () => {
+                    document.getElementById('feedback-ui').style.display = 'block';
+                    document.getElementById('main-actions').style.display = 'none';
+                };
+
+                document.getElementById('btn-submit-feedback').onclick = async () => {
+                    const btn = document.getElementById('btn-submit-feedback');
+                    const obs = document.getElementById('feedback-text').value.trim();
+                    const checked = document.querySelectorAll('.adj-check:checked');
+                    const nuances = document.querySelectorAll('.micro-grid .radio-opt.active');
+                    
+                    if (checked.length === 0 && nuances.length === 0 && obs.length < 10) {
+                        alert('Atenção: Para solicitar um ajuste, selecione ao menos um item da estrutura acima ou descreva o motivo no campo final (mínimo 10 caracteres).');
+                        return;
+                    }
+
+                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+                    btn.disabled = true;
+
+                    let feedback = `📌 SOLICITAÇÃO DE AJUSTE (${prefix})\n\n`;
+                    if (checked.length > 0) {
+                        feedback += `📍 ESTRUTURA/ESTRATÉGIA:\n`;
+                        checked.forEach(c => feedback += `- [${c.getAttribute('data-cat')}] ${c.value}\n`);
+                        feedback += `\n`;
+                    }
+                    if (nuances.length > 0) {
+                        feedback += `🎯 MICROAJUSTES:\n`;
+                        nuances.forEach(n => {
+                            const cat = n.parentElement.getAttribute('data-nuance');
+                            feedback += `- ${cat}: ${n.getAttribute('data-val')}\n`;
+                        });
+                        feedback += `\n`;
+                    }
+                    const priority = document.querySelector('#priority-selector .radio-opt.active')?.getAttribute('data-val') || 'Ajuste moderado';
+                    feedback += `⚠️ PRIORIDADE: ${priority}\n\n`;
+                    if (obs) feedback += `💬 OBSERVAÇÃO FINAL:\n${obs}`;
+
+                    const nextStatus = isFinalArt ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
+                    
+                    // Atualizar no localStorage
+                    c.status = nextStatus;
+                    c.internal_notes = feedback;
+                    localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+
+                    showFinalSuccess('Ajuste Solicitado', 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.');
+                };
             }
         }
         window.onload = load;

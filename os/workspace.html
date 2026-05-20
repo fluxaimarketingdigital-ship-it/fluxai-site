@@ -56,7 +56,7 @@
         async function initWorkspace() {
             const statusEl = document.getElementById('client-name');
             const params = new URLSearchParams(window.location.search);
-            const projectId = params.get('project');
+            const projectId = params.get('project') || params.get('project_id') || localStorage.getItem('fluxai_current_project_id') || 'p_c1';
             
             if (!projectId) {
                 statusEl.innerText = 'ID do Projeto não encontrado';
@@ -95,9 +95,22 @@
                 updateStats(contents || []);
                 
             } catch (err) {
-                console.error('[WORKSPACE] Erro crítico:', err);
-                statusEl.innerText = 'Erro na conexão. Tente atualizar a página.';
-                renderCalendar([]); 
+                console.warn('[WORKSPACE] Supabase offline/error. Iniciando Fallback LocalStorage Mocks...', err);
+                const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+                const activeProject = mockProjects.find(p => p.id === projectId) || { company_name: "Workspace Estratégico" };
+                statusEl.innerText = activeProject.company_name;
+                document.getElementById('client-initials').innerText = activeProject.company_name.substring(0, 2).toUpperCase();
+
+                const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+                const projectAssets = mockAssets.filter(item => item.project_id === projectId);
+                
+                console.log('[WORKSPACE] Conteúdos mock carregados:', projectAssets.length);
+                if (projectAssets.length === 0) {
+                    statusEl.innerText = activeProject.company_name + ' (Sem posts agendados)';
+                }
+                
+                renderCalendar(projectAssets);
+                updateStats(projectAssets);
             }
         }
 
@@ -136,7 +149,7 @@
                     const cleanCaption = (c.caption || '').replace(/\[TOOL:.*?\]/g, '').trim();
                     
                     return `
-                        <div class="calendar-event" onclick="window.open('/os/approval.html?id=${c.id}', '_blank')" title="${c.title}">
+                        <div class="calendar-event" onclick="window.open('approval.html?id=${c.id}', '_blank')" title="${c.title}">
                             <span class="event-status" style="background:${getStatusColor(c.status)}"></span>
                             ${c.title}
                         </div>

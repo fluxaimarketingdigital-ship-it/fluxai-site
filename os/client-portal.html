@@ -176,7 +176,7 @@
         let currentMonth = new Date().getMonth();
 
         const params = new URLSearchParams(window.location.search);
-        const projectId = params.get('project_id') || params.get('project');
+        const projectId = params.get('project_id') || params.get('project') || localStorage.getItem('fluxai_current_project_id') || 'p_c1';
 
         async function init() {
             if (!projectId) return document.getElementById('client-name').innerText = 'Acesso Negado: ID do Projeto Ausente';
@@ -184,6 +184,7 @@
             if (!_supabaseClient) {
                 _supabaseClient = window.supabase.createClient("https://mufgwetfhfhhmhowbhjj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI");
             }
+
 
             try {
                 // 1. Dados do Projeto
@@ -206,26 +207,81 @@
                 _allAssets = assets || [];
                 renderCalendar();
             } catch (err) {
-                console.warn('[PORTAL] Offline ou Erro de ID. Exibindo Estado de Manutenção Segura.', err);
+                console.warn('[PORTAL] Offline ou Erro de ID. Iniciando Fallback LocalStorage Mocks...', err);
                 
-                document.getElementById('client-name').innerText = 'MANUTENÇÃO PROGRAMADA';
-                document.getElementById('client-name').style.color = 'var(--os-warning)';
-                document.getElementById('client-profession').innerText = 'Sincronização Temporariamente Indisponível';
+                const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+                const proj = mockProjects.find(p => p.id === projectId);
                 
-                const grid = document.getElementById('calendar-body');
-                if (grid) {
-                    grid.style.display = 'flex';
-                    grid.style.justifyContent = 'center';
-                    grid.style.alignItems = 'center';
-                    grid.style.padding = '60px 20px';
-                    grid.innerHTML = `
-                        <div style="text-align:center; background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.1); padding: 40px; border-radius: 12px; max-width: 500px;">
-                            <i class="fa-solid fa-shield-halved" style="font-size: 2.5rem; color: var(--os-warning); margin-bottom: 20px; opacity: 0.8;"></i>
-                            <h2 style="font-size: 1.2rem; margin-bottom: 10px; font-weight: 800;">Protocolo de Segurança Ativo</h2>
-                            <p style="font-size: 0.8rem; color: var(--os-text-muted); line-height: 1.6;">O acesso ao portal foi pausado temporariamente para manutenção estrutural ou validação de ID. A operação retornará em breve.</p>
-                        </div>
-                    `;
+                if (proj) {
+                    document.getElementById('client-name').innerText = (proj.company_name || proj.name).toUpperCase();
+                    const profession = proj.metadata?.onboarding?.profession || proj.segment || 'Estratégia Institucional';
+                    document.getElementById('client-profession').innerText = profession.toUpperCase();
+                } else {
+                    if (projectId === 'p_c1') {
+                        document.getElementById('client-name').innerText = 'MARIA APARECIDA NUTRICIONISTA & CONSULTORA ALIMENTAR';
+                        document.getElementById('client-profession').innerText = 'NUTRIÇÃO CLÍNICA + CONSULTORIA ALIMENTAR';
+                    } else {
+                        document.getElementById('client-name').innerText = 'PROJETO FLUXAI OS™';
+                        document.getElementById('client-profession').innerText = 'SINCRONIZAÇÃO DE ATIVOS';
+                    }
                 }
+
+                const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+                _allAssets = mockAssets.filter(c => c && c.project_id === projectId);
+                
+                if (_allAssets.length === 0 && projectId === 'p_c1') {
+                    _allAssets = [
+                        {
+                            id: "m_a1",
+                            project_id: "p_c1",
+                            title: "Direção Audiovisual (Reels): Organização Alimentar Real",
+                            status: "APROVAÇÃO PLANEJAMENTO",
+                            caption: "🎯 OBJETIVO: Fortalecer autoridade regional e combater o terrorismo nutricional.\n\n🎬 HOOK: Você não precisa comer comida sem graça para ter saúde.\n\n💬 FALAS: No consultório, o que eu mais vejo são pessoas cansadas de radicalismo...\n\n✨ CTA: Comente ROTINA para acessar meu guia prático de alimentos regionais.",
+                            scheduled_at: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-05T12:00:00.000Z`,
+                            platform: "INSTAGRAM",
+                            priority: "MÉDIA",
+                            metadata: { version: "V1", approval_deadline: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-04T18:00:00.000Z` }
+                        },
+                        {
+                            id: "m_a2",
+                            project_id: "p_c1",
+                            title: "Estrutura Narrativa (Carrossel): Substituições Inteligentes",
+                            status: "APROVAÇÃO PLANEJAMENTO",
+                            caption: "🎯 OBJETIVO: Oferecer educação alimentar prática com alimentos acessíveis.\n\nSlide 1: Substituições saudáveis de verdade e baratas.\n\nSlide 2: Em vez de ingredientes caros importados, use raízes locais e peixes frescos.\n\n✨ CTA: Compartilhe este post com quem precisa de mais praticidade na cozinha.",
+                            scheduled_at: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-12T15:00:00.000Z`,
+                            platform: "INSTAGRAM",
+                            priority: "MÉDIA",
+                            metadata: { version: "V1", approval_deadline: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-10T18:00:00.000Z` }
+                        },
+                        {
+                            id: "m_a3",
+                            project_id: "p_c1",
+                            title: "Direção Audiovisual (Reels): Bastidores da Nutrição Humana",
+                            status: "PRODUÇÃO",
+                            caption: "🎯 OBJETIVO: Humanizar a marca e gerar conexão com pacientes locais.\n\n🎬 HOOK: O que acontece nos bastidores de um consultório de nutrição real?\n\n💬 FALAS: Meu trabalho vai muito além de prescrever dietas. É escuta ativa...\n\n✨ CTA: Agende sua consulta pelo WhatsApp no link da Bio.",
+                            scheduled_at: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-19T18:00:00.000Z`,
+                            platform: "INSTAGRAM",
+                            priority: "MÉDIA",
+                            metadata: { version: "V1", approval_deadline: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-17T18:00:00.000Z` }
+                        },
+                        {
+                            id: "m_a4",
+                            project_id: "p_c1",
+                            title: "Estrutura Narrativa (Carrossel): Ética CFN na Nutrição",
+                            status: "PRONTO",
+                            caption: "🎯 OBJETIVO: Construir autoridade ética premium, explicando porque não fazemos antes e depois.\n\nSlide 1: Por que sua saúde vale mais que uma foto de 'antes e depois'.\n\nSlide 2: De acordo com o Conselho Federal de Nutrição, a imagem corporal é privada e de responsabilidade ética...\n\n✨ CTA: Agende seu acompanhamento ético pelo WhatsApp.",
+                            scheduled_at: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-26T09:00:00.000Z`,
+                            platform: "INSTAGRAM",
+                            priority: "ALTA",
+                            metadata: { version: "V1", approval_deadline: `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-24T18:00:00.000Z` }
+                        }
+                    ];
+                    const allMocks = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+                    const filteredOthers = allMocks.filter(c => c.project_id !== projectId);
+                    localStorage.setItem('fluxai_mock_assets', JSON.stringify([...filteredOthers, ..._allAssets]));
+                }
+                
+                renderCalendar();
             }
         }
 
@@ -254,7 +310,7 @@
                             
                             if (isActionable) {
                                 return `
-                                    <div class="asset-card status-${statusClass}" onclick="window.location.href='/os/approval.html?id=${c.id}'">
+                                    <div class="asset-card status-${statusClass}" onclick="window.location.href='approval.html?id=${c.id}'">
                                         <div style="font-size:0.5rem; opacity:0.8; margin-bottom:2px; text-transform:uppercase; font-weight:800;">${statusName}</div>
                                         <div style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${c.title}</div>
                                     </div>
