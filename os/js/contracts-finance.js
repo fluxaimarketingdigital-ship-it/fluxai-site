@@ -409,9 +409,6 @@ function renderContracts(contracts) {
                 <td>${renewalDate}</td>
                 <td>
                     <div class="action-btns" style="justify-content: flex-end;">
-                        <a href="/os/analytics.html?project=${c.project_id}&input=true" class="btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Lançar Métricas Instagram">
-                            <i class="fa-brands fa-instagram"></i>
-                        </a>
                         <a href="/os/workspace.html?project=${c.project_id}" class="btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Ver Workspace Cliente">
                             <i class="fa-solid fa-briefcase"></i>
                         </a>
