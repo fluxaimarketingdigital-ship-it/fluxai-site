@@ -1557,154 +1557,75 @@
 
         const renderAnalyticsData = async () => {
             const activeProjectId = localStorage.getItem('fluxai_current_project_id') || 'todos';
-            const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-            
-            const month = localStorage.getItem('fluxai_current_month') || "2026-05"; // Mês ativo no dashboard
-            
-            let metrics;
-            if (activeProjectId === 'todos') {
-                // Loop through all projects and consolidate metrics!
-                let totalReach = 0;
-                let totalImpressions = 0;
-                let totalSaveRate = 0;
-                let totalWatchTime = 0; // seconds
-                let totalFollowers = 0;
-                let totalProfileViews = 0;
-                let totalEngagement = 0;
-                
-                let totalGAActiveUsers = 0;
-                let totalGANewUsers = 0;
-                let totalGAEngagement = 0; // seconds
-                let totalGASessions = 0;
-                
-                let totalGSCClicks = 0;
-                let totalGSCImpressions = 0;
-                let totalGSCCTR = 0;
-                let totalGSCPosition = 0;
+            const month = localStorage.getItem('fluxai_current_month') || "2026-05";
 
-                let totalMetaSpent = 0;
-                let totalMetaLeads = 0;
-                let totalMetaRoas = 0;
-                let metaAdsActiveCount = 0;
+            // Métricas zeradas por padrão — preenchidas pelo Make.com via Supabase
+            let metrics = {
+                reach: '--', impressions: '--', saveRate: '--', watchTime: '--',
+                followers: '--', profileViews: '--', engagement: '--',
+                ga_activeUsers: '--', ga_newUsers: '--', ga_engagement: '--', ga_sessions: '--',
+                gsc_clicks: '--', gsc_impressions: '--', gsc_ctr: '--', gsc_position: '--',
+                meta_spent: '--', meta_leads: '--', meta_cpl: '--', meta_roas: '--'
+            };
 
-                const count = mockProjects.length;
-
-                mockProjects.forEach(proj => {
-                    const m = getMetricsForClientAndMonth(proj.id, month);
-                    totalReach += parseK(m.reach);
-                    totalImpressions += parseK(m.impressions);
-                    totalSaveRate += parsePercent(m.saveRate);
-                    totalWatchTime += parseTime(m.watchTime);
-                    totalFollowers += parseK(m.followers);
-                    totalProfileViews += parseK(m.profileViews);
-                    totalEngagement += parsePercent(m.engagement);
-                    
-                    totalGAActiveUsers += parseK(m.ga_activeUsers);
-                    totalGANewUsers += parseK(m.ga_newUsers);
-                    totalGAEngagement += parseTime(m.ga_engagement);
-                    totalGASessions += parseK(m.ga_sessions);
-                    
-                    totalGSCClicks += parseK(m.gsc_clicks);
-                    totalGSCImpressions += parseK(m.gsc_impressions);
-                    totalGSCCTR += parsePercent(m.gsc_ctr);
-                    totalGSCPosition += parseFloat(m.gsc_position) || 0;
-
-                    const spentVal = parseCurrency(m.meta_spent);
-                    totalMetaSpent += spentVal;
-                    totalMetaLeads += parseFloat(m.meta_leads) || 0;
-                    if (spentVal > 0) {
-                        totalMetaRoas += parseROAS(m.meta_roas);
-                        metaAdsActiveCount++;
+            // Tentar carregar métricas reais do Supabase
+            try {
+                const supabase = getSupabase();
+                if (supabase && activeProjectId && activeProjectId !== 'todos') {
+                    const { data: mData } = await supabase
+                        .from('analytics_metrics')
+                        .select('*')
+                        .eq('project_id', activeProjectId)
+                        .order('created_at', { ascending: false })
+                        .limit(1)
+                        .single();
+                    if (mData) {
+                        metrics = {
+                            reach: mData.reach || '--',
+                            impressions: mData.impressions || '--',
+                            saveRate: mData.save_rate || '--',
+                            watchTime: mData.watch_time || '--',
+                            followers: mData.followers || '--',
+                            profileViews: mData.profile_views || '--',
+                            engagement: mData.engagement_rate || '--',
+                            ga_activeUsers: mData.ga_active_users || '--',
+                            ga_newUsers: mData.ga_new_users || '--',
+                            ga_engagement: mData.ga_engagement || '--',
+                            ga_sessions: mData.ga_sessions || '--',
+                            gsc_clicks: mData.gsc_clicks || '--',
+                            gsc_impressions: mData.gsc_impressions || '--',
+                            gsc_ctr: mData.gsc_ctr || '--',
+                            gsc_position: mData.gsc_position || '--',
+                            meta_spent: mData.meta_spent || '--',
+                            meta_leads: mData.meta_leads || '--',
+                            meta_cpl: mData.meta_cpl || '--',
+                            meta_roas: mData.meta_roas || '--'
+                        };
                     }
-                });
-
-                metrics = {
-                    reach: formatK(totalReach),
-                    impressions: formatK(totalImpressions),
-                    saveRate: formatPercent(totalSaveRate / count),
-                    watchTime: formatTime(totalWatchTime / count),
-                    followers: "+" + formatK(totalFollowers),
-                    profileViews: formatK(totalProfileViews),
-                    engagement: formatPercent(totalEngagement / count),
-                    
-                    ga_activeUsers: formatK(totalGAActiveUsers),
-                    ga_newUsers: formatK(totalGANewUsers),
-                    ga_engagement: formatTime(totalGAEngagement / count),
-                    ga_sessions: formatK(totalGASessions),
-                    
-                    gsc_clicks: formatK(totalGSCClicks),
-                    gsc_impressions: formatK(totalGSCImpressions),
-                    gsc_ctr: formatPercent(totalGSCCTR / count),
-                    gsc_position: (totalGSCPosition / count).toFixed(1),
-
-                    meta_spent: formatCurrency(totalMetaSpent),
-                    meta_leads: Math.round(totalMetaLeads).toString(),
-                    meta_cpl: totalMetaLeads > 0 ? formatCurrency(totalMetaSpent / totalMetaLeads) : "R$ 0,00",
-                    meta_roas: (metaAdsActiveCount > 0 ? (totalMetaRoas / metaAdsActiveCount).toFixed(1) : "0.0") + "x"
-                };
-            } else {
-                metrics = getMetricsForClientAndMonth(activeProjectId, month);
+                }
+            } catch(e) {
+                console.warn('[ANALYTICS] Sem dados reais ainda. Aguardando integração Make.com.', e);
             }
 
-            // Definir métricas decisionais personalizadas por segmento
-            let activeDecisionalMetrics = [];
-            let activeSocialContext = "";
-            let activeInsights = [];
+            // Métricas decisionais (aguardando integração real)
+            const activeDecisionalMetrics = [
+                { label: "Taxa de Retenção", value: metrics.saveRate !== '--' ? metrics.saveRate : '--', status: "pendente", impact: "Aguardando dados reais" },
+                { label: "CAC Médio", value: metrics.meta_cpl !== '--' ? metrics.meta_cpl : '--', status: "pendente", impact: "Via Make.com + Meta Ads" },
+                { label: "LTV Total", value: "--", status: "pendente", impact: "Configuração via CRM" },
+                { label: "Tempo de Resposta Médio", value: "--", status: "pendente", impact: "Configuração via SLA" }
+            ];
 
-            if (activeProjectId === 'p_c1') {
-                activeDecisionalMetrics = [
-                    { label: "Taxa de Retenção", value: "96.5%", status: "ativo", impact: "Excelente LTV de Consultório" },
-                    { label: "CAC (Aquisição)", value: "R$ 150", status: "ativo", impact: "Altamente Orgânico CFN" },
-                    { label: "LTV Projetado", value: "R$ 9.6k", status: "ativo", impact: "Valor Vitalício Médio" },
-                    { label: "Tempo de Resposta", value: "8m", status: "ativo", impact: "Alta Prontidão WhatsApp" }
-                ];
-                activeSocialContext = "Sinais de forte tração regional e alto engajamento em salvamentos de guias alimentares práticos.";
-                activeInsights = [
-                    { id: "INS-01", title: "Autoridade Ética CFN", desc: "Conteúdos educativos sem terrorismo nutricional e 100% alinhados com o CFN geraram aumento de 28% no agendamento de consultas diretas.", type: "oportunidade" },
-                    { id: "INS-02", title: "Parcerias Locais", desc: "Recomenda-se aumentar posts focados em consultoria alimentar para empresas regionais de Porto de Pedras para expandir autoridade corporativa.", type: "oportunidade" }
-                ];
-            } else if (activeProjectId === 'p_c2') {
-                activeDecisionalMetrics = [
-                    { label: "Taxa de Retenção", value: "92.4%", status: "ativo", impact: "Fidelidade Odonto Premium" },
-                    { label: "CAC (Aquisição)", value: "R$ 480", status: "atenção", impact: "Eficiência Meta Ads" },
-                    { label: "LTV Projetado", value: "R$ 45k", status: "ativo", impact: "Alta Reabilitação Oral" },
-                    { label: "Tempo de Resposta", value: "12m", status: "ativo", impact: "Agilidade Comercial" }
-                ];
-                activeSocialContext = "Tração qualificada em agendamento de implantes, facetas estéticas e clareamento dental.";
-                activeInsights = [
-                    { id: "INS-01", title: "Previsibilidade de Conversão", desc: "Vídeos mostrando a tecnologia digital 3D de escaneamento intraoral elevaram o fechamento de planos de tratamento estéticos em 22%.", type: "oportunidade" },
-                    { id: "INS-02", title: "Tempo de Resposta de Leads", desc: "Leads gerados aos finais de semana sofrem maior tempo de resposta, gerando leve fricção no funil inbound.", type: "atenção" }
-                ];
-            } else if (activeProjectId === 'p_c3') {
-                activeDecisionalMetrics = [
-                    { label: "Taxa de Retenção", value: "94.2%", status: "ativo", impact: "Matrículas Corporativas B2B" },
-                    { label: "CAC (Aquisição)", value: "R$ 650", status: "atenção", impact: "Competição de Leilões Executivos" },
-                    { label: "LTV Projetado", value: "R$ 85k", status: "ativo", impact: "Valor do Pipeline Executivo" },
-                    { label: "Tempo de Resposta", value: "15m", status: "ativo", impact: "SLA Operacional Inbound" }
-                ];
-                activeSocialContext = "Forte autoridade acadêmica corporativa e captação de leads de alta gerência empresariais.";
-                activeInsights = [
-                    { id: "INS-01", title: "MBA Cohort de Vendas", desc: "Webinars focados em metodologias ágeis de gestão e tomadas de decisão escaláveis impulsionaram inscrições orgânicas em 35%.", type: "oportunidade" },
-                    { id: "INS-02", title: "Elevação do CAC no Meta Ads", desc: "Custo por Lead subiu ligeiramente no Meta devido à concorrência direta no nicho de pós-graduação executiva.", type: "atenção" }
-                ];
-            } else { // todos
-                activeDecisionalMetrics = [
-                    { label: "Média de Retenção", value: "94.3%", status: "ativo", impact: "Fidelidade Multissetorial" },
-                    { label: "CAC Médio", value: "R$ 426", status: "ativo", impact: "Média Consolidada FluxAI" },
-                    { label: "LTV Total", value: "R$ 139.6k", status: "ativo", impact: "Valor Vitalício Acumulado" },
-                    { label: "Tempo de Resposta Médio", value: "11m", status: "ativo", impact: "Eficiência de Atendimento" }
-                ];
-                activeSocialContext = "Consolidação operacional de todas as marcas com tráfego e engajamento qualificados.";
-                activeInsights = [
-                    { id: "INS-01", title: "Consolidação de Growth", desc: "A média de retenção de 94.3% entre todas as contas indica altíssima maturidade e aderência dos pilares editoriais FluxAI.", type: "oportunidade" },
-                    { id: "INS-02", title: "Otimização de Custos", desc: "O CAC médio consolidado de R$ 426 é impulsionado pelo forte tráfego orgânico da nutricionista. Sugere-se expandir canais orgânicos em odontologia para equilibrar o CAC total.", type: "oportunidade" }
-                ];
-            }
+            const activeSocialContext = activeProjectId !== 'todos' && activeProjectId
+                ? "Dados reais serão exibidos após integração do Make.com com Instagram Insights."
+                : "Selecione um cliente para visualizar as métricas consolidadas.";
 
-            // Sincronizar variáveis globais para o PDF
+            const activeInsights = [
+                { id: "INS-00", title: "Aguardando Integração", desc: "Configure a automação no Make.com para começar a receber dados reais do Instagram, Meta Ads e Google Analytics.", type: "oportunidade" }
+            ];
+
             currentDecisional = activeDecisionalMetrics;
-            currentBehavioral = { avgWatchTime: metrics.watchTime, saveRate: metrics.saveRate, depthOfInteraction: "Forte", recurrence: "65%" };
-            currentSocial = { totalReach: metrics.reach, impressions: metrics.impressions, context: activeSocialContext };
+            currentBehavioral = { avgWatchTime: '--', saveRate: '--', depthOfInteraction: '--', recurrence: '--' };
+            currentSocial = { totalReach: '--', impressions: '--', context: activeSocialContext };
 
             // Renderizar Decisão & Negócio
             OS_UI.renderMetric('metric-retention', { label: activeDecisionalMetrics[0].label, value: activeDecisionalMetrics[0].value, trend: '+1.2%', trendUp: true, meta: activeDecisionalMetrics[0].impact });

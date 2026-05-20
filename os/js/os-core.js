@@ -58,17 +58,21 @@ export const OS_UI = {
             <nav class="os-sidebar-nav">`;
 
         let currentGroup = "";
+        const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+        const sessionRole = session.role || userRole;
+
         navItems.forEach(item => {
             // 1. Filtro de papel (RBAC)
             if (!item.roles.includes(userRole)) return;
             // 2. Filtro de contexto
             if (item.contexts && !item.contexts.includes(context)) return;
-            // 3. Filtro de permissão granular
-            const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
-            if (item.permission) {
-                if (session.permissions && !session.permissions.includes(item.permission)) return;
-            } else if (session.permissions && session.permissions.length > 0) {
-                if (!session.permissions.includes(item.id)) return;
+            // 3. Filtro de permissão granular — ADMIN sempre vê tudo
+            if (sessionRole !== 'ADMIN') {
+                if (item.permission) {
+                    if (session.permissions && !session.permissions.includes(item.permission)) return;
+                } else if (session.permissions && session.permissions.length > 0) {
+                    if (!session.permissions.includes(item.id)) return;
+                }
             }
 
             if (item.group !== currentGroup) {
