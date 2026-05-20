@@ -112,6 +112,9 @@ async function loadFinanceData() {
     
     // Inicializar mockProjects no localStorage para persistência cadastral
     let mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects'));
+    if (mockProjects && mockProjects[1] && (!mockProjects[1].digital_infrastructure?.operational_links?.canva || !mockProjects[1].digital_infrastructure.operational_links.canva.includes('folders'))) {
+        mockProjects = null;
+    }
     if (!mockProjects || !mockProjects[0] || !mockProjects[0].metadata || !mockProjects[0].metadata.dna) {
         mockProjects = [
             { 
@@ -149,56 +152,56 @@ async function loadFinanceData() {
                 segment: "Odontologia de Alta Performance",
                 digital_infrastructure: {
                     operational_links: {
-                        instagram: "https://instagram.com/alves.odonto",
+                        instagram: "https://www.instagram.com/alves.odonto",
                         website: "https://alvesodontologia.com.br",
-                        canva: "https://canva.com/design/alves-premium",
-                        drive: "https://drive.google.com/drive/alves-folder",
-                        whatsapp: "5511888888888"
+                        canva: "https://drive.google.com/drive/folders/1K__Y4QTCfJ_4cnr54iocJyhFEDsPa5iZ?usp=drive_link",
+                        drive: "https://drive.google.com/drive/folders/14stjSxP6piUM2w0gFmRS-v9H2zjFIE0P?usp=drive_link",
+                        whatsapp: "5582993051282"
                     }
                 },
                 metadata: {
                     dna: {
-                        desired_patterns: ["Estética Natural", "Alta Performance Oral", "Tecnologia 3D", "Confiança Premium"],
-                        anti_patterns: ["Amadorismo", "Preços Populares", "Promessas Indevidas de Indolor", "Venda Agressiva"],
-                        forbidden_themes: "Propaganda de tratamento indolor sem base, promessas de resultados milagrosos, fotos antes e depois antiéticas, descontos agressivos na saúde"
+                        desired_patterns: ["Estética Natural", "Alta Performance Oral", "Tecnologia 3D", "Confiança Premium", "Atendimento Humanizado de Alta Performance"],
+                        anti_patterns: ["Amadorismo Comercial", "Preços Populares Populistas", "Promessas Indevidas de Indolor", "Venda Agressiva Irresponsável", "Exposição de Pacientes Fora das Normas CRO"],
+                        forbidden_themes: "Propaganda de tratamento indolor sem base científica, promessas de resultados estéticos milagrosos imediatos, fotos antes e depois depreciativas, descontos agressivos na saúde, mercantilização odontológica"
                     },
-                    tone_of_voice: "Altamente profissional, técnico, elite, acolhedor, limpo, científico porém acessível",
+                    tone_of_voice: "Altamente profissional, sofisticado, elite, acolhedor, limpo, científico, preciso e de alta credibilidade",
                     strategic_roadmap: {
-                        semana_1: "Estrutura clínica, pilares de tecnologia, alinhamento visual",
-                        semana_2: "Bastidores de atendimento, depoimentos e casos éticos",
-                        semana_3: "Tecnologia 3D na prática, autoridade regional",
-                        semana_4: "Otimização de conversão de implantes e lentes, métricas"
+                        semana_1: "organização estratégica, alinhamento da marca premium, análise das diretrizes CRO locais, definição dos pilares de tecnologia, alinhamento visual de excelência clínica",
+                        semana_2: "primeiros conteúdos de bastidores, construção de autoridade clínica, depoimentos qualificados, humanização da equipe médica, início da percepção de valor elite",
+                        semana_3: "fortalecimento regional de credibilidade, demonstração prática da tecnologia 3D, conteúdo educativo preventivo premium, consolidação de diferenciais estéticos",
+                        semana_4: "análise detalhada de performance, ajustes estratégicos de captação de pacientes, melhoria do agendamento direto, evolução da percepção de alta performance"
                     },
-                    cfn_rules: "Respeito às diretrizes do CFO (Conselho Federal de Odontologia), sem sensacionalismo ou mercantilização da saúde dental, valorização de diagnósticos reais."
+                    cfn_rules: "Respeito ético estrito às diretrizes do CRO (Conselho Regional de Odontologia), sem sensacionalismo ou mercantilização da saúde bucal, valorização da ciência, diagnósticos reais e integridade profissional."
                 }
             },
             { 
                 id: "p_c3", 
                 company_name: "Apex Educacional",
-                segment: "Educação Executiva",
+                segment: "Educação Executiva de Elite",
                 digital_infrastructure: {
                     operational_links: {
-                        instagram: "https://instagram.com/instituto.apex",
+                        instagram: "https://www.instagram.com/instituto.apex",
                         website: "https://apexeducacional.com.br",
-                        canva: "https://canva.com/design/apex-premium",
-                        drive: "https://drive.google.com/drive/apex-folder",
-                        whatsapp: "5511777777777"
+                        canva: "https://drive.google.com/drive/folders/1K__Y4QTCfJ_4cnr54iocJyhFEDsPa5iZ?usp=drive_link",
+                        drive: "https://drive.google.com/drive/folders/14stjSxP6piUM2w0gFmRS-v9H2zjFIE0P?usp=drive_link",
+                        whatsapp: "5582993051282"
                     }
                 },
                 metadata: {
                     dna: {
-                        desired_patterns: ["Educação Executiva", "Networking Executivo", "Escala de Times", "Alta LTV"],
-                        anti_patterns: ["Linguagem de Cursos Baratos", "Fórmulas Mágicas de Enriquecimento", "Amadorismo", "Gatilhos Mentais Agressivos"],
-                        forbidden_themes: "Esquemas de enriquecimento rápido, hacks genéricos de carreira, promessas de faturamento sem embasamento, gírias excessivas"
+                        desired_patterns: ["Educação Executiva Avançada", "Networking Corporativo de Elite", "Escala de Times e Liderança", "Alta LTV e Retenção Corporativa"],
+                        anti_patterns: ["Linguagem de Cursos Baratos Promocionais", "Fórmulas Mágicas de Enriquecimento Rápido", "Amadorismo Pedagógico", "Gatilhos Mentais Enganosos e Agressivos"],
+                        forbidden_themes: "Esquemas de enriquecimento rápido, hacks genéricos de carreira, promessas irreais de faturamento empresarial sem embasamento sólido, gírias excessivas e informais"
                     },
-                    tone_of_voice: "Executivo, afiado, autoritário, educativo, altamente profissional, analítico, confiável",
+                    tone_of_voice: "Executivo, altamente qualificado, afiado, autoritário com embasamento, educativo de excelência, analítico, inspirador e confiável",
                     strategic_roadmap: {
-                        semana_1: "Posicionamento executivo, pilares de gestão e liderança",
-                        semana_2: "Networking e depoimentos corporativos de sucesso",
-                        semana_3: "Estudos de caso corporativos de alta escala",
-                        semana_4: "Ofertas de turmas, captação e análise de LTV"
+                        semana_1: "organização estratégica e alinhamento de posicionamento de elite, mapeamento de dores executivas, definição de paleta visual sóbria corporativa",
+                        semana_2: "primeiros conteúdos estratégicos de gestão, construção de autoridade institucional, demonstração de depoimentos e cases corporativos de alto impacto",
+                        semana_3: "fortalecimento de networking e ecossistema, publicação de estudos de caso reais de grandes corporações, conteúdo avançado de tomada de decisão executiva",
+                        semana_4: "análise de métricas corporativas, otimização de conversão de turmas de alta LTV, captação estratégica B2B, consolidação do posicionamento de referência nacional"
                     },
-                    cfn_rules: "Integridade educacional e conformidade com as diretrizes do MEC para ensino de alta performance corporativa."
+                    cfn_rules: "Integridade educacional avançada, conformidade absoluta com as melhores práticas de ensino corporativo nacional, respeito ao desenvolvimento ético de lideranças empresariais."
                 }
             }
         ];
@@ -375,6 +378,22 @@ function renderContracts(contracts) {
 
         const val = c.contract_value;
         const deliverables = c.deliverables || 'N/A';
+        
+        let deliverablesHtml = deliverables;
+        if (deliverables.includes('[EXTRA]')) {
+            const parts = deliverables.split('[EXTRA]:');
+            const baseDeliverables = parts[0].trim();
+            const extraDetails = parts.slice(1).join('[EXTRA]:').trim();
+            deliverablesHtml = `
+                <div style="font-weight: 500;">${baseDeliverables.replace(/\n/g, '<br>')}</div>
+                <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; background: rgba(142, 158, 104, 0.12); border: 1px dashed var(--os-primary); padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; color: #fff; line-height: 1.2;">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--os-primary); font-size: 0.65rem;"></i>
+                    <span><strong>EXTRA:</strong> ${extraDetails}</span>
+                </div>
+            `;
+        } else {
+            deliverablesHtml = `<div style="font-weight: 500;">${deliverables.replace(/\n/g, '<br>')}</div>`;
+        }
 
         return `
             <tr>
@@ -383,7 +402,7 @@ function renderContracts(contracts) {
                     <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.client_name}</div>
                 </td>
                 <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">ENGENHARIA DE CONTEÚDO</td>
-                <td style="font-size: 0.75rem;">${deliverables}</td>
+                <td style="font-size: 0.75rem;">${deliverablesHtml}</td>
                 <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(val)}</td>
                 <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">${c.status}</span></td>
                 <td>${startDate}</td>

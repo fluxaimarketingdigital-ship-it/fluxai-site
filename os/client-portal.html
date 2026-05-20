@@ -179,6 +179,61 @@
             .btn-back-portal { position: static; display: inline-flex; margin-bottom: 20px; }
         }
         @media (max-width: 600px) { .calendar-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        /* PREMIUM FINANCE & PIX SYSTEM ALERTS */
+        .expiration-banner {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+            border: 1px solid rgba(239, 68, 68, 0.25);
+            border-radius: 12px;
+            padding: 20px 30px;
+            margin: 20px auto 10px;
+            max-width: 1350px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            animation: slideDown 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+            box-shadow: 0 10px 30px rgba(239, 68, 68, 0.05);
+            width: calc(100% - 40px);
+            box-sizing: border-box;
+        }
+        .expiration-banner.warning {
+            background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(142, 158, 104, 0.08) 100%);
+            border-color: rgba(245, 158, 11, 0.25);
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.03);
+        }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .pix-details-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            backdrop-filter: blur(15px);
+        }
+        .pix-modal-content {
+            background: #0f120f;
+            border: 1px solid var(--os-primary);
+            border-radius: 16px;
+            padding: 40px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+            animation: zoomIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+        @keyframes zoomIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -199,6 +254,7 @@
         </div>
     </header>
 
+    <div id="expiration-alert-container"></div>
     <div class="calendar-grid" id="calendar-body"></div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -323,6 +379,7 @@
                 
                 renderCalendar();
             }
+            await checkFinancialAlerts();
         }
 
         function renderCalendar() {
@@ -377,7 +434,139 @@
             renderCalendar();
         };
 
+        async function checkFinancialAlerts() {
+            // Sincronizar/Garantir datas de teste no localStorage para simulação perfeita
+            let mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
+            const todayStr = new Date().toISOString().split('T')[0] + 'T00:00:00.000Z';
+            
+            // 2 dias a partir de hoje
+            const in2Days = new Date();
+            in2Days.setDate(in2Days.getDate() + 2);
+            const in2DaysStr = in2Days.toISOString().split('T')[0] + 'T00:00:00.000Z';
+            
+            if (mockPayments.length > 0) {
+                // Maria Aparecida (p_c1) -> Vencimento em 2 dias (Warning)
+                const p1 = mockPayments.find(p => p.id === 'p1' || p.contract_id === 'c1');
+                if (p1) {
+                    p1.due_date = in2DaysStr;
+                    p1.status = 'PENDENTE';
+                    p1.amount_due = 800;
+                }
+                
+                // Alves Odonto (p_c2) -> Vencimento Hoje (Critical PIX)
+                const p2 = mockPayments.find(p => p.id === 'p2' || p.contract_id === 'c2');
+                if (p2) {
+                    p2.due_date = todayStr;
+                    p2.status = 'PENDENTE';
+                    p2.amount_due = 5000;
+                }
+                
+                localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
+            }
+
+            // Verificar status financeiro/vencimento para o cliente atual
+            const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+            const activeContract = mockContracts.find(c => c.project_id === projectId);
+            
+            if (activeContract) {
+                const activePayment = mockPayments.find(p => p.contract_id === activeContract.id && p.status !== 'PAGO');
+                if (activePayment) {
+                    const dueDate = new Date(activePayment.due_date);
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    dueDate.setHours(0,0,0,0);
+                    
+                    const diffTime = dueDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    const alertContainer = document.getElementById('expiration-alert-container');
+                    
+                    if (diffDays === 2) {
+                        // Alerta de 2 dias antes
+                        alertContainer.innerHTML = `
+                            <div class="expiration-banner warning">
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <i class="fa-solid fa-circle-exclamation" style="font-size:1.5rem; color:var(--os-warning);"></i>
+                                    <div>
+                                        <h4 style="margin:0; font-size:0.85rem; color:#fff; font-weight:800;">Lembrete de Vencimento Próximo</h4>
+                                        <p style="margin:3px 0 0 0; font-size:0.7rem; color:var(--os-text-muted);">
+                                            Sua recorrência mensal no valor de R$ ${activePayment.amount_due.toFixed(2)} vence em 2 dias (${dueDate.toLocaleDateString('pt-BR')}).
+                                        </p>
+                                    </div>
+                                </div>
+                                <button onclick="window.location.href='/os/content-engine.html?project=${projectId}'" style="background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s;">
+                                    Ver Pautas & Estratégia
+                                </button>
+                            </div>
+                        `;
+                    } else if (diffDays === 0) {
+                        // Alerta do Dia do Vencimento (PIX)
+                        alertContainer.innerHTML = `
+                            <div class="expiration-banner">
+                                <div style="display:flex; align-items:center; gap:15px;">
+                                    <i class="fa-solid fa-triangle-exclamation" style="font-size:1.5rem; color:var(--os-danger); animation: pulse 1.5s infinite;"></i>
+                                    <div>
+                                        <h4 style="margin:0; font-size:0.85rem; color:#fff; font-weight:800;">Recorrência com Vencimento Hoje!</h4>
+                                        <p style="margin:3px 0 0 0; font-size:0.7rem; color:var(--os-text-muted);">
+                                            Sua mensalidade no valor de R$ ${activePayment.amount_due.toFixed(2)} vence hoje. Efetue o pagamento via PIX para manter seus disparos e automações ativos.
+                                        </p>
+                                    </div>
+                                </div>
+                                <button onclick="openPixModal(${activePayment.amount_due}, '${activeContract.company_name}')" style="background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.3);">
+                                    Pagar com PIX <i class="fa-solid fa-qrcode" style="margin-left:4px;"></i>
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+            }
+        }
+
+        window.openPixModal = (value, companyName) => {
+            const formattedValue = value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            const message = encodeURIComponent(`Olá! Acabei de realizar o pagamento PIX no valor de ${formattedValue} referente à mensalidade da ${companyName} no FluxAI OS™. Segue o comprovante em anexo.`);
+            document.getElementById('btn-whatsapp-receipt').href = `https://wa.me/5582993051282?text=${message}`;
+            document.getElementById('pix-details-modal').style.display = 'flex';
+        };
+
+        window.copyPixKey = () => {
+            const keyText = document.getElementById('pix-key-display').innerText;
+            navigator.clipboard.writeText(keyText).then(() => {
+                alert('Chave PIX copiada com sucesso!');
+            });
+        };
+
         init();
     </script>
+
+    <!-- MODAL PIX PREMIUM -->
+    <div id="pix-details-modal" class="pix-details-modal">
+        <div class="pix-modal-content">
+            <button onclick="document.getElementById('pix-details-modal').style.display='none'" style="position:absolute; right:20px; top:20px; background:transparent; border:none; color:var(--os-text-muted); cursor:pointer; font-size:1.5rem;">&times;</button>
+            <i class="fa-solid fa-qrcode" style="font-size: 3rem; color: var(--os-primary); margin-bottom: 20px;"></i>
+            <h2 style="color: #fff; margin: 0 0 10px 0; font-size: 1.4rem; font-weight: 800;">Pagamento Instantâneo PIX</h2>
+            <p style="font-size: 0.8rem; color: var(--os-text-muted); margin-bottom: 25px; line-height: 1.5;">
+                Realize o pagamento escaneando o QR Code ou copiando a chave abaixo. Seu ecossistema continuará totalmente ativo.
+            </p>
+            
+            <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); border-radius: 8px; padding: 20px; margin-bottom: 25px;">
+                <div style="font-size: 0.65rem; color: var(--os-primary); font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">Chave CNPJ PIX</div>
+                <div id="pix-key-display" style="font-family: monospace; font-size: 0.95rem; color: #fff; font-weight: 700; margin-bottom: 15px;">45.291.901/0001-88</div>
+                
+                <button onclick="copyPixKey()" style="background: rgba(142, 158, 104, 0.15); border: 1px solid var(--os-primary); color: var(--os-primary); padding: 8px 16px; border-radius: 4px; font-size: 0.7rem; font-weight: 800; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;">
+                    <i class="fa-solid fa-copy"></i> Copiar Chave
+                </button>
+            </div>
+            
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <a id="btn-whatsapp-receipt" href="#" target="_blank" style="background: #25d366; color: #000; padding: 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 800; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2); transition: 0.2s;">
+                    <i class="fa-brands fa-whatsapp"></i> Enviar Comprovante
+                </a>
+                <button onclick="document.getElementById('pix-details-modal').style.display='none'" style="background: transparent; border: 1px solid var(--os-border); color: #fff; padding: 12px; border-radius: 6px; font-size: 0.8rem; font-weight: 700; cursor: pointer;">
+                    Fechar Janela
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

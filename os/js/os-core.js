@@ -221,9 +221,11 @@ OS_UI.renderTopbar = async () => {
     let activeProj = null;
     if (currentProjectId && currentProjectId !== 'todos') {
         const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-        activeProj = mockProjects.find(p => p.id === currentProjectId);
+        const supabaseProjects = JSON.parse(localStorage.getItem('fluxai_supabase_projects') || '[]');
+        activeProj = mockProjects.find(p => p.id === currentProjectId) || supabaseProjects.find(p => p.id === currentProjectId);
         if (activeProj) {
-            activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: ${activeProj.company_name.toUpperCase()}</span>`;
+            const companyName = activeProj.company_name || activeProj.name || 'Desconhecido';
+            activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: ${companyName.toUpperCase()}</span>`;
         } else {
             activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
         }

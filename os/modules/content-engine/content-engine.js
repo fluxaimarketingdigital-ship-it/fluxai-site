@@ -240,6 +240,7 @@ async function loadProjects() {
 
         // Armazenar projetos globalmente para consulta rápida
         window.allProjects = projects || [];
+        localStorage.setItem('fluxai_supabase_projects', JSON.stringify(window.allProjects));
 
         const select = document.getElementById('project-filter');
         if (select) {
@@ -258,6 +259,7 @@ async function loadProjects() {
         
         const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
         window.allProjects = mockProjects;
+        localStorage.setItem('fluxai_supabase_projects', JSON.stringify(mockProjects));
 
         const select = document.getElementById('project-filter');
         if (select) {
