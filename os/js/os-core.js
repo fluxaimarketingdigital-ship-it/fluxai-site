@@ -39,7 +39,7 @@ export const OS_UI = {
         // contexts: em quais contextos o item aparece
         const navItems = [
             { id: 'command-center',   label: 'Centro de Comando',     icon: 'fa-gauge-high',          group: 'Núcleo Estratégico',    roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'onboarding',       label: 'Onboarding Estratégico',icon: 'fa-address-card',         group: 'Núcleo Estratégico',    roles: ['ADMIN'],             contexts: ['MASTER'] },
+            { id: 'onboarding',       label: 'Onboarding Estratégico',icon: 'fa-address-card',         group: 'Núcleo Estratégico',    roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER', 'LABS'] },
             { id: 'content-engine',   label: 'Motor de Conteúdo',     icon: 'fa-pen-nib',             group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS','CLIENT'] },
             { id: 'crm-intelligence', label: 'Inteligência de CRM',   icon: 'fa-users-gear',          group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },
             { id: 'automation-hub',   label: 'Central de Automação',  icon: 'fa-robot',               group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },

@@ -1306,7 +1306,19 @@
             if (!user) return;
 
             OS_UI.renderSidebar('analytics', user.role);
-            
+
+            // Tentar buscar projetos reais do Supabase
+            let activeProjects = [];
+            try {
+                const supabase = getSupabase();
+                const { data, error } = await supabase.from('projects').select('*').eq('status', 'ATIVO');
+                if (data && !error && data.length > 0) {
+                    activeProjects = data;
+                }
+            } catch (e) {
+                console.warn('Fallback: Usando projetos do cache/mock.');
+            }
+
             // Garantir que mockProjects está inicializado no localStorage para sincronia total
             let mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects'));
             if (mockProjects && mockProjects[1] && (!mockProjects[1].digital_infrastructure?.operational_links?.canva || !mockProjects[1].digital_infrastructure.operational_links.canva.includes('folders'))) {
@@ -1405,6 +1417,10 @@
                 localStorage.setItem('fluxai_mock_projects', JSON.stringify(mockProjects));
             }
 
+            if (activeProjects.length === 0) {
+                activeProjects = mockProjects || [];
+            }
+
             // Popular Filtros de Clientes
             const projectFilter = document.getElementById('analytics-project-filter');
             const modalProjectFilter = document.getElementById('modal-metric-project-id');
@@ -1419,15 +1435,16 @@
                 optTodos.innerText = "TODOS OS CLIENTES";
                 projectFilter.appendChild(optTodos);
 
-                mockProjects.forEach(proj => {
+                activeProjects.forEach(proj => {
+                    const companyName = proj.company_name || proj.name || 'Projeto sem nome';
                     const opt1 = document.createElement('option');
                     opt1.value = proj.id;
-                    opt1.innerText = proj.company_name.toUpperCase();
+                    opt1.innerText = companyName.toUpperCase();
                     projectFilter.appendChild(opt1);
 
                     const opt2 = document.createElement('option');
                     opt2.value = proj.id;
-                    opt2.innerText = proj.company_name.toUpperCase();
+                    opt2.innerText = companyName.toUpperCase();
                     modalProjectFilter.appendChild(opt2);
                 });
             }
@@ -1439,10 +1456,10 @@
             const triggerInput = params.get('input') === 'true';
 
             let currentProjectId = localStorage.getItem('fluxai_current_project_id');
-            if (urlProjId && (urlProjId === 'todos' || mockProjects.some(p => p.id === urlProjId))) {
+            if (urlProjId && (urlProjId === 'todos' || activeProjects.some(p => p.id === urlProjId))) {
                 currentProjectId = urlProjId;
                 localStorage.setItem('fluxai_current_project_id', urlProjId);
-            } else if (!currentProjectId || (currentProjectId !== 'todos' && !mockProjects.some(p => p.id === currentProjectId))) {
+            } else if (!currentProjectId || (currentProjectId !== 'todos' && !activeProjects.some(p => p.id === currentProjectId))) {
                 currentProjectId = "todos"; // Fallback para consolidado que fica incrível
                 localStorage.setItem('fluxai_current_project_id', currentProjectId);
             }
