@@ -22,6 +22,18 @@ async function initOnboarding() {
         check.onchange = renderDynamicFields;
     });
 
+    // Permitir clique direto nas bolinhas das etapas lá em cima
+    const stepItems = document.querySelectorAll('.step-item');
+    stepItems.forEach(item => {
+        item.onclick = () => {
+            const targetStep = parseInt(item.getAttribute('data-step'));
+            if (targetStep !== currentStep) {
+                const delta = targetStep - currentStep;
+                moveStep(delta);
+            }
+        };
+    });
+
     const form = document.getElementById('onboardingForm');
     form.onsubmit = handleOnboarding;
 
