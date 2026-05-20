@@ -6,11 +6,16 @@ let currentStep = 1;
 const totalSteps = 7;
 
 async function initOnboarding() {
-    OS_UI.renderSidebar('onboarding', 'ADMIN'); 
+    // Renderiza sidebar e topbar imediatamente (não depende de auth)
+    OS_UI.renderSidebar('onboarding', 'ADMIN');
     OS_UI.renderTopbar();
 
     const user = await OS_AUTH.check('ADMIN');
-    if (!user) return;
+    if (!user) {
+        // Se não estiver logado, auth.check já redireciona
+        // mas mantém a sidebar visível durante o redirecionamento
+        return;
+    }
 
     // Listeners de Navegação
     document.getElementById('btn-next').onclick = () => moveStep(1);

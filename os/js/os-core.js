@@ -116,8 +116,17 @@ export const OS_UI = {
      * e badges de alertas operacionais.
      */
     renderTopbar: async () => {
-        const user = await OS_AUTH.check();
-        if (!user) return;
+        // Lê sessão diretamente do localStorage para não disparar redirect
+        let user = null;
+        try {
+            const raw = localStorage.getItem('fluxai_session');
+            if (raw) user = JSON.parse(raw);
+        } catch(e) {}
+        if (!user) {
+            // Sem sessão: topbar vazio mas sem redirecionar
+            return;
+        }
+        user.full_name = user.full_name || user.name || user.email || 'Admin';
 
         const initials = (user.full_name || user.email || '??')
             .split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();

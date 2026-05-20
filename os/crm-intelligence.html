@@ -451,32 +451,20 @@
                 }
             }
 
+            // Se não carregou do banco, mostra estado vazio (sem mocks)
             if (!loadedFromDb) {
-                // Tenta carregar do localStorage (suporte total aos 3 clientes offline)
-                const localContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-                if (localContracts && localContracts.length > 0) {
-                    leads = localContracts.map(c => {
-                        const healthVal = c.status === 'ATIVO' ? 95 : (c.status === 'PROPOSAL' ? 70 : 40);
-                        return {
-                            project_id: c.project_id || 'p_c1',
-                            company: c.company_name,
-                            name: c.client_name,
-                            value: c.contract_value || 0,
-                            healthScore: healthVal,
-                            status: c.status || 'ATIVO',
-                            lastFollowUp: new Date(c.created_at).toLocaleDateString('pt-BR'),
-                            nextAction: c.status === 'ATIVO' ? 'MONITORAR' : 'REVISAR',
-                            impact: 'R$ ' + Number(c.contract_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
-                        };
-                    });
-                } else {
-                    leads = crmLeadsData.map(l => ({
-                        ...l,
-                        project_id: l.id === 'L-1024' ? 'p_c1' : (l.id === 'L-1025' ? 'p_c2' : 'p_c3'),
-                        company: l.name,
-                        name: l.contact
-                    }));
-                }
+                leads = [];
+            }
+
+            if (leads.length === 0) {
+                crmBody.innerHTML = `
+                    <tr><td colspan="7" style="text-align: center; padding: 60px 20px; color: var(--os-text-muted); font-size: 0.85rem;">
+                        <i class="fa-solid fa-users" style="font-size: 2rem; display: block; margin-bottom: 15px; opacity: 0.3;"></i>
+                        Nenhum cliente ou lead cadastrado ainda.<br/>
+                        <span style="font-size: 0.75rem;">Use o Onboarding para ativar o primeiro cliente.</span>
+                    </td></tr>
+                `;
+                return;
             }
 
             crmBody.innerHTML = leads.map(item => {
@@ -572,10 +560,24 @@
                 OS_UI.renderSidebar('crm-intelligence', user.role);
                 await OS_UI.renderTopbar();
 
-                OS_UI.renderMetric('metric-value', { label: 'Valor em Pipeline', value: crmMetrics.pipelineValue, trend: '+15%', trendUp: true });
-                OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: crmMetrics.retentionRate, trend: '+0.5%', trendUp: true });
-                OS_UI.renderMetric('metric-cycle', { label: 'Ciclo Médio', value: crmMetrics.avgSalesCycle, trend: '-2d', trendUp: true });
-                OS_UI.renderMetric('metric-opps', { label: 'Oportunidades Ativas', value: crmMetrics.activeOpportunities, trend: '+3', trendUp: true });
+                // Métricas dinâmicas do Supabase
+                let pipelineVal = 'R$ 0', oppsCount = 0;
+                const supabaseInst = getSupabase();
+                if (supabaseInst) {
+                    try {
+                        const { data: cData } = await supabaseInst.from('contracts').select('contract_value, status');
+                        if (cData && cData.length > 0) {
+                            const total = cData.reduce((s, c) => s + (Number(c.contract_value) || 0), 0);
+                            pipelineVal = 'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 0 });
+                            oppsCount = cData.filter(c => c.status === 'ATIVO').length;
+                        }
+                    } catch(e) {}
+                }
+
+                OS_UI.renderMetric('metric-value', { label: 'Valor em Pipeline', value: pipelineVal, trend: '--', trendUp: true });
+                OS_UI.renderMetric('metric-retention', { label: 'Taxa de Retenção', value: '--', trend: '--', trendUp: true });
+                OS_UI.renderMetric('metric-cycle', { label: 'Ciclo Médio', value: '--', trend: '--', trendUp: true });
+                OS_UI.renderMetric('metric-opps', { label: 'Oportunidades Ativas', value: oppsCount, trend: '--', trendUp: true });
 
                 await renderLeads();
                 renderLogs();
