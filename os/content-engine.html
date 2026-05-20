@@ -62,6 +62,9 @@
                                 <option value="CRM" style="background:#111; color:#fff;">CRM</option>
                                 <option value="AUTOMACAO" style="background:#111; color:#fff;">AUTOMAÇÃO</option>
                             </select>
+                            <button id="btn-config-openai" onclick="window.configOpenAIKey()" class="btn-ai" style="height: 34px; padding: 0 15px; border-color: #a855f7; color: #a855f7; background: transparent; margin-right: 8px;" title="Configurar Chave API OpenAI">
+                                <i class="fa-solid fa-key"></i> CHAVE IA
+                            </button>
                             <button id="btn-ai-planner" class="btn-ai" onclick="window.runAiPlanner()" style="height: 34px; padding: 0 15px;">
                                 <i class="fa-solid fa-wand-magic-sparkles"></i> GERAR IA
                             </button>
@@ -253,6 +256,20 @@
                 window.getSupabase = getSupabase;
                 window.OS_UI = OS_UI;
                 window.OS_AUTH = OS_AUTH;
+
+                window.configOpenAIKey = () => {
+                    const currentKey = localStorage.getItem('openai_api_key') || '';
+                    const newKey = prompt('Insira sua Chave de API da OpenAI (sk-...):\n\nIsso permitirá que o FluxAI OS crie pautas reais com GPT-4o.', currentKey);
+                    if (newKey !== null) {
+                        if (newKey.trim() === '') {
+                            localStorage.removeItem('openai_api_key');
+                            alert('Chave OpenAI removida. O sistema usará os modelos estáticos (fallback).');
+                        } else {
+                            localStorage.setItem('openai_api_key', newKey.trim());
+                            alert('Chave OpenAI salva com sucesso! O Motor de Conteúdo agora possui Inteligência Artificial real.');
+                        }
+                    }
+                };
 
                 const user = await OS_AUTH.check('OPERATOR');
                 if (!user) return;
