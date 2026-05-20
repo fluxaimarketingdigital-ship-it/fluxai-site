@@ -198,30 +198,53 @@ export const AIPlanner = {
      */
     generatePlan: async (projectId, specificService = 'ALL', maxToGenerate = 99) => {
         const supabase = window.getSupabase();
-        const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
+        let project = null;
+        let existing = [];
+        let isDbOnline = false;
+
+        try {
+            const { data, error } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
+            if (!error && data) {
+                project = data;
+                isDbOnline = true;
+                
+                const { data: dbExisting, error: existingErr } = await supabase.from('content_assets')
+                    .select('scheduled_at')
+                    .eq('project_id', projectId);
+                if (!existingErr) {
+                    existing = dbExisting || [];
+                }
+            }
+        } catch (e) {
+            console.warn('Erro ao acessar o banco de dados no planejador IA, buscando mocks locais...', e);
+        }
+
+        // Fallback Local se Supabase falhou ou não retornou dados
+        if (!isDbOnline) {
+            const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+            project = mockProjects.find(p => p.id === projectId);
+            
+            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+            existing = mockAssets.filter(item => item && item.project_id === projectId);
+        }
         
-        const onboarding = project.metadata?.onboarding || {};
-        const opsActivation = project.metadata?.operational_activation || project.operational_activation || {};
+        const onboarding = project?.metadata?.onboarding || project?.onboarding || {};
+        const opsActivation = project?.metadata?.operational_activation || project?.operational_activation || {};
         
         const icp = onboarding.icp || "Público High-Ticket, busca exclusividade";
         const tone = onboarding.voice_tone || onboarding.tone || "Soberano, técnico";
         const objectives = onboarding.primary_pain ? `Resolver dor: ${onboarding.primary_pain}` : "Escala e Autoridade";
         
-        const painPoints = opsActivation.pain_points ? opsActivation.pain_points.join(', ') : "Não especificado";
-        const dnaDesired = opsActivation.dna?.desired_patterns ? opsActivation.dna.desired_patterns.join(', ') : "Premium";
-        const dnaAnti = opsActivation.dna?.anti_patterns ? opsActivation.dna.anti_patterns.join(', ') : "Amadorismo";
+        const painPoints = opsActivation.pain_points ? (Array.isArray(opsActivation.pain_points) ? opsActivation.pain_points.join(', ') : opsActivation.pain_points) : "Não especificado";
+        const dnaDesired = opsActivation.dna?.desired_patterns ? (Array.isArray(opsActivation.dna.desired_patterns) ? opsActivation.dna.desired_patterns.join(', ') : opsActivation.dna.desired_patterns) : "Premium";
+        const dnaAnti = opsActivation.dna?.anti_patterns ? (Array.isArray(opsActivation.dna.anti_patterns) ? opsActivation.dna.anti_patterns.join(', ') : opsActivation.dna.anti_patterns) : "Amadorismo";
 
-        // Buscar datas já ocupadas para evitar colisões
-        const { data: existing } = await supabase.from('content_assets')
-            .select('scheduled_at')
-            .eq('project_id', projectId);
-        
         const occupiedDates = (existing || []).map(e => {
             const d = new Date(e.scheduled_at);
             return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
         });
 
-        const strategicDays = project.metadata?.onboarding?.best_posting_days || [1, 2, 3, 4, 5]; 
+        const strategicDays = project?.metadata?.onboarding?.best_posting_days || [1, 2, 3, 4, 5]; 
         
         const contents = [];
         const now = new Date();

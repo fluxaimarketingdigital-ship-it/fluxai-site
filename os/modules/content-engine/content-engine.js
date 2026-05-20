@@ -1054,6 +1054,45 @@ window.approvePendingAssets = async () => {
     }
 };
 
+// Função auxiliar para extrair a cota a partir dos entregáveis do contrato
+function extractQuotaFromDeliverables(deliverablesStr) {
+    if (!deliverablesStr) return null;
+    
+    const str = deliverablesStr.toLowerCase();
+    
+    // Se o padrão for explícito de "X ativos" ou "X slots", ex: "12 ativos/mês"
+    const genericMatch = str.match(/(\d+)\s*(ativos|slots|conteúdos|conteudos|posts|publicações|publicacoes|peças|pecas|artigos)/);
+    if (genericMatch) {
+        return parseInt(genericMatch[1]);
+    }
+    
+    // Caso seja composto, ex: "2 carrosséis + 2 reels/mês" ou "4 posts + 2 vídeos"
+    const pattern = /(\d+)\s*(reels|reles|carross[eê]is|posts?|v[ií]deos?|stories|cards?|landing\s*pages?|sites?)/g;
+    let total = 0;
+    let match;
+    let found = false;
+    
+    while ((match = pattern.exec(str)) !== null) {
+        total += parseInt(match[1]);
+        found = true;
+    }
+    
+    if (found && total > 0) {
+        return total;
+    }
+    
+    // Fallback simples: se tiver apenas números gerais no texto curto (menos de 50 caracteres)
+    if (str.length < 50) {
+        const simpleMatches = str.match(/\d+/g);
+        if (simpleMatches) {
+            const simpleSum = simpleMatches.reduce((sum, val) => sum + parseInt(val), 0);
+            if (simpleSum > 0) return simpleSum;
+        }
+    }
+    
+    return null;
+}
+
 window.runAiPlanner = async () => {
     const user = await OS_AUTH.check();
     if (user?.role !== 'ADMIN' && user?.role !== 'MANAGER') return alert('Acesso negado.');
@@ -1064,13 +1103,66 @@ window.runAiPlanner = async () => {
 
     const supabase = getSupabase();
     
-    // VERIFICAÇÃO DE COTA (CONTRATO)
-    const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', selectedId).single();
-    const { count } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('project_id', selectedId);
+    // VERIFICAÇÃO DE COTA (CONTRATO) DE FORMA DINÂMICA E RESILIENTE
+    let project = null;
+    let count = 0;
+    let deliverablesStr = '';
+    let isDbOnline = false;
+
+    try {
+        const { data, error } = await supabase.from('projects').select('*, contracts(*)').eq('id', selectedId).single();
+        if (!error && data) {
+            project = data;
+            isDbOnline = true;
+            
+            const { count: dbCount, error: countErr } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('project_id', selectedId);
+            if (!countErr) {
+                count = dbCount || 0;
+            }
+        }
+    } catch (dbErr) {
+        console.warn('Erro ao conectar ao Supabase para verificação de cota:', dbErr);
+    }
+
+    // Fallback offline / LocalStorage se o banco estiver offline ou indisponível
+    if (!isDbOnline) {
+        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+        project = mockProjects.find(p => p.id === selectedId);
+        
+        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+        count = mockAssets.filter(item => item && item.project_id === selectedId).length;
+    }
+
+    // Obter cota real dos deliverables do contrato
+    let quota = 12; // Default padrão
     
-    // Tentar extrair número da cota do 'content_scope' (Ex: "12 Ativos/mês")
-    const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
-    const quota = quotaMatch ? parseInt(quotaMatch[0]) : 12;
+    if (project) {
+        // Buscar deliverables do relacionamento do banco
+        if (project.contracts) {
+            const contracts = Array.isArray(project.contracts) ? project.contracts : [project.contracts];
+            const activeContract = contracts.find(c => c.status === 'ATIVO') || contracts[0];
+            if (activeContract) {
+                deliverablesStr = activeContract.deliverables || '';
+            }
+        }
+        
+        // Se não houver deliverables no banco ou for offline, buscar dos mocks de contratos
+        if (!deliverablesStr) {
+            const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+            const clientContract = mockContracts.find(c => c.project_id === selectedId && c.status === 'ATIVO')
+                || mockContracts.find(c => c.project_id === selectedId);
+            if (clientContract) {
+                deliverablesStr = clientContract.deliverables || '';
+            }
+        }
+        
+        // Tentar extrair do deliverables ou do content_scope antigo como fallback
+        const scopeStr = deliverablesStr || project.content_scope || '';
+        const parsedQuota = extractQuotaFromDeliverables(scopeStr);
+        if (parsedQuota !== null) {
+            quota = parsedQuota;
+        }
+    }
 
     const remaining = quota - count;
 
@@ -1085,7 +1177,7 @@ window.runAiPlanner = async () => {
         const type = document.getElementById('ai-planner-service').value;
         
         if (confirm(`Gerar ${type === 'ALL' ? 'novo planejamento' : 'ativos de ' + type} para preencher os ${remaining} slots disponíveis no contrato?`)) {
-            const newAssets = await AIPlanner.generatePlan(currentProject, type, remaining);
+            const newAssets = await AIPlanner.generatePlan(selectedId, type, remaining);
             
             if (newAssets && newAssets.length > 0) {
                 // APLICAR INTELIGÃŠNCIA DE PRAZO E RESPONSÁVEL
