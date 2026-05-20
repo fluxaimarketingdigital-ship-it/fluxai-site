@@ -16,23 +16,23 @@ window.changeMonth = (delta) => {
 
 const sLog = (msg) => { if (window.screenLog) window.screenLog(msg); console.log('[ENGINE]', msg); };
 
-// MATRIZ DE OPERA�!�"ES ESTRAT�0GICAS FLUXAI v7.0 (FLUXO MESTRE)
+// MATRIZ DE OPERAÇÕES ESTRATÉGICAS FLUXAI v7.0 (FLUXO MESTRE)
 const STRATEGIC_MATRIX = {
     'REELS': { 
         name: 'Direção Operacional Audiovisual', 
         clientPrefix: 'REELS', 
         platform: 'REELS',
         generate: (p, obj) => `
-�x}� OBJETIVO: ${obj}
-�x}� FORMATO: Reels (Vertical 9:16)
-����� TEMPO ESTIMADO: 45-60 segundos
+ðŸŽ¯ OBJETIVO: ${obj}
+ðŸŽ¬ FORMATO: Reels (Vertical 9:16)
+â�±ï¸� TEMPO ESTIMADO: 45-60 segundos
 
-�x�� HOOK: "A maioria das empresas não falha por falta de produto, mas por excesso de ruído operacional."
-����� PAUSA ESTRAT�0GICA: [Silêncio de 1.5s para ênfase visual]
-�x� DESENVOLVIMENTO: Discorrer sobre a diferença entre 'movimento' e 'progresso real'. Utilizar tom de voz Soberano e Técnico.
-�x��� DIRE�!ÒO DE CENA: Enquadramento em plano médio. Fundo neutro/escritório. Iluminação de alto contraste.
-�S� CTA: "Comente ESTRUTURA para acessar o diagnóstico de eficiência da FluxAI."
-�x� LEGENDA: Narrativa focada em autoridade executiva e diferenciação de mercado.
+ðŸª� HOOK: "A maioria das empresas não falha por falta de produto, mas por excesso de ruído operacional."
+â�¸ï¸� PAUSA ESTRATÉGICA: [Silêncio de 1.5s para ênfase visual]
+ðŸ“� DESENVOLVIMENTO: Discorrer sobre a diferença entre 'movimento' e 'progresso real'. Utilizar tom de voz Soberano e Técnico.
+ðŸ‘�ï¸� DIREÇÃO DE CENA: Enquadramento em plano médio. Fundo neutro/escritório. Iluminação de alto contraste.
+âœ¨ CTA: "Comente ESTRUTURA para acessar o diagnóstico de eficiência da FluxAI."
+ðŸ“� LEGENDA: Narrativa focada em autoridade executiva e diferenciação de mercado.
         `
     },
     'CARROSSEL': { 
@@ -40,10 +40,10 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'CARROSSEL', 
         platform: 'INSTAGRAM',
         generate: (p, obj) => `
-�x}� OBJETIVO: ${obj}
-�x}� FORMATO: Carrossel Estratégico (10 slides)
+ðŸŽ¯ OBJETIVO: ${obj}
+ðŸŽ¬ FORMATO: Carrossel Estratégico (10 slides)
 
-�x��� ESTRUTURA NARRATIVA:
+ðŸ–¼ï¸� ESTRUTURA NARRATIVA:
 - Slide 01: [Gancho de Atenção] "O custo invisível da desorganização estratégica."
 - Slide 02: [Tensão] Por que processos manuais estão drenando sua margem de lucro.
 - Slide 03: [Conceito] A lógica da Engenharia de Processos aplicada ao marketing.
@@ -58,11 +58,11 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'POST', 
         platform: 'INSTAGRAM',
         generate: (p, obj) => `
-�x}� OBJETIVO: ${obj}
-�x� CONCEITO: Afirmação de Autoridade Absoluta.
-�x}� DESIGN: Tipografia imponente, alto espaço negativo (silêncio visual).
-�x� HEADLINE: "Escala não é sobre intensidade, é sobre arquitetura."
-�S� CTA: "Toque no link da Bio para entender a Engenharia por trás da FluxAI."
+ðŸŽ¯ OBJETIVO: ${obj}
+ðŸ’¡ CONCEITO: Afirmação de Autoridade Absoluta.
+ðŸŽ¨ DESIGN: Tipografia imponente, alto espaço negativo (silêncio visual).
+ðŸ“� HEADLINE: "Escala não é sobre intensidade, é sobre arquitetura."
+âœ¨ CTA: "Toque no link da Bio para entender a Engenharia por trás da FluxAI."
         `
     },
     'SITE': { 
@@ -70,15 +70,15 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'SITE', 
         platform: 'WEB',
         generate: (p, obj) => `
-�x}� OBJETIVO: Conversão de Alta Autoridade (High-Ticket)
-�xR� ESTRUTURA UX: Foco em Jornada de Decisão Executiva
+ðŸŽ¯ OBJETIVO: Conversão de Alta Autoridade (High-Ticket)
+ðŸŒ� ESTRUTURA UX: Foco em Jornada de Decisão Executiva
 
-�x��� SE�!�"ES:
+ðŸ�—ï¸� SEÇÕES:
 1. HERO: Proposta de valor inquestionável + Visual Cinematic.
-2. DIAGN�STICO: Exposição das dores do ICP e solução técnica.
+2. DIAGNÓSTICO: Exposição das dores do ICP e solução técnica.
 3. ECOSSISTEMA: Detalhamento dos módulos operacionais.
 4. PROVA DE VALOR: Resultados tangíveis e depoimentos selecionados.
-�xa� SEO: Otimização para palavras-chave de intenção comercial institucional.
+ðŸš€ SEO: Otimização para palavras-chave de intenção comercial institucional.
         `
     },
     'BRANDING': { 
@@ -86,20 +86,20 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'BRANDING', 
         platform: 'BRAND',
         generate: (p, obj) => `
-�x} PERCEP�!ÒO: Posicionamento de Elite e Exclusividade Técnica.
-�x� NARRATIVA: Construir a imagem de ${p.company_name} como autoridade máxima no setor.
-�x}� VISUAL: Paleta sóbria, contrastes elegantes e iconografia proprietária.
+ðŸ’Ž PERCEPÇÃO: Posicionamento de Elite e Exclusividade Técnica.
+ðŸ“� NARRATIVA: Construir a imagem de ${p.company_name} como autoridade máxima no setor.
+ðŸŽ¨ VISUAL: Paleta sóbria, contrastes elegantes e iconografia proprietária.
         `
     },
     'TRAFEGO': { 
         name: 'Estratégia de Aquisição', 
-        clientPrefix: 'AQUISI�!ÒO', 
+        clientPrefix: 'AQUISIÇÃO', 
         platform: 'ADS',
         generate: (p, obj) => `
-�x}� OBJETIVO: Atração de Leads Qualificados (ICP High-Ticket)
-�x� CANAIS: Meta Ads + LinkedIn Ads
-�x� CRIATIVOS: Foco em dor latente e prova de autoridade.
-�x� ESTRAT�0GIA: Funil de conscientização progressiva com foco em LTV.
+ðŸŽ¯ OBJETIVO: Atração de Leads Qualificados (ICP High-Ticket)
+ðŸ“¡ CANAIS: Meta Ads + LinkedIn Ads
+ðŸ“� CRIATIVOS: Foco em dor latente e prova de autoridade.
+ðŸ’° ESTRATÉGIA: Funil de conscientização progressiva com foco em LTV.
         `
     },
     'CRM': { 
@@ -107,29 +107,29 @@ const STRATEGIC_MATRIX = {
         clientPrefix: 'CRM', 
         platform: 'CRM',
         generate: (p, obj) => `
-�x` GESTÒO: Inteligência de Dados aplicada ao Funil de Vendas.
-�x AUTOMA�!ÒO: Réguas de relacionamento baseadas no comportamento do lead.
-�x� M�0TRICA: Foco em Health Score e Taxa de Retenção.
+ðŸ“Š GESTÃO: Inteligência de Dados aplicada ao Funil de Vendas.
+ðŸ”„ AUTOMAÇÃO: Réguas de relacionamento baseadas no comportamento do lead.
+ðŸ“ˆ MÉTRICA: Foco em Health Score e Taxa de Retenção.
         `
     },
     'AUTOMACAO': { 
         name: 'Arquitetura Operacional', 
-        clientPrefix: 'AUTOMA�!ÒO', 
+        clientPrefix: 'AUTOMAÇÃO', 
         platform: 'SYSTEM',
         generate: (p, obj) => `
-�a"�� FLUXO: Automação de processos repetitivos para ganho de eficiência.
-�x INTEGRA�!ÒO: Sincronização em tempo real entre vendas e operação.
-�x:��� GOVERNAN�!A: Segurança de dados e rastreabilidade total das ações.
+âš™ï¸� FLUXO: Automação de processos repetitivos para ganho de eficiência.
+ðŸ”— INTEGRAÇÃO: Sincronização em tempo real entre vendas e operação.
+ðŸ›¡ï¸� GOVERNANÇA: Segurança de dados e rastreabilidade total das ações.
         `
     },
     'CONSULTORIA': { 
         name: 'Diagnóstico Estratégico', 
-        clientPrefix: 'DIAGN�STICO', 
+        clientPrefix: 'DIAGNÓSTICO', 
         platform: 'CONSULTING',
         generate: (p, obj) => `
-�x9 ESCOPO: Análise 360º da infraestrutura digital e operacional.
-�x ENTREGA: Relatório técnico com pontos de atrito e oportunidades de escala.
-�xa� IMPACTO: Definição do roadmap estratégico para os próximos 12 meses.
+ðŸ“‹ ESCOPO: Análise 360Âº da infraestrutura digital e operacional.
+ðŸ“‘ ENTREGA: Relatório técnico com pontos de atrito e oportunidades de escala.
+ðŸš€ IMPACTO: Definição do roadmap estratégico para os próximos 12 meses.
         `
     }
 };
@@ -138,7 +138,7 @@ const RESPONSIBLE_MAP = {
     'AUDIOVISUAL': 'Audiovisual',
     'REELS': 'Audiovisual',
     'NARRATIVA': 'Estrategista',
-    'DIRE�!ÒO': 'Estrategista',
+    'DIREÇÃO': 'Estrategista',
     'ARQUITETURA': 'Design',
     'CARROSSEL': 'Design',
     'CARD': 'Design',
@@ -147,8 +147,8 @@ const RESPONSIBLE_MAP = {
     'ADS': 'Gestor de Tráfego',
     'BRANDING': 'Estrategista',
     'CRM': 'Estrategista',
-    'AUTOMA�!ÒO': 'Sistemas',
-    'DIAGN�STICO': 'Estrategista'
+    'AUTOMAÇÃO': 'Sistemas',
+    'DIAGNÓSTICO': 'Estrategista'
 };
 
 export async function initEngine() {
@@ -175,7 +175,7 @@ export async function initEngine() {
         sLog('Carga Inicial: OK');
         setupRealtime();
 
-        // BOTÒO GLOBAL WA (TOP BAR)
+        // BOTÃO GLOBAL WA (TOP BAR)
         const btnGlobalWa = document.getElementById('btn-global-wa');
         if (btnGlobalWa) {
             btnGlobalWa.onclick = () => {
@@ -184,7 +184,7 @@ export async function initEngine() {
                 if (!selectedId) return alert('Selecione um cliente específico para enviar o lembrete direto.');
                 
                 const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${selectedId}`;
-                const msg = `Olá! �xa�%0A%0APassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.%0A%0AConfira aqui seu calendário atualizado:%0A${portalLink}`;
+                const msg = `Olá! ðŸš€%0A%0APassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.%0A%0AConfira aqui seu calendário atualizado:%0A${portalLink}`;
                 window.open(`https://wa.me/?text=${msg}`, '_blank');
             };
         }
@@ -195,7 +195,7 @@ export async function initEngine() {
                 currentProject = e.target.value;
                 localStorage.setItem('fluxai_current_project_id', currentProject);
                 
-                // Mostrar/Esconder bot�o de c�pia
+                // Mostrar/Esconder botão de cópia
                 const btnCopy = document.getElementById('btn-copy-portal');
                 if (btnCopy) btnCopy.style.display = currentProject ? 'flex' : 'none';
                 
@@ -299,7 +299,7 @@ async function loadContent() {
             }
         }
 
-        // RESTAURAR BOT�"ES DE A�!ÒO
+        // RESTAURAR BOTÕES DE AÇÃO
         const copyBtn = document.getElementById('btn-copy-portal');
         if (copyBtn) copyBtn.style.display = 'flex';
         
@@ -363,7 +363,7 @@ async function checkLogisticsCycle() {
         } else if (banner) {
             banner.style.display = 'none';
         }
-    } catch (e) { console.error('[LOG��STICA] Erro ao verificar ciclo:', e); }
+    } catch (e) { console.error('[LOGÃ�STICA] Erro ao verificar ciclo:', e); }
 }
 
 async function checkPublishingAlerts(contents) {
@@ -379,7 +379,7 @@ async function checkPublishingAlerts(contents) {
     });
 
     if (todayPosts.length > 0) {
-        sLog(`�x� ALERTA: Você tem ${todayPosts.length} conteúdos para publicar HOJE!`);
+        sLog(`ðŸ“¢ ALERTA: Você tem ${todayPosts.length} conteúdos para publicar HOJE!`);
         // Opcional: Mostrar uma notificação visual mais agressiva ou banner
         const metricSchedule = document.getElementById('metric-schedule');
         if (metricSchedule) {
@@ -393,13 +393,13 @@ function renderMetrics(contents) {
     const now = new Date();
     const metrics = {
         total: contents.length,
-        approval: contents.filter(c => c.status.includes('APROVA�!ÒO')).length,
+        approval: contents.filter(c => c.status.includes('APROVAÇÃO')).length,
         atrasado: contents.filter(c => {
             if (c.status === 'PUBLICADO' || c.status === 'PRONTO') return false;
             const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
             const scheduled = new Date(c.scheduled_at);
             // Atraso se passou do prazo de aprovação OU se está em produção e passou da data de postagem
-            return (deadline && deadline < now) || (c.status === 'PRODU�!ÒO' && scheduled < now);
+            return (deadline && deadline < now) || (c.status === 'PRODUÇÃO' && scheduled < now);
         }).length,
         ready: contents.filter(c => c.status === 'PRONTO').length
     };
@@ -407,7 +407,7 @@ function renderMetrics(contents) {
     OS_UI.renderMetric('metric-assets', { label: 'Logística Total', value: metrics.total, trend: 'v1.0', meta: 'Escopo' });
     OS_UI.renderMetric('metric-approval', { label: 'Aguardando Cliente', value: metrics.approval, trend: '!', meta: 'Atenção' });
     OS_UI.renderMetric('metric-production', { label: 'Atraso Operacional', value: metrics.atrasado, trend: 'down', meta: 'Crítico' });
-    OS_UI.renderMetric('metric-schedule', { label: 'Prontos para Postar', value: metrics.ready, trend: '�S', meta: 'Publicação' });
+    OS_UI.renderMetric('metric-schedule', { label: 'Prontos para Postar', value: metrics.ready, trend: 'âœ”', meta: 'Publicação' });
 
     // Atualizar status para ATRASADO via código se necessário (Lógica em tempo real)
     contents.forEach(async c => {
@@ -415,7 +415,7 @@ function renderMetrics(contents) {
             const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
             if (deadline && deadline < now) {
                 // Sincronizar com DB (Opcional - pode ser apenas visual no dashboard)
-                console.warn(`[LOG��STICA] Ativo ${c.title} está ATRASADO por prazo de aprovação.`);
+                console.warn(`[LOGÃ�STICA] Ativo ${c.title} está ATRASADO por prazo de aprovação.`);
             }
         }
     });
@@ -524,7 +524,7 @@ function renderCalendar(containerId, contents, mode) {
             
             // Filtro de visibilidade por modo
             // Filtro Estrategico Removido para sincronia total com a esteira
-            if (!isStrategic && !['PRODU�!ÒO', 'REVISÒO INTERNA FINAL', 'APROVA�!ÒO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
+            if (!isStrategic && !['PRODUÇÃO', 'REVISÃO INTERNA FINAL', 'APROVAÇÃO FINAL', 'PRONTO', 'PUBLICADO'].includes(c.status)) return '';
 
             return `
                 <div class="calendar-event" onclick="window.openApproval('${c.id}')" 
@@ -547,14 +547,14 @@ function renderCalendar(containerId, contents, mode) {
 
 function getStatusBg(status) {
     if (status === 'PLANEJAMENTO') return '#8b5cf6'; // Roxo
-    if (status === 'REVISÒO GESTÒO') return '#8b5cf6'; // Roxo
-    if (status === 'APROVA�!ÒO PLANEJAMENTO') return '#3b82f6'; // Azul
-    if (status === 'APROVA�!ÒO ESTRAT�0GICA') return '#3b82f6'; // Azul
+    if (status === 'REVISÃO GESTÃO') return '#8b5cf6'; // Roxo
+    if (status === 'APROVAÇÃO PLANEJAMENTO') return '#3b82f6'; // Azul
+    if (status === 'APROVAÇÃO ESTRATÉGICA') return '#3b82f6'; // Azul
     if (status === 'AJUSTE') return '#ef4444'; // Vermelho
-    if (status === 'PRODU�!ÒO') return '#f59e0b'; // Amarelo/Laranja
-    if (status === 'AJUSTE DE PRODU�!ÒO') return '#ec4899'; // Rosa (Refinamento técnico)
-    if (status === 'REVISÒO INTERNA FINAL') return '#ec4899';
-    if (status === 'APROVA�!ÒO FINAL') return '#3b82f6'; // Azul
+    if (status === 'PRODUÇÃO') return '#f59e0b'; // Amarelo/Laranja
+    if (status === 'AJUSTE DE PRODUÇÃO') return '#ec4899'; // Rosa (Refinamento técnico)
+    if (status === 'REVISÃO INTERNA FINAL') return '#ec4899';
+    if (status === 'APROVAÇÃO FINAL') return '#3b82f6'; // Azul
     if (status === 'PRONTO') return '#10b981'; // Verde
     if (status === 'PUBLICADO') return '#059669'; // Verde Escuro
     if (status === 'ATRASADO') return '#7f1d1d'; // Marrom/Vermelho Escuro
@@ -571,7 +571,7 @@ window.openEditModal = async (id) => {
     const supabase = getSupabase();
     const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
     if (c) {
-        const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVA�!ÒO ESTRAT�0GICA' || c.status === 'REVISÒO GESTÒO';
+        const isPlanning = c.status === 'PLANEJAMENTO' || c.status === 'APROVAÇÃO ESTRATÉGICA' || c.status === 'REVISÃO GESTÃO';
         const isDirector = localStorage.getItem('os_role') === 'DIRETOR';
         
         // Mapear campos do HTML (Somente os que são fixos)
@@ -587,7 +587,7 @@ window.openEditModal = async (id) => {
         const historyHtml = history.length > 0 ? history.map(h => `
             <div style="padding:10px; border-bottom:1px solid #222; font-size:0.7rem;">
                 <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <b style="color:${h.type === 'CLIENT' ? '#60a5fa' : '#8b5cf6'}">${h.type === 'CLIENT' ? '�xR AJUSTE CLIENTE' : '�x:��� AJUSTE ESTRAT�0GICO'}</b>
+                    <b style="color:${h.type === 'CLIENT' ? '#60a5fa' : '#8b5cf6'}">${h.type === 'CLIENT' ? 'ðŸ“Œ AJUSTE CLIENTE' : 'ðŸ›¡ï¸� AJUSTE ESTRATÉGICO'}</b>
                     <span style="opacity:0.5;">${new Date(h.date).toLocaleString('pt-BR')}</span>
                 </div>
                 <div style="color:#eee; line-height:1.4;">${h.note}</div>
@@ -598,11 +598,11 @@ window.openEditModal = async (id) => {
         document.getElementById('edit-asset-roadmap-container').innerHTML = `
             <div class="edit-modal-grid">
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">ROTEIRO ESTRAT�0GICO (PAUTA)</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">ROTEIRO ESTRATÉGICO (PAUTA)</label>
                     <textarea id="edit-asset-caption" style="width:100%; height:320px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none; transition: border 0.3s;"></textarea>
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">HIST�RICO DE AJUSTES</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">HISTÓRICO DE AJUSTES</label>
                     <div id="edit-asset-history" style="height:320px; background:#050505; border:1px solid #222; border-radius:8px; overflow-y:auto; scrollbar-width: thin; padding: 5px;">
                         ${historyHtml}
                     </div>
@@ -625,7 +625,7 @@ window.openEditModal = async (id) => {
 
             metaGrid.innerHTML = `
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONS��VEL</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONSÁVEL</label>
                     <select id="edit-asset-responsible" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                         <option value="Design">Design</option>
                         <option value="Audiovisual">Audiovisual</option>
@@ -639,19 +639,19 @@ window.openEditModal = async (id) => {
                     <select id="edit-asset-version" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                         <option value="V1">V1 - Inicial</option>
                         <option value="V2">V2 - Ajuste 1</option>
-                        <option value="V3">V3 - Ajuste 2 (CR��TICO)</option>
+                        <option value="V3">V3 - Ajuste 2 (CRÃ�TICO)</option>
                         <option value="FINAL">FINAL - Pronto para Postar</option>
                     </select>
                 </div>
                 <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRAZO DE APROVA�!ÒO</label>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRAZO DE APROVAÇÃO</label>
                     <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                 </div>
                 
                 <div style="grid-column: span 3; display:flex; gap:30px; padding-top:15px; border-top:1px solid rgba(255,255,255,0.05); margin-top:5px;">
                      <div style="display:flex; align-items:center; gap:10px; opacity: ${isLocked ? '0.5' : '1'};">
                         <input type="checkbox" id="edit-asset-strategic-req" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.strategic_approval_required ? 'checked' : ''} ${isLocked ? 'disabled' : ''}>
-                        <label for="edit-asset-strategic-req" style="font-size:0.65rem; color:#3b82f6; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">EXIGIR APROVA�!ÒO ESTRAT�0GICA?</label>
+                        <label for="edit-asset-strategic-req" style="font-size:0.65rem; color:#3b82f6; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:0.5px;">EXIGIR APROVAÇÃO ESTRATÉGICA?</label>
                      </div>
                      <div style="display:flex; align-items:center; gap:10px;">
                         <input type="checkbox" id="edit-asset-risk" style="width:16px; height:16px; cursor:pointer;" ${c.metadata?.risk ? 'checked' : ''}>
@@ -688,12 +688,12 @@ window.openEditModal = async (id) => {
             const hasStrategic = c.metadata?.strategic_approval_required;
             
             footerActions.innerHTML = `
-                ${(c.status === 'PRODU�!ÒO' || c.status === 'AJUSTE DE PRODU�!ÒO') ? `
+                ${(c.status === 'PRODUÇÃO' || c.status === 'AJUSTE DE PRODUÇÃO') ? `
                     <button class="btn-mini" onclick="window.sendToStrategicOrFinal('${c.id}')" style="padding:10px 20px; background:#8b5cf6; color:#fff; font-weight:800; border:none; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);">
                         <i class="fa-solid fa-paper-plane"></i> ${hasStrategic ? 'Finalizar e Enviar p/ Aprovação Estratégica' : 'Finalizar e Enviar'}
                     </button>
                 ` : ''}
-                ${c.status === 'APROVA�!ÒO ESTRAT�0GICA' ? `
+                ${c.status === 'APROVAÇÃO ESTRATÉGICA' ? `
                     <button class="btn-mini" onclick="window.strategicInternalAction('${c.id}', 'REJECT')" style="padding:10px 20px; background:var(--os-danger); color:#fff; font-weight:800; border:none;">Solicitar Ajuste (Produção)</button>
                     <button class="btn-mini" onclick="window.strategicInternalAction('${c.id}', 'APPROVE')" style="padding:10px 20px; background:var(--os-success); color:#fff; font-weight:800; border:none;">Aprovar p/ Cliente</button>
                 ` : ''}
@@ -739,11 +739,11 @@ window.saveAssetEdit = async () => {
             metadata: newMetadata
         };
 
-        // L�GICA DE TRANSI�!ÒO DE STATUS INTELIGENTE
+        // LÓGICA DE TRANSIÇÃO DE STATUS INTELIGENTE
         if (currentAsset.status === 'AJUSTE') {
             updatePayload.status = 'PLANEJAMENTO';
-        } else if (currentAsset.status === 'AJUSTE DE PRODU�!ÒO') {
-            updatePayload.status = 'PRODU�!ÒO'; 
+        } else if (currentAsset.status === 'AJUSTE DE PRODUÇÃO') {
+            updatePayload.status = 'PRODUÇÃO'; 
         }
         const { error } = await supabase.from('content_assets').update(updatePayload).eq('id', editingAssetId);
         if (error) throw error;
@@ -765,7 +765,7 @@ window.sendToStrategicOrFinal = async (id) => {
         const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
         
         const hasStrategic = c.metadata?.strategic_approval_required;
-        const nextStatus = hasStrategic ? 'APROVA�!ÒO ESTRAT�0GICA' : 'APROVA�!ÒO FINAL';
+        const nextStatus = hasStrategic ? 'APROVAÇÃO ESTRATÉGICA' : 'APROVAÇÃO FINAL';
         
         if (!confirm(`Confirmar envio para ${hasStrategic ? 'Aprovação Estratégica (Interna)' : 'Aprovação Final (Cliente)'}?`)) return;
 
@@ -794,7 +794,7 @@ window.strategicInternalAction = async (id, action) => {
         const supabase = getSupabase();
         const { data: c } = await supabase.from('content_assets').select('*').eq('id', id).single();
         
-        let nextStatus = action === 'APPROVE' ? 'APROVA�!ÒO FINAL' : 'PRODU�!ÒO';
+        let nextStatus = action === 'APPROVE' ? 'APROVAÇÃO FINAL' : 'PRODUÇÃO';
         let newHistory = c.metadata?.history || [];
         
         if (action === 'REJECT') {
@@ -915,7 +915,7 @@ window.approvePendingAssets = async () => {
         
         // 1. Atualizar status no banco
         const { error } = await supabase.from('content_assets')
-            .update({ status: 'APROVA�!ÒO PLANEJAMENTO' })
+            .update({ status: 'APROVAÇÃO PLANEJAMENTO' })
             .eq('project_id', currentProject)
             .eq('status', 'PLANEJAMENTO');
 
@@ -930,12 +930,12 @@ window.approvePendingAssets = async () => {
         const { data: assets } = await supabase.from('content_assets')
             .select('title')
             .eq('project_id', currentProject)
-            .eq('status', 'APROVA�!ÒO PLANEJAMENTO')
+            .eq('status', 'APROVAÇÃO PLANEJAMENTO')
             .limit(10);
 
-        let waText = `�xa� *NOVO PLANEJAMENTO DISPON�VEL - ${proj?.name || 'Projeto'}*\n\nOlá! Acabamos de liberar o novo fluxo estratégico de conteúdo. \n\nAcesse agora para validar roteiros e prazos:\n�x ${portalUrl}\n\n*Resumo do Lote:*\n`;
+        let waText = `ðŸš€ *NOVO PLANEJAMENTO DISPONÍVEL - ${proj?.name || 'Projeto'}*\n\nOlá! Acabamos de liberar o novo fluxo estratégico de conteúdo. \n\nAcesse agora para validar roteiros e prazos:\nðŸ”— ${portalUrl}\n\n*Resumo do Lote:*\n`;
         if (assets && assets.length > 0) {
-            assets.forEach(a => { waText += `⬢ ${a.title}\n`; });
+            assets.forEach(a => { waText += `â€¢ ${a.title}\n`; });
         }
         waText += `\n#FluxAI #EstratégiaDigital #HighTicket`;
         
@@ -952,81 +952,62 @@ window.approvePendingAssets = async () => {
         alert('Erro ao enviar pautas: ' + e.message);
     }
 };
+
 window.runAiPlanner = async () => {
     const user = await OS_AUTH.check();
     if (user?.role !== 'ADMIN' && user?.role !== 'MANAGER') return alert('Acesso negado.');
 
     const filter = document.getElementById('project-filter');
     const selectedId = filter.value || currentProject;
-    if (!selectedId) return alert('Selecione um projeto para gerar planejamento estrategico!');
+    if (!selectedId) return alert('Selecione um projeto para gerar planejamento estratégico!');
 
     const supabase = getSupabase();
     
-    // VERIFICACAO DE COTA DINAMICA (ONBOARDING SMART SCOPE)
+    // VERIFICAÇÃO DE COTA (CONTRATO)
     const { data: project } = await supabase.from('projects').select('*, contracts(*)').eq('id', selectedId).single();
     const { count } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('project_id', selectedId);
     
-    let quota = 12; // Fallback padrao
-    const smartScope = project.operational_activation?.smart_scope?.conteudo
-        || project.metadata?.operational_activation?.smart_scope?.conteudo
-        || project.metadata?.onboarding?.module_details;
-    
-    if (smartScope) {
-        const reelsQty = parseInt(smartScope.reels || smartScope.escopo_conteudo_reels_qty) || 0;
-        const carrosselQty = parseInt(smartScope.carrossel || smartScope.escopo_conteudo_carrossel_qty) || 0;
-        const totalSmart = reelsQty + carrosselQty;
-        if (totalSmart > 0) quota = totalSmart;
-    } else {
-        const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
-        if (quotaMatch) quota = parseInt(quotaMatch[0]);
-    }
+    // Tentar extrair número da cota do 'content_scope' (Ex: "12 Ativos/mês")
+    const quotaMatch = project.content_scope ? project.content_scope.match(/\d+/) : null;
+    const quota = quotaMatch ? parseInt(quotaMatch[0]) : 12;
 
     const remaining = quota - count;
 
     if (remaining <= 0) {
-        return alert('Limite de Cota Atingido (' + count + '/' + quota + ').\n\nApague ativos para liberar espaco ou solicite upgrade de contrato.');
+        return alert(`Limite de Cota Atingido (${count}/${quota}).\n\nApague ativos para liberar espaço ou solicite upgrade de contrato.`);
     }
 
-    sLog('Iniciando Motor Estrategico (Cota: ' + count + '/' + quota + ' | Disponivel: ' + remaining + ')');
+    sLog(`Iniciando Motor Estratégico (Cota: ${count}/${quota} | Disponível: ${remaining})`);
     
     try {
         const { AIPlanner } = await import('../../services/ai-planner.js');
         const type = document.getElementById('ai-planner-service').value;
         
-        if (confirm('Gerar ' + (type === 'ALL' ? 'novo planejamento' : 'ativos de ' + type) + ' para preencher os ' + remaining + ' slots disponiveis no contrato?')) {
+        if (confirm(`Gerar ${type === 'ALL' ? 'novo planejamento' : 'ativos de ' + type} para preencher os ${remaining} slots disponíveis no contrato?`)) {
             const newAssets = await AIPlanner.generatePlan(currentProject, type, remaining);
             
             if (newAssets && newAssets.length > 0) {
-                // APLICAR INTELIGENCIA DE PRAZO E RESPONSAVEL
+                // APLICAR INTELIGÃŠNCIA DE PRAZO E RESPONSÁVEL
                 const processedAssets = newAssets.map(asset => {
                     const titleUpper = asset.title.toUpperCase();
-                    const assetType = Object.keys(RESPONSIBLE_MAP).find(k => titleUpper.includes(k)) || 'CARD';
+                    const type = Object.keys(RESPONSIBLE_MAP).find(k => titleUpper.includes(k)) || 'CARD';
                     
                     const scheduledDate = new Date(asset.scheduled_at);
                     const now = new Date();
                     
-                    // Defesa Cronologica: prazo de aprovacao SEMPRE antes do horario de postagem
+                    // Lógica Pub-2 para Planejamento/Produção Inicial
                     let deadline = new Date(scheduledDate.getTime() - 48 * 60 * 60 * 1000);
-                    if (deadline < now) {
-                        deadline = new Date(now.getTime() + (scheduledDate.getTime() - now.getTime()) / 2);
-                        if (deadline.getTime() >= scheduledDate.getTime() || deadline.getTime() <= now.getTime()) {
-                            deadline = new Date(scheduledDate.getTime() - 2 * 60 * 60 * 1000);
-                        }
-                    }
+                    if (deadline < now) deadline = new Date(now.getTime() + 48 * 60 * 60 * 1000);
                     
-                    // Logica de Prioridade Estrategica Premium
-                    const priority = asset.priority || (
-                        (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('BRANDING') ||
-                         titleUpper.includes('REELS') || titleUpper.includes('CARROSSEL') || titleUpper.includes('SITE') || titleUpper.includes('LP'))
-                        ? 'ALTA' : 'MEDIA'
-                    );
+                    // Lógica de Prioridade: Apenas itens críticos de Tração e Marca são ALTA por padrão
+                    const priority = (titleUpper.includes('TRAFEGO') || titleUpper.includes('ADS') || titleUpper.includes('BRANDING')) ? 'ALTA' : 'MÉDIA';
 
                     return {
                         ...asset,
                         priority: priority,
                         metadata: {
                             ...asset.metadata,
-                            responsible: RESPONSIBLE_MAP[assetType] || 'Design',
+                            responsible: RESPONSIBLE_MAP[type] || 'Design',
                             approval_deadline: deadline.toISOString(),
                             revision_cycle: 1,
                             version: 'V1'
@@ -1036,7 +1017,7 @@ window.runAiPlanner = async () => {
 
                 const { error } = await supabase.from('content_assets').insert(processedAssets);
                 if (error) throw error;
-                sLog(processedAssets.length + ' Ativos de Logistica Gerados.');
+                sLog(`${processedAssets.length} Ativos de Logística Gerados.`);
                 loadContent();
             }
         }
@@ -1068,4 +1049,4 @@ window.deleteAsset = async (id) => {
 };
 
 initEngine();
-async function setupRealtime() { const supabase = getSupabase(); if (realtimeChannel) { supabase.removeChannel(realtimeChannel); } realtimeChannel = supabase.channel('content-updates').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'content_assets' }, (payload) => { sLog('Sincroniza��o Realtime: Altera��o detectada.'); loadContent(); }).subscribe(); }
+async function setupRealtime() { const supabase = getSupabase(); if (realtimeChannel) { supabase.removeChannel(realtimeChannel); } realtimeChannel = supabase.channel('content-updates').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'content_assets' }, (payload) => { sLog('Sincronização Realtime: Alteração detectada.'); loadContent(); }).subscribe(); }
