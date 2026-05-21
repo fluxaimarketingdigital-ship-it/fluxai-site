@@ -507,8 +507,18 @@
                     `;
                 } else {
                     // Contrato ativo / Cliente
+                    let metadataObj = item.metadata || {};
                     actionHtml = `
-                        <a href="analytics.html?project=${projId}&input=true" class="os-action-btn" title="Lançar Métricas" style="color: var(--os-primary); margin-right: 15px; font-size: 1.1rem; transition: all 0.2s; display: inline-block;"><i class="fa-solid fa-instagram"></i></a>
+                        <button class="os-action-btn btn-manage-client-trigger" 
+                            data-id="${projId}" 
+                            data-name="${item.name}" 
+                            data-company="${item.company}"
+                            data-status="${item.status}"
+                            data-contract="${metadataObj.contract_link || ''}"
+                            data-receipt="${metadataObj.receipt_link || ''}"
+                            data-files="${metadataObj.files_link || ''}"
+                            title="Ficha do Cliente" style="color: var(--os-primary); margin-right: 15px; font-size: 1.1rem; border:none; background:transparent; cursor:pointer;"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="os-action-btn btn-delete-client" data-id="${projId}" title="Excluir" style="background: transparent; border: none; color: var(--os-danger); font-size: 1.1rem; cursor: pointer; margin-right: 15px;"><i class="fa-solid fa-trash"></i></button>
                         <a href="workspace.html?project=${projId}" class="os-action-btn" title="Acessar Workspace" style="color: #60a5fa; font-size: 1.1rem; transition: all 0.2s; display: inline-block;"><i class="fa-solid fa-briefcase"></i></a>
                     `;
                 }
@@ -649,8 +659,9 @@
                 }
 
                 // Salvar localmente
+                // Salvar localmente
                 let localLeads = JSON.parse(localStorage.getItem('fluxai_mock_leads') || '[]');
-                localLeads.push({
+                const newLeadObj = {
                     id: 'L-LOCAL-' + Math.floor(Math.random()*1000),
                     project_id: 'novo',
                     name,
@@ -666,8 +677,26 @@
                     lastFollowUp: new Date().toLocaleDateString('pt-BR'),
                     nextAction: 'QUALIFICAR LEAD',
                     impact: 'A DEFINIR'
-                });
+                };
+                localLeads.push(newLeadObj);
                 localStorage.setItem('fluxai_mock_leads', JSON.stringify(localLeads));
+
+                // Disparo para o Webhook Real (Make.com / n8n)
+                const webhookUrl = localStorage.getItem('fluxai_webhook_lead');
+                if (webhookUrl) {
+                    try {
+                        fetch(webhookUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                event: 'new_lead_created',
+                                source: 'FluxAI OS CRM',
+                                timestamp: new Date().toISOString(),
+                                data: newLeadObj
+                            })
+                        }).catch(e => console.warn('Falha silenciosa ao disparar webhook:', e));
+                    } catch(e) {}
+                }
 
                 alert('Lead adicionado com sucesso!');
                 addLeadModal.style.display = 'none';
@@ -1110,5 +1139,154 @@
             </div>
         </div>
     </div>
+
+    <!-- MODAL: GERENCIAR CLIENTE -->
+    <div id="manage-client-modal" class="os-modal">
+        <div class="os-widget" style="max-width: 650px; width: 100%;">
+            <div style="padding: 25px 30px; border-bottom: 1px solid var(--os-border); display: flex; justify-content: space-between; align-items: center; background: rgba(15, 18, 15, 0.95);">
+                <div>
+                    <h2 style="margin: 0; color: var(--os-primary); font-size: 1.25rem; font-weight: 800; display: flex; align-items: center; gap: 10px;">
+                        <i class="fa-solid fa-user-tie"></i> Ficha do Cliente
+                    </h2>
+                    <p style="margin: 5px 0 0 0; font-size: 0.75rem; color: var(--os-text-muted);">Edite o status e anexe links de documentos e comprovantes.</p>
+                </div>
+                <button onclick="document.getElementById('manage-client-modal').style.display='none'" style="background: transparent; border: none; color: var(--os-text-muted); cursor: pointer; font-size: 1.5rem;">&times;</button>
+            </div>
+            <form id="manage-client-form" style="padding: 30px; background: rgba(10, 12, 10, 0.95); margin: 0;">
+                <input type="hidden" id="manage-client-id" />
+                
+                <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); padding: 18px; border-radius: 8px; margin-bottom: 25px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 0.8rem;">
+                        <div><strong style="color:var(--os-primary)">Nome:</strong> <span id="info-client-name"></span></div>
+                        <div><strong style="color:var(--os-primary)">Empresa:</strong> <span id="info-client-company"></span></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Status do Cadastro</label>
+                    <select id="manage-client-status" class="form-control">
+                        <option value="ATIVO">Ativo</option>
+                        <option value="INATIVO">Inativo</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-solid fa-file-contract"></i> Link do Contrato</label>
+                    <input type="url" id="manage-client-contract" class="form-control" placeholder="https://drive.google.com/..." />
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-file-invoice-dollar"></i> Link do Comprovante / Pagamento</label>
+                    <input type="url" id="manage-client-receipt" class="form-control" placeholder="https://..." />
+                </div>
+                <div class="form-group">
+                    <label><i class="fa-solid fa-folder-open"></i> Link de Arquivos / Repositório</label>
+                    <input type="url" id="manage-client-files" class="form-control" placeholder="https://..." />
+                </div>
+
+                <div style="margin-top: 25px; padding-top: 20px; border-top: 1px solid var(--os-border); display: flex; gap: 10px; justify-content: flex-end;">
+                    <button type="button" onclick="document.getElementById('manage-client-modal').style.display='none'" class="btn-glass-secondary">Cancelar</button>
+                    <button type="submit" class="btn-glass-primary">Salvar Ficha</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        // 9. Gerenciar Cliente (Event Delegation)
+        const manageClientModal = document.getElementById('manage-client-modal');
+        document.getElementById('crm-leads-body').addEventListener('click', async (e) => {
+            const btnEdit = e.target.closest('.btn-manage-client-trigger');
+            if (btnEdit) {
+                document.getElementById('manage-client-id').value = btnEdit.getAttribute('data-id');
+                document.getElementById('info-client-name').innerText = btnEdit.getAttribute('data-name');
+                document.getElementById('info-client-company').innerText = btnEdit.getAttribute('data-company');
+                document.getElementById('manage-client-status').value = btnEdit.getAttribute('data-status') === 'INATIVO' ? 'INATIVO' : 'ATIVO';
+                document.getElementById('manage-client-contract').value = btnEdit.getAttribute('data-contract') || '';
+                document.getElementById('manage-client-receipt').value = btnEdit.getAttribute('data-receipt') || '';
+                document.getElementById('manage-client-files').value = btnEdit.getAttribute('data-files') || '';
+                manageClientModal.style.display = 'flex';
+                return;
+            }
+
+            const btnDel = e.target.closest('.btn-delete-client');
+            if (btnDel) {
+                if(confirm('Tem certeza que deseja excluir este cadastro permanentemente?')) {
+                    const id = btnDel.getAttribute('data-id');
+                    try {
+                        const supabaseInst = window.getSupabase ? window.getSupabase() : null;
+                        if (supabaseInst && !id.startsWith('p_local_')) {
+                            await supabaseInst.from('contracts').delete().eq('project_id', id);
+                            await supabaseInst.from('projects').delete().eq('id', id);
+                        }
+                        // Remove from mock
+                        let mProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects')||'[]');
+                        mProjects = mProjects.filter(p => p.id !== id);
+                        localStorage.setItem('fluxai_mock_projects', JSON.stringify(mProjects));
+                        
+                        let mContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts')||'[]');
+                        mContracts = mContracts.filter(c => c.project_id !== id);
+                        localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mContracts));
+                        
+                        // Recarregar a página ou re-renderizar
+                        window.location.reload();
+                    } catch(err) {
+                        console.error('Erro ao excluir:', err);
+                    }
+                }
+            }
+        });
+
+        // 10. Salvar Ficha do Cliente
+        document.getElementById('manage-client-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('manage-client-id').value;
+            const status = document.getElementById('manage-client-status').value;
+            const contract = document.getElementById('manage-client-contract').value;
+            const receipt = document.getElementById('manage-client-receipt').value;
+            const files = document.getElementById('manage-client-files').value;
+
+            try {
+                const supabaseInst = window.getSupabase ? window.getSupabase() : null;
+                if (supabaseInst && id && !id.startsWith('p_local_')) {
+                    await supabaseInst.from('contracts').update({ status }).eq('project_id', id);
+                    
+                    // Fetch existing metadata to avoid wiping out
+                    const { data: projData } = await supabaseInst.from('projects').select('metadata').eq('id', id).single();
+                    let metadata = (projData && projData.metadata) ? projData.metadata : {};
+                    metadata.contract_link = contract;
+                    metadata.receipt_link = receipt;
+                    metadata.files_link = files;
+                    
+                    await supabaseInst.from('projects').update({ 
+                        status,
+                        metadata: metadata
+                    }).eq('id', id);
+                }
+                
+                // Save locally
+                let mProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects')||'[]');
+                let projIdx = mProjects.findIndex(p => p.id === id);
+                if (projIdx > -1) {
+                    mProjects[projIdx].status = status;
+                    mProjects[projIdx].metadata = { ...(mProjects[projIdx].metadata || {}), contract_link: contract, receipt_link: receipt, files_link: files };
+                    localStorage.setItem('fluxai_mock_projects', JSON.stringify(mProjects));
+                }
+                
+                let mContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts')||'[]');
+                let contIdx = mContracts.findIndex(c => c.project_id === id);
+                if (contIdx > -1) {
+                    mContracts[contIdx].status = status;
+                    localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mContracts));
+                }
+                
+                alert('Ficha do cliente salva com sucesso!');
+                manageClientModal.style.display = 'none';
+                window.location.reload(); // Recarregar para refletir alterações
+            } catch(err) {
+                console.error(err);
+                alert('Erro ao salvar.');
+            }
+        });
+    </script>
 </body>
 </html>
