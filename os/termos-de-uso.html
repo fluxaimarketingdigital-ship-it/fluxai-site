@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Termos de Uso e LGPD | FluxAI OS</title>
+    <link rel="stylesheet" href="./styles/interface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --os-primary: #8e9e68;
+            --os-bg: #050705;
+            --os-surface: rgba(15, 18, 15, 0.7);
+            --os-border: rgba(142, 158, 104, 0.15);
+            --os-text: #e0e0e0;
+            --os-text-muted: #888;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--os-bg);
+            color: var(--os-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .os-bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(142, 158, 104, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, rgba(142, 158, 104, 0.05) 0%, transparent 40%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .legal-container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 40px;
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            border-radius: 12px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            color: #fff;
+            font-weight: 800;
+            font-size: 2rem;
+            margin-top: 0;
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--os-border);
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--os-primary);
+            font-size: 1.2rem;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        p, li {
+            color: var(--os-text-muted);
+            font-size: 0.95rem;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .legal-footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--os-border);
+            text-align: center;
+            font-size: 0.85rem;
+            color: var(--os-text-muted);
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--os-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .btn-back:hover {
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="os-bg-glow"></div>
+
+    <div class="legal-container">
+        <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Voltar</a>
+        
+        <h1>Política de Privacidade e Termos de Uso</h1>
+        
+        <p><strong>Última atualização:</strong> Maio de 2026</p>
+
+        <p>A FluxAI (inscrita sob o CPF 017.711.905-58) leva a sua privacidade a sério e zela pela segurança e proteção de dados de todos os seus clientes, parceiros, fornecedores e usuários, de acordo com a Lei Geral de Proteção de Dados (Lei nº 13.709/2018 - LGPD).</p>
+
+        <h2>1. Coleta e Uso de Dados</h2>
+        <p>O FluxAI OS coleta as seguintes informações estritamente necessárias para a prestação de serviços de Growth, CRM e Dashboard Operacional:</p>
+        <ul>
+            <li>Dados Cadastrais (Nome, E-mail, Telefone).</li>
+            <li>Dados Profissionais e de Negócio (Cargo, Nome da Empresa).</li>
+            <li>Dados de Integração (Métricas de Anúncios e Analytics fornecidas via Make.com ou APIs de terceiros).</li>
+        </ul>
+        <p>Estes dados são utilizados unicamente para gerar painéis analíticos, relatórios de estratégia e gerenciar solicitações operacionais dentro do sistema.</p>
+
+        <h2>2. Compartilhamento e Proteção (Infraestrutura)</h2>
+        <p>Nenhum dado sensível ou de performance é comercializado ou repassado a terceiros de forma irrestrita. Utilizamos infraestrutura segura em nuvem (Supabase / AWS / Vercel) com criptografia end-to-end e políticas estritas de Row Level Security (RLS) para garantir que cada cliente acesse apenas as informações do seu próprio ecossistema.</p>
+
+        <h2>3. Os Direitos do Titular (Você)</h2>
+        <p>De acordo com o Art. 18 da LGPD, você tem o direito a qualquer momento, mediante requisição, de:</p>
+        <ul>
+            <li>Confirmar a existência de tratamento de seus dados.</li>
+            <li>Acessar seus dados.</li>
+            <li>Corrigir dados incompletos, inexatos ou desatualizados.</li>
+            <li>Solicitar a anonimização, bloqueio ou eliminação de dados desnecessários ou excessivos.</li>
+            <li>Revogar o consentimento e solicitar a exclusão de sua conta.</li>
+        </ul>
+
+        <h2>4. Contato com o DPO (Encarregado de Dados)</h2>
+        <p>Para exercer qualquer um de seus direitos sob a LGPD ou se tiver dúvidas sobre esta Política de Privacidade, entre em contato através do e-mail oficial: <br>
+        <strong>fluxai.marketingdigital@gmail.com</strong></p>
+
+        <div class="legal-footer">
+            <p>FluxAI - Sistema de Crescimento Operacional &copy; 2026. Todos os direitos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

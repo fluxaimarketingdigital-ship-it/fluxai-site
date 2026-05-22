@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Central de Ajuda | FluxAI OS</title>
+    <link rel="stylesheet" href="./styles/interface.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --os-primary: #8e9e68;
+            --os-bg: #050705;
+            --os-surface: rgba(15, 18, 15, 0.7);
+            --os-border: rgba(142, 158, 104, 0.15);
+            --os-text: #e0e0e0;
+            --os-text-muted: #888;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--os-bg);
+            color: var(--os-text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .os-bg-glow {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle at 50% 0%, rgba(142, 158, 104, 0.1) 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, rgba(142, 158, 104, 0.05) 0%, transparent 40%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .help-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 40px;
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            border-radius: 12px;
+            position: relative;
+            z-index: 1;
+            backdrop-filter: blur(10px);
+        }
+
+        .help-header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 1px solid var(--os-border);
+            padding-bottom: 30px;
+        }
+
+        .help-header h1 {
+            color: #fff;
+            font-weight: 900;
+            font-size: 2.5rem;
+            margin: 0 0 10px 0;
+        }
+
+        .help-header p {
+            color: var(--os-text-muted);
+            font-size: 1.1rem;
+            margin: 0;
+        }
+
+        .faq-item {
+            margin-bottom: 25px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--os-border);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .faq-question {
+            color: var(--os-primary);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .faq-answer {
+            color: var(--os-text);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .contact-box {
+            margin-top: 50px;
+            background: rgba(142, 158, 104, 0.1);
+            border: 1px solid var(--os-primary);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .contact-box h3 {
+            color: #fff;
+            margin-top: 0;
+        }
+
+        .btn-support {
+            display: inline-block;
+            background: var(--os-primary);
+            color: #000;
+            padding: 12px 25px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            margin-top: 15px;
+            transition: all 0.3s;
+        }
+
+        .btn-support:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(142, 158, 104, 0.2);
+        }
+
+        .btn-back {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--os-primary);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="os-bg-glow"></div>
+
+    <div class="help-container">
+        <a href="javascript:history.back()" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Voltar ao Sistema</a>
+        
+        <div class="help-header">
+            <h1><i class="fa-solid fa-life-ring" style="color: var(--os-primary);"></i> Central de Ajuda</h1>
+            <p>Guias, tutoriais e respostas para as principais dúvidas do FluxAI OS.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-rocket"></i> Como faço para solicitar uma Nova Demanda?</h3>
+            <p class="faq-answer">No seu painel principal, acesse o <strong>Portal do Cliente</strong> pelo menu lateral. Role até a seção "Solicitações Extras" e clique no botão verde "Adicionar Nova Demanda". Um formulário será aberto onde você pode descrever o serviço que precisa.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-chart-line"></i> Quando as métricas de Ads são atualizadas?</h3>
+            <p class="faq-answer">Seu sistema está integrado diretamente com o Meta Ads e Google Analytics através do nosso parceiro de automação (Make.com). Os dados na tela <strong>Análise de Dados</strong> são atualizados em tempo real conforme as requisições, porém pode haver um pequeno delay (atraso) de plataforma por parte do Meta/Google de até 2 horas.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-wallet"></i> Onde encontro o comprovante ou fatura para pagamento?</h3>
+            <p class="faq-answer">No <strong>Portal do Cliente</strong>, você encontrará a área de Financeiro e Faturas. Lá estão listados todos os seus pagamentos pendentes e já realizados. Para pagar uma fatura pendente, basta clicar no botão de "Pagar Fatura" para visualizar a chave PIX ou o boleto.</p>
+        </div>
+
+        <div class="faq-item">
+            <h3 class="faq-question"><i class="fa-solid fa-shield-halved"></i> Meus dados operacionais estão seguros?</h3>
+            <p class="faq-answer">Sim! Nós não armazenamos as senhas das suas redes sociais. Todas as integrações são feitas via Tokens de API com permissões restritas apenas para leitura de dados. Além disso, nosso sistema segue padrões de criptografia e conformidade com a LGPD.</p>
+        </div>
+
+        <div class="contact-box">
+            <h3>Ainda precisa de ajuda especializada?</h3>
+            <p style="color: var(--os-text-muted);">Nossa equipe de Customer Success e Suporte Técnico está pronta para resolver qualquer gargalo operacional.</p>
+            <a href="mailto:fluxai.marketingdigital@gmail.com" class="btn-support"><i class="fa-solid fa-envelope"></i> Acionar Suporte VIP</a>
+        </div>
+    </div>
+</body>
+</html>

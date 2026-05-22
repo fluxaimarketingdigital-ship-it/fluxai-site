@@ -3,7 +3,7 @@
  * Inicialização e exportação do cliente Supabase.
  */
 
-import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+import { SUPABASE_CONFIG } from '../config/secrets/supabase-keys.js';
 
 // Nota: Em um ambiente real, carregaríamos via npm ou CDN
 // Aqui assumimos que a biblioteca está disponível globalmente ou injetada.
