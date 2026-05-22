@@ -51,6 +51,7 @@ export const OS_UI = {
             { id: 'crm-intelligence', label: 'Inteligência de CRM',   icon: 'fa-users-gear',          group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },
             { id: 'automation-hub',   label: 'Central de Automação',  icon: 'fa-robot',               group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },
             { id: 'analytics',        label: 'Análise de Dados',      icon: 'fa-chart-line',          group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'fluxai-labs',      label: 'FluxAI Labs',           icon: 'fa-flask',               group: 'Workspace Interno',     roles: ['ADMIN'],             contexts: ['MASTER','LABS'], permission: 'fluxai-labs-workspace' },
             { id: 'client-portal',    label: 'Portal do Cliente',     icon: 'fa-briefcase',           group: 'Interface de Valor',    roles: ['ADMIN', 'CLIENT'],   contexts: ['MASTER','CLIENT'] },
             { id: 'contracts-finance',label: 'Contratos & Financeiro',icon: 'fa-file-invoice-dollar', group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
             { id: 'governance',       label: 'Governança',            icon: 'fa-user-shield',         group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },

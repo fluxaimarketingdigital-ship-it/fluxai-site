@@ -43,27 +43,28 @@
         
         .btn-back-portal {
             position: absolute;
-            top: 25px;
-            left: 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            text-decoration: none;
+            left: 30px;
+            top: 40px;
+            background: var(--glass-bg);
+            border: 1px solid var(--os-border);
+            color: var(--os-text-muted);
+            padding: 10px 20px;
+            border-radius: 20px;
             font-size: 0.75rem;
-            font-weight: 700;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             transition: all 0.3s;
             z-index: 1000;
-            text-transform: uppercase;
         }
         .btn-back-portal:hover {
-            background: rgba(142, 158, 104, 0.1);
+            color: #fff;
             border-color: var(--os-primary);
-            color: var(--os-primary);
+            background: rgba(142, 158, 104, 0.1);
         }
 
         .wizard-footer { margin-top: 40px; background: rgba(10,10,10,0.8); border-top: 1px solid var(--os-border); padding: 20px 0; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
