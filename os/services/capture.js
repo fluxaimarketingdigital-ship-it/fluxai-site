@@ -36,34 +36,44 @@ export const LeadCapture = {
                 utm_source: new URLSearchParams(window.location.search).get('utm_source') || 'orgânico'
             };
 
-            // Disparo para o Webhook Real (Make.com / n8n) - Ampliação de Métricas
-            const webhookUrl = localStorage.getItem('fluxai_webhook_lead') || 'https://hook.us2.make.com/bnm7xedyxhxdlvh417gone7gy5m4e8me';
-            if (webhookUrl) {
-                fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        event: 'new_lead_captured_site',
-                        source: 'FluxAI Website Form',
-                        timestamp: new Date().toISOString(),
-                        data: leadData
-                    })
-                }).catch(e => console.warn('Falha silenciosa ao disparar webhook do site:', e));
-            }
+            // Payload exclusivo para o Make.com
+            const payloadMake = {
+                cliente_id: "FLUXAI_LABS_001",
+                cliente_nome: "FluxAI Labs",
+                origem_site: "site_fluxai",
+                nome_lead: formData.get('name') || '',
+                email: formData.get('email') || '',
+                telefone: formData.get('phone') || '',
+                empresa: formData.get('company') || '',
+                servico_interesse: "leads_site",
+                canal_origem: "site",
+                campanha: new URLSearchParams(window.location.search).get('utm_campaign') || '',
+                pagina_origem: window.location.href,
+                observacao: formData.get('internal_notes') || ''
+            };
+
+            const webhookUrl = 'https://hook.us2.make.com/gmu9xakjqfocdd8nk4sn5lxcc7pmbte2';
 
             try {
-                const { data, error } = await supabase.from('crm_leads').insert([leadData]);
-                if (error) throw error;
+                console.log('Enviando payload para o Make:', payloadMake);
+                const response = await fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payloadMake)
+                });
+                console.log('Resposta do Make:', response);
 
-                // Sucesso
+                if (!response.ok) throw new Error('Erro na requisição para o Make');
+
+                // Envio assíncrono pro Supabase (sem afetar a resposta do Make)
+                supabase.from('crm_leads').insert([leadData]).catch(e => console.warn('Erro silencioso no Supabase', e));
+
                 if (btnSubmit) {
-                    btnSubmit.innerHTML = '<i class="fa-solid fa-check"></i> Enviado com Sucesso!';
+                    btnSubmit.innerHTML = 'Diagnóstico enviado com sucesso.';
                     btnSubmit.style.backgroundColor = '#10b981';
                 }
                 
-                // Disparar evento customizado se o site quiser fazer redirect ou exibir modal
-                window.dispatchEvent(new CustomEvent('fluxai_lead_captured', { detail: leadData }));
-
+                window.dispatchEvent(new CustomEvent('fluxai_lead_captured', { detail: payloadMake }));
                 
                 setTimeout(() => {
                     form.reset();
@@ -76,7 +86,7 @@ export const LeadCapture = {
             } catch (err) {
                 console.error('[FluxAI Capture] Erro ao enviar lead:', err);
                 if (btnSubmit) {
-                    btnSubmit.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> Tentar Novamente';
+                    btnSubmit.innerHTML = 'Não foi possível enviar seu diagnóstico agora. Tente novamente.';
                     btnSubmit.style.backgroundColor = '#ef4444';
                 }
                 setTimeout(() => {
