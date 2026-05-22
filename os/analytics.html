@@ -1212,60 +1212,6 @@
         let currentBehavioral = behavioralData;
         let currentSocial = socialSignals;
 
-        // Expor funções fechamento/salvamento do modal para o escopo global
-        window.closeMetricsModal = () => {
-            document.getElementById('input-metrics-modal').style.display = 'none';
-        };
-
-        window.saveInstagramMetrics = () => {
-            const projId = document.getElementById('modal-metric-project-id').value;
-            const month = document.getElementById('modal-metric-month').value;
-            if (!projId || !month) return;
-
-            const storedMetrics = JSON.parse(localStorage.getItem('fluxai_instagram_metrics') || '{}');
-            if (!storedMetrics[projId]) storedMetrics[projId] = {};
-
-            storedMetrics[projId][month] = {
-                // Instagram
-                reach: document.getElementById('metric-ig-reach').value,
-                impressions: document.getElementById('metric-ig-impressions').value,
-                saveRate: document.getElementById('metric-ig-save-rate').value,
-                watchTime: document.getElementById('metric-ig-watch-time').value,
-                followers: document.getElementById('metric-ig-followers').value,
-                profileViews: document.getElementById('metric-ig-profile-views').value,
-                engagement: document.getElementById('metric-ig-engagement').value,
-                
-                // GA4
-                ga_activeUsers: document.getElementById('metric-ga-active-users').value,
-                ga_newUsers: document.getElementById('metric-ga-new-users').value,
-                ga_engagement: document.getElementById('metric-ga-engagement').value,
-                ga_sessions: document.getElementById('metric-ga-sessions').value,
-                
-                // GSC
-                gsc_clicks: document.getElementById('metric-gsc-clicks').value,
-                gsc_impressions: document.getElementById('metric-gsc-impressions').value,
-                gsc_ctr: document.getElementById('metric-gsc-ctr').value,
-                gsc_position: document.getElementById('metric-gsc-position').value,
-
-                // Meta Ads
-                meta_spent: document.getElementById('metric-meta-spent').value,
-                meta_leads: document.getElementById('metric-meta-leads').value,
-                meta_cpl: document.getElementById('metric-meta-cpl').value,
-                meta_roas: document.getElementById('metric-meta-roas').value
-            };
-
-            localStorage.setItem('fluxai_instagram_metrics', JSON.stringify(storedMetrics));
-            
-            // Se o projeto salvo for o ativo ou "todos", atualiza a tela na hora
-            const activeProjId = document.getElementById('analytics-project-filter').value;
-            if (activeProjId === projId || activeProjId === 'todos') {
-                renderAnalyticsData();
-            }
-
-            window.closeMetricsModal();
-            alert(`Todos os indicadores de ${month} gravados com sucesso no banco de dados operacional!`);
-        };
-
         function getMetricsForClientAndMonth(projectId, month) {
             const customStore = JSON.parse(localStorage.getItem('fluxai_instagram_metrics') || '{}');
             if (customStore[projectId] && customStore[projectId][month]) {

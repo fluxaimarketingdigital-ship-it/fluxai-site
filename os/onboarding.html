@@ -40,6 +40,31 @@
         .checkbox-card:hover { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); }
         .checkbox-card input { accent-color: var(--os-primary); width: 18px; height: 18px; }
         .checkbox-card.active { border-color: var(--os-primary); background: rgba(107,122,69,0.1); }
+        
+        .btn-back-portal {
+            position: absolute;
+            top: 25px;
+            left: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 6px;
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            z-index: 1000;
+            text-transform: uppercase;
+        }
+        .btn-back-portal:hover {
+            background: rgba(142, 158, 104, 0.1);
+            border-color: var(--os-primary);
+            color: var(--os-primary);
+        }
 
         .wizard-footer { margin-top: 40px; background: rgba(10,10,10,0.8); border-top: 1px solid var(--os-border); padding: 20px 0; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
         .btn-wizard { padding: 14px 28px; border-radius: 8px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; transition: 0.2s; border: none; }

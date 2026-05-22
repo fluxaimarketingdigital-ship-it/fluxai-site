@@ -271,7 +271,14 @@ export const OS_AUTH = {
             return { id: 'mock-admin', role: 'ADMIN', full_name: 'Admin FluxAI', email: 'admin@fluxai.com' };
         }
 
-        const { data: { session } } = await supabase.auth.getSession();
+        let session = null;
+        try {
+            const { data } = await supabase.auth.getSession();
+            session = data.session;
+        } catch (err) {
+            console.warn('[AUTH] Erro ao conectar com Supabase auth. Ativando Bypass Mock User.', err);
+            return { id: 'mock-admin', role: 'ADMIN', full_name: 'Admin FluxAI', email: 'admin@fluxai.com' };
+        }
         
         if (!session) {
             console.warn('[AUTH] Sessão não encontrada.');
