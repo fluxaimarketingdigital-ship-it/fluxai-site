@@ -334,35 +334,78 @@
         <!-- CALENDÁRIO DE PUBLICAÇÕES -->
         <div class="portal-section">
             <div class="section-title"><i class="fa-solid fa-calendar-days"></i> Calendário Operacional</div>
-            <div id="calendar-container" style="background: rgba(142, 158, 104, 0.05); border: 1px solid var(--os-border); border-radius: 8px; padding: 20px;">
-                <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--os-border); padding-bottom:10px; margin-bottom:15px;">
-                    <div style="font-weight: 800; color: #fff;">Próximas Entregas</div>
-                    <div style="font-size:0.7rem; color:var(--os-primary);"><i class="fa-solid fa-rotate"></i> Sincronizado</div>
+            <div class="calendar-grid">
+                <div class="cal-day">
+                    <div class="cal-date">01</div>
+                    <div class="cal-post ig"><i class="fa-brands fa-instagram"></i> Lançamento Campanha</div>
                 </div>
-                <!-- Mock Items -->
-                <div style="display:flex; flex-direction:column; gap:10px;">
-                    <div style="display:flex; align-items:center; justify-content:space-between; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border-left: 3px solid var(--os-primary);">
-                        <div>
-                            <div style="font-size:0.8rem; font-weight:700; color:#fff;">Lançamento de Campanha (Módulo 2)</div>
-                            <div style="font-size:0.7rem; color:var(--os-text-muted); margin-top:3px;">Instagram Reels + Stories</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:0.75rem; font-weight:800; color:var(--os-primary);">HOJE</div>
-                            <div style="font-size:0.65rem; color:var(--os-text-muted);">18:00</div>
-                        </div>
-                    </div>
-                    <div style="display:flex; align-items:center; justify-content:space-between; background: rgba(0,0,0,0.3); padding: 12px; border-radius: 6px; border-left: 3px solid var(--os-warning);">
-                        <div>
-                            <div style="font-size:0.8rem; font-weight:700; color:#fff;">Artigo Blog Corporativo</div>
-                            <div style="font-size:0.7rem; color:var(--os-text-muted); margin-top:3px;">SEO On-Page</div>
-                        </div>
-                        <div style="text-align:right;">
-                            <div style="font-size:0.75rem; font-weight:800; color:var(--os-warning);">AGUARDANDO APROVAÇÃO</div>
-                            <div style="font-size:0.65rem; color:var(--os-text-muted);">Amanhã, 14:00</div>
-                        </div>
-                    </div>
+                <div class="cal-day">
+                    <div class="cal-date">02</div>
+                </div>
+                <div class="cal-day">
+                    <div class="cal-date">03</div>
+                    <div class="cal-post tiktok"><i class="fa-brands fa-tiktok"></i> Bastidores (Trend)</div>
+                </div>
+                <div class="cal-day today">
+                    <div class="cal-date">04</div>
+                    <div class="cal-post lk"><i class="fa-brands fa-linkedin"></i> Artigo Corporativo</div>
+                </div>
+                <div class="cal-day">
+                    <div class="cal-date">05</div>
+                </div>
+                <div class="cal-day">
+                    <div class="cal-date">06</div>
+                    <div class="cal-post ig"><i class="fa-brands fa-instagram"></i> Depoimento Cliente</div>
+                </div>
+                <div class="cal-day">
+                    <div class="cal-date">07</div>
                 </div>
             </div>
+            <style>
+                .calendar-grid {
+                    display: grid;
+                    grid-template-columns: repeat(7, 1fr);
+                    gap: 10px;
+                    margin-top: 15px;
+                }
+                .cal-day {
+                    background: rgba(255,255,255,0.02);
+                    border: 1px solid var(--os-border);
+                    border-radius: 8px;
+                    padding: 10px;
+                    min-height: 100px;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 5px;
+                }
+                .cal-day.today {
+                    border-color: var(--os-primary);
+                    background: rgba(142, 158, 104, 0.05);
+                }
+                .cal-date {
+                    font-size: 0.8rem;
+                    font-weight: 800;
+                    color: var(--os-text-muted);
+                    margin-bottom: 5px;
+                }
+                .cal-day.today .cal-date { color: var(--os-primary); }
+                .cal-post {
+                    font-size: 0.65rem;
+                    padding: 4px 6px;
+                    border-radius: 4px;
+                    color: #fff;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                .cal-post.ig { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); }
+                .cal-post.tiktok { background: #000; border: 1px solid #333; }
+                .cal-post.lk { background: #0077b5; }
+                
+                @media (max-width: 900px) {
+                    .calendar-grid { grid-template-columns: repeat(2, 1fr); }
+                }
+            </style>
         </div>
 
         <!-- ATIVIDADE OPERACIONAL -->

@@ -2354,5 +2354,34 @@
 
         initPage();
     </script>
+    <script>
+        function closeMetricsModal() {
+            document.getElementById('input-metrics-modal').style.display = 'none';
+        }
+
+        function saveInstagramMetrics() {
+            const projId = document.getElementById('modal-metric-project-id').value;
+            const month = document.getElementById('modal-metric-month').value;
+            if (!projId || !month) return;
+
+            const storedMetrics = JSON.parse(localStorage.getItem('fluxai_instagram_metrics') || '{}');
+            if (!storedMetrics[projId]) storedMetrics[projId] = {};
+
+            storedMetrics[projId][month] = {
+                reach: document.getElementById('metric-ig-reach').value,
+                impressions: document.getElementById('metric-ig-imp').value,
+                save_rate: document.getElementById('metric-ig-save').value,
+                watch_time: document.getElementById('metric-ig-watch').value,
+                followers: document.getElementById('metric-ig-follow').value,
+                profile_views: document.getElementById('metric-ig-views').value,
+                engagement_rate: document.getElementById('metric-ig-eng').value
+            };
+
+            localStorage.setItem('fluxai_instagram_metrics', JSON.stringify(storedMetrics));
+            alert('Métricas atualizadas com sucesso para o banco local! A página será recarregada.');
+            closeMetricsModal();
+            location.reload();
+        }
+    </script>
 </body>
 </html>

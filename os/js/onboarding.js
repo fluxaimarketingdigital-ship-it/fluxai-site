@@ -1,6 +1,6 @@
-import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
-import { getSupabase } from '/os/services/supabase-client.js';
-import { dispatchEvent } from '/os/js/os-integration.js';
+import { OS_UI, OS_AUTH } from './os-core.js';
+import { getSupabase } from '../services/supabase-client.js';
+import { dispatchEvent } from './os-integration.js';
 
 let currentStep = 1;
 const totalSteps = 7;

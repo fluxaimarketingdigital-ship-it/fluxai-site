@@ -280,32 +280,9 @@
                     <p>Orquestração de microsserviços e inteligência de fluxos operacionais.</p>
                 </div>
 
-                <!-- ESTADO DAS INTEGRAÇÕES -->
-                <div class="integration-grid" id="integrations-container">
-                    <!-- Injetado via data -->
-                </div>
+                <!-- API Integrations foram movidos para a tela de Governança -->
 
                 <div class="os-widget-grid">
-                    <!-- CONFIGURAÇÃO MAKE.COM / N8N -->
-                    <div class="os-widget" style="grid-column: span 12; margin-bottom: 5px;">
-                        <span class="os-widget-label">Conexão com Ambiente Real (Make.com / n8n)</span>
-                        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); padding: 20px; border-radius: 8px;">
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; font-size: 0.75rem; color: var(--os-primary); font-weight: 800; margin-bottom: 8px; text-transform: uppercase;">Webhook URL - Criação de Novo Lead (CRM)</label>
-                                <div style="display: flex; gap: 10px;">
-                                    <input type="url" id="webhook-lead-url" placeholder="https://hook.us1.make.com/..." style="flex: 1; padding: 12px 16px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--os-border); border-radius: 4px; color: #fff; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;" />
-                                    <button id="btn-save-webhooks" style="background: var(--os-primary); color: #050705; border: none; padding: 0 24px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; transition: all 0.3s;">Salvar URL</button>
-                                </div>
-                                <p style="font-size: 0.7rem; color: var(--os-text-muted); margin-top: 8px;">Insira a URL gerada no seu cenário do Make.com ou n8n para receber os dados do FluxAI OS automaticamente.</p>
-                            </div>
-                            <div style="display: flex; gap: 10px;">
-                                <button id="btn-test-webhook" style="background: transparent; color: var(--os-text); border: 1px solid var(--os-border); padding: 10px 20px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                                    <i class="fa-solid fa-paper-plane"></i> Disparar Teste Real
-                                </button>
-                                <span id="webhook-test-status" style="display: none; align-items: center; font-size: 0.75rem; font-weight: 800;"></span>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- INSERÇÃO MANUAL DE LEAD (CRM INTELIGENTE) -->
                     <div class="os-widget" style="grid-column: span 12; margin-bottom: 5px;">
