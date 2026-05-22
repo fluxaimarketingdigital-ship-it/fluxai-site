@@ -20,7 +20,7 @@ Este documento serve como a "Fonte da Verdade" para a infraestrutura técnica e 
 ## 2. Captura e Fluxo de Leads (The Backbone)
 
 *   **Formulário:** Localizado na seção `#diagnostico`.
-*   **Webhook (Make.com):** `https://hook.us2.make.com/e6ydrb095p983d2z6s6m2jzwgff3mpt2`
+*   **Webhook (Make.com):** `https://hook.us2.make.com/bnm7xedyxhxdlvh417gone7gy5m4e8me`
 *   **Destino CRM:** Google Sheets (FluxAI_CRM).
 *   **Fluxo de Encerramento:** Após o envio, o lead é redirecionado para o WhatsApp `+5571981114694` com os dados pré-preenchidos.
 
