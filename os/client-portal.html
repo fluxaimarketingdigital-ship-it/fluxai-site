@@ -391,6 +391,21 @@
                     </select>
                 </div>
 
+                <div class="form-group">
+                    <label>Prazo Desejado</label>
+                    <input type="date" id="demanda-prazo" class="form-control" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Link de Referência / Arquivo (Opcional)</label>
+                    <input type="url" id="demanda-arquivo" class="form-control" placeholder="https://..." />
+                </div>
+                
+                <div class="form-group">
+                    <label>Observação Adicional</label>
+                    <input type="text" id="demanda-obs" class="form-control" placeholder="Ex: Favor utilizar a paleta de cores secundária." />
+                </div>
+
                 <div style="text-align: right; margin-top: 30px;">
                     <button class="btn-nova-demanda" onclick="submitDemanda()" style="padding: 10px 20px; font-size: 0.8rem;">
                         <i class="fa-solid fa-paper-plane"></i> Enviar Solicitação
@@ -591,14 +606,18 @@
             const originalText = btn.innerHTML;
             
             const data = {
-                tipo: document.getElementById('demanda-tipo').value,
-                titulo: document.getElementById('demanda-titulo').value,
-                descricao: document.getElementById('demanda-desc').value,
+                cliente_id: new URLSearchParams(window.location.search).get('project_id') || 'FLUXAI_LABS_001',
+                cliente_nome: document.getElementById('dual-client-name') ? document.getElementById('dual-client-name').innerText : 'FluxAI Labs',
+                tipo_demanda: document.getElementById('demanda-tipo').value,
+                titulo_demanda: document.getElementById('demanda-titulo').value,
+                descricao_demanda: document.getElementById('demanda-desc').value,
                 prioridade: document.getElementById('demanda-prioridade').value,
-                cliente_id: new URLSearchParams(window.location.search).get('project_id') || 'desconhecido'
+                prazo_desejado: document.getElementById('demanda-prazo') ? document.getElementById('demanda-prazo').value : '',
+                arquivo_referencia: document.getElementById('demanda-arquivo') ? document.getElementById('demanda-arquivo').value : '',
+                observacao: document.getElementById('demanda-obs') ? document.getElementById('demanda-obs').value : ''
             };
 
-            if (!data.tipo || !data.titulo) {
+            if (!data.tipo_demanda || !data.titulo_demanda) {
                 alert('Por favor, preencha o Tipo de Serviço e o Título da demanda.');
                 return;
             }
