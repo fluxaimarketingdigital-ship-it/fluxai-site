@@ -191,6 +191,34 @@
             box-shadow: 0 10px 20px rgba(142, 158, 104, 0.3);
         }
 
+        /* MODAL NOVA DEMANDA */
+        .os-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            backdrop-filter: blur(10px);
+            z-index: 9999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .os-modal-content {
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            border-radius: 12px;
+            max-width: 600px;
+            width: 100%;
+            padding: 30px;
+            position: relative;
+        }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.75rem; color: var(--os-text-muted); text-transform: uppercase; font-weight: 800; margin-bottom: 8px; }
+        .form-control { width: 100%; padding: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--os-border); border-radius: 6px; color: #fff; font-family: inherit; box-sizing: border-box; }
+        .form-control:focus { outline: none; border-color: var(--os-primary); }
+        .close-modal { position: absolute; top: 20px; right: 20px; background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+
         .btn-back-portal {
             position: absolute;
             left: 30px;
@@ -323,6 +351,54 @@
             </div>
         </div>
 
+        <!-- MODAL NOVA DEMANDA -->
+        <div id="modal-demanda" class="os-modal">
+            <div class="os-modal-content">
+                <button class="close-modal" onclick="closeDemandaModal()"><i class="fa-solid fa-xmark"></i></button>
+                <h2 style="margin-top:0; color:var(--os-primary); text-transform:uppercase; font-weight:900; font-size:1.2rem; border-bottom:1px solid var(--os-border); padding-bottom:15px; margin-bottom:20px;">
+                    <i class="fa-solid fa-rocket"></i> Solicitar Novo Serviço
+                </h2>
+                
+                <div class="form-group">
+                    <label>Tipo de Serviço / Demanda</label>
+                    <select id="demanda-tipo" class="form-control">
+                        <option value="">Selecione...</option>
+                        <option value="landing_page">Landing Page de Alta Conversão</option>
+                        <option value="automacao">Automação Make / Integrações</option>
+                        <option value="copywriting">Copywriting Especializado (Emails, VSL)</option>
+                        <option value="campanha_meta">Configuração de Campanha (Meta Ads)</option>
+                        <option value="design_criativo">Design de Criativos Estratégicos</option>
+                        <option value="consultoria">Consultoria Técnica / Reunião</option>
+                        <option value="outro">Outros</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Título da Demanda</label>
+                    <input type="text" id="demanda-titulo" class="form-control" placeholder="Ex: Criação de LP para o Produto X" />
+                </div>
+                
+                <div class="form-group">
+                    <label>Descrição Detalhada do que você precisa</label>
+                    <textarea id="demanda-desc" class="form-control" rows="4" placeholder="Explique os detalhes para que nossa equipe possa precificar e estimar o prazo..."></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Urgência / Prioridade</label>
+                    <select id="demanda-prioridade" class="form-control">
+                        <option value="baixa">Normal (Fluxo Padrão)</option>
+                        <option value="alta">Alta Prioridade (Urgente)</option>
+                    </select>
+                </div>
+
+                <div style="text-align: right; margin-top: 30px;">
+                    <button class="btn-nova-demanda" onclick="submitDemanda()" style="padding: 10px 20px; font-size: 0.8rem;">
+                        <i class="fa-solid fa-paper-plane"></i> Enviar Solicitação
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- FINANCEIRO -->
         <div class="portal-section">
             <div class="section-title"><i class="fa-solid fa-wallet"></i> Financeiro & Faturas</div>
@@ -438,7 +514,7 @@
             <div class="section-title"><i class="fa-solid fa-circle-plus"></i> Solicitações Extras</div>
             <div style="background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 8px; padding: 20px;">
                 <p style="color: var(--os-text-light); font-size: 0.85rem; margin-top: 0;">Precisa de uma landing page, campanha avulsa ou design extra? Faça sua solicitação aqui e ela será adicionada ao próximo faturamento após aprovação.</p>
-                <button onclick="alert('Funcionalidade de Nova Demanda será conectada ao fluxo de Tickets!')" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase;">
+                <button onclick="openDemandaModal()" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase;">
                     <i class="fa-solid fa-paper-plane"></i> Adicionar Nova Demanda
                 </button>
             </div>
@@ -502,6 +578,55 @@
             await checkFinancialAlerts();
         }
         
+        function openDemandaModal() {
+            document.getElementById('modal-demanda').style.display = 'flex';
+        }
+
+        function closeDemandaModal() {
+            document.getElementById('modal-demanda').style.display = 'none';
+        }
+
+        async function submitDemanda() {
+            const btn = document.querySelector('#modal-demanda .btn-nova-demanda');
+            const originalText = btn.innerHTML;
+            
+            const data = {
+                tipo: document.getElementById('demanda-tipo').value,
+                titulo: document.getElementById('demanda-titulo').value,
+                descricao: document.getElementById('demanda-desc').value,
+                prioridade: document.getElementById('demanda-prioridade').value,
+                cliente_id: new URLSearchParams(window.location.search).get('project_id') || 'desconhecido'
+            };
+
+            if (!data.tipo || !data.titulo) {
+                alert('Por favor, preencha o Tipo de Serviço e o Título da demanda.');
+                return;
+            }
+
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...';
+            
+            const makeWebhookUrl = localStorage.getItem('fluxai_make_webhook_demanda') || 'https://hook.us2.make.com/SEU_WEBHOOK_AQUI';
+            
+            try {
+                await new Promise(r => setTimeout(r, 1200));
+                if (makeWebhookUrl.includes('hook.us2.make.com') && !makeWebhookUrl.includes('SEU_WEBHOOK_AQUI')) {
+                    await fetch(makeWebhookUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                }
+                alert('Demanda enviada com sucesso! Em breve entraremos em contato.');
+                closeDemandaModal();
+                document.getElementById('demanda-titulo').value = '';
+                document.getElementById('demanda-desc').value = '';
+            } catch (err) {
+                alert('Erro ao enviar a solicitação. Tente novamente.');
+            } finally {
+                btn.innerHTML = originalText;
+            }
+        }
+
         async function renderFinanceList() {
             const list = document.getElementById('portal-finance');
             list.innerHTML = `
