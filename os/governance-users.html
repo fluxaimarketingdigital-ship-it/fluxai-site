@@ -39,52 +39,72 @@
             opacity: 0.95;
         }
         .user-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); 
-            gap: 25px; 
+            display: flex; 
+            flex-direction: column;
+            gap: 10px; 
             margin-top: 20px; 
         }
         .user-card { 
             background: var(--os-sidebar); 
             border: 1px solid var(--os-border); 
-            border-radius: 8px; 
-            padding: 24px; 
+            border-radius: 6px; 
             display: flex; 
             flex-direction: column; 
-            gap: 20px;
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
         }
         .user-card:hover {
             border-color: rgba(142, 158, 104, 0.4);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
-            transform: translateY(-2px);
         }
         .user-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            width: 4px;
+            width: 3px;
             height: 100%;
             background: var(--os-border);
+            z-index: 2;
         }
         .user-card.role-admin::before { background: #a855f7; }
         .user-card.role-operator::before { background: #f59e0b; }
         .user-card.role-client::before { background: var(--os-primary); }
+        
+        .user-card-header {
+            display: grid;
+            grid-template-columns: 250px 1fr 200px 50px;
+            align-items: center;
+            padding: 15px 20px;
+            cursor: pointer;
+            gap: 15px;
+        }
+        
+        .user-card-body {
+            display: none;
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .user-card.expanded .user-card-body {
+            display: block;
+        }
+        
+        .user-card.expanded .toggle-icon {
+            transform: rotate(180deg);
+        }
 
         .user-header { display: flex; align-items: center; gap: 15px; }
         .user-avatar { 
-            width: 45px; 
-            height: 45px; 
+            width: 36px; 
+            height: 36px; 
             border-radius: 50%; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             font-weight: 800; 
-            font-size: 1rem; 
+            font-size: 0.85rem; 
             background: rgba(255,255,255,0.05);
             border: 1px solid var(--os-border);
             color: #fff;
@@ -93,8 +113,8 @@
         .user-card.role-operator .user-avatar { border-color: rgba(245, 158, 11, 0.4); color: #fbbf24; background: rgba(245, 158, 11, 0.1); }
         .user-card.role-client .user-avatar { border-color: rgba(142, 158, 104, 0.4); color: var(--os-primary); background: rgba(142, 158, 104, 0.1); }
 
-        .user-info h3 { font-size: 0.95rem; margin-bottom: 4px; font-weight: 700; color: #fff; }
-        .user-info p { font-size: 0.75rem; color: var(--os-text-muted); font-family: 'JetBrains Mono', monospace; }
+        .user-info h3 { font-size: 0.9rem; margin-bottom: 2px; font-weight: 700; color: #fff; }
+        .user-info p { font-size: 0.7rem; color: var(--os-text-muted); font-family: 'JetBrains Mono', monospace; }
         
         .role-badge {
             font-size: 0.55rem;
@@ -104,7 +124,6 @@
             text-transform: uppercase;
             letter-spacing: 1px;
             display: inline-block;
-            margin-top: 4px;
         }
         .role-badge.admin { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
         .role-badge.operator { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
@@ -170,7 +189,7 @@
         }
         .permissions-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(4, 1fr);
             gap: 8px;
         }
         .permission-item {
@@ -205,11 +224,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-top: 5px;
+            margin-top: 20px;
+            justify-content: flex-end;
+            border-top: 1px solid var(--os-border);
+            padding-top: 15px;
         }
         .btn-card-action {
-            flex: 1;
-            padding: 10px;
+            flex: 0 1 auto;
+            padding: 10px 15px;
             font-size: 0.65rem;
             font-weight: 700;
             border-radius: 4px;
@@ -498,57 +520,67 @@
                 });
 
                 card.innerHTML = `
-                    <div class="user-header">
-                        <div class="user-avatar">${initials}</div>
-                        <div class="user-info">
-                            <h3>${u.full_name || 'Usuário Sem Nome'}</h3>
-                            <p>${u.email}</p>
+                    <div class="user-card-header" onclick="this.parentElement.classList.toggle('expanded')">
+                        <div class="user-header">
+                            <div class="user-avatar">${initials}</div>
+                            <div class="user-info">
+                                <h3>${u.full_name || 'Usuário Sem Nome'}</h3>
+                                <p>${u.email}</p>
+                            </div>
+                        </div>
+                        <div>
                             <span class="role-badge ${roleClass}">${roleLabel}</span>
                         </div>
-                    </div>
-
-                    <!-- Bloco de Credenciais -->
-                    <div class="credentials-box">
-                        <div class="credential-row">
-                            <span class="credential-label">Login</span>
-                            <span class="credential-value" style="font-size: 0.7rem;">${u.email}</span>
+                        <div>
+                            <span style="font-size: 0.7rem; color: var(--os-text-muted);"><i class="fa-solid fa-key"></i> Chave: <span id="pass-${u.id}" class="mask-password">••••••••</span></span>
                         </div>
-                        <div class="credential-row">
-                            <span class="credential-label">Chave de Acesso</span>
-                            <span class="credential-value">
-                                <span id="pass-${u.id}" class="mask-password">••••••••</span>
-                                <button class="btn-credential-action" onclick="window.togglePasswordReveal('${u.id}', '${u.password}')" title="Revelar Senha">
-                                    <i id="eye-icon-${u.id}" class="fa-solid fa-eye"></i>
-                                </button>
-                                <button class="btn-credential-action" onclick="window.copyToClipboard('${u.password}')" title="Copiar Senha">
-                                    <i class="fa-solid fa-copy"></i>
-                                </button>
-                            </span>
+                        <div style="text-align: right; color: var(--os-text-muted);">
+                            <i class="fa-solid fa-chevron-down toggle-icon" style="transition: transform 0.3s ease;"></i>
                         </div>
                     </div>
 
-                    <!-- Grade de Módulos Autorizados -->
-                    <div class="permissions-section">
-                        <div class="permissions-title">
-                            <span>Módulos Autorizados</span>
-                            <span style="font-size: 0.55rem; color: var(--os-primary);"><i class="fa-solid fa-shield-halved"></i> RBAC</span>
+                    <div class="user-card-body">
+                        <!-- Bloco de Credenciais -->
+                        <div class="credentials-box" style="margin-bottom: 20px;">
+                            <div class="credential-row">
+                                <span class="credential-label">Login Operacional</span>
+                                <span class="credential-value" style="font-size: 0.8rem;">${u.email}</span>
+                            </div>
+                            <div class="credential-row">
+                                <span class="credential-label">Chave de Acesso Externa</span>
+                                <span class="credential-value">
+                                    <button class="btn-credential-action" onclick="window.togglePasswordReveal('${u.id}', '${u.password}')" title="Revelar Senha">
+                                        <i id="eye-icon-${u.id}" class="fa-solid fa-eye"></i> Revelar
+                                    </button>
+                                    <button class="btn-credential-action" onclick="window.copyToClipboard('${u.password}')" title="Copiar Senha">
+                                        <i class="fa-solid fa-copy"></i> Copiar
+                                    </button>
+                                </span>
+                            </div>
                         </div>
-                        <div class="permissions-grid">
-                            ${permissionGridHtml}
-                        </div>
-                    </div>
 
-                    <!-- Botões de Ações do Cartão -->
-                    <div class="card-actions">
-                        <button class="btn-card-action btn-card-reset" onclick="window.resetUserPassword('${u.id}')" title="Resetar senha para fluxai@2026">
-                            <i class="fa-solid fa-key"></i> Resetar Senha
-                        </button>
-                        <button class="btn-card-action" onclick="window.toggleContractStatus('${u.id}', '${u.email}')" title="Ativar / Inativar Contrato" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2); padding: 8px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; gap: 6px; display:flex; align-items:center;">
-                            <i class="fa-solid fa-toggle-on"></i> Ativar/Inativar
-                        </button>
-                        <button class="btn-card-action btn-card-delete" onclick="window.deleteUser('${u.id}', '${u.email}')" title="Excluir Usuário">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                        <!-- Grade de Módulos Autorizados -->
+                        <div class="permissions-section">
+                            <div class="permissions-title">
+                                <span>Módulos Autorizados (RBAC)</span>
+                            </div>
+                            <div class="permissions-grid">
+                                ${permissionGridHtml}
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ações do Cartão -->
+                        <div class="card-actions">
+                            <button class="btn-card-action btn-card-reset" onclick="window.resetUserPassword('${u.id}')" title="Resetar senha para fluxai@2026">
+                                <i class="fa-solid fa-key"></i> Resetar Senha
+                            </button>
+                            <button class="btn-card-action" onclick="window.toggleContractStatus('${u.id}', '${u.email}')" title="Ativar / Inativar Contrato" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2);">
+                                <i class="fa-solid fa-toggle-on"></i> Ativar/Inativar
+                            </button>
+                            <button class="btn-card-action btn-card-delete" onclick="window.deleteUser('${u.id}', '${u.email}')" title="Excluir Usuário" style="max-width: none;">
+                                <i class="fa-solid fa-trash-can"></i> Excluir
+                            </button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);

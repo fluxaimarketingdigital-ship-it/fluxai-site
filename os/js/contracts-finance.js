@@ -723,7 +723,22 @@ window.sendWhatsAppBilling = async (paymentId) => {
 
     if (!p) return;
 
-    const msg = `Olá, ${p.contracts.client_name}. Tudo bem?\n\nPassando para lembrar que o pagamento referente ao serviço na FluxAI OS™ vence em ${new Date(p.due_date).toLocaleDateString('pt-BR')}, no valor de ${formatCurrency(p.amount_due)}.\n\nQualquer dúvida, fico à disposição.`;
+    const dueDate = new Date(p.due_date);
+    const now = new Date();
+    dueDate.setHours(0,0,0,0);
+    now.setHours(0,0,0,0);
+    const diffDays = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
+    
+    let msg = '';
+    
+    if (diffDays === 0) {
+        msg = `Olá, ${p.contracts.client_name}. Tudo bem?\n\nPassando para lembrar que a sua recorrência da FluxAI no valor de ${formatCurrency(p.amount_due)} vence *hoje*.\n\nPara facilitar, você pode realizar o pagamento acessando o seu Portal do Cliente ou diretamente via PIX (CNPJ): \n\n*45.291.901/0001-88*\n\nAssim que realizar o pagamento, você pode anexar o comprovante direto no seu portal ou nos enviar por aqui.\n\nQualquer dúvida, fico à disposição.`;
+    } else if (diffDays > 0) {
+        msg = `Olá, ${p.contracts.client_name}. Tudo bem?\n\nPassando para lembrar que o seu pagamento referente à FluxAI no valor de ${formatCurrency(p.amount_due)} vence em ${diffDays} dia(s) (${dueDate.toLocaleDateString('pt-BR')}).\n\nVocê também poderá ver todos os detalhes e realizar o pagamento no seu Portal do Cliente.\n\nQualquer dúvida, fico à disposição.`;
+    } else {
+        msg = `Olá, ${p.contracts.client_name}. Tudo bem?\n\nIdentificamos que o pagamento da sua mensalidade FluxAI no valor de ${formatCurrency(p.amount_due)} (vencimento ${dueDate.toLocaleDateString('pt-BR')}) encontra-se pendente.\n\nPara mantermos o seu ecossistema ativo, por favor realize o pagamento via PIX (CNPJ):\n\n*45.291.901/0001-88*\n\nSe já efetuou o pagamento, por favor desconsidere este aviso e nos envie o comprovante.`;
+    }
+
     window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
 };
 

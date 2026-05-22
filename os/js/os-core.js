@@ -60,8 +60,12 @@ export const OS_UI = {
 
         let html = `
             <div class="os-sidebar-header">
-                <div class="os-brand"><i class="fa-solid fa-cube"></i> FLUXAI <span>OS™</span></div>
+                <div class="os-logo">
+                    FLUXAI OS™ <span style="font-size:0.6rem; color:var(--os-primary);">v1.0</span>
+                </div>
+                <button class="os-menu-close" onclick="document.querySelector('.os-sidebar').classList.remove('active')" style="display: none; background: transparent; border: none; color: var(--os-text-muted); cursor: pointer; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
             </div>
+            
             <nav class="os-sidebar-nav">`;
 
         let currentGroup = "";

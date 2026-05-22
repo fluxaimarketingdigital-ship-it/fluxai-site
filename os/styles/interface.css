@@ -261,8 +261,11 @@ body.os-mode {
         bottom: 0;
         width: 260px;
         transform: translateX(-100%);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
     }
     .os-sidebar.active { transform: translateX(0); }
+    .os-sidebar-header { display: flex; justify-content: space-between; align-items: center; }
+    .os-menu-close { display: block !important; }
     .os-menu-toggle { display: block; }
     .os-topbar { padding: 0 20px; }
     .os-viewport { padding: 25px; }

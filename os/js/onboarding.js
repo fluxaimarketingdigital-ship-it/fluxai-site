@@ -6,9 +6,8 @@ let currentStep = 1;
 const totalSteps = 7;
 
 async function initOnboarding() {
-    // Renderiza sidebar e topbar imediatamente (não depende de auth)
+    // Renderiza topbar imediatamente (não depende de auth)
     try {
-        OS_UI.renderSidebar('onboarding', 'ADMIN');
         OS_UI.renderTopbar();
     } catch(e) { console.error('[ONBOARDING] Falha ao renderizar interface base:', e); }
 

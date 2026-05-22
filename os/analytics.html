@@ -1042,6 +1042,10 @@
         import { decisionalMetrics, operationalInsights, behavioralData, socialSignals } from './data/analytics.js';
         import { getSupabase } from './services/supabase-client.js';
 
+        let currentDecisional = [];
+        let currentBehavioral = {};
+        let currentSocial = {};
+
         // Helper Parsers
         function parseK(val) {
             if (!val) return 0;
