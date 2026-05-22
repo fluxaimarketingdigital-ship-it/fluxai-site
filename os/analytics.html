@@ -1320,7 +1320,8 @@
             }
 
             if (activeProjects.length === 0) {
-                console.warn('Nenhum projeto ativo encontrado no banco de dados.');
+                console.warn('Nenhum projeto ativo encontrado no banco de dados. Usando mock.');
+                activeProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
             }
 
             // Popular Filtros de Clientes
@@ -2339,21 +2340,6 @@
 
                     <div class="footer">
                         FLUXAI OS™ • INTELIGÊNCIA INTEGRADA E OPERAÇÃO DIGITAL DE ALTA PERFORMANCE • FLUXAIDIGITAL.COM.BR
-                    </div>
-                </body>
-                </html>
-            `);
-            reportWindow.document.close();
-        };
-
-        initPage();
-    </script>AC) detectado no módulo de Automação."}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="footer">
-                        FLUXAI OS™ • INTELIGÊNCIA E ESTRUTURA DE CRESCIMENTO DIGITAL • FLUXAIDIGITAL.COM.BR
                     </div>
                 </body>
                 </html>
