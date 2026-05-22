@@ -60,8 +60,8 @@ export const OS_UI = {
 
         let html = `
             <div class="os-sidebar-header">
-                <div class="os-logo">
-                    FLUXAI OS™ <span style="font-size:0.6rem; color:var(--os-primary);">v1.0</span>
+                <div class="os-logo" style="display: flex; align-items: center; justify-content: center; padding: 10px 0;">
+                    <img src="./assets/logo.png" alt="FluxAI Labs" style="max-width: 140px; height: auto;" onerror="this.outerHTML='FLUXAI OS™ <span style=\\\'font-size:0.6rem; color:var(--os-primary);\\\'>v1.0</span>'" />
                 </div>
                 <button class="os-menu-close" onclick="document.querySelector('.os-sidebar').classList.remove('active')" style="display: none; background: transparent; border: none; color: var(--os-text-muted); cursor: pointer; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
             </div>
