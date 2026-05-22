@@ -602,18 +602,19 @@
         }
 
         async function submitDemanda() {
-            const btn = document.querySelector('#modal-demanda .btn-nova-demanda');
-            const originalText = btn.innerHTML;
-            
+            // Lógica temporária clara para teste
+            const tempClientId = 'FLUXAI_LABS_001';
+            const tempClientNome = 'FluxAI Labs';
+
             const data = {
-                cliente_id: new URLSearchParams(window.location.search).get('project_id') || 'FLUXAI_LABS_001',
-                cliente_nome: document.getElementById('dual-client-name') ? document.getElementById('dual-client-name').innerText : 'FluxAI Labs',
+                cliente_id: tempClientId,
+                cliente_nome: tempClientNome,
                 tipo_demanda: document.getElementById('demanda-tipo').value,
                 titulo_demanda: document.getElementById('demanda-titulo').value,
                 descricao_demanda: document.getElementById('demanda-desc').value,
                 prioridade: document.getElementById('demanda-prioridade').value,
                 prazo_desejado: document.getElementById('demanda-prazo') ? document.getElementById('demanda-prazo').value : '',
-                arquivo_referencia: document.getElementById('demanda-arquivo') ? document.getElementById('demanda-arquivo').value : '',
+                arquivo_referencia: document.getElementById('demanda-arquivo') && document.getElementById('demanda-arquivo').value ? document.getElementById('demanda-arquivo').value : 'N/A',
                 observacao: document.getElementById('demanda-obs') ? document.getElementById('demanda-obs').value : ''
             };
 
@@ -627,20 +628,31 @@
             const makeWebhookUrl = localStorage.getItem('fluxai_make_webhook_demanda') || 'https://hook.us2.make.com/bnm7xedyxhxdlvh417gone7gy5m4e8me';
             
             try {
-                await new Promise(r => setTimeout(r, 1200));
-                if (makeWebhookUrl.includes('hook.us2.make.com') && !makeWebhookUrl.includes('SEU_WEBHOOK_AQUI')) {
-                    await fetch(makeWebhookUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(data)
-                    });
+                console.log('Enviando demanda para Make:');
+                console.log(data);
+                
+                const response = await fetch(makeWebhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                console.log('Resposta do Make:', response);
+                
+                if (!response.ok) {
+                    throw new Error('Falha na resposta do webhook');
                 }
-                alert('Demanda enviada com sucesso! Em breve entraremos em contato.');
+                
+                alert('Demanda enviada com sucesso.');
                 closeDemandaModal();
                 document.getElementById('demanda-titulo').value = '';
                 document.getElementById('demanda-desc').value = '';
+                if(document.getElementById('demanda-prazo')) document.getElementById('demanda-prazo').value = '';
+                if(document.getElementById('demanda-arquivo')) document.getElementById('demanda-arquivo').value = '';
+                if(document.getElementById('demanda-obs')) document.getElementById('demanda-obs').value = '';
             } catch (err) {
-                alert('Erro ao enviar a solicitação. Tente novamente.');
+                console.error(err);
+                alert('Não foi possível enviar sua demanda agora. Tente novamente.');
             } finally {
                 btn.innerHTML = originalText;
             }
