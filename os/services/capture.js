@@ -36,6 +36,21 @@ export const LeadCapture = {
                 utm_source: new URLSearchParams(window.location.search).get('utm_source') || 'orgânico'
             };
 
+            // Disparo para o Webhook Real (Make.com / n8n) - Ampliação de Métricas
+            const webhookUrl = localStorage.getItem('fluxai_webhook_lead') || 'https://hook.us2.make.com/bnm7xedyxhxdlvh417gone7gy5m4e8me';
+            if (webhookUrl) {
+                fetch(webhookUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        event: 'new_lead_captured_site',
+                        source: 'FluxAI Website Form',
+                        timestamp: new Date().toISOString(),
+                        data: leadData
+                    })
+                }).catch(e => console.warn('Falha silenciosa ao disparar webhook do site:', e));
+            }
+
             try {
                 const { data, error } = await supabase.from('crm_leads').insert([leadData]);
                 if (error) throw error;
@@ -48,21 +63,7 @@ export const LeadCapture = {
                 
                 // Disparar evento customizado se o site quiser fazer redirect ou exibir modal
                 window.dispatchEvent(new CustomEvent('fluxai_lead_captured', { detail: leadData }));
-                
-                // Disparo para o Webhook Real (Make.com / n8n) - Ampliação de Métricas
-                const webhookUrl = localStorage.getItem('fluxai_webhook_lead');
-                if (webhookUrl) {
-                    fetch(webhookUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            event: 'new_lead_captured_site',
-                            source: 'FluxAI Website Form',
-                            timestamp: new Date().toISOString(),
-                            data: leadData
-                        })
-                    }).catch(e => console.warn('Falha silenciosa ao disparar webhook do site:', e));
-                }
+
                 
                 setTimeout(() => {
                     form.reset();
