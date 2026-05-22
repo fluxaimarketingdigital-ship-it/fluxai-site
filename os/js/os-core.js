@@ -168,19 +168,24 @@ export const OS_UI = {
         const financeBadge = finAlerts > 0 ? `<span style="background:var(--os-danger);color:#fff;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:4px;">${finAlerts} ALERTA${finAlerts>1?'S':''}</span>` : '';
 
         const html = `
-            <div class="os-topbar-left" style="display:flex;align-items:center;">
+            <div class="os-topbar-left" style="display:flex;align-items:center;gap:15px;">
+                <button class="os-menu-toggle" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>
                 <div class="os-status-indicator"><span class="os-dot"></span> ${OS_CONFIG.status}</div>
                 ${contextSwitcher}${approvalBadge}${financeBadge}
             </div>
             <div class="os-topbar-right">
                 <div class="os-user-profile" id="user-profile-menu" style="cursor:pointer;">
                     <div class="os-avatar">${initials}</div>
-                    <span>${user.full_name || user.email}</span>
+                    <span>${user ? (user.full_name || user.email) : 'Visitante'}</span>
                     <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;margin-left:8px;opacity:0.5;"></i>
                 </div>
             </div>`;
 
         document.querySelector('.os-topbar').innerHTML = html;
+
+        document.getElementById('mobile-menu-toggle')?.addEventListener('click', () => {
+            document.querySelector('.os-sidebar')?.classList.toggle('active');
+        });
 
         document.getElementById('user-profile-menu')?.addEventListener('click', () => {
             if (confirm('Deseja encerrar a sessão operacional?')) OS_AUTH.logout();

@@ -7,19 +7,16 @@ const totalSteps = 7;
 
 async function initOnboarding() {
     // Renderiza sidebar e topbar imediatamente (não depende de auth)
-    OS_UI.renderSidebar('onboarding', 'ADMIN');
-    OS_UI.renderTopbar();
+    try {
+        OS_UI.renderSidebar('onboarding', 'ADMIN');
+        OS_UI.renderTopbar();
+    } catch(e) { console.error('[ONBOARDING] Falha ao renderizar interface base:', e); }
 
-    const user = await OS_AUTH.check('ADMIN');
-    if (!user) {
-        // Se não estiver logado, auth.check já redireciona
-        // mas mantém a sidebar visível durante o redirecionamento
-        return;
-    }
-
-    // Listeners de Navegação
-    document.getElementById('btn-next').onclick = () => moveStep(1);
-    document.getElementById('btn-prev').onclick = () => moveStep(-1);
+    // Listeners de Navegação (Garantir vinculação imediata)
+    const btnNext = document.getElementById('btn-next');
+    const btnPrev = document.getElementById('btn-prev');
+    if (btnNext) btnNext.onclick = () => moveStep(1);
+    if (btnPrev) btnPrev.onclick = () => moveStep(-1);
 
     // Listener de Módulos Dinâmicos
     const moduleChecks = document.querySelectorAll('input[name="modules"]');
@@ -40,7 +37,13 @@ async function initOnboarding() {
     });
 
     const form = document.getElementById('onboardingForm');
-    form.onsubmit = handleOnboarding;
+    if (form) form.onsubmit = handleOnboarding;
+
+    const user = await OS_AUTH.check('ADMIN');
+    if (!user) {
+        // Se não estiver logado, auth.check já redireciona
+        return;
+    }
 
     // Ativar auto-preenchimento inteligente de escopo e preço para Serviços Extras no Onboarding
     const selectOnboardingExtra = document.getElementById('finance_extra_services_type');
