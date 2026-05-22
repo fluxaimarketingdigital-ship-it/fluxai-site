@@ -524,13 +524,13 @@
 
                     <!-- Wizard Rodapé -->
                     <div class="wizard-footer">
-                        <button type="button" class="btn-wizard btn-prev" id="btn-prev" style="visibility: hidden;">
+                        <button type="button" class="btn-wizard btn-prev" id="btn-prev" onclick="window.moveStep(-1)" style="visibility: hidden;">
                             <i class="fa-solid fa-arrow-left"></i> Anterior
                         </button>
                         <div style="font-size: 0.7rem; color: var(--os-text-muted); font-weight: 800; letter-spacing: 1px;">
                             ETAPA <span id="current-step-display">1</span> DE 7
                         </div>
-                        <button type="button" class="btn-wizard btn-next" id="btn-next">
+                        <button type="button" class="btn-wizard btn-next" id="btn-next" onclick="window.moveStep(1)">
                             Próximo <i class="fa-solid fa-arrow-right"></i>
                         </button>
                     </div>

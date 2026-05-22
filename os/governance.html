@@ -116,7 +116,7 @@
                             </div>
                             
                             <!-- Make.com / Webhooks -->
-                            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px; margin-bottom: 20px;">
                                 <label style="display:block; font-size: 0.75rem; font-weight: 800; color: #fff; margin-bottom: 8px;"><i class="fa-solid fa-bolt" style="color: #8B5CF6; margin-right: 5px;"></i> Make.com / n8n (Webhooks Core)</label>
                                 <div style="display: flex; gap: 15px; align-items: center;">
                                     <input type="password" id="make-api-key" placeholder="https://hook.us1.make.com/..." style="flex: 1; max-width: 500px; padding: 12px 15px; background: #000; border: 1px solid var(--os-border); color: #fff; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;" />
@@ -125,6 +125,45 @@
                                 </div>
                                 <div id="make-status-msg" style="margin-top: 10px; font-size: 0.75rem; color: var(--os-primary); display: none;">
                                     <i class="fa-solid fa-circle-check"></i> URL Base de Webhooks ativa.
+                                </div>
+                            </div>
+                            
+                            <!-- Supabase -->
+                            <div style="margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                                <label style="display:block; font-size: 0.75rem; font-weight: 800; color: #fff; margin-bottom: 8px;"><i class="fa-solid fa-database" style="color: #3ECF8E; margin-right: 5px;"></i> Supabase (Backend API)</label>
+                                <div style="display: flex; gap: 15px; align-items: center;">
+                                    <input type="password" id="supabase-api-key" placeholder="eyJhbGciOiJIUzI1NiIs..." style="flex: 1; max-width: 500px; padding: 12px 15px; background: #000; border: 1px solid var(--os-border); color: #fff; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;" />
+                                    <button id="btn-save-supabase-key" class="btn-action btn-approve" style="height: 40px; padding: 0 25px; border-radius: 4px;" onclick="window.saveAPIKey('supabase', 'supabase-api-key')">Salvar</button>
+                                    <button id="btn-delete-supabase-key" class="btn-action btn-review" style="height: 40px; padding: 0 15px; border-radius: 4px; display: none;" onclick="window.deleteAPIKey('supabase')">Excluir</button>
+                                </div>
+                                <div id="supabase-status-msg" style="margin-top: 10px; font-size: 0.75rem; color: var(--os-primary); display: none;">
+                                    <i class="fa-solid fa-circle-check"></i> Chave Supabase ativa.
+                                </div>
+                            </div>
+                            
+                            <!-- Anthropic Claude -->
+                            <div style="margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                                <label style="display:block; font-size: 0.75rem; font-weight: 800; color: #fff; margin-bottom: 8px;"><i class="fa-solid fa-robot" style="color: #D97757; margin-right: 5px;"></i> Anthropic Claude</label>
+                                <div style="display: flex; gap: 15px; align-items: center;">
+                                    <input type="password" id="claude-api-key" placeholder="sk-ant-..." style="flex: 1; max-width: 500px; padding: 12px 15px; background: #000; border: 1px solid var(--os-border); color: #fff; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;" />
+                                    <button id="btn-save-claude-key" class="btn-action btn-approve" style="height: 40px; padding: 0 25px; border-radius: 4px;" onclick="window.saveAPIKey('claude', 'claude-api-key')">Salvar</button>
+                                    <button id="btn-delete-claude-key" class="btn-action btn-review" style="height: 40px; padding: 0 15px; border-radius: 4px; display: none;" onclick="window.deleteAPIKey('claude')">Excluir</button>
+                                </div>
+                                <div id="claude-status-msg" style="margin-top: 10px; font-size: 0.75rem; color: var(--os-primary); display: none;">
+                                    <i class="fa-solid fa-circle-check"></i> Chave Claude ativa.
+                                </div>
+                            </div>
+                            
+                            <!-- GitHub -->
+                            <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                                <label style="display:block; font-size: 0.75rem; font-weight: 800; color: #fff; margin-bottom: 8px;"><i class="fa-brands fa-github" style="color: #fff; margin-right: 5px;"></i> GitHub (Deployments)</label>
+                                <div style="display: flex; gap: 15px; align-items: center;">
+                                    <input type="password" id="github-api-key" placeholder="ghp_..." style="flex: 1; max-width: 500px; padding: 12px 15px; background: #000; border: 1px solid var(--os-border); color: #fff; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;" />
+                                    <button id="btn-save-github-key" class="btn-action btn-approve" style="height: 40px; padding: 0 25px; border-radius: 4px;" onclick="window.saveAPIKey('github', 'github-api-key')">Salvar</button>
+                                    <button id="btn-delete-github-key" class="btn-action btn-review" style="height: 40px; padding: 0 15px; border-radius: 4px; display: none;" onclick="window.deleteAPIKey('github')">Excluir</button>
+                                </div>
+                                <div id="github-status-msg" style="margin-top: 10px; font-size: 0.75rem; color: var(--os-primary); display: none;">
+                                    <i class="fa-solid fa-circle-check"></i> Chave GitHub ativa.
                                 </div>
                             </div>
                             

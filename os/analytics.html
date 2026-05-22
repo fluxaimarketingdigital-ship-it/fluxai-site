@@ -394,7 +394,7 @@
                             <option value="2026-05" selected>MAIO 2026</option>
                             <option value="2026-06">JUNHO 2026</option>
                         </select>
-                        <button id="btn-input-metrics" style="background: rgba(142, 158, 104, 0.1); border: 1px solid var(--os-primary); color: var(--os-primary); padding: 12px 20px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.1);">
+                        <button id="btn-input-metrics" onclick="document.getElementById('input-metrics-modal').style.display='flex'" style="background: rgba(142, 158, 104, 0.1); border: 1px solid var(--os-primary); color: var(--os-primary); padding: 12px 20px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.1);">
                             <i class="fa-solid fa-plus-circle"></i> LANÇAR MÉTRICAS MULTICANAL
                         </button>
                         <button id="btn-generate-report" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.2); letter-spacing: 0.5px; text-transform: uppercase;">
@@ -1310,6 +1310,7 @@
             if (!user) return;
 
             OS_UI.renderSidebar('analytics', user.role);
+            await OS_UI.renderTopbar();
 
             // Tentar buscar projetos reais do Supabase
             let activeProjects = [];

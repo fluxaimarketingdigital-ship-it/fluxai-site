@@ -11,13 +11,7 @@ async function initOnboarding() {
         OS_UI.renderTopbar();
     } catch(e) { console.error('[ONBOARDING] Falha ao renderizar interface base:', e); }
 
-    // Listeners de Navegação (Garantir vinculação imediata)
-    const btnNext = document.getElementById('btn-next');
-    const btnPrev = document.getElementById('btn-prev');
-    if (btnNext) btnNext.onclick = () => moveStep(1);
-    if (btnPrev) btnPrev.onclick = () => moveStep(-1);
-
-    // Listener de Módulos Dinâmicos
+    // Permitir clique direto nas bolinhas das etapas lá em cima
     const moduleChecks = document.querySelectorAll('input[name="modules"]');
     moduleChecks.forEach(check => {
         check.onchange = renderDynamicFields;
@@ -114,7 +108,7 @@ async function initOnboarding() {
     }
 }
 
-function moveStep(delta) {
+window.moveStep = function(delta) {
     const nextStep = currentStep + delta;
     if (nextStep < 1 || nextStep > totalSteps) return;
 
