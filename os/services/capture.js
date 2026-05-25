@@ -49,6 +49,8 @@ export const LeadCapture = {
                 canal_origem: "site",
                 campanha: new URLSearchParams(window.location.search).get('utm_campaign') || '',
                 pagina_origem: window.location.href,
+                status_lead: "novo",
+                responsavel: "FluxAI",
                 observacao: formData.get('internal_notes') || ''
             };
 

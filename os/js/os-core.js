@@ -45,7 +45,13 @@ export const OS_UI = {
 
         // contexts: em quais contextos o item aparece
         const navItems = [
-            { id: 'command-center',   label: 'Centro de Comando',     icon: 'fa-gauge-high',          group: 'Núcleo Estratégico',    roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'command-center',   label: 'Centro de Comando',     icon: 'fa-gauge-high',          group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'onboarding-cliente',label: 'Novo Cliente',         icon: 'fa-user-plus',           group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'clientes',         label: 'Clientes',              icon: 'fa-users',               group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'demandas',         label: 'Demandas',              icon: 'fa-list-check',          group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'leads',            label: 'Leads',                 icon: 'fa-funnel-dollar',       group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'metricas',         label: 'Métricas',              icon: 'fa-chart-pie',           group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'relatorio-mensal', label: 'Relatório Mensal',      icon: 'fa-file-signature',      group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
             { id: 'onboarding',       label: 'Onboarding Estratégico',icon: 'fa-address-card',         group: 'Núcleo Estratégico',    roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER', 'LABS'] },
             { id: 'content-engine',   label: 'Motor de Conteúdo',     icon: 'fa-pen-nib',             group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS','CLIENT'] },
             { id: 'crm-intelligence', label: 'Inteligência de CRM',   icon: 'fa-users-gear',          group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },

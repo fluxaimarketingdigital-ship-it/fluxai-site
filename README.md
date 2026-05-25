@@ -69,3 +69,35 @@ npx serve .
 O FluxAI OS atua de forma passiva-agressiva com o Make.com. O frontend dispara intenções (POST Webhooks) e o Make orquestra os dados entre Google Sheets, Slack, Meta Ads e CRM.
 
 Para visualizar o Payload exato necessário para configurar novos Webhooks, acesse a documentação da API fornecida nos manuais de entrega.
+
+---
+
+## 🧠 Camada Operacional: Make + Google Sheets + FluxAI OS™
+
+O FluxAI OS™ agora atua como uma **interface de comando real** (Command Center).
+
+**Fluxo Operacional:**
+1. **Make.com:** Coleta demandas, leads, métricas diárias (GA4, Meta, Instagram) e status de rotas.
+2. **Google Sheets:** Funciona como nosso banco de dados relacional intermediário (tabelas como `CLIENTES_CONFIG`, `DEMANDAS_CLIENTES`, etc).
+3. **FluxAI OS™:** Lê, formata e exibe essas informações. Não há gravação direta pesada no frontend, toda a inteligência e lógica ficam no Sheets e Make.
+
+**Regras de Governança Operacional:**
+- Nenhum relatório mensal é enviado automaticamente ao cliente. Eles nascem como `rascunho` e passam por aprovação interna.
+- Clientes com coleta manual geram alertas e pendências operacionais.
+- Rotas pausadas ou com token ausente geram alertas críticos no Command Center.
+- A comunicação futura entre OS e Sheets se dará pelos adapters na pasta `/os/services/`.
+
+**Fluxo de Novo Cliente (Onboarding):**
+O onboarding não salva mídias (imagens, PDFs) nativamente no banco (Supabase) nesta fase. Tudo funciona via referências do Google Drive para manter o servidor ágil e leve.
+1. **Novo Cliente** (Sidebar > Operação Make > Novo Cliente)
+2. **Onboarding Operacional** (Wizard local com preenchimento de Dados, Serviços, Tokens, Pastas do Drive e Estratégia)
+3. **Revisão e Geração de Payload** (O OS formata a matriz pronta para as abas do Sheets)
+4. **Ativar Cliente** (O cliente entra como pendente nos mocks locais e aguarda sincronização)
+5. **Integração Real (Futura)** (O Webhook envia ao Make, que popula o Google Sheets)
+6. **Operação Ativa** (Make passa a varrer as APIs do cliente e enviar o log diário ao OS)
+
+**Camada de Inteligência GPT (Governança e Créditos):**
+A API GPT não funciona como banco de dados; ela atua estritamente como *Camada de Inteligência* consumindo o contexto estruturado (Contrato, Serviços Extras, DNA e Métricas).
+- **Regras Contratuais:** A IA só pode gerar pautas e relatórios se houver *Crédito de IA* disponível e o cliente possuir o serviço ativo.
+- **Serviços Extras:** A aquisição de serviços avulsos (Catálogo FluxAI) pode injetar créditos adicionais e alterar a permissão da IA para criar landing pages ou pacotes de reels.
+- **Isolamento de Papéis:** O **Cliente** pode apenas *solicitar orçamentos* via Portal. Ele **não pode** gerar IA diretamente, nem visualizar prompts, nem alterar o escopo. A geração, aprovação e exclusão de rascunhos são de exclusividade do **Operador FluxAI**. Tudo nasce como `rascunho` e passa por revisão técnica.

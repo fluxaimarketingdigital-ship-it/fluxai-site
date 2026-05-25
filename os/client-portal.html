@@ -360,16 +360,9 @@
                 </h2>
                 
                 <div class="form-group">
-                    <label>Tipo de Serviço / Demanda</label>
+                    <label>Serviço Extra (Catálogo FluxAI)</label>
                     <select id="demanda-tipo" class="form-control">
-                        <option value="">Selecione...</option>
-                        <option value="landing_page">Landing Page de Alta Conversão</option>
-                        <option value="automacao">Automação Make / Integrações</option>
-                        <option value="copywriting">Copywriting Especializado (Emails, VSL)</option>
-                        <option value="campanha_meta">Configuração de Campanha (Meta Ads)</option>
-                        <option value="design_criativo">Design de Criativos Estratégicos</option>
-                        <option value="consultoria">Consultoria Técnica / Reunião</option>
-                        <option value="outro">Outros</option>
+                        <option value="">Carregando Catálogo...</option>
                     </select>
                 </div>
                 
@@ -537,6 +530,10 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module">
+        import { mockCatalogoServicos } from './data/catalogo.data.js';
+        window.mockCatalogoServicos = mockCatalogoServicos;
+    </script>
     <script>
         let _supabaseClient = null;
         let _allAssets = [];
@@ -594,6 +591,15 @@
         }
         
         function openDemandaModal() {
+            const select = document.getElementById('demanda-tipo');
+            if (select && window.mockCatalogoServicos) {
+                let opts = '<option value="">Selecione um Serviço...</option>';
+                window.mockCatalogoServicos.filter(s => s.permite_orcamento).forEach(s => {
+                    opts += `<option value="${s.servico_id}">${s.nome_servico}</option>`;
+                });
+                opts += '<option value="SRV_EXTRA_CUSTOM">Outro (Descrever detalhadamente)</option>';
+                select.innerHTML = opts;
+            }
             document.getElementById('modal-demanda').style.display = 'flex';
         }
 

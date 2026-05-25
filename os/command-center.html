@@ -227,41 +227,28 @@
                     <p>Orquestração estratégica e estados operacionais em tempo real.</p>
                 </div>
 
-                <div class="os-widget-grid">
-                    <!-- MÉTRICAS PRINCIPAIS -->
-                    <div class="os-widget" id="metric-assets" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-approval" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-production" style="grid-column: span 3;"></div>
-                    <div class="os-widget" id="metric-schedule" style="grid-column: span 3;"></div>
+                <div class="os-widget-grid" id="metrics-grid">
+                    <div style="opacity: 0.5; padding: 20px; grid-column: span 12;">Sincronizando com Google Sheets via Make...</div>
+                </div>
 
-                    <!-- CENTRAL OPERACIONAL DO DIA (LOGÍSTICA) -->
-                    <div class="os-widget" style="grid-column: span 8; grid-row: span 2;">
-                        <div class="os-widget-header" style="display:flex; justify-content:space-between; align-items:center;">
-                            <span class="os-widget-label">Central Operacional do Dia</span>
-                            <span id="pub-today-count" style="font-size:0.6rem; background:var(--os-primary); color:#000; padding:2px 8px; border-radius:10px; font-weight:800;">Calculando...</span>
-                        </div>
-                        <div id="daily-ops-container" style="padding:15px; display:grid; grid-template-columns: 1fr 1fr; gap:15px;">
-                            <!-- Injetado via JS -->
-                        </div>
-                    </div>
-
+                <div class="os-widget-grid" style="margin-top: 20px;">
                     <!-- CENTRAL DE ALERTAS CRÍTICOS -->
-                    <div class="os-widget" style="grid-column: span 4; grid-row: span 2;">
+                    <div class="os-widget" style="grid-column: span 4;">
                         <div class="os-widget-header">
-                            <span class="os-widget-label">Alertas Críticos de Logística</span>
+                            <span class="os-widget-label">Alertas Operacionais</span>
                         </div>
                         <div class="os-alert-list" id="alerts-container">
                             <!-- Injetado via data -->
                         </div>
                     </div>
 
-                    <!-- ATIVIDADE OPERACIONAL -->
+                    <!-- CLIENT HEALTH -->
                     <div class="os-widget" style="grid-column: span 8;">
                         <div class="os-widget-header">
-                            <span class="os-widget-label">Atividade Operacional Recente</span>
+                            <span class="os-widget-label">Client Health & Status de Integração</span>
                         </div>
-                        <div class="os-activity-log" id="activity-log">
-                            <!-- Injetado via data -->
+                        <div id="health-table-container">
+                            <!-- Injetado via JS -->
                         </div>
                     </div>
                 </div>
@@ -270,233 +257,6 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script type="module">
-        import { OS_UI, OS_AUTH } from './js/os-core.js';
-        import { getSupabase } from './services/supabase-client.js';
-
-        async function initPage() {
-            const user = await OS_AUTH.check('OPERATOR');
-            if (!user) return;
-
-            OS_UI.renderSidebar('command-center', user.role);
-            await OS_UI.renderTopbar();
- 
-            await renderMetrics();
-            await runLogisticsEngine();
-            await renderActivity();
-        }
-
-        async function renderMetrics() {
-            const supabase = getSupabase();
-            
-            try {
-                if (!supabase) throw new Error('DB off');
-                // 1. Total de Ativos (Mês)
-                const { count: totalAssets } = await supabase.from('content_assets').select('*', { count: 'exact', head: true });
-                OS_UI.renderMetric('metric-assets', {
-                    label: 'Ativos Gerenciados',
-                    value: totalAssets || 0,
-                    icon: 'fa-layer-group',
-                    trend: '+12%',
-                    trendUp: true
-                });
-            } catch (e) {
-                OS_UI.renderMetric('metric-assets', { label: 'Ativos Gerenciados', value: '1.492', icon: 'fa-layer-group', trend: '+14.5%', meta: 'Alta Demanda' });
-            }
-
-            try {
-                if (!supabase) throw new Error('DB off');
-                // 2. Aguardando Aprovação
-                const { count: pendingApproval } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('status', 'AGUARDANDO APROVAÇÃO');
-                OS_UI.renderMetric('metric-approval', {
-                    label: 'Aguardando Aprovação',
-                    value: pendingApproval || 0,
-                    icon: 'fa-clock',
-                    trend: 'Sincronizado',
-                    trendUp: true
-                });
-            } catch (e) {
-                OS_UI.renderMetric('metric-approval', { label: 'Aguardando Aprovação', value: '38', icon: 'fa-clock', trend: '-2.1%', meta: 'Atenção Necessária' });
-            }
-
-            try {
-                if (!supabase) throw new Error('DB off');
-                // 3. Em Produção
-                const { count: inProduction } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('status', 'EM PRODUÇÃO');
-                OS_UI.renderMetric('metric-production', {
-                    label: 'Em Produção',
-                    value: inProduction || 0,
-                    icon: 'fa-gears',
-                    trend: 'Ativo',
-                    trendUp: true
-                });
-            } catch (e) {
-                OS_UI.renderMetric('metric-production', { label: 'Em Produção', value: '154', icon: 'fa-gears', trend: '+5.2%', meta: 'Velocidade Máxima' });
-            }
-
-            try {
-                if (!supabase) throw new Error('DB off');
-                // 4. Agendados (Total)
-                const { count: scheduled } = await supabase.from('content_assets').select('*', { count: 'exact', head: true }).eq('status', 'AGENDADO');
-                OS_UI.renderMetric('metric-schedule', {
-                    label: 'Total Agendados',
-                    value: scheduled || 0,
-                    icon: 'fa-calendar-check',
-                    trend: 'Online',
-                    trendUp: true
-                });
-            } catch (e) {
-                OS_UI.renderMetric('metric-schedule', { label: 'Total Agendados', value: '412', icon: 'fa-calendar-check', trend: '+1.8%', meta: 'Cronograma Estável' });
-            }
-        }
-
-        async function runLogisticsEngine() {
-            const container = document.getElementById('daily-ops-container');
-            const alertContainer = document.getElementById('alerts-container');
-            const countBadge = document.getElementById('pub-today-count');
-
-            const supabase = getSupabase();
-            const now = new Date();
-            const startOfDay = new Date(now.setHours(0,0,0,0)).toISOString();
-            const endOfDay = new Date(now.setHours(23,59,59,999)).toISOString();
-            let hoy = [];
-
-            try {
-                if (!supabase) throw new Error('DB off');
-                const { data } = await supabase.from('content_assets')
-                    .select('*, projects(name)')
-                    .gte('scheduled_at', startOfDay)
-                    .lte('scheduled_at', endOfDay)
-                    .order('scheduled_at', { ascending: true });
-                if (data) hoy = data;
-            } catch (e) {
-                // PREMIUM MOCK DATA FALLBACK
-                console.warn("[LOGISTICS] Falha ao carregar banco real, ativando inteligência simulada.");
-                hoy = [
-                    {
-                        scheduled_at: new Date(new Date().setHours(10,30,0,0)).toISOString(),
-                        status: 'AGENDADO',
-                        title: 'Lançamento: Imersão Mente Mestra',
-                        platform: 'INSTAGRAM',
-                        projects: { name: 'Instituto Zeni' },
-                        metadata: { responsible: 'FLUXAI MEDIA' }
-                    },
-                    {
-                        scheduled_at: new Date(new Date().setHours(14,15,0,0)).toISOString(),
-                        status: 'AGUARDANDO APROVAÇÃO',
-                        title: 'Estratégia de Captação B2B (Módulo 2)',
-                        platform: 'LINKEDIN',
-                        projects: { name: 'Corp Solutions Group' },
-                        metadata: { responsible: 'CLIENTE', approval_deadline: new Date(Date.now() - 7200000).toISOString() }
-                    },
-                    {
-                        scheduled_at: new Date(new Date().setHours(18,0,0,0)).toISOString(),
-                        status: 'AGENDADO',
-                        title: 'Arquitetura de Conversão - Casos de Sucesso',
-                        platform: 'YOUTUBE',
-                        projects: { name: 'Agência FluxAI' },
-                        metadata: { responsible: 'SQUAD ALPHA' }
-                    },
-                    {
-                        scheduled_at: new Date(new Date().setHours(20,45,0,0)).toISOString(),
-                        status: 'AGENDADO',
-                        title: 'Stories Interativos - Tráfego Orgânico',
-                        platform: 'TIKTOK',
-                        projects: { name: 'Dr. Rodrigo Lemos' },
-                        metadata: { responsible: 'SQUAD BETA' }
-                    }
-                ];
-            }
-
-            if (!hoy || hoy.length === 0) {
-                container.innerHTML = '<div style="grid-column:span 2; opacity:0.5; text-align:center; padding:40px; font-size:0.8rem;">SISTEMA OPERANDO EM STANDBY • SEM AGENDAMENTOS</div>';
-                countBadge.innerText = '0 HOJE';
-                return;
-            }
-
-            countBadge.innerText = `${hoy.length} HOJE`;
-            
-            let alertsHtml = '';
-            container.innerHTML = hoy.map(c => {
-                const time = new Date(c.scheduled_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                const statusColor = c.status === 'AGENDADO' ? 'var(--os-primary)' : 'var(--os-warning)';
-                
-                // Lógica de Alertas
-                const deadline = c.metadata?.approval_deadline ? new Date(c.metadata.approval_deadline) : null;
-                const isAwaiting = c.status.includes('APROVAÇÃO') || c.status === 'PLANEJAMENTO';
-                
-                if (isAwaiting && deadline && deadline < new Date()) {
-                    alertsHtml += `
-                        <div class="os-alert-item" style="border-left: 3px solid var(--os-danger);">
-                            <div class="os-alert-icon" style="color: var(--os-danger);"><i class="fa-solid fa-clock-rotate-left"></i></div>
-                            <div class="os-alert-content">
-                                <h4 style="font-size:0.7rem; margin:0; color:#fff;">APROVAÇÃO ATRASADA</h4>
-                                <p style="font-size:0.6rem; margin:2px 0 0; color:var(--os-text-muted);">${c.projects?.name} • Post ${time}</p>
-                            </div>
-                        </div>
-                    `;
-                }
-
-                return `
-                    <div class="os-alert-item" style="margin-bottom:0; background: rgba(255,255,255,0.01); border-color: rgba(255,255,255,0.05);">
-                        <div style="flex:1;">
-                            <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:5px;">
-                                <div style="font-size:0.6rem; font-weight:800; color:var(--os-primary); text-transform:uppercase;">${time} • ${c.projects?.name}</div>
-                                <i class="fa-solid fa-circle-dot" style="color:${statusColor}; font-size:0.5rem; animation: pulse 2s infinite;"></i>
-                            </div>
-                            <div style="font-size:0.8rem; font-weight:600; color:#fff;">${c.title}</div>
-                            <div style="display:flex; gap:8px; margin-top:8px;">
-                                <span style="font-size:0.55rem; color:var(--os-text-muted); border:1px solid var(--os-border); padding:2px 6px; border-radius:4px;">${c.platform}</span>
-                                <span style="font-size:0.55rem; color:var(--os-text-muted); border:1px solid var(--os-border); padding:2px 6px; border-radius:4px;">${c.metadata?.responsible || 'SQUAD'}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-
-            alertContainer.innerHTML = alertsHtml || '<div style="opacity:0.3; text-align:center; padding:20px; font-size:0.7rem;">ESTADO OPERACIONAL ESTÁVEL</div>';
-        }
-
-        const renderActivity = async () => {
-            const logContainer = document.getElementById('activity-log');
-            const supabase = getSupabase();
-            
-            try {
-                if (!supabase) throw new Error('DB off');
-                const { data } = await supabase.from('audit_logs').select('*').limit(8).order('created_at', { ascending: false });
-                if (data && data.length > 0) {
-                    logContainer.innerHTML = data.map(log => `
-                        <div class="log-entry">
-                            <span class="log-time">[${new Date(log.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}]</span>
-                            <span class="log-user">CORE:</span>
-                            <span class="log-msg">${log.action}</span>
-                        </div>
-                    `).join('');
-                    return;
-                }
-            } catch (e) {
-                // FALLBACK PREMIUM
-                const fallbackLogs = [
-                    { time: '17:42', user: 'SYSTEM', msg: 'Escalonamento automático de cluster ativado (Nó ALPHA).' },
-                    { time: '17:35', user: 'ADMIN', msg: 'Aprovou o planejamento estratégico "Q3 Sales Pipeline".' },
-                    { time: '16:50', user: 'INTEGRATION', msg: 'Sincronização de leads via Meta Ads API concluída com sucesso.' },
-                    { time: '15:22', user: 'CLIENTE', msg: 'Solicitou revisão no ativo de branding (Card #421).' },
-                    { time: '14:10', user: 'SYSTEM', msg: 'Backup de rotina finalizado em 3.2s.' }
-                ];
-                
-                logContainer.innerHTML = fallbackLogs.map(log => `
-                    <div class="log-entry">
-                        <span class="log-time">[${log.time}]</span>
-                        <span class="log-user">${log.user}:</span>
-                        <span class="log-msg">${log.msg}</span>
-                    </div>
-                `).join('');
-                return;
-            }
-            logContainer.innerHTML = `<div class="log-entry" style="opacity:0.5;">AGUARDANDO SINCRONIZAÇÃO...</div>`;
-        };
-
-        initPage();
-    </script>
+    <script type="module" src="./js/modules/command-center.js"></script>
 </body>
 </html>
