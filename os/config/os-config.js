@@ -67,7 +67,7 @@ export const FEATURE_FLAGS = {
     // Fonte de dados
     mockData:             ENVIRONMENT_CONFIG.isDev,   // true em dev, false em prod
     sendRealWebhooks:     false,                      // GLOBALMENTE DESATIVADO por padrão para segurança
-    enabledRealWebhooks:  ['LEAD_CAPTURE', 'DEMAND_SUBMISSION', 'CLIENT_ONBOARDING'], // Apenas estes webhooks listados disparam real (homologação gradual)
+    enabledRealWebhooks:  ['LEAD_CAPTURE', 'DEMAND_SUBMISSION', 'CLIENT_ONBOARDING', 'SERVICE_EXTRA_REQUEST'], // Apenas estes webhooks listados disparam real (homologação gradual)
     useSupabaseAuth:      true,   // Supabase é o auth primário (fallback: mock users)
     useSheetsAPI:         false,  // Google Sheets API direta (fase 2)
     useMakeWebhooks:      true,   // Webhooks Make como canal de escrita
@@ -118,7 +118,7 @@ export const WEBHOOK_CONFIG = {
     CLIENT_ONBOARDING: 'https://hook.us2.make.com/mybtyyiob2msvh5sgo1115vx9pxroym9',
 
     // 10_FLUXAI_SERVICO_EXTRA_REQUEST (Serviço extra solicitado pelo cliente no portal)
-    SERVICE_EXTRA_REQUEST: '',
+    SERVICE_EXTRA_REQUEST: 'https://hook.us2.make.com/rplnhe37vqvzcjh6gu92ltpvr8rirean',
 
     // 11_FLUXAI_IA_CREDITOS_CONTROLE (Controle de créditos e consumo de IA)
     IA_CREDITOS_CONTROLE: '',
