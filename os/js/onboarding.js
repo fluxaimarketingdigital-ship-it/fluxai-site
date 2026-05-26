@@ -585,7 +585,7 @@ async function handleOnboarding(e) {
     await logPromise;
 
     setTimeout(() => {
-        window.location.href = '/os/command-center.html';
+        window.location.href = `cliente-detalhe.html?client_id=${projectId}`;
     }, 500);
 }
 
