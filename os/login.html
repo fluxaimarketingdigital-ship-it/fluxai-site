@@ -112,17 +112,27 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
         import { getSupabase } from './services/supabase-client.js';
+        import { OS_LOGS_ENGINE } from './services/logs-engine.js';
+
+        // Utilitário de hash
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
 
         // Inicializador de usuários locais
         const getMockUsers = () => {
             let mock = localStorage.getItem('fluxai_mock_users');
             if (!mock) {
                 const initialMock = [
-                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', password: 'fluxai@2026', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] },
-                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', password: 'fluxai@2026', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] },
-                    { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', password: 'fluxai@2026', role: 'CLIENT', needsPasswordChange: false, permissions: ['client-portal'] }
+                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] },
+                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] },
+                    { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'CLIENT', needsPasswordChange: false, permissions: ['client-portal'] }
                 ];
                 localStorage.setItem('fluxai_mock_users', JSON.stringify(initialMock));
                 return initialMock;
@@ -130,11 +140,12 @@
             return JSON.parse(mock);
         };
 
-        const updateMockUserPassword = (userId, newPassword) => {
+        const updateMockUserPassword = async (userId, newPassword) => {
             const mockUsers = getMockUsers();
             const index = mockUsers.findIndex(u => u.id === userId);
             if (index !== -1) {
-                mockUsers[index].password = newPassword;
+                mockUsers[index].passwordHash = await sha256(newPassword);
+                delete mockUsers[index].password; // remove plain text legacy if any
                 mockUsers[index].needsPasswordChange = false;
                 localStorage.setItem('fluxai_mock_users', JSON.stringify(mockUsers));
                 return mockUsers[index];
@@ -162,7 +173,12 @@
             const localUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
 
             if (localUser) {
-                if (localUser.password === password) {
+                const enteredHash = await sha256(password);
+                const isPasswordValid = localUser.passwordHash 
+                    ? localUser.passwordHash === enteredHash 
+                    : localUser.password === password;
+
+                if (isPasswordValid) {
                     if (localUser.needsPasswordChange) {
                         // Exibir Modal de redefinição
                         document.getElementById('resetUserId').value = localUser.id;
@@ -179,6 +195,9 @@
                     return;
                 } else {
                     alert('Chave de Acesso incorreta para esta credencial.');
+                    if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                        OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Senha mock incorreta' }, 'warning');
+                    }
                     btn.innerHTML = originalText;
                     btn.disabled = false;
                     return;
@@ -189,6 +208,9 @@
             const supabase = getSupabase();
             if (!supabase) {
                 alert('Falha na Autenticação: Credencial não encontrada localmente e Supabase offline.');
+                if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Supabase offline e sem credencial local' }, 'critical');
+                }
                 btn.innerHTML = originalText;
                 btn.disabled = false;
                 return;
@@ -201,6 +223,9 @@
 
             if (error) {
                 alert('Falha na Autenticação: ' + error.message);
+                if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Erro Supabase auth: ' + error.message }, 'warning');
+                }
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             } else {
@@ -227,7 +252,6 @@
                     logUserIn(finalUser);
                 } catch (profileErr) {
                     console.error('[LOGIN_PROFILE_ERROR]', profileErr);
-                    // Fallback seguro caso o perfil falhe
                     logUserIn({
                         id: data.user.id,
                         full_name: data.user.email,
@@ -251,18 +275,22 @@
                 permissions: user.permissions || []
             }));
 
+            // Registrar log de Login com OS_LOGS_ENGINE
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: user.id, email: user.email, role: user.role }, false);
+            }
+
             // Sincronizar projeto ativo no localStorage se for cliente
             if (user.role === 'CLIENT' && user.project_id) {
                 localStorage.setItem('fluxai_current_project_id', user.project_id);
                 window.location.href = `client-portal.html?project_id=${user.project_id}`;
             } else {
-                // Admins/Operators podem ter um projeto selecionado ou ir para Centro de Comando
                 window.location.href = 'command-center.html';
             }
         }
 
         // Submissão do formulário de redefinição de senha
-        document.getElementById('passwordResetForm').addEventListener('submit', (e) => {
+        document.getElementById('passwordResetForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const userId = document.getElementById('resetUserId').value;
             const newPassword = document.getElementById('newPassword').value;
@@ -278,7 +306,7 @@
                 return;
             }
 
-            const updatedUser = updateMockUserPassword(userId, newPassword);
+            const updatedUser = await updateMockUserPassword(userId, newPassword);
             if (updatedUser) {
                 alert('Chave de Acesso pessoal salva com sucesso! Seja bem-vindo ao FluxAI OS™.');
                 document.getElementById('passwordResetModal').style.display = 'none';

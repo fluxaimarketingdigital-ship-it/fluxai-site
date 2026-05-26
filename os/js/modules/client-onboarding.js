@@ -98,7 +98,7 @@ function buildExtraBox(id, label, valorEstimado, geraCredito, qtdCredito, subFie
     <div class="service-box extra-box">
         <label style="display: flex; align-items: center; gap: 10px; font-weight: 700; color: #fff; cursor: pointer;">
             <input type="checkbox" class="extra-check" value="${id}"> ${label}
-            ${geraCredito ? `<span style="font-size:0.6rem; background:rgba(167,139,250,0.2); color:#a78bfa; padding:2px 6px; border-radius:4px;">+${qtdCredito} Créditos IA</span>` : ''}
+            ${geraCredito ? `<span style="font-size:0.6rem; background:rgba(167,139,250,0.2); color:#a78bfa; padding:2px 6px; border-radius:4px;">+${qtdCredito} Limite de Geração Aprovado</span>` : ''}
         </label>
         <div class="service-details" id="details-extra-${id}" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--os-border); display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
     `;
@@ -184,12 +184,12 @@ function generateGPT_Package() {
             timestamp_geracao: new Date().toISOString(),
             status_operacional: onboardingData.principal.status
         },
-        contrato_e_creditos: {
+        escopo_e_limites: {
             valor_global: onboardingData.contrato.valor_global,
-            creditos_base: creditosIniciais,
-            creditos_extras_aprovados: limitadorExtendido,
-            limite_total_geracao: creditosIniciais + limitadorExtendido,
-            regra_consumo: "Gerar rascunho = 0 crédito. Aprovar rascunho na FluxAI = 1 crédito."
+            limite_operacional_contratado: creditosIniciais,
+            limite_geracao_aprovado: limitadorExtendido,
+            limite_total_operacional: creditosIniciais + limitadorExtendido,
+            regra_controle_escopo: "Geração em rascunho ou descartada antes de aprovada não ocupa limite operacional. Geração aprovada ocupa o limite operacional contratado. Geração publicada/entregue ocupa definitivamente o limite operacional daquele ciclo/contrato. Exclusão pós-aprovação requer confirmação interna manual para liberação de espaço (espaço liberado por exclusão)."
         },
         escopo_contratado: {
             servicos_base: Object.keys(onboardingData.servicos),

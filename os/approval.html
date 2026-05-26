@@ -313,6 +313,9 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
         import { SUPABASE_CONFIG } from './config/supabase-config.js';
+        import { StatusEngine } from './config/status-system.js';
+        import { OS_LOGS_ENGINE } from './services/logs-engine.js';
+        import { OS_CONFIG } from './config/os-config.js';
         const CLIENT_VIEW_MATRIX = {
             'Direção Audiovisual (Reels)': 'REELS',
             'Estrutura Narrativa (Carrossel)': 'CARROSSEL',
@@ -447,6 +450,58 @@
             const internalName = parts[0].trim();
             const objective = parts[1] ? parts[1].trim() : 'Estratégia';
             return { prefix: CLIENT_VIEW_MATRIX[internalName] || 'POST', obj: objective };
+        }
+
+        async function executeTransition(asset, targetDbStatus, targetLogicalStatus, customFeedback = null) {
+            const currentLogical = mapToStandardStatus(asset.status).toLowerCase();
+            const targetLogical = targetLogicalStatus.toLowerCase();
+            
+            const transitionResult = await StatusEngine.transition(
+                'conteudos',
+                asset.id,
+                currentLogical,
+                targetLogical,
+                { role: 'OPERATOR' }
+            );
+            
+            if (!transitionResult.success) {
+                throw new Error(`Transição de status inválida: ${transitionResult.error}`);
+            }
+            
+            let actionType = 'AI_GENERATION_STATUS';
+            if (targetLogical === 'planning_approved' || targetLogical === 'content_approved') {
+                actionType = 'DELIVERY_APPROVED';
+            } else {
+                actionType = 'DELIVERY_REJECTED';
+            }
+            
+            OS_LOGS_ENGINE.userAction(
+                actionType,
+                'external-approval-page',
+                { 
+                    asset_id: asset.id, 
+                    title: asset.title,
+                    current_status: asset.status, 
+                    target_status: targetDbStatus,
+                    feedback: customFeedback
+                },
+                'CLIENT',
+                asset.project_id
+            );
+            
+            const webhookKey = transitionResult.webhook || 'DELIVERY_APPROVAL';
+            const payload = {
+                asset_id: asset.id,
+                project_id: asset.project_id,
+                title: asset.title,
+                current_status: asset.status,
+                target_status: targetDbStatus,
+                logical_transition: `${currentLogical} -> ${targetLogical}`,
+                feedback: customFeedback,
+                timestamp: new Date().toISOString()
+            };
+            
+            await OS_CONFIG.webhooks.send(webhookKey, payload);
         }
 
         async function load() {
@@ -657,8 +712,14 @@
 
                     try {
                         let nextStatus = 'PRODUÇÃO';
-                        if (currentStatus === 'APROVAÇÃO FINAL') nextStatus = 'PRONTO';
+                        let logicalTarget = 'planning_approved';
+                        if (currentStatus === 'APROVAÇÃO FINAL') {
+                            nextStatus = 'PRONTO';
+                            logicalTarget = 'content_approved';
+                        }
                         
+                        await executeTransition(c, nextStatus, logicalTarget);
+
                         const updateData = { status: nextStatus };
                         if (nextStatus === 'PRODUÇÃO') {
                             updateData.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
@@ -715,6 +776,10 @@
                         if (obs) feedback += `💬 OBSERVAÇÃO FINAL:\n${obs}`;
 
                         const nextStatus = isFinalArt ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
+                        const logicalTarget = isFinalArt ? 'client_revision_content' : 'client_revision_planning';
+
+                        await executeTransition(c, nextStatus, logicalTarget, feedback);
+
                         const { error } = await _supabaseClient.from('content_assets').update({ 
                             status: nextStatus,
                             internal_notes: feedback 
@@ -724,7 +789,7 @@
                         showFinalSuccess('Ajuste Solicitado', 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.');
                     } catch (err) {
                         console.error('[FEEDBACK_ERROR]', err);
-                        alert('Erro ao enviar feedback. Verifique sua conexão.');
+                        alert('Erro ao enviar feedback: ' + err.message);
                         btn.innerHTML = 'Tentar Novamente';
                         btn.disabled = false;
                     }
@@ -917,17 +982,29 @@
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
                     btn.disabled = true;
 
-                    let nextStatus = 'PRODUÇÃO';
-                    if (currentStatus === 'APROVAÇÃO FINAL') nextStatus = 'PRONTO';
-                    
-                    // Atualizar no localStorage
-                    c.status = nextStatus;
-                    if (nextStatus === 'PRODUÇÃO') {
-                        c.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
+                    try {
+                        let nextStatus = 'PRODUÇÃO';
+                        let logicalTarget = 'planning_approved';
+                        if (currentStatus === 'APROVAÇÃO FINAL') {
+                            nextStatus = 'PRONTO';
+                            logicalTarget = 'content_approved';
+                        }
+                        
+                        await executeTransition(c, nextStatus, logicalTarget);
+
+                        // Atualizar no localStorage
+                        c.status = nextStatus;
+                        if (nextStatus === 'PRODUÇÃO') {
+                            c.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
+                        }
+                        localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+                        
+                        showFinalSuccess(nextStatus === 'PRONTO' ? 'Conteúdo Finalizado!' : 'Planejamento Aprovado!', 'A pauta seguiu para a próxima etapa.');
+                    } catch (err) {
+                        alert('Erro: ' + err.message);
+                        btn.innerHTML = 'Tentar Novamente';
+                        btn.disabled = false;
                     }
-                    localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
-                    
-                    showFinalSuccess(nextStatus === 'PRONTO' ? 'Conteúdo Finalizado!' : 'Planejamento Aprovado!', 'A pauta seguiu para a próxima etapa.');
                 };
 
                 document.getElementById('btn-reject-action').onclick = () => {
@@ -942,39 +1019,49 @@
                     const nuances = document.querySelectorAll('.micro-grid .radio-opt.active');
                     
                     if (checked.length === 0 && nuances.length === 0 && obs.length < 10) {
-                        alert('Atenção: Para solicitar um ajuste, selecione ao menos um item da estrutura acima ou descreva o motivo no campo final (mínimo 10 caracteres).');
+                        alert('Atenção: Para solicitar um ajuste, selecione au menos um item da estrutura acima ou descreva o motivo no campo final (mínimo 10 caracteres).');
                         return;
                     }
 
                     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
                     btn.disabled = true;
 
-                    let feedback = `📌 SOLICITAÇÃO DE AJUSTE (${prefix})\n\n`;
-                    if (checked.length > 0) {
-                        feedback += `📍 ESTRUTURA/ESTRATÉGIA:\n`;
-                        checked.forEach(c => feedback += `- [${c.getAttribute('data-cat')}] ${c.value}\n`);
-                        feedback += `\n`;
-                    }
-                    if (nuances.length > 0) {
-                        feedback += `🎯 MICROAJUSTES:\n`;
-                        nuances.forEach(n => {
-                            const cat = n.parentElement.getAttribute('data-nuance');
-                            feedback += `- ${cat}: ${n.getAttribute('data-val')}\n`;
-                        });
-                        feedback += `\n`;
-                    }
-                    const priority = document.querySelector('#priority-selector .radio-opt.active')?.getAttribute('data-val') || 'Ajuste moderado';
-                    feedback += `⚠️ PRIORIDADE: ${priority}\n\n`;
-                    if (obs) feedback += `💬 OBSERVAÇÃO FINAL:\n${obs}`;
+                    try {
+                        let feedback = `📌 SOLICITAÇÃO DE AJUSTE (${prefix})\n\n`;
+                        if (checked.length > 0) {
+                            feedback += `📍 ESTRUTURA/ESTRATÉGIA:\n`;
+                            checked.forEach(c => feedback += `- [${c.getAttribute('data-cat')}] ${c.value}\n`);
+                            feedback += `\n`;
+                        }
+                        if (nuances.length > 0) {
+                            feedback += `🎯 MICROAJUSTES:\n`;
+                            nuances.forEach(n => {
+                                const cat = n.parentElement.getAttribute('data-nuance');
+                                feedback += `- ${cat}: ${n.getAttribute('data-val')}\n`;
+                            });
+                            feedback += `\n`;
+                        }
+                        const priority = document.querySelector('#priority-selector .radio-opt.active')?.getAttribute('data-val') || 'Ajuste moderado';
+                        feedback += `⚠️ PRIORIDADE: ${priority}\n\n`;
+                        if (obs) feedback += `💬 OBSERVAÇÃO FINAL:\n${obs}`;
 
-                    const nextStatus = isFinalArt ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
-                    
-                    // Atualizar no localStorage
-                    c.status = nextStatus;
-                    c.internal_notes = feedback;
-                    localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+                        const nextStatus = isFinalArt ? 'AJUSTE DE PRODUÇÃO' : 'AJUSTE';
+                        const logicalTarget = isFinalArt ? 'client_revision_content' : 'client_revision_planning';
 
-                    showFinalSuccess('Ajuste Solicitado', 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.');
+                        await executeTransition(c, nextStatus, logicalTarget, feedback);
+
+                        // Atualizar no localStorage
+                        c.status = nextStatus;
+                        c.internal_notes = feedback;
+                        localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+
+                        showFinalSuccess('Ajuste Solicitado', 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.');
+                    } catch (err) {
+                        console.error('[MOCK_FEEDBACK_ERROR]', err);
+                        alert('Erro ao enviar feedback: ' + err.message);
+                        btn.innerHTML = 'Tentar Novamente';
+                        btn.disabled = false;
+                    }
                 };
             }
         }

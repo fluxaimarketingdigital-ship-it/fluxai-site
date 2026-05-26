@@ -3,12 +3,9 @@
  * Gestão de Componentes Operacionais, RBAC e Estado Global
  */
 import { OSState } from '/os/js/os-state.js';
+import { OS_CONFIG } from '/os/config/os-config.js';
+import { OS_LOGS_ENGINE } from '/os/services/logs-engine.js';
 
-export const OS_CONFIG = {
-    brand: "FLUXAI OS™",
-    version: "v2.0.0_CONSOLIDATED",
-    status: "ESTÁVEL"
-};
 
 // Projeto interno da FluxAI Labs (INTERNAL_WORKSPACE)
 export const FLUXAI_LABS_PROJECT = {
@@ -62,6 +59,7 @@ export const OS_UI = {
             { id: 'contracts-finance',label: 'Contratos & Financeiro',icon: 'fa-file-invoice-dollar', group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
             { id: 'governance',       label: 'Governança',            icon: 'fa-user-shield',         group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
             { id: 'governance-users', label: 'Gestão de Usuários',    icon: 'fa-users-cog',           group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
+            { id: 'logs',             label: 'Logs Operacionais',     icon: 'fa-terminal',            group: 'Governança',            roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER', 'LABS'] },
         ];
 
         let html = `
@@ -273,8 +271,12 @@ export const OS_AUTH = {
 
         const supabase = getSupabase();
         if (!supabase) {
-            console.warn('[AUTH] Supabase offline ou CDN ausente. Ativando Bypass Mock User.');
-            return { id: 'mock-admin', role: 'ADMIN', full_name: 'Admin FluxAI', email: 'admin@fluxai.com' };
+            console.warn('[AUTH] Supabase offline ou CDN ausente. Redirecionando para login.');
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { reason: 'Supabase offline e sem sessão local' }, 'critical');
+            }
+            window.location.href = 'login.html';
+            return null;
         }
 
         let session = null;
@@ -282,8 +284,12 @@ export const OS_AUTH = {
             const { data } = await supabase.auth.getSession();
             session = data.session;
         } catch (err) {
-            console.warn('[AUTH] Erro ao conectar com Supabase auth. Ativando Bypass Mock User.', err);
-            return { id: 'mock-admin', role: 'ADMIN', full_name: 'Admin FluxAI', email: 'admin@fluxai.com' };
+            console.warn('[AUTH] Erro ao conectar com Supabase auth. Redirecionando para login.', err);
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { reason: 'Falha na conexão Supabase auth: ' + err.message }, 'critical');
+            }
+            window.location.href = 'login.html';
+            return null;
         }
         
         if (!session) {
@@ -305,6 +311,13 @@ export const OS_AUTH = {
         if (requiredRole && user.role !== 'ADMIN') {
             if (user.role !== requiredRole) {
                 console.error('[AUTH] Acesso Negado. Nível insuficiente.');
+                if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { 
+                        user_id: user.id || user.email, 
+                        user_role: user.role, 
+                        required_role: requiredRole 
+                    }, 'critical');
+                }
                 window.location.href = 'access-denied.html';
                 return null;
             }
@@ -317,6 +330,17 @@ export const OS_AUTH = {
      * Logout Seguro
      */
     logout: async () => {
+        const user = OS_AUTH.user || {};
+        if (typeof OS_LOGS_ENGINE !== 'undefined') {
+            OS_LOGS_ENGINE.userAction(
+                'AUTH_LOGOUT',
+                'os-core',
+                { user_id: user.id, email: user.email },
+                user.role || 'CLIENT',
+                user.project_id || null
+            );
+        }
+
         localStorage.removeItem('fluxai_session');
         localStorage.removeItem('fluxai_current_project_id');
         const supabase = getSupabase();

@@ -66,13 +66,13 @@ Todo status tem: chave técnica, label legível, cor semântica e implicação d
 
 ### Gerações de IA
 
-| Chave | Label | Badge | Crédito | Quem Pode Alterar |
-|-------|-------|-------|---------|------------------|
-| `rascunho` | Rascunho | `neutral` | 0 | Operador/Admin |
-| `em_revisao` | Em Revisão | `info` | 0 | Operador/Admin |
-| `aprovado` | Aprovado | `warning` | 1 consumido | Operador/Admin |
-| `publicado` | Publicado | `success` | definitivo | Operador/Admin |
-| `descartado` | Descartado | `neutral` | 0 (pré-aprovação) | Operador/Admin |
+| Chave | Label | Badge | Controle de Limite Operacional | Quem Pode Alterar |
+|-------|-------|-------|-------------------------------|------------------|
+| `rascunho` | Rascunho | `neutral` | Não ocupa limite operacional | Operador/Admin |
+| `em_revisao` | Em Revisão | `info` | Não ocupa limite operacional | Operador/Admin |
+| `aprovado` | Aprovado | `warning` | Ocupa o limite operacional contratado | Operador/Admin |
+| `publicado` | Publicado | `success` | Ocupa definitivamente o limite operacional daquele ciclo/contrato | Operador/Admin |
+| `descartado` | Descartado | `neutral` | Sem consumo (ou libera espaço se excluído após aprovação mediante confirmação interna) | Operador/Admin |
 
 ### Tokens / Integrações
 

@@ -1,4 +1,5 @@
-import { SUPABASE_CONFIG } from '../config/supabase-config.js';
+import { OS_CONFIG } from '../config/os-config.js';
+import { OS_LOGS_ENGINE } from './logs-engine.js';
 
 export const LeadCapture = {
     init: () => {
@@ -8,7 +9,7 @@ export const LeadCapture = {
             return;
         }
 
-        const supabase = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+        const supabase = window.supabase.createClient(OS_CONFIG.supabase.url, OS_CONFIG.supabase.anonKey);
         
         const form = document.getElementById('fluxai-lead-form');
         if (!form) return;
@@ -54,18 +55,14 @@ export const LeadCapture = {
                 observacao: formData.get('internal_notes') || ''
             };
 
-            const webhookUrl = 'https://hook.us2.make.com/gmu9xakjqfocdd8nk4sn5lxcc7pmbte2';
-
             try {
-                console.log('Enviando payload para o Make:', payloadMake);
-                const response = await fetch(webhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payloadMake)
-                });
-                console.log('Resposta do Make:', response);
+                // Registrar log de tentativa de envio
+                OS_LOGS_ENGINE.userAction('LEAD_CAPTURED', payloadMake, !OS_CONFIG.flags.sendRealWebhooks);
 
-                if (!response.ok) throw new Error('Erro na requisição para o Make');
+                // Enviar via hub de webhooks centralizado
+                const result = await OS_CONFIG.webhooks.send('LEAD_CAPTURE', payloadMake);
+                
+                if (!result.success) throw new Error(result.error || 'Erro ao enviar lead.');
 
                 // Envio assíncrono pro Supabase (sem afetar a resposta do Make)
                 supabase.from('crm_leads').insert([leadData]).catch(e => console.warn('Erro silencioso no Supabase', e));
@@ -87,6 +84,7 @@ export const LeadCapture = {
 
             } catch (err) {
                 console.error('[FluxAI Capture] Erro ao enviar lead:', err);
+                OS_LOGS_ENGINE.error('Erro ao enviar lead no formulário', { email: leadData.email, error: err.message }, err);
                 if (btnSubmit) {
                     btnSubmit.innerHTML = 'Não foi possível enviar seu diagnóstico agora. Tente novamente.';
                     btnSubmit.style.backgroundColor = '#ef4444';

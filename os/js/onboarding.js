@@ -1,6 +1,9 @@
 import { OS_UI, OS_AUTH } from './os-core.js';
 import { getSupabase } from '../services/supabase-client.js';
 import { dispatchEvent } from './os-integration.js';
+import { OS_CONFIG } from '../config/os-config.js';
+import { OS_LOGS_ENGINE } from '../services/logs-engine.js';
+import { StatusEngine } from '../config/status-system.js';
 
 let currentStep = 1;
 const totalSteps = 7;
@@ -384,8 +387,86 @@ async function handleOnboarding(e) {
         }
     };
 
-    // 3. Executar o provisionamento real
+    // 3. Executar o webhook e provisionamento real
     try {
+        const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+        
+        // Obter status inicial a partir do STATUS_SYSTEM
+        const statusConfig = StatusEngine.resolve('clientes', 'onboarding');
+        projectData.status = statusConfig.value;
+
+        // Montar o payload completo para o Make
+        const webhookPayload = {
+            evento: "client_onboarding",
+            timestamp: new Date().toISOString(),
+            operador_id: session.id || "admin",
+            dados_principais: {
+                cliente_id: projectId,
+                nome_interno: raw.company_name,
+                nome_comercial: raw.company_name,
+                email: raw.responsible_name.toLowerCase().replace(/[^a-z0-9]/g, '') + "@fluxai.com",
+                telefone: raw.whatsapp_decisor,
+                website: raw.client_website || '',
+                instagram_profile: raw.client_instagram_handle || '',
+                status_ativo: statusConfig.value,
+                data_entrada: raw.finance_start_date || new Date().toISOString().split('T')[0]
+            },
+            contrato: {
+                drive_url: raw.asset_drive_link || '',
+                valor_global: Number(raw.monthly_fee) || 0,
+                vigencia_meses: raw.finance_min_duration ? parseInt(raw.finance_min_duration) : 12,
+                dia_vencimento: Number(raw.payment_day) || 5
+            },
+            servicos_contratados: Array.from(formData.getAll('modules')),
+            servicos_extras: raw.finance_extra_services_type ? [{
+                nome_servico: raw.finance_extra_services_type,
+                valor: Number(raw.finance_extra_services_value) || 0,
+                descricao: raw.finance_extra_services_desc || ''
+            }] : [],
+            drive: {
+                pasta_cliente: raw.asset_drive_link || '',
+                identidade_visual: raw.asset_brand_guidelines || '',
+                contrato: raw.asset_documents || '',
+                logo_principal: raw.asset_logos || '',
+                referencias: raw.references || '',
+                entregas: raw.asset_videos || ''
+            },
+            dna: {
+                objetivo_principal: raw.objective,
+                publico_alvo: raw.segment,
+                oferta_principal: raw.value_proposition,
+                dor_mais_forte: raw.pain_points,
+                diferencial_real: raw.differentiators,
+                tom_de_voz: raw.voice_tone,
+                palavras_proibidas: raw.forbidden_language,
+                formatacao_exigida: raw.desired_language
+            },
+            tokens: {
+                instagram_business_id: raw.client_instagram_handle || '',
+                meta_ad_account_id: '',
+                ga4_property_id: '',
+                gtm_id: '',
+                clarity_project_id: '',
+                search_console_property: '',
+                status_geral: 'aguardando_autorizacao'
+            },
+            planejamento_inicial: {
+                briefing_mes_1: raw.first_delivery,
+                alinhamento_kickoff: 'Agendado'
+            }
+        };
+
+        // Disparar log de auditoria
+        if (typeof OS_LOGS_ENGINE !== 'undefined') {
+            OS_LOGS_ENGINE.userAction('ONBOARDING_CREATED', webhookPayload, !OS_CONFIG.flags.sendRealWebhooks);
+        }
+
+        // Disparar Webhook
+        const webhookResult = await OS_CONFIG.webhooks.send('CLIENT_ONBOARDING', webhookPayload);
+        if (!webhookResult.success) {
+            console.warn('[ONBOARDING] Webhook não enviado ou falhou:', webhookResult.error);
+        }
+
         const supabase = getSupabase();
         let project = null;
         let pError = null;

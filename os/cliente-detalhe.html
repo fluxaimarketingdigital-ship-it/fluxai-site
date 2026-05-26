@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Cockpit do Cliente</title>
+    <link rel="stylesheet" href="./styles/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --os-primary: #8e9e68;
+            --os-bg: #050705;
+            --os-surface: rgba(12, 15, 12, 0.95);
+            --os-border: rgba(142, 158, 104, 0.15);
+            --os-text: #e0e0e0;
+            --os-text-muted: #787878;
+            --os-success: #8e9e68;
+            --os-warning: #d97706;
+            --os-danger: #ef4444;
+            --os-info: #3b82f6;
+            --os-font-mono: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--os-bg);
+            color: var(--os-text);
+            overflow: hidden;
+        }
+
+        .os-shell {
+            display: flex;
+            height: 100vh;
+        }
+
+        .os-sidebar {
+            width: 280px;
+            background: rgba(10, 12, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--os-border);
+            z-index: 100;
+        }
+
+        .os-viewport-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .os-topbar {
+            height: 70px;
+            background: rgba(8, 10, 8, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--os-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 90;
+        }
+
+        .os-viewport {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* HEADER */
+        .cockpit-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--os-border);
+            padding-bottom: 20px;
+        }
+
+        .cockpit-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .cockpit-title p {
+            color: var(--os-text-muted);
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        /* GRID SYSTEM (visual silêncio) */
+        .cockpit-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 20px;
+        }
+
+        .cockpit-widget {
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            border-radius: 6px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .cockpit-widget-title {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--os-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            padding-bottom: 8px;
+        }
+
+        .col-12 { grid-column: span 12; }
+        .col-8 { grid-column: span 8; }
+        .col-6 { grid-column: span 6; }
+        .col-4 { grid-column: span 4; }
+        .col-3 { grid-column: span 3; }
+
+        /* WIDGET 1: IDENTIDADE */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-label {
+            font-size: 0.6rem;
+            color: var(--os-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .tag-badge {
+            font-size: 0.6rem;
+            background: rgba(142,158,104,0.1);
+            color: var(--os-primary);
+            border: 1px solid rgba(142,158,104,0.3);
+            padding: 2px 6px;
+            border-radius: 3px;
+            margin-right: 4px;
+            display: inline-block;
+        }
+
+        /* WIDGET 2: INTEGRAÇÕES */
+        .int-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .int-table td {
+            padding: 8px 0;
+            font-size: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .int-name {
+            font-weight: 600;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .switch-manual {
+            font-size: 0.65rem;
+            color: var(--os-text-muted);
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--os-border);
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        
+        .switch-manual.active {
+            color: var(--os-primary);
+            border-color: var(--os-primary);
+            background: rgba(142, 158, 104, 0.08);
+        }
+
+        /* WIDGET 4: IA OPERACIONAL */
+        .ia-metric-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .ia-metric-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--os-border);
+            border-radius: 4px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .ia-metric-val {
+            font-family: var(--os-font-mono);
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .ia-metric-lbl {
+            font-size: 0.55rem;
+            color: var(--os-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 2px;
+        }
+
+        .control-btn {
+            background: transparent;
+            border: 1px solid var(--os-border);
+            color: var(--os-text);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .control-btn:hover {
+            border-color: var(--os-primary);
+            color: var(--os-primary);
+            background: rgba(142,158,104,0.05);
+        }
+        
+        .control-btn.btn-danger-action:hover {
+            border-color: var(--os-danger);
+            color: var(--os-danger);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        /* WIDGET 5: PRODUÇÃO */
+        .prod-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            border-radius: 4px;
+            margin-bottom: 6px;
+            font-size: 0.75rem;
+        }
+
+        .prod-status {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 2px 6px;
+            border-radius: 2px;
+        }
+
+        /* FILES LIST */
+        .file-link-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 6px 0;
+            font-size: 0.75rem;
+            color: #dcdcdc;
+            text-decoration: none;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .file-link-item:hover {
+            color: var(--os-primary);
+        }
+
+        .file-link-item i {
+            color: var(--os-text-muted);
+            width: 14px;
+        }
+
+        /* TABLE MOCK GENERAL */
+        .simple-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.75rem;
+        }
+
+        .simple-table th {
+            padding: 8px 10px;
+            color: var(--os-text-muted);
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid var(--os-border);
+        }
+
+        .simple-table td {
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .badge-status {
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 2px;
+            text-transform: uppercase;
+        }
+
+        .badge-status.success { background: rgba(142,158,104,0.1); color: var(--os-success); }
+        .badge-status.warning { background: rgba(217,119,6,0.1); color: var(--os-warning); }
+        .badge-status.danger { background: rgba(239,68,68,0.1); color: var(--os-danger); }
+        .badge-status.neutral { background: rgba(255,255,255,0.05); color: var(--os-text-muted); }
+
+        /* GOVERNANÇA ACTION BAR */
+        .gov-action-bar {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* MODAL FOR LIMIT RELEASE */
+        .os-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .os-modal-content {
+            background: #080a08;
+            border: 1px solid var(--os-border);
+            border-radius: 6px;
+            width: 420px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .modal-input {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--os-border);
+            padding: 10px;
+            color: #fff;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .modal-input:focus {
+            border-color: var(--os-primary);
+        }
+    </style>
+</head>
+<body class="os-mode">
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+        
+        <div class="os-viewport-wrapper">
+            <header class="os-topbar"></header>
+            
+            <main class="os-viewport">
+                <!-- COCKPIT HEADER -->
+                <div class="cockpit-header">
+                    <div class="cockpit-title">
+                        <h1 id="client-name-title">Cockpit Operacional</h1>
+                        <p>Visão consolidada e controle de infraestrutura do cliente.</p>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <a href="clientes.html" class="control-btn" style="text-decoration:none; display:flex; align-items:center; gap:5px;"><i class="fa-solid fa-arrow-left"></i> Voltar à Lista</a>
+                    </div>
+                </div>
+                
+                <div class="cockpit-grid">
+                    
+                    <!-- 1. IDENTIDADE DO CLIENTE -->
+                    <div class="cockpit-widget col-12">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-address-card"></i> 1. Identidade do Cliente</span>
+                            <span id="badge-operational-status" class="badge-status success">ATIVO</span>
+                        </div>
+                        <div class="info-grid">
+                            <div class="info-item">
+                                <span class="info-label">Nome do Cliente</span>
+                                <span class="info-value" id="info-client-name">—</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Segmento</span>
+                                <span class="info-value" id="info-segment">—</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Responsável Interno</span>
+                                <span class="info-value">Brenda (Estratégico)</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Data de Entrada</span>
+                                <span class="info-value" id="info-start-date">—</span>
+                            </div>
+                            <div class="info-item" style="margin-top: 10px;">
+                                <span class="info-label">Contrato Ativo</span>
+                                <span class="info-value" id="info-contract-type">Recorrente Mensal (Flux Pro)</span>
+                            </div>
+                            <div class="info-item" style="margin-top: 10px;">
+                                <span class="info-label">Tipo de Operação</span>
+                                <span class="info-value">Tráfego Pago + Social Media</span>
+                            </div>
+                            <div class="info-item" style="margin-top: 10px; grid-column: span 2;">
+                                <span class="info-label">Tags Estratégicas</span>
+                                <div style="margin-top: 4px;" id="info-tags">
+                                    <span class="tag-badge">High-Ticket</span>
+                                    <span class="tag-badge">Meta Ads Scale</span>
+                                    <span class="tag-badge">Camada GPT Ativa</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 2. INTEGRAÇÕES -->
+                    <div class="cockpit-widget col-6">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-network-wired"></i> 2. Integrações de Canais</span>
+                        </div>
+                        <table class="int-table">
+                            <thead>
+                                <tr style="text-align: left; font-size: 0.6rem; color: var(--os-text-muted); text-transform: uppercase;">
+                                    <th style="padding-bottom: 6px;">Canal</th>
+                                    <th style="padding-bottom: 6px;">Conexão</th>
+                                    <th style="padding-bottom: 6px;">Token</th>
+                                    <th style="padding-bottom: 6px; text-align: right;">Modo</th>
+                                </tr>
+                            </thead>
+                            <tbody id="integrations-list">
+                                <!-- Preenchido dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 3. OPERAÇÃO CONTRATADA -->
+                    <div class="cockpit-widget col-6">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-file-contract"></i> 3. Operação Contratada</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:12px; font-size:0.75rem;">
+                            <div>
+                                <span style="font-weight: 700; color: #fff; display: block; margin-bottom: 4px;">Serviços Ativos:</span>
+                                <span id="contract-services-list">—</span>
+                            </div>
+                            <div>
+                                <span style="font-weight: 700; color: #fff; display: block; margin-bottom: 4px;">Serviços Extras / Upgrade do Ciclo:</span>
+                                <span id="contract-extras-list">—</span>
+                            </div>
+                            <div>
+                                <span style="font-weight: 700; color: #fff; display: block; margin-bottom: 4px;">Escopo de Entregas Mensais:</span>
+                                <p style="margin: 0; color: var(--os-text-muted); line-height: 1.4;" id="contract-scope-text">Sincronizando escopo operacional direto do Google Sheets...</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 4. IA OPERACIONAL -->
+                    <div class="cockpit-widget col-6">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-brain"></i> 4. IA Operacional (Camada GPT)</span>
+                            <span id="badge-ia-active" class="badge-status success">ATIVO</span>
+                        </div>
+                        <div class="ia-metric-row">
+                            <div class="ia-metric-card">
+                                <div class="ia-metric-val" id="ia-limit-total">10</div>
+                                <div class="ia-metric-lbl">Limite total</div>
+                            </div>
+                            <div class="ia-metric-card">
+                                <div class="ia-metric-val" id="ia-limit-approved">0</div>
+                                <div class="ia-metric-lbl">Aprovado</div>
+                            </div>
+                            <div class="ia-metric-card">
+                                <div class="ia-metric-val" id="ia-limit-review">0</div>
+                                <div class="ia-metric-lbl">Em Revisão</div>
+                            </div>
+                            <div class="ia-metric-card">
+                                <div class="ia-metric-val" id="ia-limit-published">0</div>
+                                <div class="ia-metric-lbl">Publicado</div>
+                            </div>
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--os-text-muted); line-height: 1.4; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
+                            <strong>Regra de Limites:</strong> Rascunhos/Em Revisão não ocupam o limite operacional. Aprovados ocupam o limite contratado. Publicados ocupam definitivamente no ciclo.
+                        </div>
+                        <div style="display:flex; gap: 8px;">
+                            <button id="btn-toggle-ia" class="control-btn"><i class="fa-solid fa-ban"></i> Bloquear IA</button>
+                            <button id="btn-adjust-limit" class="control-btn"><i class="fa-solid fa-arrows-spin"></i> Liberar Limite</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 5. PRODUÇÃO & MESA EDITORIAL -->
+                    <div class="cockpit-widget col-6">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-table-list"></i> 5. Produção & Mesa Editorial</span>
+                            <span class="badge-status success" id="badge-automation-status">AUTOMAÇÕES: OK</span>
+                        </div>
+                        <div style="display:flex; flex-direction:column; gap:8px;" id="production-list">
+                            <!-- Populado via JS -->
+                        </div>
+                        <div style="display: flex; gap: 8px; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.03); padding-top: 12px;">
+                            <button id="btn-toggle-automations" class="control-btn"><i class="fa-solid fa-pause"></i> Pausar Automações</button>
+                            <button id="btn-return-report" class="control-btn"><i class="fa-solid fa-reply"></i> Devolver Relatório</button>
+                            <button id="btn-approve-report" class="control-btn"><i class="fa-solid fa-circle-check"></i> Aprovar Relatório</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 6. MÉTRICAS E CRESCIMENTO -->
+                    <div class="cockpit-widget col-8">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-chart-simple"></i> 6. Métricas & Telemetria de Crescimento (GA4 / Meta / Insta)</span>
+                        </div>
+                        <table class="simple-table">
+                            <thead>
+                                <tr>
+                                    <th>Canal</th>
+                                    <th>Métrica Chave</th>
+                                    <th>Volume Atual</th>
+                                    <th>Variação Mensal</th>
+                                    <th>Alerta Estratégico</th>
+                                </tr>
+                            </thead>
+                            <tbody id="metrics-list">
+                                <!-- Preenchido dinamicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 7. ARQUIVOS & ASSETS -->
+                    <div class="cockpit-widget col-4">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-folder-open"></i> 7. Pastas de Drive & Assets</span>
+                        </div>
+                        <div style="display: flex; flex-direction: column;">
+                            <a href="#" id="drive-root-link" target="_blank" class="file-link-item"><i class="fa-solid fa-folder"></i> <span>Pasta Raiz do Cliente</span> <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto; font-size:0.6rem;"></i></a>
+                            <a href="#" id="drive-brand-link" target="_blank" class="file-link-item"><i class="fa-solid fa-palette"></i> <span>Identidade Visual</span> <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto; font-size:0.6rem;"></i></a>
+                            <a href="#" id="drive-contracts-link" target="_blank" class="file-link-item"><i class="fa-solid fa-file-pdf"></i> <span>Contratos & Propostas</span> <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto; font-size:0.6rem;"></i></a>
+                            <a href="#" id="drive-assets-link" target="_blank" class="file-link-item"><i class="fa-solid fa-photo-film"></i> <span>Assets e Referências</span> <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto; font-size:0.6rem;"></i></a>
+                        </div>
+                    </div>
+                    
+                    <!-- 8. LOGS OPERACIONAIS DO CLIENTE -->
+                    <div class="cockpit-widget col-12">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-terminal"></i> 8. Logs Operacionais do Cliente</span>
+                            <span style="font-size:0.6rem; color:var(--os-text-muted);">Sincronia do logs-engine</span>
+                        </div>
+                        <div style="max-height: 200px; overflow-y: auto;">
+                            <table class="simple-table" style="font-family: var(--os-font-mono); font-size:0.7rem;">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 140px;">Timestamp</th>
+                                        <th style="width: 100px;">Usuário</th>
+                                        <th style="width: 150px;">Ação</th>
+                                        <th style="width: 100px; text-align: center;">Ambiente</th>
+                                        <th style="width: 100px; text-align: center;">Status</th>
+                                        <th>Payload</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="client-logs-body">
+                                    <!-- Injetado via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- 9. GOVERNANÇA & SEGURANÇA -->
+                    <div class="cockpit-widget col-12" style="border: 1px dashed var(--os-danger);">
+                        <div class="cockpit-widget-title" style="color: var(--os-danger);">
+                            <span><i class="fa-solid fa-shield-halved"></i> 9. Governança Operacional & Controle Crítico</span>
+                            <span style="font-size:0.6rem; color:var(--os-danger);">Apenas ADMIN / OPERATOR</span>
+                        </div>
+                        <div style="font-size: 0.75rem; line-height: 1.4;">
+                            Ações nesta área modificam o status de faturamento, permissões de escrita de webhooks do Make, sincronização de arquivos do Google Drive e acesso do cliente ao portal corporativo.
+                        </div>
+                        <div class="gov-action-bar">
+                            <button class="control-btn" id="btn-gov-active"><i class="fa-solid fa-check"></i> Ativar Cliente</button>
+                            <button class="control-btn" id="btn-gov-pause"><i class="fa-solid fa-pause"></i> Pausar Cliente</button>
+                            <button class="control-btn" id="btn-gov-deactivate"><i class="fa-solid fa-ban"></i> Desativar Cliente</button>
+                            <button class="control-btn btn-danger-action" id="btn-gov-archive"><i class="fa-solid fa-box-archive"></i> Arquivar Cliente</button>
+                        </div>
+                    </div>
+                    
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Limit Adjust Modal -->
+    <div id="limit-modal" class="os-modal">
+        <div class="os-modal-content">
+            <h3 style="margin: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--os-primary);">Ajustar Limite Operacional IA</h3>
+            <p style="font-size: 0.7rem; color: var(--os-text-muted); margin: 0 0 10px;">Informe o novo limite de geração de IA a ser disponibilizado para este cliente no ciclo atual.</p>
+            <input type="number" id="input-new-limit" class="modal-input" placeholder="Novo limite (ex: 15)" />
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                <button class="control-btn" onclick="document.getElementById('limit-modal').style.display='none'">Cancelar</button>
+                <button class="control-btn" id="btn-save-new-limit" style="background: var(--os-primary); color: #000; font-weight: 700;">Salvar Limite</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="./js/modules/cliente-detalhe.js"></script>
+</body>
+</html>

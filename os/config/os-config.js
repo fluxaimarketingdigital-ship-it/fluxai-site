@@ -12,6 +12,10 @@
 
 'use strict';
 
+import { OS_LOGS_ENGINE } from '../services/logs-engine.js';
+import { STATUS_SYSTEM, StatusEngine } from './status-system.js';
+
+
 // ═══════════════════════════════════════════════════════════
 // 1. AMBIENTE E IDENTIDADE DO SISTEMA
 // ═══════════════════════════════════════════════════════════
@@ -62,6 +66,8 @@ export const SYSTEM_IDENTITY = {
 export const FEATURE_FLAGS = {
     // Fonte de dados
     mockData:             ENVIRONMENT_CONFIG.isDev,   // true em dev, false em prod
+    sendRealWebhooks:     false,                      // GLOBALMENTE DESATIVADO por padrão para segurança
+    enabledRealWebhooks:  ['LEAD_CAPTURE', 'DEMAND_SUBMISSION'], // Apenas estes webhooks listados disparam real (homologação gradual)
     useSupabaseAuth:      true,   // Supabase é o auth primário (fallback: mock users)
     useSheetsAPI:         false,  // Google Sheets API direta (fase 2)
     useMakeWebhooks:      true,   // Webhooks Make como canal de escrita
@@ -102,29 +108,49 @@ export const FEATURE_FLAGS = {
  * ambiente via backend ou Supabase Edge Functions.
  */
 export const WEBHOOK_CONFIG = {
-    // Captura de lead do site institucional
+    // 01_FLUXAI_PORTAL_DEMANDAS (Cliente envia demanda pelo portal)
+    DEMAND_SUBMISSION: 'https://hook.us2.make.com/bnm7xedyxhxdlvh417gone7gy5m4e8me',
+
+    // 02_FLUXAI_LEADS_SITE (Captura de lead do site institucional)
     LEAD_CAPTURE: 'https://hook.us2.make.com/gmu9xakjqfocdd8nk4sn5lxcc7pmbte2',
 
-    // Onboarding de novo cliente
-    CLIENT_ONBOARDING: '',       // Preencher após criar cenário Make
+    // 09_FLUXAI_NOVO_CLIENTE_ONBOARDING (Processa onboarding de novo cliente)
+    CLIENT_ONBOARDING: '',
 
-    // Serviço extra solicitado pelo cliente
-    SERVICE_EXTRA_REQUEST: '',   // Preencher após criar cenário Make
+    // 10_FLUXAI_SERVICO_EXTRA_REQUEST (Serviço extra solicitado pelo cliente no portal)
+    SERVICE_EXTRA_REQUEST: '',
 
-    // Serviço extra criado internamente pelo operador
-    SERVICE_EXTRA_INTERNAL: '',  // Preencher após criar cenário Make
+    // 11_FLUXAI_IA_CREDITOS_CONTROLE (Controle de créditos e consumo de IA)
+    IA_CREDITOS_CONTROLE: '',
 
-    // Status de demanda atualizado
-    DEMAND_STATUS_UPDATE: '',    // Preencher após criar cenário Make
+    // 12_FLUXAI_SERVICO_EXTRA_APROVACAO (Aprovação de orçamento de serviço extra)
+    SERVICE_EXTRA_APPROVAL: '',
 
-    // Relatório mensal — mudar status
-    REPORT_STATUS_UPDATE: '',    // Preencher após criar cenário Make
+    // 13_FLUXAI_IA_GUARDRAIL (Auditoria de qualidade e segurança do prompt de IA)
+    IA_GUARDRAIL: '',
 
-    // Sincronização de métricas (acionado pelo Make, não pelo OS)
-    METRICS_SYNC_INBOUND: '',    // Recebido, não enviado
+    // 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC (Sincronização de arquivos do Google Drive)
+    CLIENTES_ARQUIVOS_SYNC: '',
 
-    // Sincronização de leads (acionado pelo Make)
-    LEADS_SYNC_INBOUND: '',      // Recebido, não enviado
+    // 15_FLUXAI_PLANEJAMENTO_CONTEUDO (Aprovação e ajustes de pautas/planejamento)
+    PLANEJAMENTO_CONTEUDO: '',
+
+    // 16_FLUXAI_CALENDARIO_POSTAGENS (Aprovação final e publicação de posts)
+    CALENDARIO_POSTAGENS: '',
+
+    // 17_FLUXAI_GPT_GERACOES_LOG (Log de geração e uso do GPT)
+    GPT_GERACOES_LOG: '',
+
+    // 18_FLUXAI_LEADS_CLIENTES (Leads gerados/atualizados dentro da carteira do cliente)
+    LEADS_CLIENTES: '',
+
+    // --- ALIASES DE COMPATIBILIDADE ---
+    SERVICE_EXTRA_INTERNAL: '',  // Redireciona para SERVICE_EXTRA_APPROVAL
+    DEMAND_STATUS_UPDATE: '',    // Atualizações de status de demanda
+    REPORT_STATUS_UPDATE: '',    // Relatório mensal
+    DELIVERY_APPROVAL: '',       // Redireciona para PLANEJAMENTO_CONTEUDO ou CALENDARIO_POSTAGENS
+    METRICS_SYNC_INBOUND: '',
+    LEADS_SYNC_INBOUND: '',
 
     /**
      * Utilitário interno — não exportar como endpoint
@@ -140,9 +166,41 @@ export const WEBHOOK_CONFIG = {
      * Retorna { success, status, error }.
      */
     send: async (webhookKey, payload) => {
-        const url = WEBHOOK_CONFIG[webhookKey];
-        if (!WEBHOOK_CONFIG._isConfigured(webhookKey)) {
-            console.warn(`[WEBHOOK] ${webhookKey} não configurado. Payload ignorado.`, payload);
+        // Redirecionamento inteligente de aliases para cenários reais
+        let targetKey = webhookKey;
+        if (webhookKey === 'DELIVERY_APPROVAL') {
+            targetKey = (payload.type === 'PLANNING' || payload.logical_transition?.includes('planning'))
+                ? 'PLANEJAMENTO_CONTEUDO'
+                : 'CALENDARIO_POSTAGENS';
+        } else if (webhookKey === 'SERVICE_EXTRA_INTERNAL') {
+            targetKey = 'SERVICE_EXTRA_APPROVAL';
+        }
+
+        const isReal = FEATURE_FLAGS.sendRealWebhooks || 
+                       (Array.isArray(FEATURE_FLAGS.enabledRealWebhooks) && FEATURE_FLAGS.enabledRealWebhooks.includes(targetKey));
+        const isSimulated = !isReal;
+        
+        if (typeof console !== 'undefined') {
+            console.info(
+                `%c[WEBHOOK:${isSimulated ? 'SIMULADO' : 'REAL'}] Acionando ${targetKey} (origem: ${webhookKey})...`,
+                'color: #8e9e68; font-weight: bold;'
+            );
+        }
+
+        if (isSimulated) {
+            // Registrar envio simulado no OS_LOGS_ENGINE
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.webhook(targetKey, payload, true, 200, null, true);
+            }
+            return { success: true, status: 200, simulated: true };
+        }
+
+        const url = WEBHOOK_CONFIG[targetKey];
+        if (!WEBHOOK_CONFIG._isConfigured(targetKey)) {
+            console.warn(`[WEBHOOK] ${targetKey} não configurado. Payload ignorado.`, payload);
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.webhook(targetKey, payload, false, 0, 'WEBHOOK_NOT_CONFIGURED', false);
+            }
             return { success: false, status: 0, error: 'WEBHOOK_NOT_CONFIGURED' };
         }
         try {
@@ -152,9 +210,15 @@ export const WEBHOOK_CONFIG = {
                 body: JSON.stringify(payload),
             });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.webhook(targetKey, payload, true, res.status, null, false);
+            }
             return { success: true, status: res.status };
         } catch (err) {
-            console.error(`[WEBHOOK] Erro ao enviar para ${webhookKey}:`, err.message);
+            console.error(`[WEBHOOK] Erro ao enviar para ${targetKey}:`, err.message);
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.webhook(targetKey, payload, false, 0, err.message, false);
+            }
             return { success: false, status: 0, error: err.message };
         }
     }
@@ -385,9 +449,9 @@ export const STATUS_CONFIG = {
     GERACAO_IA: {
         RASCUNHO:         { key: 'rascunho',         label: 'Rascunho',         badge: 'neutral' },
         EM_REVISAO:       { key: 'em_revisao',       label: 'Em Revisão',       badge: 'info'    },
-        APROVADO:         { key: 'aprovado',         label: 'Aprovado',         badge: 'warning' }, // consome crédito
-        PUBLICADO:        { key: 'publicado',        label: 'Publicado',        badge: 'success' }, // crédito definitivo
-        DESCARTADO:       { key: 'descartado',       label: 'Descartado',       badge: 'neutral' }, // sem custo (pré-aprovação)
+        APROVADO:         { key: 'aprovado',         label: 'Aprovado',         badge: 'warning' }, // ocupa o limite operacional contratado
+        PUBLICADO:        { key: 'publicado',        label: 'Publicado',        badge: 'success' }, // ocupa definitivamente o limite operacional daquele ciclo/contrato
+        DESCARTADO:       { key: 'descartado',       label: 'Descartado',       badge: 'neutral' }, // sem consumo (se descartado antes da aprovação) ou espaço liberado por exclusão (requer confirmação se já aprovado)
     },
 
     // Status de token/integração
@@ -508,40 +572,93 @@ export const TRACKING_CONFIG = {
  * O cliente nunca acessa essas configs diretamente.
  */
 export const GPT_CONFIG = {
-    // Regras de crédito
-    credits: {
-        RASCUNHO_SEM_CUSTO:        0,     // Gerado mas não aprovado
-        APROVADO_INTERNAMENTE:     1,     // Aprovação interna = 1 crédito consumido
-        PUBLICADO:                 1,     // Publicado = crédito definitivo (não adicional)
-        ESTORNO_REQUER_CONFIRMACAO: true, // Estorno de crédito aprovado precisa de confirmação
+    // Regras de controle de escopo contratual e consumo interno de IA
+    scopeControl: {
+        RASCUNHO_SEM_CONSUMO:        0,     // Gerado mas não aprovado (não ocupa limite)
+        APROVADO_INTERNAMENTE:       1,     // Passa a ocupar o limite operacional contratado
+        PUBLICADO_ENTREGUE:          1,     // Ocupa definitivamente o limite operacional daquele ciclo/contrato
+        ESTORNO_REQUER_CONFIRMACAO: true, // Geração excluída depois de aprovada só libera espaço (espaço liberado por exclusão) mediante confirmação interna manual da equipe
     },
 
-    // Quem pode executar ações de IA
+    // Quem pode executar ações de IA (O controle é exclusivo do operador FluxAI. O cliente não controla limites, não gera IA e não libera limite)
     governance: {
         pode_gerar:    [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
         pode_aprovar:  [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
         pode_excluir:  [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
         pode_publicar: [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
-        pode_ver_prompts: [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
-        // CLIENT: pode apenas ver entregas disponibilizadas e aprovar/reprovar
+        pode_ver_prompts: [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR], // Cliente não vê prompts internos
+        // CLIENT: cliente não controla limites, não gera IA, não libera limite, não vê prompts internos.
     },
 };
 
 // ═══════════════════════════════════════════════════════════
-// EXPORT DEFAULT — Objeto consolidado para importação simples
+// 13. CONFIGURAÇÃO DE FLUXOS OPERACIONAIS (Mapeamento de Abas e Webhooks)
 // ═══════════════════════════════════════════════════════════
 
-export default {
-    env:        ENVIRONMENT_CONFIG,
-    system:     SYSTEM_IDENTITY,
-    flags:      FEATURE_FLAGS,
-    webhooks:   WEBHOOK_CONFIG,
-    supabase:   SUPABASE_CONFIG,
-    sheets:     SHEETS_CONFIG,
-    drive:      DRIVE_CONFIG,
-    roles:      ROLE_CONFIG,
-    status:     STATUS_CONFIG,
-    labels:     UI_LABELS,
-    tracking:   TRACKING_CONFIG,
-    gpt:        GPT_CONFIG,
+export const FLOWS_CONFIG = {
+    onboarding: {
+        webhook: 'CLIENT_ONBOARDING',
+        tabs: ['CLIENTES', 'SERVICOS', 'DNA_GPT', 'CONTRATOS'],
+        initialStatus: 'onboarding',
+        feedback: 'Cliente ativado e enviado ao Make.',
+        logAction: 'ONBOARDING_CREATED'
+    },
+    servico_extra: {
+        webhook: 'SERVICE_EXTRA_REQUEST',
+        tabs: ['SERVICOS_EXTRAS'],
+        initialStatus: 'solicitado',
+        feedback: 'Solicitação enviada. Aguarde retorno da equipe.',
+        logAction: 'EXTRA_SERVICE_REQUESTED'
+    },
+    demanda: {
+        webhook: 'DEMAND_SUBMISSION',
+        tabs: ['DEMANDAS'],
+        initialStatus: 'aberta',
+        feedback: 'Demanda enviada com sucesso.',
+        logAction: 'DEMAND_SUBMITTED'
+    },
+    lead: {
+        webhook: 'LEAD_CAPTURE',
+        tabs: ['LEADS_SITE'],
+        initialStatus: 'novo',
+        feedback: 'Diagnóstico enviado com sucesso.',
+        logAction: 'LEAD_CAPTURED'
+    },
+    relatorio: {
+        webhook: 'REPORT_STATUS_UPDATE',
+        tabs: ['ANALISE_MENSAL'],
+        initialStatus: 'rascunho',
+        feedback: 'Status do relatório atualizado.',
+        logAction: 'REPORT_STATUS_UPDATED'
+    },
+    aprovacao: {
+        webhook: 'DELIVERY_APPROVAL',
+        tabs: ['PLANEJAMENTO', 'CALENDARIO'],
+        initialStatus: 'pendente',
+        feedback: 'Aprovação de entrega registrada.',
+        logAction: 'DELIVERY_APPROVED'
+    }
 };
+
+export const OS_CONFIG = {
+    env:          ENVIRONMENT_CONFIG,
+    system:       SYSTEM_IDENTITY,
+    flags:        FEATURE_FLAGS,
+    webhooks:     WEBHOOK_CONFIG,
+    supabase:     SUPABASE_CONFIG,
+    sheets:       SHEETS_CONFIG,
+    drive:        DRIVE_CONFIG,
+    roles:        ROLE_CONFIG,
+    status:       STATUS_CONFIG,
+    labels:       UI_LABELS,
+    tracking:     TRACKING_CONFIG,
+    gpt:          GPT_CONFIG,
+    flows:        FLOWS_CONFIG,
+    logs:         OS_LOGS_ENGINE,
+    statusSystem: StatusEngine,
+    brand:        SYSTEM_IDENTITY.brand,
+    version:      SYSTEM_IDENTITY.version,
+    statusStr:    SYSTEM_IDENTITY.status
+};
+
+export default OS_CONFIG;

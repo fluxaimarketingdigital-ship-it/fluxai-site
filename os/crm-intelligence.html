@@ -381,6 +381,11 @@
         import { OS_UI, OS_AUTH } from './js/os-core.js';
         import { crmLeadsData, crmMetrics } from './data/crm.js';
         import { getSupabase } from './services/supabase-client.js';
+        import { OS_CONFIG } from './config/os-config.js';
+        import { OS_LOGS_ENGINE } from './services/logs-engine.js';
+        import { StatusEngine } from './config/status-system.js';
+
+        let allLeads = [];
 
         const renderLeads = async () => {
             const crmBody = document.getElementById('crm-leads-body');
@@ -481,7 +486,9 @@
                 
                 const healthClass = healthVal > 80 ? '' : (healthVal > 50 ? 'warning' : 'danger');
                 const statusName = item.status || 'ATIVO';
-                const tempClass = statusName === 'PROPOSAL' || statusName === 'QUENTE' || statusName === 'ATIVO' ? 'quente' : (statusName === 'MORNA' ? 'morna' : 'fria');
+                const isClient = item.project_id !== 'novo';
+                const statusCategory = isClient ? 'clientes' : 'leads';
+                const statusBadge = StatusEngine.renderBadge(statusCategory, statusName);
                 
                 const projId = item.project_id || (companyName.includes('Maria Aparecida') ? 'p_c1' : (companyName.includes('Alves') ? 'p_c2' : 'p_c3'));
 
@@ -533,7 +540,7 @@
                             <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: var(--os-primary);">${healthVal}%</div>
                             <div class="health-bar"><div class="health-fill ${healthClass}" style="width: ${healthVal}%;"></div></div>
                         </td>
-                        <td><span class="temp-badge temp-${tempClass}">${statusName}</span></td>
+                        <td>${statusBadge}</td>
                         <td style="font-size: 0.75rem; color: var(--os-text-muted);">${item.lastFollowUp || 'HOJE'}</td>
                         <td style="font-weight: 600; color: var(--os-primary); font-size: 0.75rem;">${item.nextAction || 'FOLLOW-UP'}</td>
                         <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color:#fff;">${leadValue.toString().includes('R$') ? leadValue : 'R$ ' + leadValue}</td>
@@ -543,6 +550,8 @@
                     </tr>
                 `;
             }).join('');
+            
+            allLeads = leads;
         };
 
         const renderLogs = () => {
@@ -681,21 +690,17 @@
                 localLeads.push(newLeadObj);
                 localStorage.setItem('fluxai_mock_leads', JSON.stringify(localLeads));
 
-                // Disparo para o Webhook Real (Make.com / n8n)
-                const webhookUrl = localStorage.getItem('fluxai_webhook_lead');
-                if (webhookUrl) {
-                    try {
-                        fetch(webhookUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({
-                                event: 'new_lead_created',
-                                source: 'FluxAI OS CRM',
-                                timestamp: new Date().toISOString(),
-                                data: newLeadObj
-                            })
-                        }).catch(e => console.warn('Falha silenciosa ao disparar webhook:', e));
-                    } catch(e) {}
+                // Disparo para o Webhook Centralizado via OS_CONFIG
+                try {
+                    OS_LOGS_ENGINE.userAction('LEAD_CAPTURED', newLeadObj, !OS_CONFIG.flags.sendRealWebhooks);
+                    await OS_CONFIG.webhooks.send('LEAD_CAPTURE', {
+                        event: 'new_lead_created',
+                        source: 'FluxAI OS CRM',
+                        timestamp: new Date().toISOString(),
+                        data: newLeadObj
+                    });
+                } catch(e) {
+                    console.warn('Falha ao disparar webhook de lead:', e);
                 }
 
                 alert('Lead adicionado com sucesso!');
@@ -803,6 +808,18 @@
                 const health = parseInt(document.getElementById('manage-lead-health').value) || 50;
                 const notes = document.getElementById('manage-lead-notes').value;
 
+                // Validar transição via StatusEngine
+                const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+                const role = session.role || 'OPERATOR';
+                const currentLead = allLeads.find(l => l.id === id);
+                const currentStatus = currentLead ? currentLead.status : 'NOVO';
+
+                const transResult = await StatusEngine.transition('leads', id, currentStatus.toLowerCase(), status.toLowerCase(), { role });
+                if (!transResult.success) {
+                    alert(`Transição de status inválida: ${transResult.error}`);
+                    return;
+                }
+
                 if (supabase && id && !id.startsWith('L-LOCAL-')) {
                     try {
                         const { error } = await supabase.from('crm_leads').update({
@@ -840,6 +857,18 @@
                     localStorage.setItem('fluxai_mock_leads', JSON.stringify(localLeads));
                 }
 
+                // Gravar log da ação em OS_LOGS_ENGINE
+                if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                    OS_LOGS_ENGINE.userAction('LEAD_UPDATED', { id, status, temperature, health_score: health }, !OS_CONFIG.flags.sendRealWebhooks);
+                }
+
+                // Enviar webhook simulado via OS_CONFIG
+                await OS_CONFIG.webhooks.send('LEAD_CAPTURE', {
+                    event: 'lead_status_updated',
+                    timestamp: new Date().toISOString(),
+                    data: { id, status, temperature, health_score: health, notes }
+                });
+
                 alert('Alterações salvas com sucesso!');
                 manageLeadModal.style.display = 'none';
                 await renderLeads();
@@ -861,6 +890,18 @@
 
                 if (isNaN(contractVal) || contractVal <= 0) {
                     alert('Por favor, informe um valor de contrato válido.');
+                    return;
+                }
+
+                // Validar transição via StatusEngine
+                const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+                const role = session.role || 'OPERATOR';
+                const currentLead = allLeads.find(l => l.id === leadId);
+                const currentStatus = currentLead ? currentLead.status : 'NOVO';
+
+                const transResult = await StatusEngine.transition('leads', leadId, currentStatus.toLowerCase(), 'convertido', { role });
+                if (!transResult.success) {
+                    alert(`Transição de status de lead inválida: ${transResult.error}`);
                     return;
                 }
 
@@ -957,10 +998,136 @@
                     alert(`Sucesso! Lead convertido localmente.\nProjeto (${mockProjId}) e Contrato de R$ ${contractVal} criados no LocalStorage.`);
                 }
 
+                // Registrar log de conversão
+                if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                    OS_LOGS_ENGINE.userAction('LEAD_CONVERTED', { lead_id: leadId, company, contract_value: contractVal }, !OS_CONFIG.flags.sendRealWebhooks);
+                }
+
+                // Enviar webhook CLIENT_ONBOARDING
+                await OS_CONFIG.webhooks.send('CLIENT_ONBOARDING', {
+                    event: 'lead_converted',
+                    timestamp: new Date().toISOString(),
+                    data: { lead_id: leadId, company, client_name: name, contract_value: contractVal, due_day: dueDay, deliverables }
+                });
+
                 manageLeadModal.style.display = 'none';
                 await renderLeads();
             });
         }
+
+        // 9. Gerenciar Cliente (Event Delegation)
+        const manageClientModal = document.getElementById('manage-client-modal');
+        document.getElementById('crm-leads-body').addEventListener('click', async (e) => {
+            const btnEdit = e.target.closest('.btn-manage-client-trigger');
+            if (btnEdit) {
+                document.getElementById('manage-client-id').value = btnEdit.getAttribute('data-id');
+                document.getElementById('info-client-name').innerText = btnEdit.getAttribute('data-name');
+                document.getElementById('info-client-company').innerText = btnEdit.getAttribute('data-company');
+                document.getElementById('manage-client-status').value = btnEdit.getAttribute('data-status') === 'INATIVO' ? 'INATIVO' : 'ATIVO';
+                document.getElementById('manage-client-contract').value = btnEdit.getAttribute('data-contract') || '';
+                document.getElementById('manage-client-receipt').value = btnEdit.getAttribute('data-receipt') || '';
+                document.getElementById('manage-client-files').value = btnEdit.getAttribute('data-files') || '';
+                manageClientModal.style.display = 'flex';
+                return;
+            }
+
+            const btnDel = e.target.closest('.btn-delete-client');
+            if (btnDel) {
+                if(confirm('Tem certeza que deseja excluir este cadastro permanentemente?')) {
+                    const id = btnDel.getAttribute('data-id');
+                    try {
+                        const supabaseInst = getSupabase();
+                        if (supabaseInst && !id.startsWith('p_local_')) {
+                            await supabaseInst.from('contracts').delete().eq('project_id', id);
+                            await supabaseInst.from('projects').delete().eq('id', id);
+                        }
+                        // Remove from mock
+                        let mProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects')||'[]');
+                        mProjects = mProjects.filter(p => p.id !== id);
+                        localStorage.setItem('fluxai_mock_projects', JSON.stringify(mProjects));
+                        
+                        let mContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts')||'[]');
+                        mContracts = mContracts.filter(c => c.project_id !== id);
+                        localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mContracts));
+                        
+                        window.location.reload();
+                    } catch(err) {
+                        console.error('Erro ao excluir:', err);
+                    }
+                }
+            }
+        });
+
+        // 10. Salvar Ficha do Cliente
+        document.getElementById('manage-client-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('manage-client-id').value;
+            const status = document.getElementById('manage-client-status').value;
+            const contract = document.getElementById('manage-client-contract').value;
+            const receipt = document.getElementById('manage-client-receipt').value;
+            const files = document.getElementById('manage-client-files').value;
+
+            // Validar transição via StatusEngine
+            const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+            const role = session.role || 'OPERATOR';
+            let currentStatus = 'ativo';
+            
+            let mProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects')||'[]');
+            let projIdx = mProjects.findIndex(p => p.id === id);
+            if (projIdx > -1) {
+                currentStatus = mProjects[projIdx].status || 'ativo';
+            }
+
+            const transResult = await StatusEngine.transition('clientes', id, currentStatus.toLowerCase(), status.toLowerCase(), { role });
+            if (!transResult.success) {
+                alert(`Transição de status inválida: ${transResult.error}`);
+                return;
+            }
+
+            // Gravar log
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.userAction('CLIENT_STATUS_UPDATED', { id, status }, !OS_CONFIG.flags.sendRealWebhooks);
+            }
+
+            try {
+                const supabaseInst = getSupabase();
+                if (supabaseInst && id && !id.startsWith('p_local_')) {
+                    await supabaseInst.from('contracts').update({ status }).eq('project_id', id);
+                    
+                    const { data: projData } = await supabaseInst.from('projects').select('metadata').eq('id', id).single();
+                    let metadata = (projData && projData.metadata) ? projData.metadata : {};
+                    metadata.contract_link = contract;
+                    metadata.receipt_link = receipt;
+                    metadata.files_link = files;
+                    
+                    await supabaseInst.from('projects').update({ 
+                        status,
+                        metadata: metadata
+                    }).eq('id', id);
+                }
+                
+                // Save locally
+                if (projIdx > -1) {
+                    mProjects[projIdx].status = status;
+                    mProjects[projIdx].metadata = { ...(mProjects[projIdx].metadata || {}), contract_link: contract, receipt_link: receipt, files_link: files };
+                    localStorage.setItem('fluxai_mock_projects', JSON.stringify(mProjects));
+                }
+                
+                let mContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts')||'[]');
+                let contIdx = mContracts.findIndex(c => c.project_id === id);
+                if (contIdx > -1) {
+                    mContracts[contIdx].status = status;
+                    localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mContracts));
+                }
+                
+                alert('Ficha do cliente salva com sucesso!');
+                manageClientModal.style.display = 'none';
+                window.location.reload();
+            } catch(err) {
+                console.error(err);
+                alert('Erro ao salvar.');
+            }
+        });
     </script>
 
     <!-- MODAL: ADICIONAR LEAD MANUAL -->
@@ -1191,102 +1358,5 @@
         </div>
     </div>
     
-    <script>
-        // 9. Gerenciar Cliente (Event Delegation)
-        const manageClientModal = document.getElementById('manage-client-modal');
-        document.getElementById('crm-leads-body').addEventListener('click', async (e) => {
-            const btnEdit = e.target.closest('.btn-manage-client-trigger');
-            if (btnEdit) {
-                document.getElementById('manage-client-id').value = btnEdit.getAttribute('data-id');
-                document.getElementById('info-client-name').innerText = btnEdit.getAttribute('data-name');
-                document.getElementById('info-client-company').innerText = btnEdit.getAttribute('data-company');
-                document.getElementById('manage-client-status').value = btnEdit.getAttribute('data-status') === 'INATIVO' ? 'INATIVO' : 'ATIVO';
-                document.getElementById('manage-client-contract').value = btnEdit.getAttribute('data-contract') || '';
-                document.getElementById('manage-client-receipt').value = btnEdit.getAttribute('data-receipt') || '';
-                document.getElementById('manage-client-files').value = btnEdit.getAttribute('data-files') || '';
-                manageClientModal.style.display = 'flex';
-                return;
-            }
-
-            const btnDel = e.target.closest('.btn-delete-client');
-            if (btnDel) {
-                if(confirm('Tem certeza que deseja excluir este cadastro permanentemente?')) {
-                    const id = btnDel.getAttribute('data-id');
-                    try {
-                        const supabaseInst = window.getSupabase ? window.getSupabase() : null;
-                        if (supabaseInst && !id.startsWith('p_local_')) {
-                            await supabaseInst.from('contracts').delete().eq('project_id', id);
-                            await supabaseInst.from('projects').delete().eq('id', id);
-                        }
-                        // Remove from mock
-                        let mProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects')||'[]');
-                        mProjects = mProjects.filter(p => p.id !== id);
-                        localStorage.setItem('fluxai_mock_projects', JSON.stringify(mProjects));
-                        
-                        let mContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts')||'[]');
-                        mContracts = mContracts.filter(c => c.project_id !== id);
-                        localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mContracts));
-                        
-                        // Recarregar a página ou re-renderizar
-                        window.location.reload();
-                    } catch(err) {
-                        console.error('Erro ao excluir:', err);
-                    }
-                }
-            }
-        });
-
-        // 10. Salvar Ficha do Cliente
-        document.getElementById('manage-client-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const id = document.getElementById('manage-client-id').value;
-            const status = document.getElementById('manage-client-status').value;
-            const contract = document.getElementById('manage-client-contract').value;
-            const receipt = document.getElementById('manage-client-receipt').value;
-            const files = document.getElementById('manage-client-files').value;
-
-            try {
-                const supabaseInst = window.getSupabase ? window.getSupabase() : null;
-                if (supabaseInst && id && !id.startsWith('p_local_')) {
-                    await supabaseInst.from('contracts').update({ status }).eq('project_id', id);
-                    
-                    // Fetch existing metadata to avoid wiping out
-                    const { data: projData } = await supabaseInst.from('projects').select('metadata').eq('id', id).single();
-                    let metadata = (projData && projData.metadata) ? projData.metadata : {};
-                    metadata.contract_link = contract;
-                    metadata.receipt_link = receipt;
-                    metadata.files_link = files;
-                    
-                    await supabaseInst.from('projects').update({ 
-                        status,
-                        metadata: metadata
-                    }).eq('id', id);
-                }
-                
-                // Save locally
-                let mProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects')||'[]');
-                let projIdx = mProjects.findIndex(p => p.id === id);
-                if (projIdx > -1) {
-                    mProjects[projIdx].status = status;
-                    mProjects[projIdx].metadata = { ...(mProjects[projIdx].metadata || {}), contract_link: contract, receipt_link: receipt, files_link: files };
-                    localStorage.setItem('fluxai_mock_projects', JSON.stringify(mProjects));
-                }
-                
-                let mContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts')||'[]');
-                let contIdx = mContracts.findIndex(c => c.project_id === id);
-                if (contIdx > -1) {
-                    mContracts[contIdx].status = status;
-                    localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mContracts));
-                }
-                
-                alert('Ficha do cliente salva com sucesso!');
-                manageClientModal.style.display = 'none';
-                window.location.reload(); // Recarregar para refletir alterações
-            } catch(err) {
-                console.error(err);
-                alert('Erro ao salvar.');
-            }
-        });
-    </script>
 </body>
 </html>

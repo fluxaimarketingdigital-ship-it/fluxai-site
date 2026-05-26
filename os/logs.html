@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Logs Operacionais</title>
+    <link rel="stylesheet" href="./styles/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --os-primary: #8e9e68;
+            --os-bg: #050705;
+            --os-surface: rgba(12, 15, 12, 0.9);
+            --os-border: rgba(142, 158, 104, 0.12);
+            --os-text: #dcdcdc;
+            --os-text-muted: #707070;
+            --os-success: #8e9e68;
+            --os-warning: #d97706;
+            --os-danger: #ef4444;
+            --os-info: #3b82f6;
+            --os-font-mono: 'JetBrains Mono', monospace;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background-color: var(--os-bg);
+            color: var(--os-text);
+            overflow: hidden;
+        }
+
+        .os-shell {
+            display: flex;
+            height: 100vh;
+        }
+
+        .os-sidebar {
+            width: 280px;
+            background: rgba(10, 12, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid var(--os-border);
+            z-index: 100;
+        }
+
+        .os-viewport-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .os-topbar {
+            height: 70px;
+            background: rgba(8, 10, 8, 0.8);
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--os-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 90;
+        }
+
+        .os-viewport {
+            flex: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .os-page-title h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin: 0;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+
+        .os-page-title p {
+            color: var(--os-text-muted);
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        /* FILTERS BAR */
+        .logs-control-panel {
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            border-radius: 6px;
+            padding: 16px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .filter-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 3px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .filter-tab {
+            background: transparent;
+            border: none;
+            color: var(--os-text-muted);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 14px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-tab:hover {
+            color: #fff;
+        }
+
+        .filter-tab.active {
+            background: rgba(142, 158, 104, 0.12);
+            color: var(--os-primary);
+            border: 1px solid rgba(142, 158, 104, 0.2);
+        }
+
+        .badge-count {
+            font-family: var(--os-font-mono);
+            font-size: 0.6rem;
+            opacity: 0.6;
+            margin-left: 4px;
+        }
+
+        .option-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .option-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--os-text);
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .option-checkbox input {
+            cursor: pointer;
+            accent-color: var(--os-primary);
+            margin: 0;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--os-border);
+            border-radius: 4px;
+            padding: 0 12px;
+            width: 280px;
+        }
+
+        .search-box i {
+            color: var(--os-text-muted);
+            font-size: 0.8rem;
+            margin-right: 8px;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 8px 0;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-box input::placeholder {
+            color: var(--os-text-muted);
+        }
+
+        .btn-clear {
+            background: transparent;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--os-danger);
+            padding: 7px 12px;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.2s;
+        }
+
+        .btn-clear:hover {
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        /* TELEMETRY TABLE */
+        .logs-table-wrapper {
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .table-scroll {
+            overflow-y: auto;
+            max-height: calc(100vh - 280px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background: rgba(0,0,0,0.4);
+            border-bottom: 1px solid var(--os-border);
+            padding: 10px 16px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--os-text-muted);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 10px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+            font-size: 0.75rem;
+            vertical-align: middle;
+        }
+
+        tr:hover td {
+            background: rgba(255,255,255,0.01);
+        }
+
+        .col-time {
+            font-family: var(--os-font-mono);
+            font-size: 0.7rem;
+            color: var(--os-text-muted);
+            width: 130px;
+        }
+
+        .col-user {
+            font-weight: 500;
+            color: #fff;
+            max-width: 140px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .col-client {
+            font-family: var(--os-font-mono);
+            font-size: 0.7rem;
+            color: var(--os-text-muted);
+            max-width: 110px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .col-action {
+            font-family: var(--os-font-mono);
+            font-size: 0.7rem;
+            color: var(--os-primary);
+        }
+
+        .col-webhook {
+            font-family: var(--os-font-mono);
+            font-size: 0.7rem;
+            color: var(--os-info);
+            max-width: 130px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .col-source {
+            font-size: 0.7rem;
+            color: var(--os-text-muted);
+        }
+
+        .col-payload {
+            font-family: var(--os-font-mono);
+            font-size: 0.7rem;
+            color: #aaa;
+            max-width: 220px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            cursor: pointer;
+        }
+
+        .col-payload:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        /* PILLS & BADGES */
+        .pill-env {
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .pill-real {
+            background: rgba(142, 158, 104, 0.1);
+            color: var(--os-primary);
+            border: 1px solid var(--os-primary);
+        }
+
+        .pill-simulado {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--os-text-muted);
+            border: 1px dashed rgba(255, 255, 255, 0.15);
+        }
+
+        .status-badge {
+            font-size: 0.6rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 2px;
+            display: inline-block;
+        }
+
+        .status-success {
+            background: rgba(142, 158, 104, 0.08);
+            color: var(--os-success);
+        }
+
+        .status-warning {
+            background: rgba(217, 119, 6, 0.08);
+            color: var(--os-warning);
+        }
+
+        .status-critical {
+            background: rgba(239, 68, 68, 0.08);
+            color: var(--os-danger);
+        }
+
+        /* MODAL FOR PAYLOAD */
+        .os-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .os-modal-content {
+            background: #080a08;
+            border: 1px solid var(--os-border);
+            border-radius: 6px;
+            width: 700px;
+            max-width: 90%;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .os-modal-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--os-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .os-modal-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--os-primary);
+        }
+
+        .os-modal-close {
+            background: transparent;
+            border: none;
+            color: var(--os-text-muted);
+            cursor: pointer;
+            font-size: 1.1rem;
+        }
+
+        .os-modal-close:hover {
+            color: #fff;
+        }
+
+        .os-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .os-modal-body pre {
+            margin: 0;
+            font-family: var(--os-font-mono);
+            font-size: 0.75rem;
+            color: #e0e0e0;
+            background: rgba(0,0,0,0.3);
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.02);
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        /* SCROLLBAR */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(142, 158, 104, 0.12); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--os-primary); }
+    </style>
+</head>
+<body class="os-mode">
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+        
+        <div class="os-viewport-wrapper">
+            <header class="os-topbar"></header>
+            
+            <main class="os-viewport">
+                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h1>Logs Operacionais</h1>
+                        <p>Telemetria e rastreabilidade de processos em tempo real.</p>
+                    </div>
+                    <button id="btn-clear-logs" class="btn-clear">
+                        <i class="fa-solid fa-trash-can" style="margin-right: 5px;"></i> Limpar Logs
+                    </button>
+                </div>
+                
+                <div class="logs-control-panel">
+                    <div class="filter-row">
+                        <!-- Left: Filter Tabs -->
+                        <div class="filter-tabs" id="category-tabs">
+                            <button class="filter-tab active" data-filter="ALL">All <span class="badge-count" id="count-all">0</span></button>
+                            <button class="filter-tab" data-filter="WEBHOOKS">Webhooks <span class="badge-count" id="count-webhooks">0</span></button>
+                            <button class="filter-tab" data-filter="ERRORS">Errors <span class="badge-count" id="count-errors">0</span></button>
+                            <button class="filter-tab" data-filter="SECURITY">Security <span class="badge-count" id="count-security">0</span></button>
+                            <button class="filter-tab" data-filter="IA">IA <span class="badge-count" id="count-ia">0</span></button>
+                            <button class="filter-tab" data-filter="APPROVALS">Approvals <span class="badge-count" id="count-approvals">0</span></button>
+                            <button class="filter-tab" data-filter="AUTOMATIONS">Automations <span class="badge-count" id="count-automations">0</span></button>
+                        </div>
+                        
+                        <!-- Right: Search Box -->
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="log-search-input" placeholder="Filtrar por ação, ID, payload..." />
+                        </div>
+                    </div>
+                    
+                    <div class="filter-row" style="border-top: 1px solid rgba(255,255,255,0.02); padding-top: 12px; margin-top: 2px;">
+                        <!-- Left: Telemetry Type Filters -->
+                        <div class="option-group">
+                            <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--os-text-muted); font-weight: 700; letter-spacing: 0.5px;">Ambiente:</span>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="chk-real" checked />
+                                REAL
+                            </label>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="chk-simulado" checked />
+                                SIMULADO
+                            </label>
+                        </div>
+                        
+                        <!-- Right: Severity Filters -->
+                        <div class="option-group">
+                            <span style="font-size: 0.65rem; text-transform: uppercase; color: var(--os-text-muted); font-weight: 700; letter-spacing: 0.5px;">Severidade:</span>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="chk-success" checked />
+                                SUCCESS
+                            </label>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="chk-warning" checked />
+                                WARNING
+                            </label>
+                            <label class="option-checkbox">
+                                <input type="checkbox" id="chk-critical" checked />
+                                CRITICAL
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="logs-table-wrapper">
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 140px;">Timestamp</th>
+                                    <th style="width: 130px;">Usuário</th>
+                                    <th style="width: 100px;">Cliente</th>
+                                    <th style="width: 160px;">Ação</th>
+                                    <th style="width: 140px;">Webhook</th>
+                                    <th style="width: 90px; text-align: center;">Tipo</th>
+                                    <th style="width: 90px; text-align: center;">Severidade</th>
+                                    <th style="width: 120px;">Origem</th>
+                                    <th>Payload Resumido</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table-body">
+                                <tr>
+                                    <td colspan="9" style="text-align: center; color: var(--os-text-muted); padding: 40px 0;">
+                                        Carregando logs da telemetria...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Payload Details Modal -->
+    <div id="payload-modal" class="os-modal">
+        <div class="os-modal-content">
+            <div class="os-modal-header">
+                <span class="os-modal-title" id="modal-log-title">Detalhes do Evento</span>
+                <button class="os-modal-close" id="btn-close-modal">&times;</button>
+            </div>
+            <div class="os-modal-body">
+                <pre id="modal-json-content"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="./js/modules/logs-view.js"></script>
+</body>
+</html>

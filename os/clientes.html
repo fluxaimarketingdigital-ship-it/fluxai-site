@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FluxAI OS™ | Clientes (Operação Make)</title>
+    <title>FluxAI OS™ | Clientes e Controles Operacionais</title>
     <link rel="stylesheet" href="./styles/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -11,10 +11,15 @@
         :root {
             --os-primary: #8e9e68;
             --os-bg: #050705;
-            --os-surface: rgba(15, 18, 15, 0.7);
+            --os-surface: rgba(12, 15, 12, 0.95);
             --os-border: rgba(142, 158, 104, 0.15);
             --os-text: #e0e0e0;
-            --os-text-muted: #888;
+            --os-text-muted: #787878;
+            --os-success: #8e9e68;
+            --os-warning: #d97706;
+            --os-danger: #ef4444;
+            --os-info: #3b82f6;
+            --os-font-mono: 'JetBrains Mono', monospace;
         }
 
         body {
@@ -25,74 +30,219 @@
             overflow: hidden;
         }
 
-        .os-bg-glow {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: radial-gradient(circle at 0% 0%, rgba(142, 158, 104, 0.15) 0%, transparent 40%),
-                        radial-gradient(circle at 100% 100%, rgba(142, 158, 104, 0.1) 0%, transparent 40%);
-            z-index: -1;
+        .os-shell { display: flex; height: 100vh; }
+        .os-sidebar { width: 280px; background: rgba(10, 12, 10, 0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--os-border); z-index: 100; }
+        .os-viewport-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
+        .os-topbar { height: 70px; background: rgba(8, 10, 8, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid var(--os-border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 90; }
+        .os-viewport { flex: 1; padding: 30px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+
+        .os-page-title h1 { font-size: 1.8rem; font-weight: 700; margin: 0; color: #fff; letter-spacing: -0.5px; }
+        .os-page-title p { color: var(--os-text-muted); font-size: 0.85rem; margin-top: 4px; }
+
+        .os-widget { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 6px; padding: 20px; }
+        .os-widget-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--os-primary); margin-bottom: 15px; display: block; }
+
+        /* CONTROL PANEL */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .os-shell { display: flex; height: 100vh; }
-        .os-sidebar { width: 280px; background: rgba(10, 12, 10, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--os-border); z-index: 100; }
-        .os-viewport-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .os-topbar { height: 70px; background: rgba(10, 12, 10, 0.4); backdrop-filter: blur(15px); border-bottom: 1px solid var(--os-border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 90; }
-        .os-viewport { flex: 1; padding: 40px; overflow-y: auto; }
+        .filter-tabs {
+            display: flex;
+            gap: 4px;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 3px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
 
-        .os-page-title h1 { font-size: 2.2rem; font-weight: 800; margin: 0; background: linear-gradient(to right, #fff, var(--os-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .os-page-title p { color: var(--os-text-muted); font-size: 0.9rem; margin-top: 5px; }
+        .filter-tab {
+            background: transparent;
+            border: none;
+            color: var(--os-text-muted);
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            letter-spacing: 0.5px;
+        }
 
-        .os-widget { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 16px; padding: 20px; margin-top: 30px; position: relative; overflow: hidden; }
-        .os-widget-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--os-primary); }
+        .filter-tab:hover { color: #fff; }
+        .filter-tab.active {
+            background: rgba(142, 158, 104, 0.12);
+            color: var(--os-primary);
+            border: 1px solid rgba(142, 158, 104, 0.2);
+        }
 
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--os-border); font-size: 0.85rem; }
-        th { color: var(--os-text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
-        
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .badge.ativo { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge.inativo { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
-        .badge.pendente { background: rgba(245, 158, 11, 0.1); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--os-border);
+            border-radius: 4px;
+            padding: 0 12px;
+            width: 250px;
+        }
+
+        .search-box input {
+            background: transparent;
+            border: none;
+            color: #fff;
+            font-size: 0.75rem;
+            padding: 8px 0;
+            width: 100%;
+            outline: none;
+        }
+
+        .search-box i { color: var(--os-text-muted); margin-right: 8px; font-size: 0.8rem; }
+
+        /* TABLE */
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 12px 15px; border-bottom: 1px solid rgba(255, 255, 255, 0.02); font-size: 0.75rem; vertical-align: middle; }
+        th { background: rgba(0,0,0,0.4); border-bottom: 1px solid var(--os-border); color: var(--os-text-muted); font-weight: 700; text-transform: uppercase; font-size: 0.65rem; letter-spacing: 1px; }
+
+        .badge-status {
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 2px 6px;
+            border-radius: 2px;
+            text-transform: uppercase;
+            display: inline-block;
+        }
+        .badge-status.ativo { background: rgba(142, 158, 104, 0.1); color: var(--os-success); }
+        .badge-status.pausado { background: rgba(217, 119, 6, 0.1); color: var(--os-warning); }
+        .badge-status.inativo { background: rgba(239, 68, 68, 0.1); color: var(--os-danger); }
+        .badge-status.onboarding { background: rgba(59, 130, 246, 0.1); color: var(--os-info); }
+
+        .action-btn-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        .row-action-btn {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--os-border);
+            color: var(--os-text);
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: all 0.15s;
+        }
+
+        .row-action-btn:hover {
+            border-color: var(--os-primary);
+            color: var(--os-primary);
+            background: rgba(142,158,104,0.05);
+        }
+
+        .row-action-btn.danger:hover {
+            border-color: var(--os-danger);
+            color: var(--os-danger);
+            background: rgba(239, 68, 68, 0.05);
+        }
+
+        /* MODAL */
+        .os-modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .os-modal-content {
+            background: #111;
+            border: 1px solid var(--os-border);
+            border-radius: 6px;
+            padding: 30px;
+            width: 480px;
+            max-width: 90%;
+        }
+
+        .os-input {
+            width: 100%;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--os-border);
+            padding: 10px;
+            color: #fff;
+            border-radius: 4px;
+            margin-top: 5px;
+            outline: none;
+            box-sizing: border-box;
+        }
+        .os-input:focus { border-color: var(--os-primary); }
     </style>
 </head>
-<body>
-    <div class="os-bg-glow"></div>
+<body class="os-mode">
     <div class="os-shell">
         <aside class="os-sidebar"></aside>
         <div class="os-viewport-wrapper">
             <header class="os-topbar"></header>
             <main class="os-viewport">
-                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="os-page-title" style="display: flex; justify-content: space-between; align-items: flex-end;">
                     <div>
-                        <h1>Clientes (Make Sync)</h1>
-                        <p>Status operacional e serviços conectados.</p>
+                        <h1>Clientes</h1>
+                        <p>Controle de status operacional, acessos, automações e IA do ecossistema.</p>
                     </div>
-                    <button class="os-btn-primary" onclick="document.getElementById('modal-extra').style.display='flex'" style="background: var(--os-primary); color: #000; font-weight: 800; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; transition: all 0.2s; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px;">
+                    <button class="row-action-btn" onclick="document.getElementById('modal-extra').style.display='flex'" style="background: var(--os-primary); color: #000; border: none; padding: 10px 20px; border-radius: 4px; font-weight: 800;">
                         <i class="fa-solid fa-plus"></i> Adicionar Serviço Extra
                     </button>
                 </div>
                 
                 <div class="os-widget">
-                    <span class="os-widget-label">Base de Clientes</span>
+                    <span class="os-widget-label">Central Operacional de Clientes</span>
+                    
+                    <div class="controls-row">
+                        <!-- Left: Status Tabs -->
+                        <div class="filter-tabs" id="status-tabs">
+                            <button class="filter-tab active" data-status="ALL">Todos <span id="count-all">0</span></button>
+                            <button class="filter-tab" data-status="ativo">Ativos <span id="count-ativo">0</span></button>
+                            <button class="filter-tab" data-status="pausado">Pausados <span id="count-pausado">0</span></button>
+                            <button class="filter-tab" data-status="inativo">Inativos/Arq. <span id="count-inativo">0</span></button>
+                            <button class="filter-tab" data-status="onboarding">Onboarding <span id="count-onboarding">0</span></button>
+                        </div>
+                        
+                        <!-- Right: Search -->
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="client-search" placeholder="Buscar por cliente, ID, rede..." />
+                        </div>
+                    </div>
+                    
                     <div id="clients-table-container">Carregando...</div>
                 </div>
 
                 <!-- Modal Adicionar Serviço Extra -->
-                <div id="modal-extra" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999; justify-content: center; align-items: center; backdrop-filter: blur(5px);">
-                    <div style="background: #111; border: 1px solid var(--os-border); border-radius: 12px; padding: 30px; width: 500px; max-width: 90%; max-height: 90vh; overflow-y: auto;">
-                        <h2 style="margin: 0 0 20px; color: var(--os-primary); font-size: 1.2rem; text-transform: uppercase;">Adicionar Serviço Extra</h2>
+                <div id="modal-extra" class="os-modal">
+                    <div class="os-modal-content">
+                        <h2 style="margin: 0 0 20px; color: var(--os-primary); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Adicionar Serviço Extra</h2>
                         
                         <div style="display: flex; flex-direction: column; gap: 15px;">
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--os-text-muted);">Cliente Alvo</label>
-                                <select id="extra-client-id" class="os-input" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); padding: 10px; color: #fff;"></select>
+                                <select id="extra-client-id" class="os-input"></select>
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--os-text-muted);">Serviço Extra (Catálogo)</label>
-                                <select id="extra-catalog-id" class="os-input" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); padding: 10px; color: #fff;"></select>
+                                <select id="extra-catalog-id" class="os-input"></select>
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--os-text-muted);">Status do Extra</label>
-                                <select id="extra-status" class="os-input" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); padding: 10px; color: #fff;">
+                                <select id="extra-status" class="os-input">
                                     <option value="solicitado">Solicitado</option>
                                     <option value="em_orcamento">Em Orçamento</option>
                                     <option value="orcamento_enviado">Orçamento Enviado</option>
@@ -104,29 +254,29 @@
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                 <div>
                                     <label style="font-size: 0.75rem; color: var(--os-text-muted);">Valor Estimado</label>
-                                    <input type="text" id="extra-valor-est" class="os-input" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); padding: 10px; color: #fff;" />
+                                    <input type="text" id="extra-valor-est" class="os-input" />
                                 </div>
                                 <div>
                                     <label style="font-size: 0.75rem; color: var(--os-text-muted);">Valor Aprovado</label>
-                                    <input type="text" id="extra-valor-apr" class="os-input" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); padding: 10px; color: #fff;" />
+                                    <input type="text" id="extra-valor-apr" class="os-input" />
                                 </div>
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--os-text-muted);">Impacto no Planejamento GPT?</label>
-                                <select id="extra-impact" class="os-input" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); padding: 10px; color: #fff;">
+                                <select id="extra-impact" class="os-input">
                                     <option value="nao">Não</option>
                                     <option value="sim">Sim (Alterar escopo)</option>
                                 </select>
                             </div>
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--os-text-muted);">Observações</label>
-                                <textarea id="extra-obs" class="os-input" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--os-border); padding: 10px; color: #fff; height: 60px;"></textarea>
+                                <textarea id="extra-obs" class="os-input" style="height: 50px;"></textarea>
                             </div>
                         </div>
 
                         <div style="margin-top: 25px; display: flex; justify-content: flex-end; gap: 10px;">
-                            <button onclick="document.getElementById('modal-extra').style.display='none'" style="background: transparent; color: #888; border: none; padding: 10px 20px; cursor: pointer;">Cancelar</button>
-                            <button id="btn-save-extra" style="background: var(--os-primary); color: #000; font-weight: bold; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer;">Salvar</button>
+                            <button onclick="document.getElementById('modal-extra').style.display='none'" style="background: transparent; color: #888; border: none; padding: 10px 20px; cursor: pointer; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">Cancelar</button>
+                            <button id="btn-save-extra" class="row-action-btn" style="background: var(--os-primary); color: #000; border: none; padding: 10px 20px; border-radius: 4px;">Salvar</button>
                         </div>
                     </div>
                 </div>

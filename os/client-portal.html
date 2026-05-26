@@ -307,7 +307,7 @@
         }
     </style>
 </head>
-<body>
+<body class="os-mode">
     <header class="portal-header">
         <a href="command-center.html" class="btn-back-portal">
             <i class="fa-solid fa-arrow-left"></i> Voltar ao Painel
@@ -531,10 +531,18 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
+        import { SUPABASE_CONFIG } from './config/supabase-config.js';
+        import { StatusEngine } from './config/status-system.js';
+        import { OS_LOGS_ENGINE } from './services/logs-engine.js';
+        import { OS_CONFIG } from './config/os-config.js';
+        import { OS_AUTH } from './js/os-core.js';
         import { mockCatalogoServicos } from './data/catalogo.data.js';
+
+        // Enforce Authentication
+        await OS_AUTH.check('CLIENT');
+
         window.mockCatalogoServicos = mockCatalogoServicos;
-    </script>
-    <script>
+
         let _supabaseClient = null;
         let _allAssets = [];
         let currentYear = new Date().getFullYear();
@@ -545,7 +553,7 @@
 
         async function init() {
             // Controle de Exibição do Botão de Voltar (esconde se for CLIENT real)
-            const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+            const session = OS_AUTH.user || {};
             if (session.role === 'CLIENT') {
                 const backBtn = document.querySelector('.btn-back-portal');
                 if (backBtn) backBtn.style.display = 'none';
@@ -554,12 +562,13 @@
             if (!projectId) return document.getElementById('client-name').innerText = 'Acesso Negado: ID do Projeto Ausente';
 
             if (!_supabaseClient) {
-                _supabaseClient = window.supabase.createClient("https://mufgwetfhfhhmhowbhjj.supabase.co", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI");
+                _supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
             }
-
 
             try {
                 // 1. Dados do Projeto
+                const { data: proj, error } = await _supabaseClient.from('projects').select('*').eq('id', projectId).single();
+                if (error) throw error;
                 if (proj) {
                     document.getElementById('dual-client-name').innerText = (proj.name || proj.company_name).split(' ')[0].toUpperCase();
                     const profession = proj.metadata?.onboarding?.profession || 'Estratégia Institucional';
@@ -593,11 +602,14 @@
         function openDemandaModal() {
             const select = document.getElementById('demanda-tipo');
             if (select && window.mockCatalogoServicos) {
-                let opts = '<option value="">Selecione um Serviço...</option>';
+                let opts = '<option value="">Selecione o Tipo de Solicitação...</option>';
+                opts += '<option value="DEMANDA_NORMAL">Demanda Regular (Inclusa no Plano/Contrato)</option>';
+                opts += '<optgroup label="Serviços Extras (Avulsos - Faturamento Adicional)">';
                 window.mockCatalogoServicos.filter(s => s.permite_orcamento).forEach(s => {
                     opts += `<option value="${s.servico_id}">${s.nome_servico}</option>`;
                 });
-                opts += '<option value="SRV_EXTRA_CUSTOM">Outro (Descrever detalhadamente)</option>';
+                opts += '<option value="SRV_EXTRA_CUSTOM">Outro Serviço Extra Customizado</option>';
+                opts += '</optgroup>';
                 select.innerHTML = opts;
             }
             document.getElementById('modal-demanda').style.display = 'flex';
@@ -608,48 +620,109 @@
         }
 
         async function submitDemanda() {
-            // Lógica temporária clara para teste
-            const tempClientId = 'FLUXAI_LABS_001';
-            const tempClientNome = 'FluxAI Labs';
+            const user = OS_AUTH.user || {};
+            const tempClientId = projectId || user.project_id || 'FLUXAI_LABS_001';
+            const tempClientNome = document.getElementById('dual-client-name').innerText || 'FluxAI Labs';
 
-            const data = {
-                cliente_id: tempClientId,
-                cliente_nome: tempClientNome,
-                tipo_demanda: document.getElementById('demanda-tipo').value,
-                titulo_demanda: document.getElementById('demanda-titulo').value,
-                descricao_demanda: document.getElementById('demanda-desc').value,
-                prioridade: document.getElementById('demanda-prioridade').value,
-                prazo_desejado: document.getElementById('demanda-prazo') ? document.getElementById('demanda-prazo').value : '',
-                arquivo_referencia: document.getElementById('demanda-arquivo') && document.getElementById('demanda-arquivo').value ? document.getElementById('demanda-arquivo').value : 'N/A',
-                observacao: document.getElementById('demanda-obs') ? document.getElementById('demanda-obs').value : ''
-            };
+            const demandaTipo = document.getElementById('demanda-tipo').value;
+            const demandaTitulo = document.getElementById('demanda-titulo').value;
 
-            if (!data.tipo_demanda || !data.titulo_demanda) {
+            if (!demandaTipo || !demandaTitulo) {
                 alert('Por favor, preencha o Tipo de Serviço e o Título da demanda.');
                 return;
             }
 
+            const data = {
+                cliente_id: tempClientId,
+                cliente_nome: tempClientNome,
+                tipo_demanda: demandaTipo,
+                titulo_demanda: demandaTitulo,
+                descricao_demanda: document.getElementById('demanda-desc').value,
+                prioridade: document.getElementById('demanda-prioridade').value,
+                prazo_desejado: document.getElementById('demanda-prazo') ? document.getElementById('demanda-prazo').value : '',
+                arquivo_reference: document.getElementById('demanda-arquivo') && document.getElementById('demanda-arquivo').value ? document.getElementById('demanda-arquivo').value : 'N/A',
+                observacao: document.getElementById('demanda-obs') ? document.getElementById('demanda-obs').value : ''
+            };
+
+            const btn = document.querySelector('.btn-nova-demanda');
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...';
+            btn.disabled = true;
             
-            const makeWebhookUrl = localStorage.getItem('fluxai_make_webhook_demanda') || 'https://hook.us2.make.com/bnm7xedyxhxdlvh417gone7gy5m4e8me';
+            const isExtra = demandaTipo !== 'DEMANDA_NORMAL';
+            const webhookKey = isExtra ? 'SERVICE_EXTRA_REQUEST' : 'DEMAND_SUBMISSION';
+            const logAction = isExtra ? 'EXTRA_SERVICE_REQUESTED' : 'DEMAND_SUBMITTED';
+            const category = isExtra ? 'servicos_extras' : 'demandas';
+            const targetStatus = isExtra ? 'solicitado' : 'aberta';
+            const generatedId = 'dem_' + Math.random().toString(36).substr(2, 9);
             
             try {
-                console.log('Enviando demanda para Make:');
-                console.log(data);
-                
-                const response = await fetch(makeWebhookUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
+                // Validar transição inicial via StatusEngine
+                const transitionResult = await StatusEngine.transition(
+                    category,
+                    generatedId,
+                    null,
+                    targetStatus,
+                    { role: 'CLIENT' }
+                );
+
+                if (!transitionResult.success) {
+                    throw new Error('Falha na validação de status: ' + transitionResult.error);
+                }
+
+                // Gravar log de governança
+                OS_LOGS_ENGINE.userAction(
+                    logAction,
+                    'client-portal',
+                    { id: generatedId, ...data },
+                    'CLIENT',
+                    tempClientId
+                );
+
+                // Enviar webhook simulado/real
+                const response = await OS_CONFIG.webhooks.send(webhookKey, {
+                    id: generatedId,
+                    ...data,
+                    initial_status: targetStatus,
+                    timestamp: new Date().toISOString()
                 });
                 
-                console.log('Resposta do Make:', response);
-                
-                if (!response.ok) {
-                    throw new Error('Falha na resposta do webhook');
+                if (!response.success) {
+                    throw new Error(response.error || 'Falha no webhook');
                 }
                 
-                alert('Demanda enviada com sucesso.');
+                // Se estiver no mock, persistir na lista local correspondente
+                if (OS_CONFIG.flags.mockData) {
+                    if (isExtra) {
+                        const mockExtras = JSON.parse(localStorage.getItem('fluxai_mock_extras') || '[]');
+                        mockExtras.push({
+                            id: generatedId,
+                            project_id: tempClientId,
+                            service_id: demandaTipo,
+                            title: demandaTitulo,
+                            description: data.descricao_demanda,
+                            status: targetStatus,
+                            price: null,
+                            created_at: new Date().toISOString()
+                        });
+                        localStorage.setItem('fluxai_mock_extras', JSON.stringify(mockExtras));
+                    } else {
+                        const mockDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands') || '[]');
+                        mockDemands.push({
+                            id: generatedId,
+                            project_id: tempClientId,
+                            title: demandaTitulo,
+                            description: data.descricao_demanda,
+                            status: targetStatus,
+                            priority: data.prioridade,
+                            due_date: data.prazo_desejado,
+                            created_at: new Date().toISOString()
+                        });
+                        localStorage.setItem('fluxai_mock_demands', JSON.stringify(mockDemands));
+                    }
+                }
+
+                alert(isExtra ? 'Solicitação de serviço extra enviada com sucesso!' : 'Demanda regular enviada com sucesso!');
                 closeDemandaModal();
                 document.getElementById('demanda-titulo').value = '';
                 document.getElementById('demanda-desc').value = '';
@@ -658,9 +731,15 @@
                 if(document.getElementById('demanda-obs')) document.getElementById('demanda-obs').value = '';
             } catch (err) {
                 console.error(err);
-                alert('Não foi possível enviar sua demanda agora. Tente novamente.');
+                OS_LOGS_ENGINE.error(
+                    isExtra ? 'EXTRA_SERVICE_REQUEST_ERROR' : 'DEMAND_SUBMISSION_ERROR',
+                    err.message,
+                    { data }
+                );
+                alert('Não foi possível enviar sua solicitação agora. Tente novamente.');
             } finally {
                 btn.innerHTML = originalText;
+                btn.disabled = false;
             }
         }
 
@@ -687,17 +766,14 @@
         }
 
         async function checkFinancialAlerts() {
-            // Sincronizar/Garantir datas de teste no localStorage para simulação perfeita
             let mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
             const todayStr = new Date().toISOString().split('T')[0] + 'T00:00:00.000Z';
             
-            // 2 dias a partir de hoje
             const in2Days = new Date();
             in2Days.setDate(in2Days.getDate() + 2);
             const in2DaysStr = in2Days.toISOString().split('T')[0] + 'T00:00:00.000Z';
             
             if (mockPayments.length > 0) {
-                // Maria Aparecida (p_c1) -> Vencimento em 2 dias (Warning)
                 const p1 = mockPayments.find(p => p.id === 'p1' || p.contract_id === 'c1');
                 if (p1) {
                     p1.due_date = in2DaysStr;
@@ -705,7 +781,6 @@
                     p1.amount_due = 800;
                 }
                 
-                // Alves Odonto (p_c2) -> Vencimento Hoje (Critical PIX)
                 const p2 = mockPayments.find(p => p.id === 'p2' || p.contract_id === 'c2');
                 if (p2) {
                     p2.due_date = todayStr;
@@ -716,7 +791,6 @@
                 localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
             }
 
-            // Verificar status financeiro/vencimento para o cliente atual
             const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
             const activeContract = mockContracts.find(c => c.project_id === projectId);
             
@@ -734,7 +808,6 @@
                     const alertContainer = document.getElementById('expiration-alert-container');
                     
                     if (diffDays === 2) {
-                        // Alerta de 2 dias antes
                         alertContainer.innerHTML = `
                             <div class="expiration-banner warning">
                                 <div style="display:flex; align-items:center; gap:15px;">
@@ -752,7 +825,6 @@
                             </div>
                         `;
                     } else if (diffDays === 0) {
-                        // Alerta do Dia do Vencimento (PIX)
                         alertContainer.innerHTML = `
                             <div class="expiration-banner">
                                 <div style="display:flex; align-items:center; gap:15px;">
@@ -774,19 +846,26 @@
             }
         }
 
-        window.openPixModal = (value, companyName) => {
+        function openPixModal(value, companyName) {
             const formattedValue = value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             const message = encodeURIComponent(`Olá! Acabei de realizar o pagamento PIX no valor de ${formattedValue} referente à mensalidade da ${companyName} no FluxAI OS™. Segue o comprovante em anexo.`);
             document.getElementById('btn-whatsapp-receipt').href = `https://wa.me/5582993051282?text=${message}`;
             document.getElementById('pix-details-modal').style.display = 'flex';
-        };
+        }
 
-        window.copyPixKey = () => {
+        function copyPixKey() {
             const keyText = document.getElementById('pix-key-display').innerText;
             navigator.clipboard.writeText(keyText).then(() => {
                 alert('Chave PIX copiada com sucesso!');
             });
-        };
+        }
+
+        // Expose functions to window for HTML event handlers
+        window.openDemandaModal = openDemandaModal;
+        window.closeDemandaModal = closeDemandaModal;
+        window.submitDemanda = submitDemanda;
+        window.openPixModal = openPixModal;
+        window.copyPixKey = copyPixKey;
 
         init();
     </script>

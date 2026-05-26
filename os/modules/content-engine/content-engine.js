@@ -1,6 +1,10 @@
 import { OS_UI, OS_AUTH } from '../../js/os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
 import { contentEngineData } from './content-engine.data.js';
+import { StatusEngine } from '../../config/status-system.js';
+import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
+import { OS_CONFIG } from '../../config/os-config.js';
+import { AIPlanner } from '../../services/ai-planner.js';
 
 let currentProject = null;
 let currentMonth = new Date().getMonth();
@@ -877,6 +881,23 @@ function renderIntelligenceTab() {
 window.forceReady = async (id) => {
     if (!confirm('Deseja marcar este ativo como PRONTO para publicação?')) return;
     try {
+        const currentAsset = window.loadedContents?.find(item => item.id === id) || {};
+        const currentLogical = mapToStandardStatus(currentAsset.status || '').toLowerCase();
+        const userRole = OS_AUTH.user?.role || 'OPERATOR';
+
+        const transitionResult = await StatusEngine.transition(
+            'conteudos',
+            id,
+            currentLogical,
+            'ready_to_post',
+            { role: userRole }
+        );
+
+        if (!transitionResult.success) {
+            alert('Erro de validação de transição: ' + transitionResult.error);
+            return;
+        }
+
         const supabase = getSupabase();
         let error = null;
         try {
@@ -895,6 +916,26 @@ window.forceReady = async (id) => {
             }
         }
         
+        // Registrar log de governança
+        OS_LOGS_ENGINE.userAction(
+            'AI_GENERATION_APPROVED',
+            'content-engine',
+            { asset_id: id, action: 'force_ready' },
+            userRole,
+            currentProject
+        );
+
+        // Disparar webhook simulado se configurado
+        if (transitionResult.webhook) {
+            const payload = {
+                asset_id: id,
+                project_id: currentProject,
+                status: 'READY_TO_POST',
+                timestamp: new Date().toISOString()
+            };
+            await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+        }
+
         sLog('Ativo forçado para READY_TO_POST.');
         loadContent();
     } catch (e) {
@@ -904,22 +945,143 @@ window.forceReady = async (id) => {
 
 window.deleteAsset = async (id) => {
     if (!confirm('Deseja excluir este ativo da esteira?')) return;
-    const supabase = getSupabase();
-    let error = null;
     try {
-        const res = await supabase.from('content_assets').delete().eq('id', id);
-        error = res.error;
+        const currentAsset = window.loadedContents?.find(item => item.id === id) || {};
+        const currentLogical = mapToStandardStatus(currentAsset.status || '').toLowerCase();
+        const userRole = OS_AUTH.user?.role || 'OPERATOR';
+
+        let currentGiaStatus = 'rascunho';
+        if (currentLogical === 'draft_planning' || currentLogical === 'rascunho') currentGiaStatus = 'rascunho';
+        else if (currentLogical === 'internal_review' || currentLogical === 'em_revisao') currentGiaStatus = 'em_revisao';
+        else if (currentLogical === 'planning_approved' || currentLogical === 'aprovado') currentGiaStatus = 'aprovado';
+        else if (currentLogical === 'posted' || currentLogical === 'publicado') currentGiaStatus = 'publicado';
+
+        const transitionResult = await StatusEngine.transition(
+            'geracao_ia',
+            id,
+            currentGiaStatus,
+            'descartado',
+            { role: userRole }
+        );
+
+        if (!transitionResult.success) {
+            alert('Erro de validação de transição: ' + transitionResult.error);
+            return;
+        }
+
+        const supabase = getSupabase();
+        let error = null;
+        try {
+            const res = await supabase.from('content_assets').delete().eq('id', id);
+            error = res.error;
+        } catch (e) {
+            error = e;
+        }
+
+        if (error) {
+            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+            const filtered = mockAssets.filter(item => item.id !== id);
+            localStorage.setItem('fluxai_mock_assets', JSON.stringify(filtered));
+        }
+
+        // Registrar log de governança
+        OS_LOGS_ENGINE.userAction(
+            'AI_GENERATION_DELETED',
+            'content-engine',
+            { asset_id: id, action: 'delete' },
+            userRole,
+            currentProject
+        );
+
+        // Disparar webhook simulado se configurado
+        if (transitionResult.webhook) {
+            const payload = {
+                asset_id: id,
+                project_id: currentProject,
+                status: 'descartado',
+                timestamp: new Date().toISOString()
+            };
+            await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+        }
+
+        loadContent();
     } catch (e) {
-        error = e;
+        alert('Erro ao excluir ativo: ' + e.message);
+    }
+};
+
+async function runAiPlanner() {
+    const selectedId = document.getElementById('project-filter').value;
+    if (!selectedId) {
+        alert('Selecione um cliente específico para gerar pautas com IA.');
+        return;
     }
 
-    if (error) {
-        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-        const filtered = mockAssets.filter(item => item.id !== id);
-        localStorage.setItem('fluxai_mock_assets', JSON.stringify(filtered));
+    const serviceSelect = document.getElementById('ai-planner-service');
+    const serviceKey = serviceSelect ? serviceSelect.value : 'ALL';
+
+    const btnAi = document.getElementById('btn-ai-planner');
+    const originalText = btnAi ? btnAi.innerHTML : '';
+    if (btnAi) {
+        btnAi.disabled = true;
+        btnAi.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GERANDO...';
     }
-    loadContent();
-};
+
+    try {
+        sLog(`[IA_PLANNER] Executando planejamento de IA para o cliente ${selectedId}, serviço: ${serviceKey}`);
+        
+        // Chamar o gerador do planner
+        const generated = await AIPlanner.generatePlan(selectedId, serviceKey, 1);
+        if (!generated || generated.length === 0) {
+            throw new Error('Nenhuma pauta pôde ser gerada para o escopo selecionado.');
+        }
+
+        const newAsset = generated[0];
+        
+        // Injetar rascunho de IA (rascunho inicial) no banco ou no mock
+        const supabase = getSupabase();
+        let error = null;
+        try {
+            const { error: dbError } = await supabase.from('content_assets').insert(newAsset);
+            error = dbError;
+        } catch (e) {
+            error = e;
+        }
+
+        if (error) {
+            // Fallback Mock LocalStorage
+            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+            newAsset.id = 'asset_mock_' + Date.now();
+            mockAssets.unshift(newAsset);
+            localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+        }
+
+        // Registrar log de criação de pauta em rascunho (não ocupa limite operacional)
+        OS_LOGS_ENGINE.userAction(
+            'AI_GENERATION_STATUS',
+            'content-engine',
+            { action: 'generate_draft', service: serviceKey, client_id: selectedId },
+            OS_AUTH.user?.role || 'OPERATOR',
+            selectedId,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
+
+        sLog('[IA_PLANNER] Pauta em rascunho criada com sucesso.');
+        
+        // Atualizar lista
+        await loadContent();
+    } catch (err) {
+        sLog('[IA_PLANNER] Erro na geração: ' + err.message);
+        alert('Erro ao gerar IA: ' + err.message);
+    } finally {
+        if (btnAi) {
+            btnAi.disabled = false;
+            btnAi.innerHTML = originalText;
+        }
+    }
+}
+
+window.runAiPlanner = runAiPlanner;
 
 initEngine();
 async function setupRealtime() { 
