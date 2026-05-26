@@ -63,7 +63,7 @@ function setupEventListeners() {
     // Modal extras save
     const btnSave = document.getElementById('btn-save-extra');
     if (btnSave) {
-        btnSave.addEventListener('click', () => {
+        btnSave.addEventListener('click', async () => {
             const clientId = document.getElementById('extra-client-id').value;
             const catalogId = document.getElementById('extra-catalog-id').value;
             const status = document.getElementById('extra-status').value;
@@ -72,66 +72,296 @@ function setupEventListeners() {
             const impact = document.getElementById('extra-impact').value;
             const obs = document.getElementById('extra-obs').value;
 
-            // Encontrar nome do serviço
+            // Encontrar nome do serviço e categoria
             let serviceName = "Serviço Personalizado";
             let addLimit = 0;
+            let categoryName = "outros";
             if (catalogId === 'SRV_EXTRA_CUSTOM') {
                 serviceName = obs ? obs.substring(0, 40) : "Serviço Personalizado Extra";
             } else {
                 const srv = catalogServices.find(s => s.servico_id === catalogId);
                 if (srv) {
                     serviceName = srv.nome_servico;
+                    categoryName = srv.categoria || "outros";
                     if (srv.gera_credito_ia) {
                         addLimit = srv.quantidade_credito_ia;
                     }
                 }
             }
 
-            const configs = getClientConfigs();
-            if (!configs[clientId]) {
-                configs[clientId] = { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Outros', extras: [] };
-            }
-            if (!configs[clientId].extras) {
-                configs[clientId].extras = [];
+            const role = currentUser ? currentUser.role : 'CLIENT';
+            
+            // Regra: Apenas ADMIN/OPERATOR podem aprovar/alterar
+            if (status === 'aprovado' || status === 'em_producao' || status === 'entregue') {
+                if (role !== 'ADMIN' && role !== 'OPERATOR') {
+                    alert('Erro de Permissão: Apenas administradores ou operadores podem aprovar serviços extras.');
+                    OS_LOGS_ENGINE.security(
+                        'SECURITY_ACCESS_DENIED',
+                        { 
+                            action: 'tentativa_negada_aprovacao_extra', 
+                            client_id: clientId, 
+                            role: role,
+                            service: serviceName,
+                            timestamp: new Date().toISOString()
+                        },
+                        'critical'
+                    );
+                    return;
+                }
             }
 
-            // Adicionar ao extras
-            const extraLabel = `${serviceName} (${status.replace(/_/g, ' ').toUpperCase()})`;
-            configs[clientId].extras.push(extraLabel);
-
-            // Se aprovado, ou impacto sim, e gera limite IA, atualizar limite IA
-            let limitMsg = "";
-            if (addLimit > 0 && (status === 'aprovado' || status === 'em_producao' || status === 'entregue' || impact === 'sim')) {
-                const oldLimit = configs[clientId].iaLimit;
-                configs[clientId].iaLimit += addLimit;
-                limitMsg = ` Limite operacional IA incrementado em +${addLimit} (Total: ${configs[clientId].iaLimit}).`;
-                
-                // Log da IA
-                OS_LOGS_ENGINE.userAction(
-                    'SECURITY_PERMISSIONS_CHANGED',
-                    'clients-list',
-                    { action: 'liberacao_limite_ia_via_servico_extra', servico: serviceName, limite_anterior: oldLimit, limite_adicionado: addLimit, limite_novo: configs[clientId].iaLimit },
-                    'OPERATOR',
-                    clientId,
-                    !OS_CONFIG.flags.sendRealWebhooks
+            // Validar transição via STATUS_SYSTEM
+            const validation = StatusEngine.validateTransition('servicos_extras', null, status, role);
+            if (!validation.valid) {
+                alert(`Erro de Governança: Transição inválida para '${status.toUpperCase()}'.\nMotivo: ${validation.reason}`);
+                OS_LOGS_ENGINE.security(
+                    'SECURITY_ACCESS_DENIED',
+                    { 
+                        action: 'tentativa_negada_transicao_extra', 
+                        client_id: clientId, 
+                        role: role, 
+                        status_solicitado: status, 
+                        reason: validation.reason,
+                        timestamp: new Date().toISOString()
+                    },
+                    'critical'
                 );
+                return;
             }
 
-            saveClientConfigs(configs);
-            renderClientsTable();
+            const isApproval = status === 'aprovado';
+            let response = { success: true, simulated: true };
 
-            // Log de Governança/Financeiro do Serviço Extra
-            OS_LOGS_ENGINE.userAction(
-                'SERVICE_EXTRA_ADDED',
-                'clients-list',
-                { service: serviceName, status, valorEst, valorApr, impact, client: clientId },
-                'OPERATOR',
-                clientId,
-                !OS_CONFIG.flags.sendRealWebhooks
-            );
+            const originalBtnHTML = btnSave.innerHTML;
+            btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PROCESSANDO...';
+            btnSave.disabled = true;
 
-            alert(`Serviço Extra "${serviceName}" adicionado com sucesso para o cliente!${limitMsg}`);
-            document.getElementById('modal-extra').style.display = 'none';
+            try {
+                if (isApproval) {
+                    // Preparar payload para o webhook de aprovação real
+                    const payload = {
+                        id: "extra_app_" + Math.random().toString(36).substr(2, 9),
+                        client_id: clientId,
+                        cliente_id: clientId,
+                        cliente_nome: (document.querySelector(`#extra-client-id option[value="${clientId}"]`) || {}).text || clientId,
+                        service_id: catalogId,
+                        tipo_servico: catalogId,
+                        nome_servico: serviceName,
+                        categoria: categoryName,
+                        descricao: obs || serviceName,
+                        status: "aprovado",
+                        approved_by: currentUser ? (currentUser.email || currentUser.username || role) : role,
+                        approved_at: new Date().toISOString(),
+                        limite_operacional_adicionado: addLimit,
+                        origem_servico_extra: "painel_operacoes",
+                        observacao_operacional: obs,
+                        valor: Number(valorApr) || Number(valorEst) || 0,
+                        valor_base: Number(valorEst) || 0,
+                        valor_estimado: Number(valorEst) || 0,
+                        valor_aprovado: Number(valorApr) || 0,
+                        prazo: "N/A",
+                        timestamp: new Date().toISOString()
+                    };
+
+                    const isReal = OS_CONFIG.flags.sendRealWebhooks || 
+                                   (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes('SERVICE_EXTRA_APPROVAL'));
+
+                    // Acionar webhook via send (verifica se é real ou simulado)
+                    response = await OS_CONFIG.webhooks.send('SERVICE_EXTRA_APPROVAL', payload);
+
+                    // Rollback seguro em caso de falha no webhook real
+                    if (!response.success && isReal) {
+                        console.error('[SERVICE_EXTRA_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
+
+                        // Registrar logs exigidos de falha e rollback
+                        // 1. WEBHOOK_REAL_FAILED
+                        OS_LOGS_ENGINE.userAction(
+                            'WEBHOOK_REAL_FAILED',
+                            'clients-list',
+                            { webhook: 'SERVICE_EXTRA_APPROVAL', error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                            role,
+                            clientId,
+                            false
+                        );
+
+                        // 2. GOVERNANCE_ABORTED
+                        OS_LOGS_ENGINE.userAction(
+                            'GOVERNANCE_ABORTED',
+                            'clients-list',
+                            { action: 'aprovacao_servico_extra', reason: 'Falha no webhook real de integração', service: serviceName },
+                            role,
+                            clientId,
+                            false
+                        );
+
+                        // 3. SECURITY_WARNING
+                        OS_LOGS_ENGINE.security(
+                            'SECURITY_WARNING',
+                            { 
+                                action: 'aprovacao_extra_cancelada_erro_conexao', 
+                                client_id: clientId, 
+                                role: role, 
+                                service: serviceName,
+                                error: response.error,
+                                timestamp: new Date().toISOString()
+                            },
+                            'critical'
+                        );
+
+                        // 4. ROLLBACK_STARTED
+                        OS_LOGS_ENGINE.userAction(
+                            'ROLLBACK_STARTED',
+                            'clients-list',
+                            { 
+                                reason: 'Falha na resposta do webhook de aprovação',
+                                client_id: clientId, 
+                                service: serviceName, 
+                                preserved_limit: (getClientConfigs()[clientId] || {}).iaLimit || 10,
+                                preserved_status: (getClientConfigs()[clientId] || {}).status || 'ativo'
+                            },
+                            role,
+                            clientId,
+                            false
+                        );
+
+                        // 5. ROLLBACK_COMPLETED
+                        OS_LOGS_ENGINE.userAction(
+                            'ROLLBACK_COMPLETED',
+                            'clients-list',
+                            { 
+                                client_id: clientId, 
+                                service: serviceName, 
+                                restored_limit: (getClientConfigs()[clientId] || {}).iaLimit || 10,
+                                restored_status: (getClientConfigs()[clientId] || {}).status || 'ativo',
+                                local_db_status: 'CONSISTENT_UNMODIFIED'
+                            },
+                            role,
+                            clientId,
+                            false
+                        );
+
+                        alert(`Falha Crítica de Conexão com o Webhook:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado no banco de dados local.`);
+                        return;
+                    }
+                }
+
+                // Se chegamos aqui, o webhook teve sucesso (ou foi simulado/mock).
+                // Agora atualizamos os dados locais.
+                const configs = getClientConfigs();
+                if (!configs[clientId]) {
+                    configs[clientId] = { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Outros', extras: [] };
+                }
+                if (!configs[clientId].extras) {
+                    configs[clientId].extras = [];
+                }
+
+                // Adicionar ao extras
+                const extraLabel = `${serviceName} (${status.replace(/_/g, ' ').toUpperCase()})`;
+                configs[clientId].extras.push(extraLabel);
+
+                // Incremento do limite operacional contratado
+                let limitMsg = "";
+                const isRealWebhookSuccess = response.success && !response.simulated;
+                
+                if (addLimit > 0 && (status === 'aprovado' || status === 'em_producao' || status === 'entregue' || impact === 'sim')) {
+                    const oldLimit = configs[clientId].iaLimit;
+                    configs[clientId].iaLimit += addLimit;
+                    limitMsg = ` Limite operacional contratado incrementado em +${addLimit} (Total: ${configs[clientId].iaLimit}).`;
+                    
+                    // Gravar log de governança sobre a alteração de permissão/limites
+                    OS_LOGS_ENGINE.userAction(
+                        'SECURITY_PERMISSIONS_CHANGED',
+                        'clients-list',
+                        { action: 'liberacao_limite_ia_via_servico_extra', servico: serviceName, limite_anterior: oldLimit, limite_adicionado: addLimit, limite_novo: configs[clientId].iaLimit },
+                        role,
+                        clientId,
+                        !isRealWebhookSuccess
+                    );
+
+                    // LIMIT_UPDATE_CONFIRMED
+                    OS_LOGS_ENGINE.userAction(
+                        'LIMIT_UPDATE_CONFIRMED',
+                        'clients-list',
+                        { action: 'incremento_limite_operacional_contratado', limite_anterior: oldLimit, limite_adicionado: addLimit, limite_novo: configs[clientId].iaLimit },
+                        role,
+                        clientId,
+                        !isRealWebhookSuccess
+                    );
+                }
+
+                saveClientConfigs(configs);
+                renderClientsTable();
+
+                // Logs adicionais exigidos
+                if (isApproval) {
+                    // SERVICE_EXTRA_APPROVED
+                    OS_LOGS_ENGINE.userAction(
+                        'SERVICE_EXTRA_APPROVED',
+                        'clients-list',
+                        { service: serviceName, status, valorEst, valorApr, impact, client: clientId, approved_by: currentUser ? currentUser.email : role },
+                        role,
+                        clientId,
+                        !isRealWebhookSuccess
+                    );
+
+                    // STATUS_CHANGED
+                    OS_LOGS_ENGINE.userAction(
+                        'STATUS_CHANGED',
+                        'clients-list',
+                        { category: 'servicos_extras', item: serviceName, current_status: 'solicitado', target_status: 'aprovado' },
+                        role,
+                        clientId,
+                        !isRealWebhookSuccess
+                    );
+
+                    // GOVERNANCE_ACTION
+                    OS_LOGS_ENGINE.userAction(
+                        'GOVERNANCE_ACTION',
+                        'clients-list',
+                        { action: 'autorizacao_aprovada', approved_by: currentUser ? currentUser.email : role, role },
+                        role,
+                        clientId,
+                        !isRealWebhookSuccess
+                    );
+
+                    if (isRealWebhookSuccess) {
+                        // WEBHOOK_REAL_SUCCESS
+                        OS_LOGS_ENGINE.userAction(
+                            'WEBHOOK_REAL_SUCCESS',
+                            'clients-list',
+                            { webhook: 'SERVICE_EXTRA_APPROVAL', response_status: response.status || 200 },
+                            role,
+                            clientId,
+                            false
+                        );
+                    }
+                }
+
+                // Log geral de alteração
+                OS_LOGS_ENGINE.userAction(
+                    'SERVICE_EXTRA_ADDED',
+                    'clients-list',
+                    { service: serviceName, status, valorEst, valorApr, impact, client: clientId },
+                    role,
+                    clientId,
+                    !isRealWebhookSuccess
+                );
+
+                alert(`Serviço Extra "${serviceName}" adicionado com sucesso para o cliente!${limitMsg}`);
+                document.getElementById('modal-extra').style.display = 'none';
+
+            } catch (err) {
+                console.error('[SERVICE_EXTRA_APPROVAL] Erro imprevisto durante processamento.', err);
+                OS_LOGS_ENGINE.error(
+                    'SYSTEM_ERROR',
+                    `Erro no fluxo de aprovação de serviço extra: ${err.message}`,
+                    { client_id: clientId, service: serviceName }
+                );
+                alert(`Erro Crítico no Sistema:\n\n${err.message}\n\nAção abortada.`);
+            } finally {
+                btnSave.innerHTML = originalBtnHTML;
+                btnSave.disabled = false;
+            }
         });
     }
 }
@@ -391,7 +621,7 @@ window.mutateClientLimit = (clientId) => {
     }
 
     const currentLimit = configs[clientId].iaLimit;
-    const increment = prompt(`Informe a quantidade de limite operacional IA (número de pautas/gerações) a somar ao limite atual de ${currentLimit}:`, "5");
+    const increment = prompt(`Informe a quantidade de limite operacional contratado (número de pautas/gerações) a somar ao limite atual de ${currentLimit}:`, "5");
     
     if (increment === null) return;
     const add = parseInt(increment, 10);
@@ -415,7 +645,7 @@ window.mutateClientLimit = (clientId) => {
         clientId,
         !OS_CONFIG.flags.sendRealWebhooks
     );
-    alert(`Limite operacional de IA do cliente incrementado com sucesso! Novo Limite: ${newLimit}.`);
+    alert(`Limite operacional contratado do cliente incrementado com sucesso! Novo Limite: ${newLimit}.`);
 };
 
 initPage();

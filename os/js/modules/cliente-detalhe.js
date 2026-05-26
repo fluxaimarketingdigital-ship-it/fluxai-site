@@ -511,7 +511,7 @@ function setupEventListeners() {
             activeClientId,
             !OS_CONFIG.flags.sendRealWebhooks
         );
-        alert(`Limite de IA atualizado de ${oldLimit} para ${val} com sucesso!`);
+        alert(`Limite operacional contratado atualizado de ${oldLimit} para ${val} com sucesso!`);
         renderClientLogs();
     });
 
