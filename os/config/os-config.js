@@ -1,12 +1,547 @@
 /**
- * FLUXAI OS™ SYSTEM CONFIG
+ * ╔══════════════════════════════════════════════════════════════════════╗
+ * ║  FLUXAI OS™ — NÚCLEO CENTRAL DE CONFIGURAÇÃO                        ║
+ * ║  Versão: 2.1.0 | Arquivo: /os/config/os-config.js                   ║
+ * ║                                                                      ║
+ * ║  REGRA ABSOLUTA:                                                     ║
+ * ║  Este é o único arquivo onde URLs, roles, status, webhooks,          ║
+ * ║  endpoints e feature flags podem ser definidos.                      ║
+ * ║  Nenhum módulo, página ou serviço pode hardcodar esses valores.      ║
+ * ╚══════════════════════════════════════════════════════════════════════╝
  */
 
-export const OS_CONFIG = {
-    brand: "FLUXAI OS™",
-    version: "v1.1.0_MODULAR",
-    status: "ESTÁVEL",
-    environment: "PRODUCTION",
-    apiBase: "/api/v1",
-    theme: "dark"
+'use strict';
+
+// ═══════════════════════════════════════════════════════════
+// 1. AMBIENTE E IDENTIDADE DO SISTEMA
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Detecta automaticamente o ambiente baseado no hostname.
+ * Em produção, aponta para o domínio real.
+ * Em desenvolvimento, ativa os mocks locais.
+ */
+const _detectEnvironment = () => {
+    if (typeof window === 'undefined') return 'PRODUCTION';
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return 'DEVELOPMENT';
+    if (host.includes('staging') || host.includes('preview') || host.includes('vercel.app')) return 'STAGING';
+    return 'PRODUCTION';
+};
+
+export const ENVIRONMENT_CONFIG = {
+    current: _detectEnvironment(),
+    isDev:       _detectEnvironment() === 'DEVELOPMENT',
+    isStaging:   _detectEnvironment() === 'STAGING',
+    isProd:      _detectEnvironment() === 'PRODUCTION',
+    version:     '2.1.0',
+    buildDate:   '2026-05-25',
+};
+
+// ═══════════════════════════════════════════════════════════
+// 2. IDENTIDADE DO SISTEMA
+// ═══════════════════════════════════════════════════════════
+
+export const SYSTEM_IDENTITY = {
+    brand:         'FLUXAI OS™',
+    version:       '2.1.0',
+    codename:      'CONSOLIDATED',
+    status:        'ESTÁVEL',
+    operatingMode: 'INFRAESTRUTURA_ESTRATÉGICA',
+};
+
+// ═══════════════════════════════════════════════════════════
+// 3. FEATURE FLAGS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Controla funcionalidades por ambiente.
+ * Nunca hardcode "if (mock)" dentro de módulos —
+ * sempre consume FEATURE_FLAGS.mockData.
+ */
+export const FEATURE_FLAGS = {
+    // Fonte de dados
+    mockData:             ENVIRONMENT_CONFIG.isDev,   // true em dev, false em prod
+    useSupabaseAuth:      true,   // Supabase é o auth primário (fallback: mock users)
+    useSheetsAPI:         false,  // Google Sheets API direta (fase 2)
+    useMakeWebhooks:      true,   // Webhooks Make como canal de escrita
+    useGDriveLinks:       true,   // Drive como repositório de arquivos
+
+    // Módulos operacionais
+    enablePortalCliente:  true,
+    enableRelatorioMensal: true,
+    enableCreditoIA:      true,
+    enableCatalogo:       true,
+    enableOnboarding:     true,
+
+    // UI / UX
+    enableToasts:         true,
+    enableActivityLog:    true,
+    enableContextSwitcher: true,
+
+    // Tracking (apenas no site institucional e portal do cliente)
+    enableGA4:            ENVIRONMENT_CONFIG.isProd,
+    enableGTM:            ENVIRONMENT_CONFIG.isProd,
+    enableMetaPixel:      ENVIRONMENT_CONFIG.isProd,
+    enableClarityTracking: ENVIRONMENT_CONFIG.isProd,
+
+    // Debug
+    verboseLogging:       ENVIRONMENT_CONFIG.isDev,
+};
+
+// ═══════════════════════════════════════════════════════════
+// 4. WEBHOOKS — MAKE.COM
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * REGRA: Nenhum webhook pode estar hardcoded em módulo ou página.
+ * Toda chamada deve referenciar WEBHOOK_CONFIG.<chave>.
+ *
+ * ATENÇÃO: URLs de webhook não devem ser expostas em
+ * código-fonte público. Em produção, usar variáveis de
+ * ambiente via backend ou Supabase Edge Functions.
+ */
+export const WEBHOOK_CONFIG = {
+    // Captura de lead do site institucional
+    LEAD_CAPTURE: 'https://hook.us2.make.com/gmu9xakjqfocdd8nk4sn5lxcc7pmbte2',
+
+    // Onboarding de novo cliente
+    CLIENT_ONBOARDING: '',       // Preencher após criar cenário Make
+
+    // Serviço extra solicitado pelo cliente
+    SERVICE_EXTRA_REQUEST: '',   // Preencher após criar cenário Make
+
+    // Serviço extra criado internamente pelo operador
+    SERVICE_EXTRA_INTERNAL: '',  // Preencher após criar cenário Make
+
+    // Status de demanda atualizado
+    DEMAND_STATUS_UPDATE: '',    // Preencher após criar cenário Make
+
+    // Relatório mensal — mudar status
+    REPORT_STATUS_UPDATE: '',    // Preencher após criar cenário Make
+
+    // Sincronização de métricas (acionado pelo Make, não pelo OS)
+    METRICS_SYNC_INBOUND: '',    // Recebido, não enviado
+
+    // Sincronização de leads (acionado pelo Make)
+    LEADS_SYNC_INBOUND: '',      // Recebido, não enviado
+
+    /**
+     * Utilitário interno — não exportar como endpoint
+     * Verifica se o webhook está configurado antes de chamar
+     */
+    _isConfigured: (key) => {
+        const url = WEBHOOK_CONFIG[key];
+        return typeof url === 'string' && url.startsWith('https://');
+    },
+
+    /**
+     * POST genérico para o Make.
+     * Retorna { success, status, error }.
+     */
+    send: async (webhookKey, payload) => {
+        const url = WEBHOOK_CONFIG[webhookKey];
+        if (!WEBHOOK_CONFIG._isConfigured(webhookKey)) {
+            console.warn(`[WEBHOOK] ${webhookKey} não configurado. Payload ignorado.`, payload);
+            return { success: false, status: 0, error: 'WEBHOOK_NOT_CONFIGURED' };
+        }
+        try {
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json; charset=utf-8' },
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return { success: true, status: res.status };
+        } catch (err) {
+            console.error(`[WEBHOOK] Erro ao enviar para ${webhookKey}:`, err.message);
+            return { success: false, status: 0, error: err.message };
+        }
+    }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 5. SUPABASE
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Configuração do Supabase.
+ * Em produção, nunca expor a service_role key no frontend.
+ * Apenas a anon_key é segura para uso público.
+ */
+export const SUPABASE_CONFIG = {
+    url:     'https://iqdcgtyukwgcuowjguyq.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlxZGNndHl1a3dnY3Vvd2pndXlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDc1MDk3NjEsImV4cCI6MjA2MzA4NTc2MX0.mNIMOsJkjcnKQWtIdhrICEzPAfC08Q7UriZk72lX8eI',
+
+    // Tabelas do Supabase
+    tables: {
+        PROFILES:  'profiles',
+        LEADS:     'crm_leads',
+        PROJECTS:  'projects',
+    },
+};
+
+// ═══════════════════════════════════════════════════════════
+// 6. GOOGLE SHEETS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Mapeamento das abas do Google Sheets.
+ * O Make lê e escreve nessas abas.
+ * O FluxAI OS consome via mock (fase 1) ou via API (fase 2).
+ */
+export const SHEETS_CONFIG = {
+    // ID da planilha principal
+    spreadsheetId: '',  // Preencher com o ID da planilha Google
+
+    // Indicador de mock — controlado por FEATURE_FLAGS
+    get mockEnabled() { return FEATURE_FLAGS.mockData; },
+
+    // Mapeamento de abas (nome exato como aparece na planilha)
+    tabs: {
+        CLIENTES:          'CLIENTES_CONFIG',
+        SERVICOS:          'SERVICOS_CLIENTES',
+        ROTAS:             'ROTAS_AUTOMACOES',
+        DEMANDAS:          'DEMANDAS_CLIENTES',
+        LEADS_SITE:        'LEADS_SITE',
+        LEADS_CLIENTES:    'LEADS_CLIENTES',
+        GA4:               'GA4_DIARIO',
+        CLARITY:           'CLARITY_DIARIO',
+        SEARCH_CONSOLE:    'SEARCH_CONSOLE_DIARIO',
+        INSTAGRAM:         'INSTAGRAM_DIARIO',
+        META_ADS:          'META_ADS_DIARIO',
+        STATUS:            'STATUS_MONITOR_DIARIO',
+        ANALISE_MENSAL:    'ANALISE_MENSAL_CLIENTE',
+        ARQUIVOS:          'CLIENTES_ARQUIVOS',
+        ESTRATEGIA:        'CLIENTES_ESTRATEGIA',
+        CONTRATOS:         'CONTRATOS_CLIENTES',
+        SERVICOS_EXTRAS:   'SERVICOS_EXTRAS_CLIENTES',
+        DNA_GPT:           'DNA_CLIENTE_GPT',
+        PLANEJAMENTO:      'PLANEJAMENTO_CONTEUDO',
+        CALENDARIO:        'CALENDARIO_POSTAGENS',
+        GPT_LOG:           'GPT_GERACOES_LOG',
+        IA_CREDITOS:       'IA_CREDITOS_CLIENTE',
+        IA_CONTROLE:       'IA_GERACOES_CONTROLE',
+        CATALOGO:          'CATALOGO_SERVICOS_FLUXAI',
+    }
+};
+
+// ═══════════════════════════════════════════════════════════
+// 7. GOOGLE DRIVE
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * IDs das pastas raiz do Drive.
+ * Os subdiretórios de cada cliente são criados dentro dessas pastas.
+ * O FluxAI OS apenas armazena e linka — nunca faz upload direto.
+ */
+export const DRIVE_CONFIG = {
+    rootFolderId:     '',    // Pasta raiz de todos os clientes
+    templateFolderId: '',    // Modelos de pasta para novos clientes
+
+    // Estrutura padrão de subpastas por cliente
+    defaultFolderStructure: [
+        'identidade_visual',
+        'entregas',
+        'referencias',
+        'contratos',
+        'documentos_estrategicos',
+        'relatorios',
+    ],
+
+    // Base URL para visualização de pastas no Drive
+    viewUrl: (folderId) => `https://drive.google.com/drive/folders/${folderId}`,
+};
+
+// ═══════════════════════════════════════════════════════════
+// 8. ROLES — CONTROLE DE ACESSO
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Definição oficial dos papéis do sistema.
+ * Todo módulo deve importar ROLE_CONFIG para verificar roles.
+ * Nunca usar strings literais 'ADMIN', 'OPERATOR', etc.
+ */
+export const ROLE_CONFIG = {
+    ADMIN:    'ADMIN',
+    OPERATOR: 'OPERATOR',
+    CLIENT:   'CLIENT',
+
+    // Hierarquia de acesso (maior índice = maior poder)
+    hierarchy: {
+        CLIENT:   1,
+        OPERATOR: 2,
+        ADMIN:    3,
+    },
+
+    /**
+     * Verifica se o role tem acesso ao nível mínimo exigido.
+     * Ex: hasAccess('OPERATOR', 'CLIENT') → true
+     */
+    hasAccess: (userRole, requiredRole) => {
+        const h = ROLE_CONFIG.hierarchy;
+        return (h[userRole] || 0) >= (h[requiredRole] || 99);
+    },
+
+    // Permissões por módulo para cada role
+    permissions: {
+        ADMIN: ['*'],  // Acesso total
+
+        OPERATOR: [
+            'command-center',
+            'onboarding-cliente',
+            'clientes',
+            'demandas',
+            'leads',
+            'metricas',
+            'relatorio-mensal',
+            'onboarding',
+            'content-engine',
+            'crm-intelligence',
+            'automation-hub',
+            'analytics',
+            'client-portal',
+        ],
+
+        CLIENT: [
+            'client-portal',
+        ],
+    },
+
+    // Contextos de visualização
+    contexts: {
+        MASTER: 'MASTER',  // Visão global (todos os clientes)
+        LABS:   'LABS',    // Workspace interno FluxAI
+        CLIENT: 'CLIENT',  // Visão de um cliente específico
+    },
+
+    // Quais roles podem acessar qual contexto
+    contextAccess: {
+        MASTER: ['ADMIN', 'OPERATOR'],
+        LABS:   ['ADMIN', 'OPERATOR'],
+        CLIENT: ['ADMIN', 'OPERATOR', 'CLIENT'],
+    },
+};
+
+// ═══════════════════════════════════════════════════════════
+// 9. STATUS — SISTEMA OFICIAL DE STATUS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Todos os status do sistema em um único lugar.
+ * Nunca escrever strings de status manualmente nos módulos.
+ * Usar STATUS_CONFIG.<categoria>.<chave>.
+ */
+export const STATUS_CONFIG = {
+
+    // Status de clientes
+    CLIENTE: {
+        ONBOARDING:      { key: 'onboarding',      label: 'Em Onboarding',    badge: 'warning' },
+        ATIVO:           { key: 'ativo',            label: 'Ativo',            badge: 'success' },
+        PAUSADO:         { key: 'pausado',          label: 'Pausado',          badge: 'neutral' },
+        INATIVO:         { key: 'inativo',          label: 'Inativo',          badge: 'danger'  },
+    },
+
+    // Status de leads
+    LEAD: {
+        NOVO:            { key: 'novo',             label: 'Novo',             badge: 'success' },
+        CONTATADO:       { key: 'contatado',        label: 'Contatado',        badge: 'info'    },
+        EM_NEGOCIACAO:   { key: 'em_negociacao',    label: 'Em Negociação',    badge: 'warning' },
+        PROPOSTA_ENVIADA:{ key: 'proposta_enviada', label: 'Proposta Enviada', badge: 'info'    },
+        CONVERTIDO:      { key: 'convertido',       label: 'Convertido',       badge: 'success' },
+        PERDIDO:         { key: 'perdido',          label: 'Perdido',          badge: 'danger'  },
+    },
+
+    // Status de demandas
+    DEMANDA: {
+        ABERTA:          { key: 'aberta',           label: 'Aberta',           badge: 'info'    },
+        EM_ANDAMENTO:    { key: 'em_andamento',     label: 'Em Andamento',     badge: 'warning' },
+        AGUARDANDO:      { key: 'aguardando',       label: 'Aguardando',       badge: 'neutral' },
+        ENTREGUE:        { key: 'entregue',         label: 'Entregue',         badge: 'success' },
+        CANCELADA:       { key: 'cancelada',        label: 'Cancelada',        badge: 'danger'  },
+    },
+
+    // Status de serviços extras
+    SERVICO_EXTRA: {
+        SOLICITADO:       { key: 'solicitado',       label: 'Solicitado',       badge: 'info'    },
+        EM_ORCAMENTO:     { key: 'em_orcamento',     label: 'Em Orçamento',     badge: 'neutral' },
+        ORCAMENTO_ENVIADO:{ key: 'orcamento_enviado',label: 'Orçamento Enviado',badge: 'warning' },
+        APROVADO:         { key: 'aprovado',         label: 'Aprovado',         badge: 'primary' },
+        EM_PRODUCAO:      { key: 'em_producao',      label: 'Em Produção',      badge: 'info'    },
+        ENTREGUE:         { key: 'entregue',         label: 'Entregue',         badge: 'success' },
+        CANCELADO:        { key: 'cancelado',        label: 'Cancelado',        badge: 'danger'  },
+        RECUSADO:         { key: 'recusado',         label: 'Recusado',         badge: 'danger'  },
+    },
+
+    // Status de relatório mensal
+    RELATORIO: {
+        RASCUNHO:              { key: 'rascunho',              label: 'Rascunho',              badge: 'neutral' },
+        EM_REVISAO:            { key: 'em_revisao',            label: 'Em Revisão',            badge: 'info'    },
+        APROVADO_INTERNAMENTE: { key: 'aprovado_internamente', label: 'Aprovado Internamente', badge: 'warning' },
+        ENVIADO_AO_CLIENTE:    { key: 'enviado_ao_cliente',    label: 'Enviado ao Cliente',    badge: 'success' },
+    },
+
+    // Status de geração de IA
+    GERACAO_IA: {
+        RASCUNHO:         { key: 'rascunho',         label: 'Rascunho',         badge: 'neutral' },
+        EM_REVISAO:       { key: 'em_revisao',       label: 'Em Revisão',       badge: 'info'    },
+        APROVADO:         { key: 'aprovado',         label: 'Aprovado',         badge: 'warning' }, // consome crédito
+        PUBLICADO:        { key: 'publicado',        label: 'Publicado',        badge: 'success' }, // crédito definitivo
+        DESCARTADO:       { key: 'descartado',       label: 'Descartado',       badge: 'neutral' }, // sem custo (pré-aprovação)
+    },
+
+    // Status de token/integração
+    TOKEN: {
+        ATIVO:                 { key: 'ativo',                 label: 'Ativo',                 badge: 'success' },
+        AUSENTE:               { key: 'ausente',               label: 'Não Configurado',       badge: 'neutral' },
+        AGUARDANDO_AUTORIZACAO:{ key: 'aguardando_autorizacao',label: 'Aguardando Autorização',badge: 'warning' },
+        EXPIRADO:              { key: 'expirado',              label: 'Expirado',              badge: 'danger'  },
+    },
+
+    // Resolver label a partir de key
+    resolve: (category, key) => {
+        const cat = STATUS_CONFIG[category];
+        if (!cat) return { label: key, badge: 'neutral' };
+        const found = Object.values(cat).find(s => s.key === key);
+        return found || { label: key, badge: 'neutral' };
+    },
+};
+
+// ═══════════════════════════════════════════════════════════
+// 10. LABELS DA INTERFACE
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Textos oficiais da interface.
+ * Evita inconsistências de linguagem entre páginas.
+ */
+export const UI_LABELS = {
+    // Estados genéricos
+    LOADING:           'Carregando...',
+    SYNCING:           'Sincronizando...',
+    EMPTY:             'Nenhum registro encontrado.',
+    ERROR_GENERIC:     'Ocorreu um erro. Tente novamente.',
+    ERROR_NETWORK:     'Falha de conexão. Verifique sua internet.',
+    SUCCESS_SAVED:     'Salvo com sucesso.',
+    SUCCESS_SENT:      'Enviado com sucesso.',
+    CONFIRM_LOGOUT:    'Deseja encerrar a sessão operacional?',
+    CONFIRM_DELETE:    'Esta ação não pode ser desfeita. Confirmar?',
+
+    // Onboarding
+    ONBOARDING_SAVED:  'Dados salvos localmente.',
+    ONBOARDING_SENT:   'Cliente ativado e enviado ao Make.',
+    ONBOARDING_ERROR:  'Erro ao ativar cliente. Tente novamente.',
+
+    // Relatórios
+    REPORT_DRAFT:      'Rascunho salvo.',
+    REPORT_REVIEWED:   'Relatório marcado como revisado.',
+    REPORT_APPROVED:   'Relatório aprovado internamente.',
+    REPORT_SENT:       'Relatório enviado ao cliente.',
+
+    // Serviços extras
+    EXTRA_SAVED:       'Serviço extra registrado.',
+    EXTRA_BUDGET_SENT: 'Orçamento enviado ao cliente.',
+
+    // Portal do cliente
+    PORTAL_REQUEST_SENT: 'Solicitação enviada. Aguarde retorno da equipe.',
+
+    // Auth
+    AUTH_ERROR:           'Credenciais inválidas.',
+    AUTH_OFFLINE:         'Sistema em modo offline. Autenticação local ativa.',
+    AUTH_FIRST_ACCESS:    'Defina sua chave de acesso pessoal.',
+    AUTH_PASSWORD_SAVED:  'Chave de acesso definida. Bem-vindo ao FluxAI OS™.',
+
+    // Tradução de termos técnicos (para o portal do cliente)
+    GLOSSARY: {
+        'lead':           'Contato Comercial',
+        'pipeline':       'Esteira Comercial',
+        'roas':           'Retorno sobre Investimento em Mídia',
+        'cpl':            'Custo por Contato Gerado',
+        'reach':          'Alcance de Publicações',
+        'ctr':            'Taxa de Cliques',
+        'score':          'Pontuação Estratégica',
+        'onboarding':     'Configuração Inicial',
+        'crm':            'Gestão de Relacionamento Comercial',
+        'insight':        'Leitura Estratégica',
+    },
+};
+
+// ═══════════════════════════════════════════════════════════
+// 11. TRACKING E ANALYTICS
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * IDs de tracking. Apenas para uso no site institucional
+ * e portal do cliente — NUNCA no OS interno.
+ */
+export const TRACKING_CONFIG = {
+    ga4Id:       '',    // ex: G-XXXXXXXXXX
+    gtmId:       '',    // ex: GTM-XXXXXXX
+    metaPixelId: '',    // ex: 1234567890
+    clarityId:   '',    // ex: xxxxxxxxxx
+
+    // Eventos padrão de conversão
+    events: {
+        LEAD_CAPTURED:     'lead_captured',
+        BUDGET_REQUESTED:  'budget_requested',
+        CLIENT_ACTIVATED:  'client_activated',
+        REPORT_SENT:       'report_sent',
+    },
+
+    // Dispara evento (wrapper seguro)
+    track: (event, data = {}) => {
+        if (!FEATURE_FLAGS.enableGA4) return;
+        try {
+            if (typeof gtag !== 'undefined') gtag('event', event, data);
+        } catch (e) {
+            // silencioso — tracking nunca deve quebrar a operação
+        }
+    },
+};
+
+// ═══════════════════════════════════════════════════════════
+// 12. CONFIGURAÇÃO DA IA / GPT
+// ═══════════════════════════════════════════════════════════
+
+/**
+ * Parâmetros da Camada de Inteligência GPT.
+ * O cliente nunca acessa essas configs diretamente.
+ */
+export const GPT_CONFIG = {
+    // Regras de crédito
+    credits: {
+        RASCUNHO_SEM_CUSTO:        0,     // Gerado mas não aprovado
+        APROVADO_INTERNAMENTE:     1,     // Aprovação interna = 1 crédito consumido
+        PUBLICADO:                 1,     // Publicado = crédito definitivo (não adicional)
+        ESTORNO_REQUER_CONFIRMACAO: true, // Estorno de crédito aprovado precisa de confirmação
+    },
+
+    // Quem pode executar ações de IA
+    governance: {
+        pode_gerar:    [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
+        pode_aprovar:  [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
+        pode_excluir:  [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
+        pode_publicar: [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
+        pode_ver_prompts: [ROLE_CONFIG.ADMIN, ROLE_CONFIG.OPERATOR],
+        // CLIENT: pode apenas ver entregas disponibilizadas e aprovar/reprovar
+    },
+};
+
+// ═══════════════════════════════════════════════════════════
+// EXPORT DEFAULT — Objeto consolidado para importação simples
+// ═══════════════════════════════════════════════════════════
+
+export default {
+    env:        ENVIRONMENT_CONFIG,
+    system:     SYSTEM_IDENTITY,
+    flags:      FEATURE_FLAGS,
+    webhooks:   WEBHOOK_CONFIG,
+    supabase:   SUPABASE_CONFIG,
+    sheets:     SHEETS_CONFIG,
+    drive:      DRIVE_CONFIG,
+    roles:      ROLE_CONFIG,
+    status:     STATUS_CONFIG,
+    labels:     UI_LABELS,
+    tracking:   TRACKING_CONFIG,
+    gpt:        GPT_CONFIG,
 };
