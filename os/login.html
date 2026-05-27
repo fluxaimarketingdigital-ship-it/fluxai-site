@@ -267,7 +267,7 @@
             } 
  
             // Criar e persistir contexto mínimo de sessão não sensível para controle de UI e RBAC
-            const safeSession = {
+            const uiContext = {
                 id: userId,
                 full_name: userFullName,
                 role: String(userRole || 'CLIENT'),
@@ -276,9 +276,9 @@
                 session_started_at: new Date().toISOString()
             };
             if (userProjectId) {
-                safeSession.project_id = userProjectId;
+                uiContext.project_id = userProjectId;
             }
-            localStorage.setItem('fluxai_session', JSON.stringify(safeSession));
+            sessionStorage.setItem('fluxai_ui_context', JSON.stringify(uiContext));
 
             // Sincronizar projeto ativo via query params
             if (userRole === 'CLIENT') {  

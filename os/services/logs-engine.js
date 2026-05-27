@@ -108,7 +108,7 @@ const _detectEnv = () => {
 
 const _getCurrentSession = () => {
     try {
-        const raw = localStorage.getItem('fluxai_session');
+        const raw = sessionStorage.getItem('fluxai_ui_context');
         if (raw) return JSON.parse(raw);
     } catch (e) {}
     return null;

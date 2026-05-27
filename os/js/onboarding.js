@@ -389,7 +389,7 @@ async function handleOnboarding(e) {
 
     // 3. Executar o webhook e provisionamento real
     try {
-        const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+        const session = JSON.parse(sessionStorage.getItem('fluxai_ui_context') || '{}');
         
         // Obter status inicial a partir do STATUS_SYSTEM
         const statusConfig = StatusEngine.resolve('clientes', 'onboarding');

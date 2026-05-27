@@ -92,7 +92,7 @@ const OVERLAY_SCRIPT = `
 async function injectSession(page, role) {
     const session = MOCK_SESSIONS[role];
     await page.evaluateOnNewDocument((s) => {
-        localStorage.setItem('fluxai_session', JSON.stringify(s));
+        sessionStorage.setItem('fluxai_ui_context', JSON.stringify(s));
         localStorage.setItem('fluxai_current_project_id', s.project_id || 'proj_fluxai_labs_master');
         localStorage.setItem('fluxai_mock_projects', JSON.stringify([{ id: 'proj_fluxai_labs_master', company_name: 'FluxAI Labs', name: 'FluxAI Labs', status: 'ativo', plan: 'Agência Pro', segment: 'Agência Digital' }]));
     }, session);

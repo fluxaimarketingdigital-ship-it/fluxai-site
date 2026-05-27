@@ -105,8 +105,8 @@ export const OSState = {
         }
         // ADMIN sempre inicia em MASTER — nunca mantém contexto LABS gravado
         try {
-            const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
-            if (session.role === 'ADMIN') {
+            const uiContext = JSON.parse(sessionStorage.getItem('fluxai_ui_context') || '{}');
+            if (uiContext.role === 'ADMIN') {
                 _state.activeContext = 'MASTER';
                 localStorage.setItem('fluxai_state_activeContext', JSON.stringify('MASTER'));
             }

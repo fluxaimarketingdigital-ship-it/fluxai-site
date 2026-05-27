@@ -46,8 +46,8 @@ export const OS_UI = {
      * Renderiza a Sidebar filtrada por RBAC e Contexto (Master / Labs / Cliente)
      */
     renderSidebar: (activeModule, userRole = 'CLIENT') => {
-        const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
-        const sessionRole = session.role || userRole;
+        const uiContext = JSON.parse(sessionStorage.getItem('fluxai_ui_context') || '{}');
+        const sessionRole = uiContext.role || userRole;
 
         // ADMIN sempre inicia no contexto MASTER
         if (sessionRole === 'ADMIN' && !OSState.get('activeContext')) {
@@ -113,13 +113,13 @@ export const OS_UI = {
             if (!item.roles.includes(userRole)) return;
             if (item.contexts && !item.contexts.includes(context)) return;
             
-            if (sessionRole !== 'ADMIN') {
-                if (item.permission) {
-                    if (session.permissions && !session.permissions.includes(item.permission)) return;
-                } else if (session.permissions && session.permissions.length > 0) {
-                    if (!session.permissions.includes(item.id)) return;
-                }
-            }
+            if (sessionRole !== 'ADMIN') { 
+                if (item.permission) { 
+                    if (uiContext.permissions && !uiContext.permissions.includes(item.permission)) return; 
+                } else if (uiContext.permissions && uiContext.permissions.length > 0) { 
+                    if (!uiContext.permissions.includes(item.id)) return; 
+                } 
+            } 
             
             if (item.group !== currentGroup) {
                 currentGroup = item.group;
@@ -318,15 +318,15 @@ export const OS_AUTH = {
      * @param {string} requiredRole - Cargo mínimo exigido para a página
      */
     check: async (requiredRole = null) => {
-        // 1. Tentar carregar sessão local do localStorage
-        const localSession = localStorage.getItem('fluxai_session');
+        // 1. Tentar carregar sessão local do sessionStorage
+        const localSession = sessionStorage.getItem('fluxai_ui_context');
         if (localSession) {
             try {
                 const sessionData = JSON.parse(localSession);
                 const user = {
                     id: sessionData.id || 'mock-id',
                     role: sessionData.role || 'CLIENT',
-                    full_name: sessionData.name || 'Usuário Local',
+                    full_name: sessionData.full_name || 'Usuário Local',
                     email: sessionData.email || 'local@fluxai.com',
                     project_id: sessionData.project_id || null,
                     permissions: sessionData.permissions || []
@@ -352,7 +352,7 @@ export const OS_AUTH = {
                 }
                 return user; 
             } catch (err) {
-                console.error('[AUTH] Erro ao ler fluxai_session', err);
+                console.error('[AUTH] Erro ao ler fluxai_ui_context', err);
             }
         }
 
@@ -445,7 +445,7 @@ export const OS_AUTH = {
             );
         }
 
-        localStorage.removeItem('fluxai_session');
+        sessionStorage.removeItem('fluxai_ui_context');
         localStorage.removeItem('fluxai_current_project_id');
         const supabase = getSupabase();
         if (supabase) {
@@ -491,7 +491,7 @@ window.triggerWhatsAppContact = (phone, message) => {
             'CONTACT_INTENTION_LOGGED',
             'whatsapp-ponte',
             { phone: cleanPhone, message_length: message.length },
-            localStorage.getItem('fluxai_session') ? JSON.parse(localStorage.getItem('fluxai_session')).role : 'OPERATOR',
+            sessionStorage.getItem('fluxai_ui_context') ? JSON.parse(sessionStorage.getItem('fluxai_ui_context')).role : 'OPERATOR',
             localStorage.getItem('fluxai_current_project_id') || null,
             false // simulated = false (log real de governança)
         );

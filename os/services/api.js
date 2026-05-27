@@ -11,11 +11,11 @@ export const ApiService = {
      */
     request: async (endpoint, options = {}) => {
         const url = `${BASE_URL}${endpoint}`;
-        const session = JSON.parse(localStorage.getItem('fluxai_session') || '{}');
+        const uiContext = JSON.parse(sessionStorage.getItem('fluxai_ui_context') || '{}');
         
         const defaultHeaders = {
             'Content-Type': 'application/json',
-            'Authorization': session.token ? `Bearer ${session.token}` : ''
+            'Authorization': uiContext.token ? `Bearer ${uiContext.token}` : ''
         };
 
         try {
