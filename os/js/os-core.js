@@ -46,8 +46,8 @@ export const OS_UI = {
      * Renderiza a Sidebar filtrada por RBAC e Contexto (Master / Labs / Cliente)
      */
     renderSidebar: (activeModule, userRole = 'CLIENT') => {
-        const uiContext = JSON.parse(sessionStorage.getItem('fluxai_ui_context') || '{}');
-        const sessionRole = uiContext.role || userRole;
+        const runtimeCtx = window.FLUXAI_RUNTIME_CONTEXT || {};
+        const sessionRole = runtimeCtx.role || userRole;
 
         // ADMIN sempre inicia no contexto MASTER
         if (sessionRole === 'ADMIN' && !OSState.get('activeContext')) {
@@ -115,9 +115,9 @@ export const OS_UI = {
             
             if (sessionRole !== 'ADMIN') { 
                 if (item.permission) { 
-                    if (uiContext.permissions && !uiContext.permissions.includes(item.permission)) return; 
-                } else if (uiContext.permissions && uiContext.permissions.length > 0) { 
-                    if (!uiContext.permissions.includes(item.id)) return; 
+                    if (runtimeCtx.permissions && !runtimeCtx.permissions.includes(item.permission)) return; 
+                } else if (runtimeCtx.permissions && runtimeCtx.permissions.length > 0) { 
+                    if (!runtimeCtx.permissions.includes(item.id)) return; 
                 } 
             } 
             
@@ -334,25 +334,8 @@ export const OS_AUTH = {
      * @param {string} requiredPermission - Permissão específica exigida
      */
     check: async (requiredRole = null, requiredPermission = null) => {
-        // 1. Tentar carregar contexto em memória (runtime)
-        let ctx = window.FLUXAI_RUNTIME_CONTEXT || null;
-        
-        // 1.1 Se não houver contexto na memória, tentar reconstruir a partir da flag segura de mock
-        if (!ctx) {
-            const mockRole = sessionStorage.getItem('fluxai_mock_role');
-            if (mockRole) {
-                const safeMockRole = OS_AUTH.normalizeRole(mockRole);
-                ctx = {
-                    id: 'mock-user',
-                    role: safeMockRole,
-                    full_name: 'Usuário Local',
-                    email: 'local@fluxai.com',
-                    project_id: sessionStorage.getItem('fluxai_mock_project') || null,
-                    permissions: OS_AUTH.getPermissionsForRole(safeMockRole)
-                };
-                window.FLUXAI_RUNTIME_CONTEXT = ctx;
-            }
-        }
+        // 1. Tentar carregar contexto em memória RAM (runtime). Sem fallback em storage.
+        const ctx = window.FLUXAI_RUNTIME_CONTEXT || null;
 
         if (ctx) {
             const user = {
@@ -502,7 +485,7 @@ export const OS_AUTH = {
             );
         }
 
-        sessionStorage.removeItem('fluxai_ui_context');
+        window.FLUXAI_RUNTIME_CONTEXT = null;
         localStorage.removeItem('fluxai_current_project_id');
         const supabase = getSupabase();
         if (supabase) {
@@ -548,8 +531,8 @@ window.triggerWhatsAppContact = (phone, message) => {
             'CONTACT_INTENTION_LOGGED',
             'whatsapp-ponte',
             { phone: cleanPhone, message_length: message.length },
-            sessionStorage.getItem('fluxai_ui_context') ? JSON.parse(sessionStorage.getItem('fluxai_ui_context')).role : 'OPERATOR',
-            localStorage.getItem('fluxai_current_project_id') || null,
+            (window.FLUXAI_RUNTIME_CONTEXT || {}).role || 'OPERATOR',
+            OSState.get('activeProjectId') || null,
             false // simulated = false (log real de governança)
         );
     }

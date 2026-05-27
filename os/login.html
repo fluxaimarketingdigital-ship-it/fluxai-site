@@ -278,21 +278,8 @@
             if (userProjectId) {
                 uiContext.project_id = userProjectId;
             }
-            // Não utilizar storage persistente para contexto derivado do auth (Exigência CodeQL)
+            // Contexto armazenado apenas em memória RAM (sem localStorage/sessionStorage — Exigência CodeQL)
             window.FLUXAI_RUNTIME_CONTEXT = uiContext;
-
-            // Para mock login local, usar flag não sensível normalizada para permitir reconstrução do runtime
-            const roleStr = String(userRole || 'CLIENT').toUpperCase();
-            let safeMock = 'CLIENT';
-            if (roleStr === 'ADMIN') safeMock = 'ADMIN';
-            else if (roleStr === 'OPERATOR') safeMock = 'OPERATOR';
-            
-            sessionStorage.setItem('fluxai_mock_role', safeMock);
-            if (userProjectId) {
-                sessionStorage.setItem('fluxai_mock_project', String(userProjectId));
-            } else {
-                sessionStorage.removeItem('fluxai_mock_project');
-            }
 
             if (userRole === 'CLIENT') {  
                 window.location.href = `client-portal.html${userProjectId ? '?project_id=' + userProjectId : ''}`;  
