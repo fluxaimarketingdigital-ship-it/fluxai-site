@@ -242,13 +242,13 @@ export const OS_UI = {
         const financeBadge = finAlerts > 0 ? `<span style="background:var(--os-danger);color:#fff;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:4px;">${finAlerts} ALERTA${finAlerts>1?'S':''}</span>` : ''; 
  
         const html = ` 
-            <div class="os-topbar-left" style="display:flex;align-items:center;gap:15px;min-width:0;"> 
-                <button class="os-menu-toggle" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button> 
-                <div class="os-status-indicator" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"> 
-                    <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}${activeClientHtml} 
+            <div class="os-topbar-left" style="display:flex;align-items:center;gap:15px;min-width:0;">  
+                <button class="os-menu-toggle" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>  
+                <div class="os-status-indicator" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">  
+                    <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.statusStr}${activeClientHtml} 
                 </div> 
-                ${contextSwitcher}${approvalBadge}${financeBadge} 
-            </div> 
+                ${contextSwitcher}${approvalBadge}${financeBadge}  
+            </div>  
             <div class="os-topbar-right"> 
                 <div class="os-user-profile" id="user-profile-menu" style="cursor:pointer;"> 
                     <div class="os-avatar" id="safe-avatar"></div> 
@@ -332,15 +332,25 @@ export const OS_AUTH = {
                     permissions: sessionData.permissions || []
                 };
 
-                // Validação de RBAC
-                if (requiredRole && user.role !== 'ADMIN') {
-                    if (user.role !== requiredRole) {
-                        console.error('[AUTH] Acesso Negado. Nível insuficiente.');
-                        window.location.href = 'access-denied.html';
+                // Validação de RBAC 
+                if (requiredRole && user.role !== 'ADMIN') { 
+                    if (user.role !== requiredRole) { 
+                        console.error('[AUTH] Acesso Negado. Nível insuficiente.'); 
+                        window.location.href = 'access-denied.html'; 
+                        return null; 
+                    } 
+                } 
+
+                // Bloqueio Global de URL Direta para CLIENT
+                if (user.role === 'CLIENT') {
+                    const currentPath = window.location.pathname.toLowerCase();
+                    if (!currentPath.includes('client-portal') && !currentPath.includes('access-denied') && !currentPath.includes('login') && currentPath.includes('/os/')) {
+                        console.warn('[AUTH] URL interna bloqueada para CLIENT.');
+                        window.location.href = 'client-portal.html' + (user.project_id ? '?project_id=' + user.project_id : '');
                         return null;
                     }
                 }
-                return user;
+                return user; 
             } catch (err) {
                 console.error('[AUTH] Erro ao ler fluxai_session', err);
             }
@@ -384,23 +394,40 @@ export const OS_AUTH = {
 
         const user = { ...session.user, ...profile };
 
-        // Validação de RBAC
-        if (requiredRole && user.role !== 'ADMIN') {
-            if (user.role !== requiredRole) {
-                console.error('[AUTH] Acesso Negado. Nível insuficiente.');
-                if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { 
-                        user_id: user.id || user.email, 
-                        user_role: user.role, 
-                        required_role: requiredRole 
-                    }, 'critical');
+        // Validação de RBAC 
+        if (requiredRole && user.role !== 'ADMIN') { 
+            if (user.role !== requiredRole) { 
+                console.error('[AUTH] Acesso Negado. Nível insuficiente.'); 
+                if (typeof OS_LOGS_ENGINE !== 'undefined') { 
+                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', {  
+                        user_id: user.id || user.email,  
+                        user_role: user.role,  
+                        required_role: requiredRole  
+                    }, 'critical'); 
+                } 
+                window.location.href = 'access-denied.html'; 
+                return null; 
+            } 
+        } 
+
+        // Bloqueio Global de URL Direta para CLIENT
+        if (user.role === 'CLIENT') {
+            const currentPath = window.location.pathname.toLowerCase();
+            if (!currentPath.includes('client-portal') && !currentPath.includes('access-denied') && !currentPath.includes('login') && currentPath.includes('/os/')) {
+                console.warn('[AUTH] URL interna bloqueada para CLIENT.');
+                if (typeof OS_LOGS_ENGINE !== 'undefined') { 
+                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', {  
+                        user_id: user.id || user.email,  
+                        reason: 'Tentativa de URL direta restrita por CLIENT',
+                        path: currentPath
+                    }, 'critical'); 
                 }
-                window.location.href = 'access-denied.html';
+                window.location.href = 'client-portal.html' + (user.project_id ? '?project_id=' + user.project_id : '');
                 return null;
             }
         }
-
-        return user;
+ 
+        return user; 
     },
 
     /**

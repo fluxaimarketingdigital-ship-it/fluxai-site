@@ -368,6 +368,180 @@ function renderPayments(payments) {
     });
 }
 
+function renderContracts(contracts) {
+    const body = document.getElementById('contracts-body');
+    if (!body) return;
+    body.replaceChildren();
+    contracts.forEach(c => {
+        const startDate = new Date(c.created_at).toLocaleDateString('pt-BR');
+        const renewalDate = new Date(new Date(c.created_at).setMonth(new Date(c.created_at).getMonth() + 6)).toLocaleDateString('pt-BR');
+        const val = c.contract_value;
+        const deliverables = c.deliverables || 'N/A';
+
+        const tr = document.createElement('tr');
+
+        const td1 = document.createElement('td');
+        const divCompany = document.createElement('div');
+        divCompany.style.fontWeight = '700';
+        divCompany.textContent = c.company_name;
+        const divClient = document.createElement('div');
+        divClient.style.cssText = 'font-size: 0.7rem; color: var(--os-text-muted);';
+        divClient.textContent = c.client_name;
+        td1.appendChild(divCompany);
+        td1.appendChild(divClient);
+        tr.appendChild(td1);
+
+        const td2 = document.createElement('td');
+        td2.style.cssText = 'font-size: 0.7rem; font-weight: 700; color: var(--os-primary);';
+        td2.textContent = 'ENGENHARIA DE CONTEÚDO';
+        tr.appendChild(td2);
+
+        const td3 = document.createElement('td');
+        td3.style.cssText = 'font-size: 0.75rem;';
+        if (deliverables.includes('[EXTRA]')) {
+            const parts = deliverables.split('[EXTRA]:');
+            const baseDeliverables = parts[0].trim();
+            const extraDetails = parts.slice(1).join('[EXTRA]:').trim();
+            const divBase = document.createElement('div');
+            divBase.style.fontWeight = '500';
+            divBase.textContent = baseDeliverables;
+            const divExtra = document.createElement('div');
+            divExtra.style.cssText = 'margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; background: rgba(142, 158, 104, 0.12); border: 1px dashed var(--os-primary); padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; color: #fff; line-height: 1.2;';
+            const iconExtra = document.createElement('i');
+            iconExtra.className = 'fa-solid fa-wand-magic-sparkles';
+            iconExtra.style.cssText = 'color: var(--os-primary); font-size: 0.65rem;';
+            const spanExtra = document.createElement('span');
+            const strongExtra = document.createElement('strong');
+            strongExtra.textContent = 'EXTRA: ';
+            spanExtra.appendChild(strongExtra);
+            spanExtra.appendChild(document.createTextNode(extraDetails));
+            divExtra.appendChild(iconExtra);
+            divExtra.appendChild(spanExtra);
+            td3.appendChild(divBase);
+            td3.appendChild(divExtra);
+        } else {
+            const divBase = document.createElement('div');
+            divBase.style.fontWeight = '500';
+            divBase.textContent = deliverables;
+            td3.appendChild(divBase);
+        }
+        tr.appendChild(td3);
+
+        const td4 = document.createElement('td');
+        td4.style.cssText = 'font-family: var(--os-font-mono); font-weight: 600;';
+        td4.textContent = formatCurrency(val);
+        tr.appendChild(td4);
+
+        const td5 = document.createElement('td');
+        const spanStatus = document.createElement('span');
+        spanStatus.className = 'status-badge';
+        spanStatus.style.background = 'rgba(255,255,255,0.05)';
+        spanStatus.textContent = c.status;
+        td5.appendChild(spanStatus);
+        tr.appendChild(td5);
+
+        const td6 = document.createElement('td');
+        td6.textContent = startDate;
+        tr.appendChild(td6);
+
+        const td7 = document.createElement('td');
+        td7.textContent = renewalDate;
+        tr.appendChild(td7);
+
+        const td8 = document.createElement('td');
+        const actionDiv = document.createElement('div');
+        actionDiv.className = 'action-btns';
+        actionDiv.style.justifyContent = 'flex-end';
+
+        const btnPortal = document.createElement('a');
+        btnPortal.href = '/os/client-portal.html?project_id=' + c.project_id;
+        btnPortal.className = 'btn-mini';
+        btnPortal.style.cssText = 'display:inline-flex; align-items:center; justify-content:center; text-decoration:none;';
+        btnPortal.title = 'Ver Portal Cliente';
+        const iconPortal = document.createElement('i');
+        iconPortal.className = 'fa-solid fa-briefcase';
+        btnPortal.appendChild(iconPortal);
+        actionDiv.appendChild(btnPortal);
+
+        const btnDoc = document.createElement('button');
+        btnDoc.className = 'btn-mini';
+        btnDoc.title = 'Abrir Contrato';
+        btnDoc.onclick = () => window.generateContractDoc(c.id);
+        const iconDoc = document.createElement('i');
+        iconDoc.className = 'fa-solid fa-file-pdf';
+        btnDoc.appendChild(iconDoc);
+        actionDiv.appendChild(btnDoc);
+
+        const btnEdit = document.createElement('button');
+        btnEdit.className = 'btn-mini';
+        btnEdit.title = 'Editar';
+        btnEdit.onclick = () => window.editContract(c.id);
+        const iconEdit = document.createElement('i');
+        iconEdit.className = 'fa-solid fa-pen-to-square';
+        btnEdit.appendChild(iconEdit);
+        actionDiv.appendChild(btnEdit);
+
+        td8.appendChild(actionDiv);
+        tr.appendChild(td8);
+
+        body.appendChild(tr);
+    });
+}
+
+function renderContractHealth(contracts, payments) {
+    const body = document.getElementById('health-body');
+    if (!body) return;
+    const now = new Date();
+    body.replaceChildren();
+    contracts.forEach(c => {
+        const cPayments = payments.filter(p => p.contract_id === c.id);
+        const hasLate = cPayments.some(p => p.status !== 'PAGO' && new Date(p.due_date) < now);
+        let health = 'Saudável';
+        let healthClass = 'health-saudavel';
+        let finRisk = 'Nulo';
+        let opRisk = 'Baixo';
+        let nextAction = 'Manter planejamento mensal e revisar próxima rodada';
+        if (hasLate) {
+            health = 'Atenção';
+            healthClass = 'health-atencao';
+            finRisk = 'Moderado';
+            nextAction = 'Notificar Financeiro';
+        }
+        if (c.status !== 'ATIVO') {
+            health = 'Encerrado';
+            healthClass = 'health-atencao';
+            nextAction = 'N/A';
+        }
+        const tr = document.createElement('tr');
+        const td1 = document.createElement('td');
+        td1.textContent = c.client_name;
+        tr.appendChild(td1);
+        const td2 = document.createElement('td');
+        const spanHealth = document.createElement('span');
+        spanHealth.className = 'health-pill ' + healthClass;
+        spanHealth.textContent = health;
+        td2.appendChild(spanHealth);
+        tr.appendChild(td2);
+        const td3 = document.createElement('td');
+        td3.style.cssText = 'font-size: 0.7rem; color: ' + (finRisk === 'Nulo' ? 'var(--os-success)' : 'var(--os-warning)') + ';';
+        td3.textContent = finRisk;
+        tr.appendChild(td3);
+        const td4 = document.createElement('td');
+        td4.style.cssText = 'font-size: 0.7rem; color: var(--os-success);';
+        td4.textContent = opRisk;
+        tr.appendChild(td4);
+        const td5 = document.createElement('td');
+        td5.style.cssText = 'font-size: 0.7rem; color: var(--os-success);';
+        td5.textContent = 'Em Conformidade';
+        tr.appendChild(td5);
+        const td6 = document.createElement('td');
+        td6.style.cssText = 'font-size: 0.75rem; font-weight: 700; color: var(--os-primary);';
+        td6.textContent = nextAction;
+        tr.appendChild(td6);
+        body.appendChild(tr);
+    });
+}
+
 function renderOperationalAlerts(contracts, payments) {
     const container = document.getElementById('alerts-container');
     if (!container) return;

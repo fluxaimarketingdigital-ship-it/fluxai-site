@@ -149,15 +149,19 @@ body.os-mode {
 /* ═══════════════════════════════════════════════
    CAMADA 4 — SIDEBAR
    ═══════════════════════════════════════════════ */
-.os-sidebar {
-    background: var(--os-sidebar-bg);
-    border-right: 1px solid var(--os-border);
-    display: flex;
-    flex-direction: column;
-    z-index: 200;
-    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+.os-sidebar { 
+    background: var(--os-sidebar-bg); 
+    border-right: 1px solid var(--os-border); 
+    display: flex; 
+    flex-direction: column; 
+    z-index: 200; 
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    backdrop-filter: blur(12px); 
+    -webkit-backdrop-filter: blur(12px); 
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-height: 100vh;
+    padding-bottom: 20px;
 }
 
 .os-sidebar-header {

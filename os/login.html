@@ -266,12 +266,26 @@
                 OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: userId, role: userRole }, false); 
             } 
  
-            // Sincronizar projeto ativo via query params (Removida persistência local para CodeQL) 
-            if (userRole === 'CLIENT' && userProjectId) { 
-                window.location.href = `client-portal.html?project_id=${userProjectId}`; 
-            } else { 
-                window.location.href = 'command-center.html'; 
-            } 
+            // Criar e persistir contexto mínimo de sessão não sensível para controle de UI e RBAC
+            const safeSession = {
+                id: userId,
+                full_name: userFullName,
+                role: String(userRole || 'CLIENT'),
+                permissions: userRole === 'ADMIN' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] :  
+                             userRole === 'OPERATOR' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] : ['client-portal'],
+                session_started_at: new Date().toISOString()
+            };
+            if (userProjectId) {
+                safeSession.project_id = userProjectId;
+            }
+            localStorage.setItem('fluxai_session', JSON.stringify(safeSession));
+
+            // Sincronizar projeto ativo via query params
+            if (userRole === 'CLIENT') {  
+                window.location.href = `client-portal.html${userProjectId ? '?project_id=' + userProjectId : ''}`;  
+            } else {  
+                window.location.href = 'command-center.html';  
+            }  
         } 
 
         // Submissão do formulário de redefinição de senha
