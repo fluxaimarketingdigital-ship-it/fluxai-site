@@ -32,7 +32,7 @@ jobs:
         with:
           target: ${{ matrix.target }}
           allow_issue_writing: false
-          cmd_options: '-a -j -m 3 -T 10 -r report_html.html -w report_md.md -J report_json.json'
+          cmd_options: '-a -j -m 3 -T 10'
 
       - name: List generated files
         if: always()
