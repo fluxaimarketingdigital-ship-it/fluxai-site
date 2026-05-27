@@ -1002,8 +1002,18 @@
                 metaRef.replaceChildren();
                 if (refLink) {
                     const a = document.createElement('a');
-                    a.href = refLink.startsWith('http') ? refLink : '#';
-                    a.target = '_blank';
+                    try {
+                        const url = new URL(String(refLink || ''), window.location.origin);
+                        if (url.protocol === 'http:' || url.protocol === 'https:') {
+                            a.setAttribute('href', url.href);
+                        } else {
+                            a.removeAttribute('href');
+                        }
+                    } catch {
+                        a.removeAttribute('href');
+                    }
+                    a.setAttribute('target', '_blank');
+                    a.setAttribute('rel', 'noopener noreferrer');
                     a.style.cssText = 'color:var(--os-primary); text-decoration:none;';
                     const icon = document.createElement('i');
                     icon.className = 'fa-solid fa-link';
