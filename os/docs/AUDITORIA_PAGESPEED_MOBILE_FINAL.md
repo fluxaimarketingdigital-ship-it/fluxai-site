@@ -46,7 +46,16 @@
 - [x] **Zero NO_FCP:** Renderização hero instantânea validada.
 - [x] **Formulário Operacional:** Preenchimento e clique em `Enviar` respondem nativamente.
 - [x] **Fluxo Duplo de Lead:** Dados interceptados pelo `Make` na via expressa e registrados no `Supabase` em background assíncrono.
-- [x] **Gatilho de Analytics:** GTM dispara evento PageView pontualmente 0.1s após a primeira rolagem de mouse.
+- [x] **Gatilho de Analytics:** GTM dispara evento PageView pontualmente 0.1s após a primeira rolagem de mouse ou fallback após 10s.
 
-## 🚀 Próxima Ação
-Os ajustes finos mobile foram perfeitamente arquitetados e selados no código-fonte. O sistema está aguardando o *commit/push* final para atualizar a branch em produção e aguardar a próxima leitura de laboratório do Google.
+---
+
+## 🚀 Status de Deploy e Validação Final
+
+**Deploy Realizado em 26 de Maio de 2026**
+- Commit de Refatoração Ouro gerado: `9f6a432` (*perf(site): optimize mobile rendering, lazy load tracking and lead capture dependencies*)
+- Arquivos afetados: `index.html`, `os/services/capture.js`
+
+A validação local certificou que todos os componentes de Lazy Loading (Tracking híbrido on-demand e Supabase) e a remoção forçada das dimensões de imagem estão entregando a página principal instantaneamente (FCP desbloqueado), mantendo a captação de Leads à prova de falhas.
+
+**Próximo passo estratégico:** Rodar o teste oficial de laboratório do Google PageSpeed Insights (Mobile e Desktop) para aferir e consolidar as notas de Performance (Acima de 90+ esperados), Acessibilidade (Mantida em 99) e LCP limpo.
