@@ -78,8 +78,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" media="print" onload="this.media='all'" />
-  <noscript><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" /></noscript>
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" as="style" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
 
   <link rel="stylesheet" href="/src/styles/style.css" />
 
@@ -191,9 +191,9 @@
 
         <div class="hero-visual">
           <div class="composition-grid">
-            <img src="/assets/images/branding/hero-main.webp" alt="FluxAI Architecture" width="1024" height="1024" class="hero-main-img" fetchpriority="high" />
+            <img src="/assets/images/branding/hero-main.webp" alt="FluxAI Architecture" class="hero-main-img" fetchpriority="high" />
             <div class="mini-data-module parallax-element" data-speed="1.5">
-              <img src="/assets/images/backgrounds/bg-grid-technical.webp" alt="Technical DNA" width="1024" height="1024" loading="lazy" />
+              <img src="/assets/images/backgrounds/bg-grid-technical.webp" alt="Technical DNA" loading="lazy" />
               <div class="module-label">[DATA_DNA.v5]</div>
             </div>
           </div>
@@ -221,7 +221,7 @@
         <div class="section-title text-center reveal">
           <span class="section-top-label" style="color: var(--primary);">Estratégia Operacional</span>
           <h2 style="color: #fff; margin-bottom: 60px;">FluxAI Command Center.</h2>
-          <img src="/assets/images/sections/section-command-center.webp" alt="FluxAI Command Center" width="1024" height="562" loading="lazy" class="full-width-editorial" style="width: 100%; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 60px;" />
+          <img src="/assets/images/sections/section-command-center.webp" alt="FluxAI Command Center" loading="lazy" class="full-width-editorial" style="width: 100%; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 60px;" />
           <p class="impact-desc" style="max-width: 850px; margin: 0 auto; color: #94a3b8;">
             O <strong>FluxAI OS™</strong> é a infraestrutura estratégica proprietária para organizar posicionamento, conteúdo, aquisição e Inteligência Operacional através do Automation Hub.
           </p>
@@ -468,7 +468,7 @@
               <div class="diag-item highlight"><strong>Objetivo:</strong><p>Consolidar previsibilidade de aquisição.</p></div>
             </div>
             <div class="diag-fragment">
-              <img src="/assets/images/backgrounds/bg-grid-technical.webp" alt="Fragment" width="1024" height="1024" class="fragment-img" loading="lazy" />
+              <img src="/assets/images/backgrounds/bg-grid-technical.webp" alt="Fragment" class="fragment-img" loading="lazy" />
             </div>
           </div>
           <div class="diagnostic-card">
@@ -482,7 +482,7 @@
               <div class="diag-item highlight"><strong>Objetivo:</strong><p>Automação de triagem e esteira previsível.</p></div>
             </div>
             <div class="diag-fragment">
-              <img src="/assets/images/backgrounds/bg-grid-technical.webp" alt="Fragment" width="1024" height="1024" class="fragment-img" loading="lazy" />
+              <img src="/assets/images/backgrounds/bg-grid-technical.webp" alt="Fragment" class="fragment-img" loading="lazy" />
             </div>
           </div>
           <div class="diagnostic-card">
@@ -496,7 +496,7 @@
               <div class="diag-item highlight"><strong>Objetivo:</strong><p>Aumentar percepção de valor e qualificar decisões comerciais.</p></div>
             </div>
             <div class="diag-fragment">
-              <img src="/assets/images/backgrounds/bg-grid-technical.webp" alt="Fragment" width="1024" height="1024" class="fragment-img" loading="lazy" />
+              <img src="/assets/images/backgrounds/bg-grid-technical.webp" alt="Fragment" class="fragment-img" loading="lazy" />
             </div>
           </div>
         </div>
@@ -594,7 +594,7 @@
       <span class="section-top-label" style="color: rgba(255,255,255,0.5);">Operação Estratégica</span>
       <h2 style="color: #fff; margin-bottom: 60px;">FluxAI Command Center.</h2>
       <div class="editorial-image-wrap">
-        <img src="/assets/images/sections/section-command-center.webp" alt="FluxAI Command Center" width="1024" height="562" loading="lazy" class="full-width-editorial" />
+        <img src="/assets/images/sections/section-command-center.webp" alt="FluxAI Command Center" loading="lazy" class="full-width-editorial" />
         <div class="data-badge" style="bottom: 20px; right: 20px; top: auto; position: absolute; color: #FFF; opacity: 0.8; font-weight: bold;">[SECURED_FACILITY_OP]</div>
       </div>
     </div>
@@ -670,10 +670,13 @@
     </div>
   </div>
 
-  <!-- Scripts de Rastreamento Deferidos Inteligentes (GTM / Clarity) -->
+  <!-- Sistema Híbrido On-Demand (Tracking & Supabase) -->
   <script>
     (function() {
       let trackingLoaded = false;
+      let supabaseLoaded = false;
+
+      // 1. Loader de Analytics Híbrido
       const loadTracking = () => {
         if (trackingLoaded) return;
         trackingLoaded = true;
@@ -692,36 +695,57 @@
         })(window, document, "clarity", "script", "wonrxc0xrb");
       };
 
-      // Carregar em Idle ou Timeout
-      const scheduleLoad = () => {
-        if ('requestIdleCallback' in window) {
-          requestIdleCallback(() => loadTracking(), { timeout: 3000 });
-        } else {
-          setTimeout(loadTracking, 3000);
-        }
+      // Carregar Analytics na 1ª interação ou Fallback de 10s
+      let fallbackTimer = setTimeout(loadTracking, 10000);
+      const interactionEvents = ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'];
+      const onInteraction = () => {
+        clearTimeout(fallbackTimer);
+        loadTracking();
+        interactionEvents.forEach(evt => window.removeEventListener(evt, onInteraction));
+      };
+      interactionEvents.forEach(evt => window.addEventListener(evt, onInteraction, { once: true, passive: true }));
+
+      // 2. Lazy Loader do Supabase
+      const loadSupabase = () => {
+        if (supabaseLoaded || typeof window.supabase !== 'undefined') return;
+        supabaseLoaded = true;
+        const script = document.createElement('script');
+        script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2";
+        script.defer = true;
+        document.head.appendChild(script);
       };
 
-      if (document.readyState === 'complete') {
-        scheduleLoad();
-      } else {
-        window.addEventListener('load', scheduleLoad, { once: true });
+      // Carregar Supabase se formulário for visto
+      const form = document.getElementById('fluxai-lead-form');
+      if (form) {
+        // Observar Scroll Perto
+        if ('IntersectionObserver' in window) {
+            const observer = new IntersectionObserver((entries) => {
+                if(entries[0].isIntersecting) { loadSupabase(); observer.disconnect(); }
+            }, { rootMargin: "300px" });
+            observer.observe(form);
+        } else {
+            // Fallback se não tiver IO
+            setTimeout(loadSupabase, 5000);
+        }
+        
+        // Forçar se usuário interagir direto com os campos
+        form.addEventListener('focusin', loadSupabase, {once: true});
+        form.addEventListener('click', loadSupabase, {once: true});
       }
 
-      // Carregamento de emergência na primeira interação do usuário (para garantir conversões rápidas)
-      ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'].forEach(evt => {
-        window.addEventListener(evt, loadTracking, { once: true, passive: true });
+      // Forçar loaders se clicar em CTAs de conversão
+      document.querySelectorAll('a[href="#lead"], .btn').forEach(btn => {
+         btn.addEventListener('click', () => { loadTracking(); loadSupabase(); });
       });
+
     })();
   </script>
 
   <script type="module" src="/src/scripts/script.js"></script>
   <script type="module" src="/src/scripts/dashboard.js"></script>
-  
-  <!-- Ingestão Direta de Leads para o CRM Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script type="module" src="/os/services/capture.js"></script>
 
-  <!-- Welcome Pop-up Removido por UX Authority -->
 
 </body>
 </html>

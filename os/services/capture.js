@@ -3,15 +3,25 @@ import { OS_LOGS_ENGINE } from './logs-engine.js';
 
 export const LeadCapture = {
     init: () => {
-        // Assegurar que o Supabase client está disponível via CDN se não estiver empacotado
-        if (typeof window.supabase === 'undefined') {
-            console.warn('[FluxAI Capture] Biblioteca Supabase não encontrada no contexto global.');
-            return;
-        }
-
-        const supabase = window.supabase.createClient(OS_CONFIG.supabase.url, OS_CONFIG.supabase.anonKey);
-        
         const form = document.getElementById('fluxai-lead-form');
+        if (!form) return;
+        
+        let supabaseClient = null;
+        const initSupabase = async () => {
+            if (supabaseClient) return supabaseClient;
+            if (typeof window.supabase === 'undefined') {
+                // Se ainda não carregou, force o carregamento agora
+                await new Promise((resolve, reject) => {
+                    const script = document.createElement('script');
+                    script.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+                    script.onload = resolve;
+                    script.onerror = reject;
+                    document.head.appendChild(script);
+                });
+            }
+            supabaseClient = window.supabase.createClient(OS_CONFIG.supabase.url, OS_CONFIG.supabase.anonKey);
+            return supabaseClient;
+        };
         if (!form) return;
 
         form.addEventListener('submit', async (e) => {
@@ -65,7 +75,12 @@ export const LeadCapture = {
                 if (!result.success) throw new Error(result.error || 'Erro ao enviar lead.');
 
                 // Envio assíncrono pro Supabase (sem afetar a resposta do Make)
-                supabase.from('crm_leads').insert([leadData]).catch(e => console.warn('Erro silencioso no Supabase', e));
+                try {
+                    const client = await initSupabase();
+                    client.from('crm_leads').insert([leadData]).catch(e => console.warn('Erro silencioso no Supabase', e));
+                } catch (e) {
+                    console.warn('[FluxAI Capture] Supabase falhou ao inicializar no background.', e);
+                }
 
                 if (btnSubmit) {
                     btnSubmit.innerHTML = 'Diagnóstico enviado com sucesso.';
