@@ -540,6 +540,7 @@
         import { OS_LOGS_ENGINE } from './services/logs-engine.js';
         import { OS_CONFIG } from './config/os-config.js';
         import { OS_AUTH } from './js/os-core.js';
+        import { getSupabase } from './services/supabase-client.js';
         import { mockCatalogoServicos } from './data/catalogo.data.js';
 
         // Enforce Authentication
@@ -570,6 +571,10 @@
             }
         }
 
+        function isUUID(value) {
+            return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
+        }
+
         async function init() {
             // Controle de Exibição do Botão de Voltar (esconde se for CLIENT real)
             const session = OS_AUTH.user || {};
@@ -585,10 +590,14 @@
                     console.warn('[CLIENT_PORTAL] Supabase indisponível. Fallback local ativado.');
                     throw new Error('Supabase URL is invalid');
                 }
-                _supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+                _supabaseClient = getSupabase() || window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
             }
 
             try {
+                if (!isUUID(projectId)) {
+                    console.warn('[CLIENT_PORTAL] project_id local/mock detectado. Supabase query ignorada e fallback local ativado.', { projectId });
+                    throw new Error('project_id local/mock detectado');
+                }
                 // 1. Dados do Projeto
                 const { data: proj, error } = await _supabaseClient.from('projects').select('*').eq('id', projectId).single();
                 if (error) throw error;
