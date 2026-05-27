@@ -1,6 +1,14 @@
 import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
 import { getSupabase } from '/os/services/supabase-client.js';
 
+function formatCurrency(value) {
+    const number = Number(value || 0);
+    return number.toLocaleString('pt-BR', {
+        style: 'currency',
+        currency: 'BRL'
+    });
+}
+
 async function initFinance() {
     const user = await OS_AUTH.check('ADMIN');
     if (!user) return;

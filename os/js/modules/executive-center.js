@@ -223,7 +223,7 @@ tr.appendChild(td);
                         statusSpan.textContent = 'Ativo';
                     }
                     tr.querySelector('.safe-status').appendChild(statusSpan);
-                    tableContractsBody.appendChild(tr);
+                    tableFinanceBody.appendChild(tr);
                 });
             }
         }

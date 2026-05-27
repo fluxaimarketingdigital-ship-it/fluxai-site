@@ -555,6 +555,21 @@
         const params = new URLSearchParams(window.location.search);
         const projectId = params.get('project_id') || params.get('project') || localStorage.getItem('fluxai_current_project_id') || 'p_c1';
 
+        function isValidSupabaseUrl(url) {
+            try {
+                const parsed = new URL(url);
+                return (
+                    parsed.protocol === 'https:' &&
+                    parsed.hostname.endsWith('.supabase.co') &&
+                    !parsed.hostname.includes('example') &&
+                    !parsed.hostname.includes('mock') &&
+                    !parsed.hostname.includes('localhost')
+                );
+            } catch {
+                return false;
+            }
+        }
+
         async function init() {
             // Controle de Exibição do Botão de Voltar (esconde se for CLIENT real)
             const session = OS_AUTH.user || {};
@@ -566,8 +581,8 @@
             if (!projectId) return document.getElementById('client-name').innerText = 'Acesso Negado: ID do Projeto Ausente';
 
             if (!_supabaseClient) {
-                if (!SUPABASE_CONFIG || !SUPABASE_CONFIG.url || !SUPABASE_CONFIG.url.startsWith('https://') || !SUPABASE_CONFIG.url.includes('.supabase.co') || SUPABASE_CONFIG.url.includes('example')) {
-                    console.warn('[PORTAL] Supabase URL inválida/mockada. Abortando e usando fallback.');
+                if (!isValidSupabaseUrl(SUPABASE_CONFIG?.url)) {
+                    console.warn('[CLIENT_PORTAL] Supabase indisponível. Fallback local ativado.');
                     throw new Error('Supabase URL is invalid');
                 }
                 _supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);

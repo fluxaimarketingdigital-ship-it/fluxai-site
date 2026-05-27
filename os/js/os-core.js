@@ -260,7 +260,12 @@ export const OS_UI = {
                 </div> 
             </div>`; 
  
-        document.querySelector('.os-topbar').innerHTML = html; 
+        const topbarEl = document.querySelector('.os-topbar');
+        if (!topbarEl) {
+            console.warn('[OS_CORE] Container global (.os-topbar) ausente nesta rota. Renderização ignorada.');
+            return;
+        }
+        topbarEl.innerHTML = html;
         
         const safeClientNameEl = document.getElementById('safe-client-name');
         if(safeClientNameEl) safeClientNameEl.textContent = companyNameStr;
