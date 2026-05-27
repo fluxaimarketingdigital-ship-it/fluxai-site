@@ -291,69 +291,79 @@ function renderStats(contracts, payments) {
     document.getElementById('next-due-count').innerText = nextDue;
     document.getElementById('revenue-at-risk').innerText = formatCurrency(riskRevenue);
 }
-
-function renderPayments(payments) {
-    const body = document.getElementById('payments-body');
-    const now = new Date();
-    
-    body.innerHTML = payments.map(p => {
-        const dueDate = new Date(p.due_date);
-        const diffDays = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24));
-        const isPaid = p.status === 'PAGO';
+function renderPayments(payments) { 
+    const body = document.getElementById('payments-body'); 
+    const now = new Date(); 
+     
+    body.replaceChildren();
+    payments.forEach(p => { 
+        const dueDate = new Date(p.due_date); 
+        const diffDays = Math.ceil((dueDate - now) / (1000 * 60 * 60 * 24)); 
+        const isPaid = p.status === 'PAGO'; 
+         
+        let delayText = ''; 
+        let delayClass = ''; 
+         
+        if (isPaid) { 
+            delayText = 'Liquidado'; 
+            delayClass = 'color: var(--os-success); font-weight: 700;'; 
+        } else if (diffDays < 0) { 
+            delayText = `${Math.abs(diffDays)}d atraso`; 
+            delayClass = 'color: var(--os-danger); font-weight: 700;'; 
+        } else if (diffDays === 0) { 
+            delayText = 'Vence Hoje'; 
+            delayClass = 'color: var(--os-info); font-weight: 800;'; 
+        } else { 
+            delayText = `em ${diffDays} dias`; 
+            delayClass = 'color: var(--os-text-muted);'; 
+        } 
+ 
+        const statusClass = p.status === 'PAGO' ? 'status-pago' : (diffDays < 0 ? 'status-atrasado' : 'status-pendente'); 
+ 
+        const tr = document.createElement('tr');
+        tr.innerHTML = ` 
+                <td> 
+                    <div class="safe-client" style="font-weight: 700;"></div> 
+                    <div class="safe-company" style="font-size: 0.7rem; color: var(--os-text-muted);"></div> 
+                </td> 
+                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(p.amount_due)}</td> 
+                <td>${dueDate.toLocaleDateString('pt-BR')}</td> 
+                <td style="font-size: 0.7rem; text-transform: uppercase;">${p.payment_method || 'Pix'}</td> 
+                <td><span class="status-badge ${statusClass}">${p.status}</span></td> 
+                <td style="${delayClass} font-size: 0.75rem;">${delayText}</td> 
+                <td> 
+                    <div class="action-btns" style="justify-content: flex-end;"> 
+                        ${!isPaid ? ` 
+                            <button class="btn-mini btn-whatsapp safe-wpp" title="Lembrar WhatsApp"> 
+                                <i class="fa-brands fa-whatsapp"></i> 
+                            </button> 
+                            <button class="btn-mini safe-pay" title="Marcar Recebido"> 
+                                <i class="fa-solid fa-check"></i> 
+                            </button> 
+                        ` : ` 
+                             <button class="btn-mini" title="Gerar Recibo"><i class="fa-solid fa-file-invoice"></i></button> 
+                        `} 
+                        <button class="btn-mini safe-doc" title="Abrir Contrato"> 
+                            <i class="fa-solid fa-file-pdf"></i> 
+                        </button> 
+                        <button class="btn-mini safe-work" title="Abrir Workspace"> 
+                            <i class="fa-solid fa-briefcase"></i> 
+                        </button> 
+                    </div> 
+                </td> 
+        `; 
+        tr.querySelector('.safe-client').textContent = p.contracts?.client_name || 'Desconhecido';
+        tr.querySelector('.safe-company').textContent = p.contracts?.company_name || '';
         
-        let delayText = '';
-        let delayClass = '';
-        
-        if (isPaid) {
-            delayText = 'Liquidado';
-            delayClass = 'color: var(--os-success); font-weight: 700;';
-        } else if (diffDays < 0) {
-            delayText = `${Math.abs(diffDays)}d atraso`;
-            delayClass = 'color: var(--os-danger); font-weight: 700;';
-        } else if (diffDays === 0) {
-            delayText = 'Vence Hoje';
-            delayClass = 'color: var(--os-info); font-weight: 800;';
-        } else {
-            delayText = `em ${diffDays} dias`;
-            delayClass = 'color: var(--os-text-muted);';
+        if(!isPaid) {
+            tr.querySelector('.safe-wpp').onclick = () => window.sendWhatsAppBilling(p.id);
+            tr.querySelector('.safe-pay').onclick = () => window.markAsPaid(p.id, p.amount_due);
         }
-
-        const statusClass = p.status === 'PAGO' ? 'status-pago' : (diffDays < 0 ? 'status-atrasado' : 'status-pendente');
-
-        return `
-            <tr>
-                <td>
-                    <div style="font-weight: 700;">${p.contracts?.client_name || 'Desconhecido'}</div>
-                    <div style="font-size: 0.7rem; color: var(--os-text-muted);">${p.contracts?.company_name || ''}</div>
-                </td>
-                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(p.amount_due)}</td>
-                <td>${dueDate.toLocaleDateString('pt-BR')}</td>
-                <td style="font-size: 0.7rem; text-transform: uppercase;">${p.payment_method || 'Pix'}</td>
-                <td><span class="status-badge ${statusClass}">${p.status}</span></td>
-                <td style="${delayClass} font-size: 0.75rem;">${delayText}</td>
-                <td>
-                    <div class="action-btns" style="justify-content: flex-end;">
-                        ${!isPaid ? `
-                            <button class="btn-mini btn-whatsapp" title="Lembrar WhatsApp" onclick="window.sendWhatsAppBilling('${p.id}')">
-                                <i class="fa-brands fa-whatsapp"></i>
-                            </button>
-                            <button class="btn-mini" title="Marcar Recebido" onclick="window.markAsPaid('${p.id}', ${p.amount_due})">
-                                <i class="fa-solid fa-check"></i>
-                            </button>
-                        ` : `
-                             <button class="btn-mini" title="Gerar Recibo"><i class="fa-solid fa-file-invoice"></i></button>
-                        `}
-                        <button class="btn-mini" title="Abrir Contrato" onclick="window.generateContractDoc('${p.contract_id}')">
-                            <i class="fa-solid fa-file-pdf"></i>
-                        </button>
-                        <button class="btn-mini" title="Abrir Workspace" onclick="window.open('/os/content-engine.html?project=${p.contracts?.project_id}', '_blank')">
-                            <i class="fa-solid fa-briefcase"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
+        tr.querySelector('.safe-doc').onclick = () => window.generateContractDoc(p.contract_id);
+        tr.querySelector('.safe-work').onclick = () => window.open('/os/content-engine.html?project=' + p.contracts?.project_id, '_blank');
+        
+        body.appendChild(tr);
+    }); 
 }
 
 window.attachReceipt = async (paymentId) => {
@@ -371,59 +381,71 @@ window.attachReceipt = async (paymentId) => {
     }
 };
 
-function renderContracts(contracts) {
-    const body = document.getElementById('contracts-body');
-    body.innerHTML = contracts.map(c => {
-        const startDate = new Date(c.created_at).toLocaleDateString('pt-BR');
-        const renewalDate = new Date(new Date(c.created_at).setMonth(new Date(c.created_at).getMonth() + 6)).toLocaleDateString('pt-BR');
-
-        const val = c.contract_value;
-        const deliverables = c.deliverables || 'N/A';
+function renderContracts(contracts) { 
+    const body = document.getElementById('contracts-body'); 
+    
+    body.replaceChildren();
+    contracts.forEach(c => { 
+        const startDate = new Date(c.created_at).toLocaleDateString('pt-BR'); 
+        const renewalDate = new Date(new Date(c.created_at).setMonth(new Date(c.created_at).getMonth() + 6)).toLocaleDateString('pt-BR'); 
+ 
+        const val = c.contract_value; 
+        const deliverables = c.deliverables || 'N/A'; 
+         
+        let deliverablesHtmlNode = document.createElement('div');
+        if (deliverables.includes('[EXTRA]')) { 
+            const parts = deliverables.split('[EXTRA]:'); 
+            const baseDeliverables = parts[0].trim(); 
+            const extraDetails = parts.slice(1).join('[EXTRA]:').trim(); 
+            deliverablesHtmlNode.innerHTML = ` 
+                <div class="safe-base" style="font-weight: 500;"></div> 
+                <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; background: rgba(142, 158, 104, 0.12); border: 1px dashed var(--os-primary); padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; color: #fff; line-height: 1.2;"> 
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--os-primary); font-size: 0.65rem;"></i> 
+                    <span><strong>EXTRA:</strong> <span class="safe-extra"></span></span> 
+                </div> 
+            `; 
+            deliverablesHtmlNode.querySelector('.safe-base').textContent = baseDeliverables;
+            deliverablesHtmlNode.querySelector('.safe-extra').textContent = extraDetails;
+        } else { 
+            deliverablesHtmlNode.innerHTML = `<div class="safe-base" style="font-weight: 500;"></div>`;
+            deliverablesHtmlNode.querySelector('.safe-base').textContent = deliverables;
+        } 
+ 
+        const tr = document.createElement('tr');
+        tr.innerHTML = ` 
+                <td> 
+                    <div class="safe-company" style="font-weight: 700;"></div> 
+                    <div class="safe-client" style="font-size: 0.7rem; color: var(--os-text-muted);"></div> 
+                </td> 
+                <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">ENGENHARIA DE CONTEÚDO</td> 
+                <td class="safe-deliv-container" style="font-size: 0.75rem;"></td> 
+                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(val)}</td> 
+                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">${c.status}</span></td> 
+                <td>${startDate}</td> 
+                <td>${renewalDate}</td> 
+                <td> 
+                    <div class="action-btns" style="justify-content: flex-end;"> 
+                        <a class="safe-portal btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Ver Portal Cliente"> 
+                            <i class="fa-solid fa-briefcase"></i> 
+                        </a> 
+                        <button class="btn-mini safe-pdf" title="Abrir Contrato"> 
+                            <i class="fa-solid fa-file-pdf"></i> 
+                        </button> 
+                        <button class="btn-mini safe-edit" title="Editar"> 
+                            <i class="fa-solid fa-pen-to-square"></i> 
+                        </button> 
+                    </div> 
+                </td> 
+        `; 
+        tr.querySelector('.safe-company').textContent = c.company_name;
+        tr.querySelector('.safe-client').textContent = c.client_name;
+        tr.querySelector('.safe-deliv-container').appendChild(deliverablesHtmlNode);
+        tr.querySelector('.safe-portal').href = "/os/client-portal.html?project_id=" + c.project_id;
+        tr.querySelector('.safe-pdf').onclick = () => window.generateContractDoc(c.id);
+        tr.querySelector('.safe-edit').onclick = () => window.editContract(c.id);
         
-        let deliverablesHtml = deliverables;
-        if (deliverables.includes('[EXTRA]')) {
-            const parts = deliverables.split('[EXTRA]:');
-            const baseDeliverables = parts[0].trim();
-            const extraDetails = parts.slice(1).join('[EXTRA]:').trim();
-            deliverablesHtml = `
-                <div style="font-weight: 500;">${baseDeliverables.replace(/\n/g, '<br>')}</div>
-                <div style="margin-top: 6px; display: inline-flex; align-items: center; gap: 6px; background: rgba(142, 158, 104, 0.12); border: 1px dashed var(--os-primary); padding: 4px 8px; border-radius: 4px; font-size: 0.65rem; color: #fff; line-height: 1.2;">
-                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--os-primary); font-size: 0.65rem;"></i>
-                    <span><strong>EXTRA:</strong> ${extraDetails}</span>
-                </div>
-            `;
-        } else {
-            deliverablesHtml = `<div style="font-weight: 500;">${deliverables.replace(/\n/g, '<br>')}</div>`;
-        }
-
-        return `
-            <tr>
-                <td>
-                    <div style="font-weight: 700;">${c.company_name}</div>
-                    <div style="font-size: 0.7rem; color: var(--os-text-muted);">${c.client_name}</div>
-                </td>
-                <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">ENGENHARIA DE CONTEÚDO</td>
-                <td style="font-size: 0.75rem;">${deliverablesHtml}</td>
-                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(val)}</td>
-                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">${c.status}</span></td>
-                <td>${startDate}</td>
-                <td>${renewalDate}</td>
-                <td>
-                    <div class="action-btns" style="justify-content: flex-end;">
-                        <a href="/os/client-portal.html?project_id=${c.project_id}" class="btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Ver Portal Cliente">
-                            <i class="fa-solid fa-briefcase"></i>
-                        </a>
-                        <button class="btn-mini" title="Abrir Contrato" onclick="window.generateContractDoc('${c.id}')">
-                            <i class="fa-solid fa-file-pdf"></i>
-                        </button>
-                        <button class="btn-mini" title="Editar" onclick="window.editContract('${c.id}')">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
+        body.appendChild(tr);
+    }); 
 }
 
 // Helpers de Resiliência de Cadastro & Links Operacionais
@@ -795,7 +817,8 @@ function renderContractHealth(contracts, payments) {
     if (!body) return;
     const now = new Date();
 
-    body.innerHTML = contracts.map(c => {
+    body.replaceChildren();
+    contracts.forEach(c => {
         const cPayments = payments.filter(p => p.contract_id === c.id);
         const hasLate = cPayments.some(p => p.status !== 'PAGO' && new Date(p.due_date) < now);
         
@@ -818,17 +841,18 @@ function renderContractHealth(contracts, payments) {
             nextAction = 'N/A';
         }
 
-        return `
-            <tr>
-                <td>${c.client_name}</td>
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+                <td class="safe-client"></td>
                 <td><span class="health-pill ${healthClass}">${health}</span></td>
                 <td style="font-size: 0.7rem; color: ${finRisk === 'Nulo' ? 'var(--os-success)' : 'var(--os-warning)'};">${finRisk}</td>
                 <td style="font-size: 0.7rem; color: var(--os-success);">${opRisk}</td>
                 <td style="font-size: 0.7rem; color: var(--os-success);">Em Conformidade</td>
                 <td style="font-size: 0.75rem; font-weight: 700; color: var(--os-primary);">${nextAction}</td>
-            </tr>
         `;
-    }).join('');
+        tr.querySelector('.safe-client').textContent = c.client_name;
+        body.appendChild(tr);
+    });
 }
 
 function renderOperationalAlerts(contracts, payments) {
@@ -871,22 +895,31 @@ function renderOperationalAlerts(contracts, payments) {
         }
     });
 
+    container.replaceChildren();
     if (alerts.length === 0) {
-        container.innerHTML = '<p style="font-size: 0.8rem; color: var(--os-text-muted); opacity: 0.5;">Nenhum alerta crítico pendente.</p>';
+        const pNode = document.createElement('p');
+        pNode.style.cssText = "font-size: 0.8rem; color: var(--os-text-muted); opacity: 0.5;";
+        pNode.textContent = "Nenhum alerta crítico pendente.";
+        container.appendChild(pNode);
         return;
     }
 
-    container.innerHTML = alerts.map(a => `
-        <div class="alert-item ${a.type}">
+    alerts.forEach(a => {
+        const div = document.createElement('div');
+        div.className = `alert-item ${a.type}`;
+        div.innerHTML = `
             <div class="alert-icon" style="color: ${a.type === 'critical' ? 'var(--os-danger)' : 'var(--os-warning)'};">
                 <i class="fa-solid ${a.type === 'critical' ? 'fa-triangle-exclamation' : 'fa-circle-info'}"></i>
             </div>
             <div class="alert-content">
-                <h4>${a.title}</h4>
-                <p>${a.desc}</p>
+                <h4 class="safe-title"></h4>
+                <p class="safe-desc"></p>
             </div>
-        </div>
-    `).join('');
+        `;
+        div.querySelector('.safe-title').textContent = a.title;
+        div.querySelector('.safe-desc').textContent = a.desc;
+        container.appendChild(div);
+    });
 }
 
 async function logAction(action, targetId) {

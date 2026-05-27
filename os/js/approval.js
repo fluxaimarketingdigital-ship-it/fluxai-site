@@ -43,10 +43,17 @@ function renderApproval(app) {
 
     // Renderizar Preview (Imagem ou Link)
     const previewArea = document.getElementById('preview-area');
+    previewArea.replaceChildren();
     if (app.content_data.preview_url) {
-        previewArea.innerHTML = `<img src="${app.content_data.preview_url}" alt="Preview" />`;
+        const img = document.createElement('img');
+        img.src = app.content_data.preview_url;
+        img.alt = 'Preview';
+        previewArea.appendChild(img);
     } else {
-        previewArea.innerHTML = `<p style="opacity: 0.5;">[Material em formato de link ou documento]</p>`;
+        const p = document.createElement('p');
+        p.style.opacity = '0.5';
+        p.textContent = '[Material em formato de link ou documento]';
+        previewArea.appendChild(p);
     }
 }
 

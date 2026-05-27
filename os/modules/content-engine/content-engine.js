@@ -313,83 +313,98 @@ function renderMetrics(contents) {
     OS_UI.renderMetric('metric-schedule', { label: 'Prontos para Postar', value: metrics.ready, trend: '✔', meta: 'Publicação' });
 }
 
-function renderContentTable(contents) {
-    const body = document.getElementById('pipeline-table-body');
-    if (!contents || contents.length === 0) {
-        body.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 40px; color:var(--os-text-muted);">Nenhum ativo estratégico provido neste workspace.</td></tr>`;
-        return;
-    }
-
-    body.innerHTML = contents.map(c => {
-        const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Pendente';
-        const stdStatus = mapToStandardStatus(c.status);
-        const statusLabel = STATUS_LABELS[stdStatus] || c.status;
-        const revCount = c.metadata?.revision_cycle || 1;
-        const versionLabel = `V${revCount}`;
+function renderContentTable(contents) { 
+    const body = document.getElementById('pipeline-table-body'); 
+    
+    if (!contents || contents.length === 0) { 
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td colspan="6" style="text-align:center; padding: 40px; color:var(--os-text-muted);">Nenhum ativo estratégico provido neste workspace.</td>`;
+        body.replaceChildren(tr); 
+        return; 
+    } 
+ 
+    body.replaceChildren();
+    contents.forEach(c => { 
+        const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Pendente'; 
+        const stdStatus = mapToStandardStatus(c.status); 
+        const statusLabel = STATUS_LABELS[stdStatus] || c.status; 
+        const revCount = c.metadata?.revision_cycle || 1; 
+        const versionLabel = `V${revCount}`; 
+         
+        const strat = c.metadata?.strategic_approved ? '✅' : '❌'; 
+        const oper = c.metadata?.operational_approved ? '✅' : '❌'; 
+        const clie = c.metadata?.client_approved ? '✅' : '❌'; 
+         
+        const approvalsHtml = ` 
+            <div style="font-size:0.6rem; display:flex; gap:8px;" title="Estrutural | Técnico | Cliente"> 
+                <span>EST: ${strat}</span> 
+                <span>OPE: ${oper}</span> 
+                <span>CLI: ${clie}</span> 
+            </div> 
+        `; 
+ 
+        const tr = document.createElement('tr');
+        tr.innerHTML = ` 
+                <td> 
+                    <div style="display:flex; align-items:center; gap:8px;"> 
+                        <div class="safe-title" style="font-weight: 700; color: #fff;"></div> 
+                        <span style="font-size: 0.5rem; background: ${revCount >= 3 ? 'var(--os-danger)' : '#222'}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800; font-family:'JetBrains Mono';">${versionLabel}</span> 
+                    </div> 
+                    <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;"> 
+                        <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> ${scheduled} 
+                    </div> 
+                </td> 
+                <td><span class="status-badge" style="background:${getStatusBg(c.status)}; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem; font-weight: 800; white-space: nowrap;">${statusLabel}</span></td> 
+                <td> 
+                    <div class="safe-resp" style="font-size: 0.7rem; font-weight: 800; color: #fff;"></div> 
+                    <div style="font-size: 0.55rem; color: var(--os-text-muted); font-weight: 800;">${c.priority || 'MÉDIA'}</div> 
+                </td> 
+                <td style="font-size: 0.75rem; font-weight: 600;">${c.platform}</td> 
+                <td>${approvalsHtml}</td> 
+                <td> 
+                    <div class="action-btns" style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;"> 
+                        ${stdStatus === 'READY_TO_POST' ? ` 
+                            <button class="btn-mini safe-btn-pub" title="Ponte de Publicação" style="background: var(--os-primary); color: #000; border: none;"> 
+                                <i class="fa-solid fa-rocket"></i> 
+                            </button> 
+                        ` : ` 
+                            <button class="btn-mini safe-btn-force" title="Forçar Conclusão" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);"> 
+                                <i class="fa-solid fa-circle-check"></i> 
+                            </button> 
+                        `} 
+                        <button class="btn-mini safe-btn-edit" title="Editar/Governar" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);"> 
+                            <i class="fa-solid fa-pen-to-square"></i> 
+                        </button> 
+                        <button class="btn-mini safe-btn-del" title="Excluir"> 
+                            <i class="fa-solid fa-trash"></i> 
+                        </button> 
+                    </div> 
+                </td> 
+        `; 
+        tr.querySelector('.safe-title').textContent = c.title;
+        tr.querySelector('.safe-resp').textContent = c.metadata?.responsible || 'Design';
         
-        // Renderizar Aprovações Trilaterais
-        const strat = c.metadata?.strategic_approved ? '🟢' : '⚪';
-        const oper = c.metadata?.operational_approved ? '🟢' : '⚪';
-        const clie = c.metadata?.client_approved ? '🟢' : '⚪';
-        
-        const approvalsHtml = `
-            <div style="font-size:0.6rem; display:flex; gap:8px;" title="Estrutural | Técnico | Cliente">
-                <span>EST: ${strat}</span>
-                <span>OPE: ${oper}</span>
-                <span>CLI: ${clie}</span>
-            </div>
-        `;
+        if (stdStatus === 'READY_TO_POST') {
+            tr.querySelector('.safe-btn-pub').onclick = () => window.openPublishBridge(c.id);
+        } else {
+            tr.querySelector('.safe-btn-force').onclick = () => window.forceReady(c.id);
+        }
+        tr.querySelector('.safe-btn-edit').onclick = () => window.openEditModal(c.id);
+        tr.querySelector('.safe-btn-del').onclick = () => window.deleteAsset(c.id);
 
-        return `
-            <tr>
-                <td>
-                    <div style="display:flex; align-items:center; gap:8px;">
-                        <div style="font-weight: 700; color: #fff;">${c.title}</div>
-                        <span style="font-size: 0.5rem; background: ${revCount >= 3 ? 'var(--os-danger)' : '#222'}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800; font-family:'JetBrains Mono';">${versionLabel}</span>
-                    </div>
-                    <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;">
-                        <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> ${scheduled}
-                    </div>
-                </td>
-                <td><span class="status-badge" style="background:${getStatusBg(c.status)}; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem; font-weight: 800; white-space: nowrap;">${statusLabel}</span></td>
-                <td>
-                    <div style="font-size: 0.7rem; font-weight: 800; color: #fff;">${c.metadata?.responsible || 'Design'}</div>
-                    <div style="font-size: 0.55rem; color: var(--os-text-muted); font-weight: 800;">${c.priority || 'MÉDIA'}</div>
-                </td>
-                <td style="font-size: 0.75rem; font-weight: 600;">${c.platform}</td>
-                <td>${approvalsHtml}</td>
-                <td>
-                    <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
-                        ${stdStatus === 'READY_TO_POST' ? `
-                            <button class="btn-mini" title="Ponte de Publicação" onclick="window.openPublishBridge('${c.id}')" style="background: var(--os-primary); color: #000; border: none;">
-                                <i class="fa-solid fa-rocket"></i>
-                            </button>
-                        ` : `
-                            <button class="btn-mini" title="Forçar Conclusão" onclick="window.forceReady('${c.id}')" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">
-                                <i class="fa-solid fa-circle-check"></i>
-                            </button>
-                        `}
-                        <button class="btn-mini" title="Editar/Governar" onclick="window.openEditModal('${c.id}')" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">
-                            <i class="fa-solid fa-pen-to-square"></i>
-                        </button>
-                        <button class="btn-mini" title="Excluir" onclick="window.deleteAsset('${c.id}')">
-                            <i class="fa-solid fa-trash"></i>
-                        </button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
+        body.appendChild(tr);
+    }); 
 }
 
 function renderCalendar(containerId, contents, mode) {
     const container = document.getElementById(containerId);
     if (!container) return;
-    container.innerHTML = '';
+    
+    container.replaceChildren();
     
     const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
     const label = document.getElementById('calendar-month-label');
-    if (label) label.innerText = `${monthNames[currentMonth]} ${currentYear}`;
+    if (label) label.textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
     const year = currentYear;
     const month = currentMonth;
@@ -397,35 +412,53 @@ function renderCalendar(containerId, contents, mode) {
     const daysInMonth = new Date(year, month + 1, 0).getDate();
 
     for (let i = 0; i < firstDay; i++) {
-        container.innerHTML += `<div class="calendar-day" style="opacity:0.05;"></div>`;
+        const div = document.createElement('div');
+        div.className = 'calendar-day';
+        div.style.opacity = '0.05';
+        container.appendChild(div);
     }
 
     for (let day = 1; day <= daysInMonth; day++) {
         const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
         
-        let eventsHtml = dayContents.map(c => {
+        const dayDiv = document.createElement('div');
+        dayDiv.className = 'calendar-day';
+        dayDiv.style.minHeight = '100px';
+        
+        const dayNum = document.createElement('div');
+        dayNum.className = 'day-number';
+        dayNum.style.cssText = 'font-size: 0.65rem; font-weight: 800; margin-bottom: 8px;';
+        dayNum.textContent = day;
+        dayDiv.appendChild(dayNum);
+        
+        dayContents.forEach(c => {
             const std = mapToStandardStatus(c.status);
             const isStrategic = mode === 'STRATEGIC';
             const statusColor = getStatusBg(c.status);
             
-            if (!isStrategic && !['IN_PRODUCTION', 'INTERNAL_QA', 'CLIENT_REVIEW_CONTENT', 'READY_TO_POST', 'POSTED'].includes(std)) return '';
+            if (!isStrategic && !['IN_PRODUCTION', 'INTERNAL_QA', 'CLIENT_REVIEW_CONTENT', 'READY_TO_POST', 'POSTED'].includes(std)) return;
 
-            return `
-                <div class="calendar-event" onclick="window.openApproval('${c.id}')" 
-                     style="border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px;">
-                     <div style="font-weight: 800; color: #fff;">${c.title.substring(0, 15)}</div>
-                     <div style="font-size: 0.55rem; color: #fff; font-weight: 700; opacity: 0.7;">V${c.metadata?.revision_cycle || 1}</div>
-                </div>
-            `;
-        }).join('');
+            const evtNode = document.createElement('div');
+            evtNode.className = 'calendar-event';
+            evtNode.onclick = () => window.openApproval(c.id);
+            evtNode.style.cssText = `border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px;`;
+            
+            const titleNode = document.createElement('div');
+            titleNode.style.cssText = 'font-weight: 800; color: #fff;';
+            titleNode.textContent = c.title.substring(0, 15);
+            
+            const verNode = document.createElement('div');
+            verNode.style.cssText = 'font-size: 0.55rem; color: #fff; font-weight: 700; opacity: 0.7;';
+            verNode.textContent = `V${c.metadata?.revision_cycle || 1}`;
+            
+            evtNode.appendChild(titleNode);
+            evtNode.appendChild(verNode);
+            
+            dayDiv.appendChild(evtNode);
+        });
 
-        container.innerHTML += `
-            <div class="calendar-day" style="min-height: 100px;">
-                <div class="day-number" style="font-size: 0.65rem; font-weight: 800; margin-bottom: 8px;">${day}</div>
-                ${eventsHtml}
-            </div>
-        `;
+        container.appendChild(dayDiv);
     }
 }
 
@@ -525,32 +558,62 @@ window.openEditModal = async (id) => {
         }
 
         // Histórico
+        const roadmapContainer = document.getElementById('edit-asset-roadmap-container');
+        roadmapContainer.replaceChildren();
+        
+        const gridDiv = document.createElement('div');
+        gridDiv.className = 'edit-modal-grid';
+        gridDiv.style.cssText = 'display:grid; grid-template-columns:1fr 1fr; gap:20px;';
+        
+        const leftDiv = document.createElement('div');
+        const captionLabel = document.createElement('label');
+        captionLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;';
+        captionLabel.textContent = 'Roteiro Estratégico (Pauta)';
+        const captionTextarea = document.createElement('textarea');
+        captionTextarea.id = 'edit-asset-caption';
+        captionTextarea.style.cssText = 'width:100%; height:320px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none;';
+        leftDiv.appendChild(captionLabel);
+        leftDiv.appendChild(captionTextarea);
+        
+        const rightDiv = document.createElement('div');
+        const historyLabel = document.createElement('label');
+        historyLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;';
+        historyLabel.textContent = 'Histórico de Feedbacks';
+        const historyContainer = document.createElement('div');
+        historyContainer.id = 'edit-asset-history';
+        historyContainer.style.cssText = 'height:320px; background:#050505; border:1px solid #222; border-radius:8px; overflow-y:auto; padding: 5px;';
+        
         const history = c.metadata?.history || [];
-        const historyHtml = history.length > 0 ? history.map(h => `
-            <div style="padding:10px; border-bottom:1px solid #222; font-size:0.7rem;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <b style="color:#ef4444">${h.type === 'CLIENT' ? '📌 REJEITADO PELO CLIENTE' : '🛡️ AJUSTE'}</b>
-                    <span style="opacity:0.5;">${new Date(h.date).toLocaleString('pt-BR')}</span>
-                </div>
-                <div style="color:#eee; line-height:1.4;">${h.note}</div>
-                <div style="font-size:0.6rem; opacity:0.4; margin-top:3px;">Por: ${h.author}</div>
-            </div>
-        `).join('') : '<div style="padding:40px; text-align:center; opacity:0.3; font-size:0.7rem;">Sem histórico de ajustes até o momento.</div>';
-
-        document.getElementById('edit-asset-roadmap-container').innerHTML = `
-            <div class="edit-modal-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
-                <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;">Roteiro Estratégico (Pauta)</label>
-                    <textarea id="edit-asset-caption" style="width:100%; height:320px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none;"></textarea>
-                </div>
-                <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;">Histórico de Feedbacks</label>
-                    <div id="edit-asset-history" style="height:320px; background:#050505; border:1px solid #222; border-radius:8px; overflow-y:auto; padding: 5px;">
-                        ${historyHtml}
+        if (history.length > 0) {
+            history.forEach(h => {
+                const hDiv = document.createElement('div');
+                hDiv.style.cssText = 'padding:10px; border-bottom:1px solid #222; font-size:0.7rem;';
+                hDiv.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <b class="safe-h-title" style="color:#ef4444"></b>
+                        <span style="opacity:0.5;">${new Date(h.date).toLocaleString('pt-BR')}</span>
                     </div>
-                </div>
-            </div>
-        `;
+                    <div class="safe-h-note" style="color:#eee; line-height:1.4;"></div>
+                    <div class="safe-h-author" style="font-size:0.6rem; opacity:0.4; margin-top:3px;"></div>
+                `;
+                hDiv.querySelector('.safe-h-title').textContent = h.type === 'CLIENT' ? '📌 REJEITADO PELO CLIENTE' : '🛡️ AJUSTE';
+                hDiv.querySelector('.safe-h-note').textContent = h.note;
+                hDiv.querySelector('.safe-h-author').textContent = `Por: ${h.author}`;
+                historyContainer.appendChild(hDiv);
+            });
+        } else {
+            const hDiv = document.createElement('div');
+            hDiv.style.cssText = 'padding:40px; text-align:center; opacity:0.3; font-size:0.7rem;';
+            hDiv.textContent = 'Sem histórico de ajustes até o momento.';
+            historyContainer.appendChild(hDiv);
+        }
+        
+        rightDiv.appendChild(historyLabel);
+        rightDiv.appendChild(historyContainer);
+        
+        gridDiv.appendChild(leftDiv);
+        gridDiv.appendChild(rightDiv);
+        roadmapContainer.appendChild(gridDiv);
         
         document.getElementById('edit-asset-caption').value = versions[currentVersion]?.caption || c.caption || '';
 
@@ -561,58 +624,80 @@ window.openEditModal = async (id) => {
             metaGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
             metaGrid.style.gap = '20px';
 
-            const currentLogical = mapToStandardStatus(c.status).toLowerCase();
-            const currentStatusObj = StatusEngine.resolve('conteudos', currentLogical);
-            const allowedTransitions = STATUS_SYSTEM.conteudos[currentLogical]?.allowedTransitions || [];
+            const currentLogical = mapToStandardStatus(c.status).toLowerCase(); 
+            const currentStatusObj = StatusEngine.resolve('conteudos', currentLogical); 
+            const allowedTransitions = STATUS_SYSTEM.conteudos[currentLogical]?.allowedTransitions || []; 
+ 
+            metaGrid.replaceChildren();
 
-            const statusSelectorHtml = `
-                <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">STATUS OPERACIONAL (GOVERNANÇA)</label>
-                    <select id="edit-asset-status-selector" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
-                        <option value="${c.status}">${currentStatusObj.label} (Atual)</option>
-                        ${allowedTransitions.map(target => {
-                            const targetRes = StatusEngine.resolve('conteudos', target);
-                            let dbStatusVal = target.toUpperCase();
-                            if (target === 'draft_planning') dbStatusVal = 'PLANEJAMENTO';
-                            else if (target === 'internal_review') dbStatusVal = 'REVISÃO GESTÃO';
-                            else if (target === 'client_review_planning') dbStatusVal = 'APROVAÇÃO PLANEJAMENTO';
-                            else if (target === 'client_revision_planning') dbStatusVal = 'AJUSTE';
-                            else if (target === 'in_production') dbStatusVal = 'PRODUÇÃO';
-                            else if (target === 'client_revision_content') dbStatusVal = 'AJUSTE DE PRODUÇÃO';
-                            else if (target === 'internal_qa') dbStatusVal = 'REVISÃO INTERNA FINAL';
-                            else if (target === 'client_review_content') dbStatusVal = 'APROVAÇÃO FINAL';
-                            else if (target === 'ready_to_post') dbStatusVal = 'PRONTO';
-                            else if (target === 'posted') dbStatusVal = 'PUBLICADO';
-                            return `<option value="${dbStatusVal}">Mudar para: ${targetRes.label}</option>`;
-                        }).join('')}
-                    </select>
-                </div>
+            const respDiv = document.createElement('div');
+            respDiv.innerHTML = `
+                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONSÁVEL</label> 
+                <select id="edit-asset-responsible" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;"> 
+                    <option value="Design">Design</option> 
+                    <option value="Audiovisual">Audiovisual</option> 
+                    <option value="Estrategista">Estrategista</option> 
+                    <option value="Gestor de Tráfego">Gestor de Tráfego</option> 
+                </select> 
             `;
-
-            metaGrid.innerHTML = `
-                <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONSÁVEL</label>
-                    <select id="edit-asset-responsible" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
-                        <option value="Design">Design</option>
-                        <option value="Audiovisual">Audiovisual</option>
-                        <option value="Estrategista">Estrategista</option>
-                        <option value="Gestor de Tráfego">Gestor de Tráfego</option>
-                    </select>
-                </div>
-                <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRAZO DE APROVAÇÃO</label>
-                    <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
-                </div>
-                <div>
-                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRIORIDADE</label>
-                    <select id="edit-asset-priority" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
-                        <option value="BAIXA">BAIXA</option>
-                        <option value="MÉDIA">MÉDIA</option>
-                        <option value="ALTA">ALTA</option>
-                    </select>
-                </div>
-                ${statusSelectorHtml}
+            
+            const deadlineDiv = document.createElement('div');
+            deadlineDiv.innerHTML = `
+                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRAZO DE APROVAÇÃO</label> 
+                <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;"> 
             `;
+            
+            const priorityDiv = document.createElement('div');
+            priorityDiv.innerHTML = `
+                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRIORIDADE</label> 
+                <select id="edit-asset-priority" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;"> 
+                    <option value="BAIXA">BAIXA</option> 
+                    <option value="MÉDIA">MÉDIA</option> 
+                    <option value="ALTA">ALTA</option> 
+                </select> 
+            `;
+            
+            const statusDiv = document.createElement('div');
+            const statusLabel = document.createElement('label');
+            statusLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;';
+            statusLabel.textContent = 'STATUS OPERACIONAL (GOVERNANÇA)';
+            
+            const statusSelect = document.createElement('select');
+            statusSelect.id = 'edit-asset-status-selector';
+            statusSelect.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;';
+            
+            const currentOpt = document.createElement('option');
+            currentOpt.value = c.status;
+            currentOpt.textContent = `${currentStatusObj.label} (Atual)`;
+            statusSelect.appendChild(currentOpt);
+            
+            allowedTransitions.forEach(target => {
+                const targetRes = StatusEngine.resolve('conteudos', target); 
+                let dbStatusVal = target.toUpperCase(); 
+                if (target === 'draft_planning') dbStatusVal = 'PLANEJAMENTO'; 
+                else if (target === 'internal_review') dbStatusVal = 'REVISÃO GESTÃO'; 
+                else if (target === 'client_review_planning') dbStatusVal = 'APROVAÇÃO PLANEJAMENTO'; 
+                else if (target === 'client_revision_planning') dbStatusVal = 'AJUSTE'; 
+                else if (target === 'in_production') dbStatusVal = 'PRODUÇÃO'; 
+                else if (target === 'client_revision_content') dbStatusVal = 'AJUSTE DE PRODUÇÃO'; 
+                else if (target === 'internal_qa') dbStatusVal = 'REVISÃO INTERNA FINAL'; 
+                else if (target === 'client_review_content') dbStatusVal = 'APROVAÇÃO FINAL'; 
+                else if (target === 'ready_to_post') dbStatusVal = 'PRONTO'; 
+                else if (target === 'posted') dbStatusVal = 'PUBLICADO'; 
+                
+                const opt = document.createElement('option');
+                opt.value = dbStatusVal;
+                opt.textContent = `Mudar para: ${targetRes.label}`;
+                statusSelect.appendChild(opt);
+            });
+            
+            statusDiv.appendChild(statusLabel);
+            statusDiv.appendChild(statusSelect);
+            
+            metaGrid.appendChild(respDiv);
+            metaGrid.appendChild(deadlineDiv);
+            metaGrid.appendChild(priorityDiv);
+            metaGrid.appendChild(statusDiv);
 
             document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || 'Design';
             document.getElementById('edit-asset-priority').value = c.priority || 'MÉDIA';
@@ -987,33 +1072,43 @@ function injectTimelineEvent(projId, type, desc) {
     } catch (e) {}
 }
 
-function renderTimelineTab() {
-    const feed = document.getElementById('timeline-operational-feed');
-    if (!feed) return;
-
-    const mockTimeline = JSON.parse(localStorage.getItem('fluxai_mock_timeline') || '[]');
-    const projectTimeline = currentProject 
-        ? mockTimeline.filter(t => t.project_id === currentProject)
-        : mockTimeline;
-
-    if (projectTimeline.length === 0) {
-        feed.innerHTML = `<div style="padding:40px; text-align:center; color:var(--os-text-muted); font-size:0.8rem;">Nenhum log de transição operacional neste ciclo.</div>`;
-        return;
-    }
-
-    feed.innerHTML = projectTimeline.map(t => {
-        const typeColor = t.type === 'SISTEMA' ? 'var(--os-primary)' : (t.type === 'IA_ENGINE' ? '#10b981' : '#60a5fa');
-        return `
-            <div style="background:rgba(255,255,255,0.02); border:1px solid var(--os-border); border-left: 3px solid ${typeColor}; padding:15px; border-radius:6px; font-family:'JetBrains Mono', monospace; font-size:0.75rem;">
-                <div style="display:flex; justify-content:between; align-items:center; margin-bottom:5px;">
-                    <strong style="color:${typeColor}">${t.title}</strong>
-                    <span style="margin-left:auto; opacity:0.4; font-size:0.65rem;">${new Date(t.date).toLocaleString('pt-BR')}</span>
-                </div>
-                <div style="color:#ddd; margin-top:5px; line-height:1.4;">${t.description}</div>
-                <div style="font-size:0.6rem; opacity:0.4; margin-top:5px; text-align:right;">Autor: ${t.author}</div>
-            </div>
-        `;
-    }).join('');
+function renderTimelineTab() { 
+    const feed = document.getElementById('timeline-operational-feed'); 
+    if (!feed) return; 
+ 
+    const mockTimeline = JSON.parse(localStorage.getItem('fluxai_mock_timeline') || '[]'); 
+    const projectTimeline = currentProject  
+        ? mockTimeline.filter(t => t.project_id === currentProject) 
+        : mockTimeline; 
+ 
+    feed.replaceChildren();
+    if (projectTimeline.length === 0) { 
+        const div = document.createElement('div');
+        div.style.cssText = "padding:40px; text-align:center; color:var(--os-text-muted); font-size:0.8rem;";
+        div.textContent = "Nenhum log de transição operacional neste ciclo.";
+        feed.appendChild(div);
+        return; 
+    } 
+ 
+    projectTimeline.forEach(t => { 
+        const typeColor = t.type === 'SISTEMA' ? 'var(--os-primary)' : (t.type === 'IA_ENGINE' ? '#10b981' : '#60a5fa'); 
+        
+        const div = document.createElement('div');
+        div.style.cssText = `background:rgba(255,255,255,0.02); border:1px solid var(--os-border); border-left: 3px solid ${typeColor}; padding:15px; border-radius:6px; font-family:'JetBrains Mono', monospace; font-size:0.75rem; margin-bottom: 8px;`;
+        
+        div.innerHTML = ` 
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;"> 
+                <strong class="safe-title" style="color:${typeColor}"></strong> 
+                <span style="opacity:0.4; font-size:0.65rem;">${new Date(t.date).toLocaleString('pt-BR')}</span> 
+            </div> 
+            <div class="safe-desc" style="color:#ddd; margin-top:5px; line-height:1.4;"></div> 
+            <div class="safe-author" style="font-size:0.6rem; opacity:0.4; margin-top:5px; text-align:right;"></div> 
+        `; 
+        div.querySelector('.safe-title').textContent = t.title;
+        div.querySelector('.safe-desc').textContent = t.description;
+        div.querySelector('.safe-author').textContent = `Autor: ${t.author}`;
+        feed.appendChild(div);
+    }); 
 }
 
 function renderIntelligenceTab() {
@@ -1030,37 +1125,38 @@ function renderIntelligenceTab() {
     if (fatigue) fatigue.innerText = "12.3%";
     if (performance) performance.innerText = "94/100 (A+)";
 
-    // 1. Tabela de Performance
-    if (rankingBody) {
-        rankingBody.innerHTML = `
-            <tr>
-                <td style="font-weight:700; color:#fff;">Direção Audiovisual (Reels): Organização Alimentar Real</td>
-                <td>12.450 visualizações</td>
-                <td style="color:var(--os-success);">71.2% (Alto)</td>
-                <td>34 Leads</td>
-                <td style="font-weight:800; color:var(--os-primary);">96 / 100</td>
-            </tr>
-            <tr>
-                <td style="font-weight:700; color:#fff;">Estrutura Narrativa (Carrossel): Substituições Inteligentes</td>
-                <td>8.900 visualizações</td>
-                <td>58.9% (Médio)</td>
-                <td>18 Leads</td>
-                <td style="font-weight:800; color:var(--os-primary);">88 / 100</td>
-            </tr>
-            <tr>
-                <td style="font-weight:700; color:#fff;">Direção Audiovisual (Reels): Bastidores da Nutrição Humana</td>
-                <td>15.200 visualizações</td>
-                <td style="color:var(--os-success);">75.1% (Excelente)</td>
-                <td>35 Leads</td>
-                <td style="font-weight:800; color:var(--os-primary);">98 / 100</td>
-            </tr>
-        `;
-    }
-
-    // 2. Diagnóstico IA
-    if (diagnostic) {
-        diagnostic.innerHTML = `
-> [IA COGNITIVE ENGINE] Diagnóstico Narrativo de 30 Dias...
+    // 1. Tabela de Performance 
+    if (rankingBody) { 
+        rankingBody.replaceChildren();
+        const data = [
+            { t: "Direção Audiovisual (Reels): Organização Alimentar Real", v: "12.450 visualizações", r: "71.2% (Alto)", l: "34 Leads", s: "96 / 100", rc: "var(--os-success)" },
+            { t: "Estrutura Narrativa (Carrossel): Substituições Inteligentes", v: "8.900 visualizações", r: "58.9% (Médio)", l: "18 Leads", s: "88 / 100", rc: "" },
+            { t: "Direção Audiovisual (Reels): Bastidores da Nutrição Humana", v: "15.200 visualizações", r: "75.1% (Excelente)", l: "35 Leads", s: "98 / 100", rc: "var(--os-success)" }
+        ];
+        data.forEach(d => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td class="safe-t" style="font-weight:700; color:#fff;"></td>
+                <td class="safe-v"></td>
+                <td class="safe-r" style="color:${d.rc};"></td>
+                <td class="safe-l"></td>
+                <td class="safe-s" style="font-weight:800; color:var(--os-primary);"></td>
+            `;
+            tr.querySelector('.safe-t').textContent = d.t;
+            tr.querySelector('.safe-v').textContent = d.v;
+            tr.querySelector('.safe-r').textContent = d.r;
+            tr.querySelector('.safe-l').textContent = d.l;
+            tr.querySelector('.safe-s').textContent = d.s;
+            rankingBody.appendChild(tr);
+        });
+    } 
+ 
+    // 2. Diagnóstico IA 
+    if (diagnostic) { 
+        diagnostic.replaceChildren();
+        const pre = document.createElement('pre');
+        pre.style.cssText = "white-space: pre-wrap; font-family: inherit;";
+        pre.textContent = `> [IA COGNITIVE ENGINE] Diagnóstico Narrativo de 30 Dias...
 
 ==================================================
 1. ANÁLISE DE FADIGA NARRATIVA:
@@ -1075,8 +1171,8 @@ function renderIntelligenceTab() {
 
 3. RETENÇÃO AUDIOVISUAL:
 - Reels com ganchos falados na primeira pessoa (eu) retêm 14% mais nos primeiros 3 segundos do que ganchos institucionais.
-==================================================
-        `;
+==================================================`;
+        diagnostic.appendChild(pre);
     }
 }
 

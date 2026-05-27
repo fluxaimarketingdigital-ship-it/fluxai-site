@@ -38,12 +38,12 @@ O GitHub CodeQL identificou **41 alertas** de segurança na base de código atra
   - Injeção global da função `window.escapeHTML` em `os-core.js`.
   - Substituição de interpolação direta insegura em `innerHTML` nos arquivos `client-portal.html`, `approval.html` e `cliente-detalhe.js`. As variáveis renderizadas dinamicamente (como preços, nomes, textos ricos, referências) agora passam pelo filtro do `escapeHTML()`.
 
-### Vazamento de Dados Sensíveis (Storage / Logs)
-- **Status Anterior:** 9 Alertas Medium
-- **Ação Tomada:** MITIGADO.
-  - Implementação da função `redactSensitiveFields()` em `logs-engine.js`.
+### Vazamento de Dados Sensíveis (Storage / Logs) 
+- **Status Anterior:** 9 Alertas Medium / 5 Alertas High (Clear text storage of sensitive info)
+- **Ação Tomada:** MITIGADO. 
+  - O btoa foi removido porque não representa criptografia nem proteção real. O armazenamento local foi reduzido para dados não sensíveis de contexto de UI, como role, workspace ativo, timestamp e preferências operacionais mínimas. Nenhum token, access_token, refresh_token, senha, webhook, auth object completo ou payload bruto deve ser persistido em localStorage/sessionStorage.
+  - Implementação da função `redactSensitiveFields()` em `logs-engine.js`. 
   - Implementação da função `safeStringify()` com proteção contra *circular references* e controle rigoroso de limite de payload (`2000` caracteres máximo).
-  - Sanitização prévia (antes da persistência no `localStorage`) de senhas, tokens, emails, CPFs e chaves de API.
 
 ### Prototype Pollution (Assignment)
 - **Ação Tomada:** MITIGADO.

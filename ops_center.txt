@@ -1,0 +1,180 @@
+﻿                    let iaBadge = cfg.iaBlocked 
+                        ? '<span class="os-badge os-badge-danger">Bloqueada</span>' 
+                        : '<span class="os-badge os-badge-success">Liberada</span>';
+
+                    let autoBadge = cfg.automationsPaused 
+                        ? '<span class="os-badge os-badge-warning">Pausadas</span>' 
+                        : '<span class="os-badge os-badge-success">Ativas</span>';
+
+                    // OcupaÃ§Ã£o IA no ciclo: ativos que ocupam limite (aprovado + publicado + aguardando_publicacao)
+                    const clientAssets = mockAssets.filter(a => a.project_id === p.id || a.projectId === p.id);
+                    const occupied = clientAssets.filter(a => ['aprovado', 'aguardando_publicacao', 'publicado'].includes(a.status)).length;
+                    const limitWarning = occupied >= cfg.iaLimit ? 'color: var(--os-danger); font-weight:700;' : '';
+
+                    let tokenStatusBadge = '<span class="os-badge os-badge-success">OK</span>';
+                    if (p.tokenStatus === 'expirado') tokenStatusBadge = '<span class="os-badge os-badge-danger">Expirado</span>';
+                    else if (p.tokenStatus === 'ausente') tokenStatusBadge = '<span class="os-badge os-badge-neutral">Ausente</span>';
+
+                    html += `
+                        <tr>
+                            <td class="cell-primary">${p.company_name || p.name}</td>
+                            <td style="${limitWarning}">${occupied} / ${cfg.iaLimit}</td>
+                            <td>${iaBadge}</td>
+                            <td>${autoBadge}</td>
+                            <td>${tokenStatusBadge}</td>
+                        </tr>
+                    `;
+                });
+            }
+            tableRiskBody.innerHTML = html;
+        }
+
+        // --- RENDERIZAR TABELA 2: BACKLOG DE CONTEÃšDO & RELATÃ“RIOS ---
+        const tableContentBody = document.querySelector('#table-content-backlog tbody');
+        if (tableContentBody) {
+            let html = '';
+            const backlogItems = [];
+
+            // Adicionar ativos IA pendentes
+            mockAssets.filter(a => ['em_revisao', 'aprovado', 'aguardando_publicacao'].includes(a.status)).forEach(a => {
+                let action = 'Revisar ConteÃºdo';
+                if (a.status === 'aprovado') action = 'Aprovar e Agendar';
+                else if (a.status === 'aguardando_publicacao') action = 'Publicar Post';
+
+                backlogItems.push({
+                    id: a.id,
+                    ref: a.title || a.title_pauta || 'ConteÃºdo Sem TÃ­tulo',
+                    type: 'Mesa Editorial IA',
+                    status: a.status,
+                    action: action,
+                    link: 'content-engine.html'
+                });
+            });
+
+            // Adicionar relatÃ³rios pendentes
+            mockReports.filter(r => ['rascunho', 'em_revisao', 'aprovado_internamente'].includes(r.status)).forEach(r => {
+                let action = 'Revisar AnÃ¡lise';
+                if (r.status === 'aprovado_internamente') action = 'Liberar para Cliente';
+
+                backlogItems.push({
+                    id: r.id || r.clientId,
+                    ref: `${r.clientId} - ${r.month}`,
+                    type: 'RelatÃ³rio Mensal',
+                    status: r.status,
+                    action: action,
+                    link: 'relatorio-mensal.html'
+                });
+            });
+
+            if (backlogItems.length === 0) {
+                html = '<tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Nenhum conteÃºdo ou relatÃ³rio pendente.</td></tr>';
+            } else {
+                backlogItems.slice(0, 8).forEach(item => {
+                    let statusBadge = '<span class="os-badge os-badge-neutral">' + item.status + '</span>';
+                    if (item.status === 'em_revisao') statusBadge = '<span class="os-badge os-badge-info">Em RevisÃ£o</span>';
+                    else if (item.status === 'aprovado' || item.status === 'aprovado_internamente') statusBadge = '<span class="os-badge os-badge-warning">Aprovado Interno</span>';
+                    else if (item.status === 'aguardando_publicacao') statusBadge = '<span class="os-badge os-badge-warning">Aguardando Pub</span>';
+
+                    html += `
+                        <tr>
+                            <td class="cell-primary"><a href="${item.link}" style="color:#fff; text-decoration:none; border-bottom: 1px dotted var(--os-primary-dim);">${item.ref}</a></td>
+                            <td>${item.type}</td>
+                            <td>${statusBadge}</td>
+                            <td><span style="font-size:0.75rem; font-weight:700; color:var(--os-primary);">${item.action}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+            tableContentBody.innerHTML = html;
+        }
+
+        // --- RENDERIZAR TABELA 3: APROVAÃ‡Ã•ES E DEMANDAS ---
+        const tableApprovalsBody = document.querySelector('#table-approvals-demands tbody');
+        if (tableApprovalsBody) {
+            let html = '';
+            const list = [];
+
+            // Demanda
+            mockDemands.filter(d => ['aberta', 'em_andamento', 'aguardando'].includes(d.status)).forEach(d => {
+                list.push({
+                    origem: 'Portal Cliente',
+                    ref: `Demanda: ${d.title}`,
+                    status: d.status,
+                    action: 'Produzir Entrega',
+                    link: 'demandas.html'
+                });
+            });
+
+            // AprovaÃ§Ãµes Supabase
+            pendingApprovals.forEach(a => {
+                list.push({
+                    origem: 'AprovaÃ§Ã£o Externa',
+                    ref: `${a.projects?.company_name || 'Cliente'} - ${a.type === 'PLANNING' ? 'Planejamento' : 'Arte/ConteÃºdo'}`,
+                    status: 'pendente_cliente',
+                    action: 'Aguardar Cliente',
+                    link: `approval.html?token=${a.token}`
+                });
+            });
+
+            if (list.length === 0) {
+                html = '<tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Nenhuma demanda ou aprovaÃ§Ã£o externa pendente.</td></tr>';
+            } else {
+                list.slice(0, 8).forEach(item => {
+                    let badge = '<span class="os-badge os-badge-neutral">' + item.status + '</span>';
+                    if (item.status === 'aberta') badge = '<span class="os-badge os-badge-info">Aberta</span>';
+                    else if (item.status === 'em_andamento') badge = '<span class="os-badge os-badge-warning">Em ProduÃ§Ã£o</span>';
+                    else if (item.status === 'aguardando') badge = '<span class="os-badge os-badge-neutral">Pendente Equipe</span>';
+                    else if (item.status === 'pendente_cliente') badge = '<span class="os-badge os-badge-warning">Com Cliente</span>';
+
+                    html += `
+                        <tr>
+                            <td>${item.origem}</td>
+                            <td class="cell-primary"><a href="${item.link}" style="color:#fff; text-decoration:none; border-bottom: 1px dotted var(--os-primary-dim);">${item.ref}</a></td>
+                            <td>${badge}</td>
+                            <td><span style="font-size:0.75rem; font-weight:700; color:var(--os-primary);">${item.action}</span></td>
+                        </tr>
+                    `;
+                });
+            }
+            tableApprovalsBody.innerHTML = html;
+        }
+
+        // --- RENDERIZAR TABELA 4: WEBHOOK ERRORS & ERRORS ---
+        const tableWebhookErrorsBody = document.querySelector('#table-webhook-errors tbody');
+        if (tableWebhookErrorsBody) {
+            let html = '';
+            
+            // Filtrar logs de erro operacionais reais ou simulados
+            const errorLogs = allLogs.filter(l => l.severity === 'critical' || l.severity === 'warning' || l.action_type === 'WEBHOOK_REAL_FAILED' || l.action_type === 'SYSTEM_ERROR');
+
+            if (errorLogs.length === 0) {
+                html = '<tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5; color: var(--os-success);">Nenhum erro de conexÃ£o ou webhook registrado. Sistema estÃ¡vel.</td></tr>';
+            } else {
+                errorLogs.slice(0, 8).forEach(log => {
+                    const time = log.timestamp ? log.timestamp.split('T')[1].substring(0, 5) : 'N/A';
+                    
+                    let sevBadge = '<span class="os-badge os-badge-neutral">' + log.severity + '</span>';
+                    if (log.severity === 'critical') sevBadge = '<span class="os-badge os-badge-danger">CrÃ­tico</span>';
+                    else if (log.severity === 'warning') sevBadge = '<span class="os-badge os-badge-warning">Aviso</span>';
+
+                    let errorMsg = log.payload?.error || log.payload?.reason || JSON.stringify(log.payload || '');
+                    if (typeof errorMsg === 'object') errorMsg = JSON.stringify(errorMsg);
+                    if (errorMsg.length > 50) errorMsg = errorMsg.substring(0, 50) + '...';
+
+                    html += `
+                        <tr>
+                            <td class="cell-mono">${time}</td>
+                            <td class="cell-primary" style="font-size:0.75rem;">${log.action_type}</td>
+                            <td>${sevBadge}</td>
+                            <td style="font-size:0.7rem; font-family: var(--os-font-mono); color: var(--os-danger);">${errorMsg}</td>
+                        </tr>
+                    `;
+                });
+            }
+            tableWebhookErrorsBody.innerHTML = html;
+        }
+
+    } catch (e) {
+        console.error('[OPERATIONS CENTER] Erro geral ao renderizar os dados do painel.', e);
+    }
+}

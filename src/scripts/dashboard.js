@@ -10,17 +10,17 @@ export const initDashboard = () => {
     const initialContent = display.querySelector('.display-content');
     if (initialContent) {
         const initialModId = document.querySelector('.nav-item.active')?.getAttribute('data-module');
-        if (initialModId) cache[initialModId] = initialContent.outerHTML;
+        if (initialModId) cache[initialModId] = initialContent;
     }
 
-    const updateDisplay = (contentHtml) => {
+    const updateDisplay = (contentNode) => {
         const currentContent = display.querySelector('.display-content');
         if (currentContent) {
             currentContent.style.opacity = '0';
             currentContent.style.transform = 'translateY(10px)';
             
             setTimeout(() => {
-                display.innerHTML = contentHtml;
+                display.replaceChildren(contentNode);
                 const newContent = display.querySelector('.display-content');
                 if (newContent) {
                     newContent.style.display = 'block';
@@ -34,7 +34,7 @@ export const initDashboard = () => {
                 }
             }, 400);
         } else {
-            display.innerHTML = contentHtml;
+            display.replaceChildren(contentNode);
             const newContent = display.querySelector('.display-content');
             if (newContent) {
                 newContent.style.display = 'block';
@@ -45,21 +45,25 @@ export const initDashboard = () => {
 
     const loadModule = async (url, moduleId) => {
         if (cache[moduleId]) {
-            updateDisplay(cache[moduleId]);
+            updateDisplay(cache[moduleId].cloneNode(true));
             return;
         }
 
         // Show loading state (Silently)
-        const loadingHtml = `<div class="display-content active" style="opacity: 0.5;">
+        const loadingNode = document.createElement('div');
+        loadingNode.className = 'display-content active';
+        loadingNode.style.opacity = '0.5';
+        loadingNode.innerHTML = `
             <div class="display-header">
                 <span class="data-badge">[LOADING.SYS]</span>
                 <h3>Processando...</h3>
             </div>
             <div class="display-body">
-                <p>Carregando infraestrutura de ${moduleId.replace(/-/g, ' ').toUpperCase()}...</p>
+                <p class="safe-loading-msg"></p>
             </div>
-        </div>`;
-        updateDisplay(loadingHtml);
+        `;
+        loadingNode.querySelector('.safe-loading-msg').textContent = `Carregando infraestrutura de ${moduleId.replace(/-/g, ' ').toUpperCase()}...`;
+        updateDisplay(loadingNode);
 
         try {
             const fetchUrl = url.startsWith("/pages/") ? url : "/pages/" + url.split("/").pop().replace(".html", "") + ".html"; const response = await fetch(fetchUrl);
@@ -71,21 +75,40 @@ export const initDashboard = () => {
             if (mainContent) {
                 const title = mainContent.querySelector('h1')?.innerText || '';
                 const modLabel = mainContent.querySelector('.section-top-label')?.innerText || '';
-                const body = mainContent.querySelector('.editorial-content')?.innerHTML || '';
+                const bodyNodes = mainContent.querySelector('.editorial-content')?.cloneNode(true) || document.createElement('div');
 
-                const formattedHtml = `<div class="display-content reveal">
-                    <div class="display-header">
-                        <span class="data-badge">${modLabel}</span>
-                        <h3>${title}</h3>
-                    </div>
-                    <div class="display-body">${body}</div>
-                    <div class="display-footer" style="margin-top: 30px;">
-                        <a href="${url}" class="btn btn-secondary">Explorar Arquitetura Completa <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
-                </div>`;
+                const formattedNode = document.createElement('div');
+                formattedNode.className = 'display-content reveal';
+                
+                const header = document.createElement('div');
+                header.className = 'display-header';
+                const badge = document.createElement('span');
+                badge.className = 'data-badge';
+                badge.textContent = modLabel;
+                const h3 = document.createElement('h3');
+                h3.textContent = title;
+                header.appendChild(badge);
+                header.appendChild(h3);
+                
+                const bodyDiv = document.createElement('div');
+                bodyDiv.className = 'display-body';
+                bodyDiv.appendChild(bodyNodes);
+                
+                const footer = document.createElement('div');
+                footer.className = 'display-footer';
+                footer.style.marginTop = '30px';
+                const a = document.createElement('a');
+                a.className = 'btn btn-secondary';
+                a.href = url;
+                a.innerHTML = 'Explorar Arquitetura Completa <i class="fa-solid fa-arrow-right"></i>';
+                footer.appendChild(a);
+                
+                formattedNode.appendChild(header);
+                formattedNode.appendChild(bodyDiv);
+                formattedNode.appendChild(footer);
 
-                cache[moduleId] = formattedHtml;
-                updateDisplay(formattedHtml);
+                cache[moduleId] = formattedNode;
+                updateDisplay(formattedNode.cloneNode(true));
             }
         } catch (error) {
             console.error("Erro ao carregar módulo:", error);

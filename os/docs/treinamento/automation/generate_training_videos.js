@@ -33,15 +33,21 @@ const VIEWPORT       = { width: 1920, height: 1080 };
 function startServer() {
     return new Promise((resolve) => {
         const mime = { '.html': 'text/html', '.js': 'application/javascript', '.css': 'text/css', '.png': 'image/png', '.jpg': 'image/jpeg', '.svg': 'image/svg+xml', '.json': 'application/json', '.pdf': 'application/pdf', '.woff2': 'font/woff2', '.ico': 'image/x-icon' };
-        const server = http.createServer((req, res) => {
-            let filePath = path.join(PROJECT_ROOT, req.url.split('?')[0]);
-            if (filePath.endsWith('/')) filePath += 'index.html';
-            fs.readFile(filePath, (err, data) => {
-                if (err) { res.writeHead(404); res.end('Not found'); return; }
-                res.writeHead(200, { 'Content-Type': mime[path.extname(filePath)] || 'text/plain' });
-                res.end(data);
-            });
-        });
+        const server = http.createServer((req, res) => { 
+            let reqPath = decodeURIComponent(req.url.split('?')[0]); 
+            let filePath = path.normalize(path.join(PROJECT_ROOT, reqPath)); 
+            if (filePath.endsWith(path.sep) || reqPath.endsWith('/')) filePath = path.join(filePath, 'index.html'); 
+            
+            const resolvedPath = path.resolve(filePath);
+            const resolvedRoot = path.resolve(PROJECT_ROOT);
+            if (!resolvedPath.startsWith(resolvedRoot)) { res.writeHead(403); res.end('Forbidden'); return; } 
+            
+            fs.readFile(resolvedPath, (err, data) => { 
+                if (err) { res.writeHead(404); res.end('Not found'); return; } 
+                res.writeHead(200, { 'Content-Type': mime[path.extname(resolvedPath)] || 'text/plain' }); 
+                res.end(data); 
+            }); 
+        }); 
         server.listen(PORT, '127.0.0.1', () => {
             console.log(`✅ Servidor local iniciado em ${BASE_URL}`);
             resolve(server);

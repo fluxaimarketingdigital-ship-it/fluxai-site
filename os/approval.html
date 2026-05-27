@@ -596,8 +596,24 @@
                 document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
                 const refLink = c.metadata?.reference_url;
-                const safeRefLink = refLink && refLink.startsWith('http') ? window.escapeHTML(refLink) : '#';
-                document.getElementById('meta-reference').innerHTML = refLink ? `<a href="${safeRefLink}" target="_blank" style="color:var(--os-primary); text-decoration:none;"><i class="fa-solid fa-link"></i> Ver Referência</a>` : '<span style="opacity:0.3;">Não enviada</span>';
+                const metaRef = document.getElementById('meta-reference');
+                metaRef.replaceChildren();
+                if (refLink) {
+                    const a = document.createElement('a');
+                    a.href = refLink;
+                    a.target = '_blank';
+                    a.style.cssText = 'color:var(--os-primary); text-decoration:none;';
+                    const icon = document.createElement('i');
+                    icon.className = 'fa-solid fa-link';
+                    a.appendChild(icon);
+                    a.appendChild(document.createTextNode(' Ver Referência'));
+                    metaRef.appendChild(a);
+                } else {
+                    const span = document.createElement('span');
+                    span.style.opacity = '0.3';
+                    span.textContent = 'Não enviada';
+                    metaRef.appendChild(span);
+                }
                 
                 const deadlineEl = document.getElementById('meta-deadline-highlight');
                 if (c.metadata?.approval_deadline) {
@@ -822,14 +838,14 @@
                     
                     if (currentStatus === 'AJUSTE') {
                         document.getElementById('success-title').innerText = 'Ajuste em Andamento';
-                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:#60a5fa;">Seu Pedido de Ajuste:</strong><br>${c.internal_notes}</div>` : '';
+                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:#60a5fa;">Seu Pedido de Ajuste:</strong><br>${window.escapeHTML(c.internal_notes)}</div>` : '';
                         document.getElementById('success-message').innerHTML = `✅ Seus apontamentos foram recebidos e nossa equipe já está aplicando os ajustes no planejamento.<br><br>Assim que estiver pronto, você receberá acesso para uma nova rodada de aprovação. ${feedbackMsg}`;
                     } else if (currentStatus === 'PRODUÇÃO') {
                         document.getElementById('success-title').innerText = 'Em Produção';
                         document.getElementById('success-message').innerHTML = `🎬 <b>Planejamento Aprovado com sucesso!</b><br><br>Nossa equipe técnica já recebeu o briefing e está em fase de <b>Produção Audiovisual / Design</b>.<br><br>Você receberá uma notificação assim que a arte final estiver pronta para sua validação.`;
                     } else if (currentStatus === 'AJUSTE DE PRODUÇÃO') {
                         document.getElementById('success-title').innerText = 'Arte em Ajuste';
-                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(236,72,153,0.08); border:1px solid rgba(236,72,153,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:#ec4899;">Suas Observações:</strong><br>${c.internal_notes}</div>` : '';
+                        const feedbackMsg = c.internal_notes ? `<br><br><div style="background:rgba(236,72,153,0.08); border:1px solid rgba(236,72,153,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff;"><strong style="color:#ec4899;">Suas Observações:</strong><br>${window.escapeHTML(c.internal_notes)}</div>` : '';
                         document.getElementById('success-message').innerHTML = `🎨 Nossa equipe de design está refinando a arte final com base nos seus apontamentos. Em breve estará disponível para sua aprovação. ${feedbackMsg}`;
                     } else if (currentStatus === 'PRONTO' || currentStatus === 'PUBLICADO') {
                         document.getElementById('success-title').innerText = currentStatus === 'PUBLICADO' ? '🚀 Publicado!' : '✅ Conteúdo Finalizado!';
@@ -876,7 +892,24 @@
                 document.getElementById('meta-version').innerText = c.metadata?.version || 'V1';
                 
                 const refLink = c.metadata?.reference_url;
-                document.getElementById('meta-reference').innerHTML = refLink ? `<a href="${refLink}" target="_blank" style="color:var(--os-primary); text-decoration:none;"><i class="fa-solid fa-link"></i> Ver Referência</a>` : '<span style="opacity:0.3;">Não enviada</span>';
+                const metaRef = document.getElementById('meta-reference');
+                metaRef.replaceChildren();
+                if (refLink) {
+                    const a = document.createElement('a');
+                    a.href = refLink;
+                    a.target = '_blank';
+                    a.style.cssText = 'color:var(--os-primary); text-decoration:none;';
+                    const icon = document.createElement('i');
+                    icon.className = 'fa-solid fa-link';
+                    a.appendChild(icon);
+                    a.appendChild(document.createTextNode(' Ver Referência'));
+                    metaRef.appendChild(a);
+                } else {
+                    const span = document.createElement('span');
+                    span.style.opacity = '0.3';
+                    span.textContent = 'Não enviada';
+                    metaRef.appendChild(span);
+                }
                 
                 const deadlineEl = document.getElementById('meta-deadline-highlight');
                 if (c.metadata?.approval_deadline) {
@@ -900,11 +933,12 @@
                     .replace(/\n/g, '<br>');
                 
                 if (isFinalArt && c.metadata?.final_asset_url) {
+                    const safeFinalUrl = c.metadata.final_asset_url.startsWith('http') ? window.escapeHTML(c.metadata.final_asset_url) : '#';
                     document.getElementById('asset-caption').innerHTML = `
                         <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 40px 30px; border-radius: 12px; text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 20px;">
                             <i class="fa-solid fa-file-circle-check" style="font-size: 4rem; color: #8b5cf6; display: block;"></i>
                             <h3 style="color: #fff; margin: 0; font-size: 1.2rem;">A Arte Final está pronta!</h3>
-                            <a href="${c.metadata.final_asset_url}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 35px; border-radius: 8px; font-weight: 800; text-decoration: none;">
+                            <a href="${safeFinalUrl}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 35px; border-radius: 8px; font-weight: 800; text-decoration: none;">
                                 <i class="fa-solid fa-eye"></i> VISUALIZAR ARTE FINAL
                             </a>
                         </div>

@@ -110,10 +110,14 @@ mdTable += "|:---|:---:|:---:|:---|:---:|\n";
 
 results.forEach(res => {
     // Escapa caracteres markdown na snippet
-    const safeSnippet = res.snippet
-        .replace(/\|/g, '\\|')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+    const safeSnippet = String(res.snippet)
+        .replace(/&/g, '&amp;') 
+        .replace(/</g, '&lt;') 
+        .replace(/>/g, '&gt;') 
+        .replace(/"/g, '&quot;') 
+        .replace(/'/g, '&#x27;') 
+        .replace(/`/g, '&#x60;') 
+        .replace(/\|/g, '\\|'); 
     mdTable += `| [${path.basename(res.file)}](${res.file}) | ${res.line} | \`${res.term}\` | \`${safeSnippet}\` | ${res.classification} |\n`;
 });
 

@@ -602,15 +602,32 @@
         function openDemandaModal() {
             const select = document.getElementById('demanda-tipo');
             if (select && window.mockCatalogoServicos) {
-                let opts = '<option value="">Selecione o Tipo de Solicitação...</option>';
-                opts += '<option value="DEMANDA_NORMAL">Demanda Regular (Inclusa no Plano/Contrato)</option>';
-                opts += '<optgroup label="Serviços Extras (Avulsos - Faturamento Adicional)">';
+                select.replaceChildren();
+                const defaultOpt = document.createElement('option');
+                defaultOpt.value = '';
+                defaultOpt.textContent = 'Selecione o Tipo de Solicitação...';
+                select.appendChild(defaultOpt);
+
+                const normalOpt = document.createElement('option');
+                normalOpt.value = 'DEMANDA_NORMAL';
+                normalOpt.textContent = 'Demanda Regular (Inclusa no Plano/Contrato)';
+                select.appendChild(normalOpt);
+
+                const optGroup = document.createElement('optgroup');
+                optGroup.label = 'Serviços Extras (Avulsos - Faturamento Adicional)';
                 window.mockCatalogoServicos.filter(s => s.permite_orcamento).forEach(s => {
-                    opts += `<option value="${window.escapeHTML(s.servico_id)}">${window.escapeHTML(s.nome_servico)}</option>`;
+                    const opt = document.createElement('option');
+                    opt.value = s.servico_id;
+                    opt.textContent = s.nome_servico;
+                    optGroup.appendChild(opt);
                 });
-                opts += '<option value="SRV_EXTRA_CUSTOM">Outro Serviço Extra Customizado</option>';
-                opts += '</optgroup>';
-                select.innerHTML = opts;
+                
+                const customOpt = document.createElement('option');
+                customOpt.value = 'SRV_EXTRA_CUSTOM';
+                customOpt.textContent = 'Outro Serviço Extra Customizado';
+                optGroup.appendChild(customOpt);
+                
+                select.appendChild(optGroup);
             }
             document.getElementById('modal-demanda').style.display = 'flex';
         }
@@ -645,8 +662,12 @@
             };
 
             const btn = document.querySelector('.btn-nova-demanda');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO...';
+            const originalTextContent = [...btn.childNodes];
+            btn.replaceChildren();
+            const iIcon = document.createElement('i');
+            iIcon.className = 'fa-solid fa-spinner fa-spin';
+            btn.appendChild(iIcon);
+            btn.appendChild(document.createTextNode(' ENVIANDO...'));
             btn.disabled = true;
             
             const isExtra = demandaTipo !== 'DEMANDA_NORMAL';
@@ -695,30 +716,35 @@
                 if (OS_CONFIG.flags.mockData) {
                     if (isExtra) {
                         const mockExtras = JSON.parse(localStorage.getItem('fluxai_mock_extras') || '[]');
+                        const safeDesc = data.descricao_demanda;
+                        const safeTitle = demandaTitulo;
                         mockExtras.push({
                             id: generatedId,
                             project_id: tempClientId,
                             service_id: demandaTipo,
-                            title: demandaTitulo,
-                            description: data.descricao_demanda,
+                            title: safeTitle,
+                            description: safeDesc,
                             status: targetStatus,
                             price: null,
                             created_at: new Date().toISOString()
                         });
                         localStorage.setItem('fluxai_mock_extras', JSON.stringify(mockExtras));
                     } else {
-                        const mockDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands') || '[]');
-                        mockDemands.push({
-                            id: generatedId,
-                            project_id: tempClientId,
-                            title: demandaTitulo,
-                            description: data.descricao_demanda,
-                            status: targetStatus,
+                        const mockDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands') || '[]'); 
+                        const safeDesc = data.descricao_demanda; 
+                        const safeTitle = demandaTitulo; 
+                        mockDemands.push({ 
+                            id: generatedId, 
+                            project_id: tempClientId, 
+                            type: demandaTipo, 
+                            title: safeTitle, 
+                            description: safeDesc, 
+                            status: targetStatus, 
                             priority: data.prioridade,
                             due_date: data.prazo_desejado,
-                            created_at: new Date().toISOString()
-                        });
-                        localStorage.setItem('fluxai_mock_demands', JSON.stringify(mockDemands));
+                            created_at: new Date().toISOString() 
+                        }); 
+                        localStorage.setItem('fluxai_mock_demands', JSON.stringify(mockDemands)); 
                     }
                 }
 
@@ -738,7 +764,7 @@
                 );
                 alert('Não foi possível enviar sua solicitação agora. Tente novamente.');
             } finally {
-                btn.innerHTML = originalText;
+                btn.replaceChildren(...originalTextContent);
                 btn.disabled = false;
             }
         }
@@ -806,41 +832,78 @@
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     
                     const alertContainer = document.getElementById('expiration-alert-container');
+                    alertContainer.replaceChildren();
                     
                     if (diffDays === 2) {
-                        alertContainer.innerHTML = `
-                            <div class="expiration-banner warning">
-                                <div style="display:flex; align-items:center; gap:15px;">
-                                    <i class="fa-solid fa-circle-exclamation" style="font-size:1.5rem; color:var(--os-warning);"></i>
-                                    <div>
-                                        <h4 style="margin:0; font-size:0.85rem; color:#fff; font-weight:800;">Lembrete de Vencimento Próximo</h4>
-                                        <p style="margin:3px 0 0 0; font-size:0.7rem; color:var(--os-text-muted);">
-                                            Sua recorrência mensal no valor de R$ ${window.escapeHTML(activePayment.amount_due.toFixed(2))} vence em 2 dias (${window.escapeHTML(dueDate.toLocaleDateString('pt-BR'))}).
-                                        </p>
-                                    </div>
-                                </div>
-                                <button onclick="window.location.href='/os/content-engine.html?project=${projectId}'" style="background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s;">
-                                    Ver Pautas & Estratégia
-                                </button>
-                            </div>
-                        `;
+                        const banner = document.createElement('div');
+                        banner.className = 'expiration-banner warning';
+                        
+                        const innerFlex = document.createElement('div');
+                        innerFlex.style.cssText = 'display:flex; align-items:center; gap:15px;';
+                        
+                        const icon = document.createElement('i');
+                        icon.className = 'fa-solid fa-circle-exclamation';
+                        icon.style.cssText = 'font-size:1.5rem; color:var(--os-warning);';
+                        innerFlex.appendChild(icon);
+                        
+                        const textDiv = document.createElement('div');
+                        const h4 = document.createElement('h4');
+                        h4.style.cssText = 'margin:0; font-size:0.85rem; color:#fff; font-weight:800;';
+                        h4.textContent = 'Lembrete de Vencimento Próximo';
+                        
+                        const p = document.createElement('p');
+                        p.style.cssText = 'margin:3px 0 0 0; font-size:0.7rem; color:var(--os-text-muted);';
+                        p.textContent = `Sua recorrência mensal no valor de R$ ${activePayment.amount_due.toFixed(2)} vence em 2 dias (${dueDate.toLocaleDateString('pt-BR')}).`;
+                        
+                        textDiv.appendChild(h4);
+                        textDiv.appendChild(p);
+                        innerFlex.appendChild(textDiv);
+                        banner.appendChild(innerFlex);
+                        
+                        const btn = document.createElement('button');
+                        btn.style.cssText = 'background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s;';
+                        btn.textContent = 'Ver Pautas & Estratégia';
+                        btn.onclick = () => window.location.href = `/os/content-engine.html?project=${projectId}`;
+                        banner.appendChild(btn);
+                        
+                        alertContainer.appendChild(banner);
                     } else if (diffDays === 0) {
-                        alertContainer.innerHTML = `
-                            <div class="expiration-banner">
-                                <div style="display:flex; align-items:center; gap:15px;">
-                                    <i class="fa-solid fa-triangle-exclamation" style="font-size:1.5rem; color:var(--os-danger); animation: pulse 1.5s infinite;"></i>
-                                    <div>
-                                        <h4 style="margin:0; font-size:0.85rem; color:#fff; font-weight:800;">Recorrência com Vencimento Hoje!</h4>
-                                        <p style="margin:3px 0 0 0; font-size:0.7rem; color:var(--os-text-muted);">
-                                            Sua mensalidade no valor de R$ ${window.escapeHTML(activePayment.amount_due.toFixed(2))} vence hoje. Efetue o pagamento via PIX para manter seus disparos e automações ativos.
-                                        </p>
-                                    </div>
-                                </div>
-                                <button onclick="openPixModal(${window.escapeHTML(activePayment.amount_due)}, '${window.escapeHTML(activeContract.company_name)}')" style="background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.3);">
-                                    Pagar com PIX <i class="fa-solid fa-qrcode" style="margin-left:4px;"></i>
-                                </button>
-                            </div>
-                        `;
+                        const banner = document.createElement('div');
+                        banner.className = 'expiration-banner';
+                        
+                        const innerFlex = document.createElement('div');
+                        innerFlex.style.cssText = 'display:flex; align-items:center; gap:15px;';
+                        
+                        const icon = document.createElement('i');
+                        icon.className = 'fa-solid fa-triangle-exclamation';
+                        icon.style.cssText = 'font-size:1.5rem; color:var(--os-danger); animation: pulse 1.5s infinite;';
+                        innerFlex.appendChild(icon);
+                        
+                        const textDiv = document.createElement('div');
+                        const h4 = document.createElement('h4');
+                        h4.style.cssText = 'margin:0; font-size:0.85rem; color:#fff; font-weight:800;';
+                        h4.textContent = 'Recorrência com Vencimento Hoje!';
+                        
+                        const p = document.createElement('p');
+                        p.style.cssText = 'margin:3px 0 0 0; font-size:0.7rem; color:var(--os-text-muted);';
+                        p.textContent = `Sua mensalidade no valor de R$ ${activePayment.amount_due.toFixed(2)} vence hoje. Efetue o pagamento via PIX para manter seus disparos e automações ativos.`;
+                        
+                        textDiv.appendChild(h4);
+                        textDiv.appendChild(p);
+                        innerFlex.appendChild(textDiv);
+                        banner.appendChild(innerFlex);
+                        
+                        const btn = document.createElement('button');
+                        btn.style.cssText = 'background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.3);';
+                        btn.textContent = 'Pagar com PIX ';
+                        const iIcon = document.createElement('i');
+                        iIcon.className = 'fa-solid fa-qrcode';
+                        iIcon.style.marginLeft = '4px';
+                        btn.appendChild(iIcon);
+                        btn.onclick = () => openPixModal(activePayment.amount_due, activeContract.company_name);
+                        banner.appendChild(btn);
+                        
+                        alertContainer.appendChild(banner);
                     }
                 }
             }

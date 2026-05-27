@@ -139,7 +139,7 @@ const _saveLog = (key, entry) => {
             };
             const typeStr = safeEntry.simulated ? 'SIMULADO' : 'REAL';
             console.log(
-                `%c[LOG:${safeEntry.severity.toUpperCase()}] [${safeEntry.action_type}] [${typeStr}] %c${safeEntry.source_page} - ${safeStringify(safeEntry.payload)}`,
+                '%c[LOG:' + String(safeEntry.severity).toUpperCase() + '] [' + String(safeEntry.action_type) + '] [' + typeStr + '] %c' + String(safeEntry.source_page) + ' - ' + safeStringify(safeEntry.payload),
                 styles[safeEntry.severity] || '',
                 'color: #eee;'
             );

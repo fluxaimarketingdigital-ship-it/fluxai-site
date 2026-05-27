@@ -159,13 +159,17 @@
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
-            const originalText = btn.innerHTML;
+            const originalTextContent = [...btn.childNodes];
             
             const email = document.getElementById('username').value.trim();
             const password = document.getElementById('password').value.trim();
 
             // Feedback Visual
-            btn.innerHTML = 'VALIDANDO... <i class="fa-solid fa-spinner fa-spin"></i>';
+            btn.replaceChildren();
+            btn.appendChild(document.createTextNode('VALIDANDO... '));
+            const spinnerIcon = document.createElement('i');
+            spinnerIcon.className = 'fa-solid fa-spinner fa-spin';
+            btn.appendChild(spinnerIcon);
             btn.disabled = true;
 
             // 1. Verificar primeiro autenticação local na chave mock
@@ -185,7 +189,7 @@
                         document.getElementById('passwordResetModal').style.display = 'flex';
                         
                         // Resetar botão para estado normal
-                        btn.innerHTML = originalText;
+                        btn.replaceChildren(...originalTextContent);
                         btn.disabled = false;
                         return;
                     }
@@ -198,7 +202,7 @@
                     if (typeof OS_LOGS_ENGINE !== 'undefined') {
                         OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Senha mock incorreta' }, 'warning');
                     }
-                    btn.innerHTML = originalText;
+                    btn.replaceChildren(...originalTextContent);
                     btn.disabled = false;
                     return;
                 }
@@ -211,7 +215,7 @@
                 if (typeof OS_LOGS_ENGINE !== 'undefined') {
                     OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Supabase offline e sem credencial local' }, 'critical');
                 }
-                btn.innerHTML = originalText;
+                btn.replaceChildren(...originalTextContent);
                 btn.disabled = false;
                 return;
             }
@@ -226,7 +230,7 @@
                 if (typeof OS_LOGS_ENGINE !== 'undefined') {
                     OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Erro Supabase auth: ' + error.message }, 'warning');
                 }
-                btn.innerHTML = originalText;
+                btn.replaceChildren(...originalTextContent);
                 btn.disabled = false;
             } else {
                 try {
@@ -263,31 +267,30 @@
             }
         });
 
-        // Função utilitária para registrar a sessão e redirecionar de acordo com a regra de negócios
-        function logUserIn(user) {
-            localStorage.setItem('fluxai_session', JSON.stringify({
-                id: user.id,
-                role: user.role, 
-                name: user.full_name,
-                email: user.email,
-                loginTime: new Date().toISOString(),
-                project_id: user.project_id || null,
-                permissions: user.permissions || []
-            }));
-
-            // Registrar log de Login com OS_LOGS_ENGINE
-            if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: user.id, email: user.email, role: user.role }, false);
-            }
-
-            // Sincronizar projeto ativo no localStorage se for cliente
-            if (user.role === 'CLIENT' && user.project_id) {
-                localStorage.setItem('fluxai_current_project_id', user.project_id);
-                window.location.href = `client-portal.html?project_id=${user.project_id}`;
-            } else {
-                window.location.href = 'command-center.html';
-            }
-        }
+        // Função utilitária para registrar a sessão e redirecionar de acordo com a regra de negócios 
+        function logUserIn(user) { 
+            localStorage.setItem('fluxai_ui_context', JSON.stringify({ 
+                id: user.id, 
+                role: user.role,  
+                name: user.full_name, 
+                loginTime: new Date().toISOString(), 
+                project_id: user.project_id || null, 
+                permissions: user.permissions || [] 
+            })); 
+ 
+            // Registrar log de Login com OS_LOGS_ENGINE 
+            if (typeof OS_LOGS_ENGINE !== 'undefined') { 
+                OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: user.id, role: user.role }, false); 
+            } 
+ 
+            // Sincronizar projeto ativo no localStorage se for cliente 
+            if (user.role === 'CLIENT' && user.project_id) { 
+                localStorage.setItem('fluxai_active_workspace', user.project_id); 
+                window.location.href = `client-portal.html?project_id=${user.project_id}`; 
+            } else { 
+                window.location.href = 'command-center.html'; 
+            } 
+        } 
 
         // Submissão do formulário de redefinição de senha
         document.getElementById('passwordResetForm').addEventListener('submit', async (e) => {

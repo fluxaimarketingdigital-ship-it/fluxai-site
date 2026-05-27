@@ -522,10 +522,10 @@
                 card.innerHTML = `
                     <div class="user-card-header" onclick="this.parentElement.classList.toggle('expanded')">
                         <div class="user-header">
-                            <div class="user-avatar">${initials}</div>
+                            <div class="user-avatar safe-avatar"></div>
                             <div class="user-info">
-                                <h3>${u.full_name || 'Usuário Sem Nome'}</h3>
-                                <p>${u.email}</p>
+                                <h3 class="safe-name"></h3>
+                                <p class="safe-email"></p>
                             </div>
                         </div>
                         <div>
@@ -544,15 +544,15 @@
                         <div class="credentials-box" style="margin-bottom: 20px;">
                             <div class="credential-row">
                                 <span class="credential-label">Login Operacional</span>
-                                <span class="credential-value" style="font-size: 0.8rem;">${u.email}</span>
+                                <span class="credential-value safe-email-val" style="font-size: 0.8rem;"></span>
                             </div>
                             <div class="credential-row">
                                 <span class="credential-label">Chave de Acesso Externa</span>
                                 <span class="credential-value">
-                                    <button class="btn-credential-action" onclick="window.togglePasswordReveal('${u.id}', '${u.password}')" title="Revelar Senha">
+                                    <button class="btn-credential-action safe-reveal-btn" title="Revelar Senha">
                                         <i id="eye-icon-${u.id}" class="fa-solid fa-eye"></i> Revelar
                                     </button>
-                                    <button class="btn-credential-action" onclick="window.copyToClipboard('${u.password}')" title="Copiar Senha">
+                                    <button class="btn-credential-action safe-copy-btn" title="Copiar Senha">
                                         <i class="fa-solid fa-copy"></i> Copiar
                                     </button>
                                 </span>
@@ -571,18 +571,30 @@
 
                         <!-- Botões de Ações do Cartão -->
                         <div class="card-actions">
-                            <button class="btn-card-action btn-card-reset" onclick="window.resetUserPassword('${u.id}')" title="Resetar senha para fluxai@2026">
+                            <button class="btn-card-action btn-card-reset safe-reset-btn" title="Resetar senha para fluxai@2026">
                                 <i class="fa-solid fa-key"></i> Resetar Senha
                             </button>
-                            <button class="btn-card-action" onclick="window.toggleContractStatus('${u.id}', '${u.email}')" title="Ativar / Inativar Contrato" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2);">
+                            <button class="btn-card-action safe-toggle-btn" title="Ativar / Inativar Contrato" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2);">
                                 <i class="fa-solid fa-toggle-on"></i> Ativar/Inativar
                             </button>
-                            <button class="btn-card-action btn-card-delete" onclick="window.deleteUser('${u.id}', '${u.email}')" title="Excluir Usuário" style="max-width: none;">
+                            <button class="btn-card-action btn-card-delete safe-del-btn" title="Excluir Usuário" style="max-width: none;">
                                 <i class="fa-solid fa-trash-can"></i> Excluir
                             </button>
                         </div>
                     </div>
                 `;
+                
+                card.querySelector('.safe-avatar').textContent = initials;
+                card.querySelector('.safe-name').textContent = u.full_name || 'Usuário Sem Nome';
+                card.querySelector('.safe-email').textContent = u.email;
+                card.querySelector('.safe-email-val').textContent = u.email;
+                
+                card.querySelector('.safe-reveal-btn').onclick = () => window.togglePasswordReveal(u.id, u.password);
+                card.querySelector('.safe-copy-btn').onclick = () => window.copyToClipboard(u.password);
+                card.querySelector('.safe-reset-btn').onclick = () => window.resetUserPassword(u.id);
+                card.querySelector('.safe-toggle-btn').onclick = () => window.toggleContractStatus(u.id, u.email);
+                card.querySelector('.safe-del-btn').onclick = () => window.deleteUser(u.id, u.email);
+
                 container.appendChild(card);
             });
         };
@@ -756,7 +768,11 @@
 
             const toast = document.createElement('div');
             toast.className = 'toast-notification';
-            toast.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${message}`;
+            toast.replaceChildren();
+            const icon = document.createElement('i');
+            icon.className = 'fa-solid fa-circle-check';
+            toast.appendChild(icon);
+            toast.appendChild(document.createTextNode(` ${message}`));
             document.body.appendChild(toast);
 
             setTimeout(() => {

@@ -112,12 +112,15 @@ async function loadExecutiveData() {
         // 4. Renderizar Tabela 1: Saúde Financeira por Cliente
         const tableFinanceBody = document.querySelector('#table-exec-finance tbody');
         if (tableFinanceBody) {
-            let html = '';
-            if (mockProjects.length === 0) {
-                html = '<tr><td colspan="6" style="text-align:center; padding:20px; opacity:0.5;">Sem registros financeiros.</td></tr>';
+            tableFinanceBody.replaceChildren();
+            const activeProjects = mockProjects.filter(p => true); // Ajuste se necessário
+
+            if (activeProjects.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="6" style="text-align:center; padding:20px; opacity:0.5;">Nenhum dado financeiro para os clientes ativos.</td>';
+                tableFinanceBody.appendChild(tr);
             } else {
-                mockProjects.forEach(proj => {
-                    // Ignorar labs se necessário, mas mostrar contratos
+                activeProjects.forEach(proj => {
                     const contract = mockContracts.find(c => c.project_id === proj.id || c.client_name === proj.company_name);
                     const payments = mockPayments.filter(p => p.contract_id === contract?.id);
                     
@@ -136,27 +139,29 @@ async function loadExecutiveData() {
 
                     const dueDay = contract ? `Dia ${contract.due_day}` : 'N/A';
 
-                    html += `
-                        <tr>
-                            <td class="cell-primary">${proj.company_name}</td>
-                            <td class="cell-mono">${formatCurrency(value)}</td>
-                            <td class="cell-mono" style="color: var(--os-success);">${formatCurrency(paid)}</td>
-                            <td class="cell-mono" style="${pending > 0 ? 'color: var(--os-warning);' : ''}">${formatCurrency(pending)}</td>
-                            <td>${dueDay}</td>
-                            <td>${statusBadge}</td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="cell-primary safe-company"></td>
+                        <td class="cell-mono">${formatCurrency(value)}</td>
+                        <td class="cell-mono" style="color: var(--os-success);">${formatCurrency(paid)}</td>
+                        <td class="cell-mono" style="${pending > 0 ? 'color: var(--os-warning);' : ''}">${formatCurrency(pending)}</td>
+                        <td>${dueDay}</td>
+                        <td>${statusBadge}</td>
                     `;
+                    tr.querySelector('.safe-company').textContent = proj.company_name;
+                    tableFinanceBody.appendChild(tr);
                 });
             }
-            tableFinanceBody.innerHTML = html;
         }
 
         // 5. Renderizar Tabela 2: Gestão de Contratos de Clientes
         const tableContractsBody = document.querySelector('#table-exec-contracts tbody');
         if (tableContractsBody) {
-            let html = '';
+            tableContractsBody.replaceChildren();
             if (mockContracts.length === 0) {
-                html = '<tr><td colspan="6" style="text-align:center; padding:20px; opacity:0.5;">Nenhum contrato cadastrado.</td></tr>';
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="6" style="text-align:center; padding:20px; opacity:0.5;">Nenhum contrato cadastrado.</td>';
+                tableContractsBody.appendChild(tr);
             } else {
                 mockContracts.forEach(c => {
                     const project = mockProjects.find(p => p.id === c.project_id);
@@ -168,31 +173,35 @@ async function loadExecutiveData() {
                     if (c.status === 'PAUSADO') statusBadge = '<span class="os-badge os-badge-warning">Pausado</span>';
                     else if (c.status === 'CANCELADO') statusBadge = '<span class="os-badge os-badge-danger">Cancelado</span>';
 
-                    html += `
-                        <tr>
-                            <td class="cell-mono">${c.id.toUpperCase()}</td>
-                            <td class="cell-primary">${c.company_name}</td>
-                            <td style="font-size: 0.75rem;">${c.deliverables}</td>
-                            <td>${renewal.toLocaleDateString('pt-BR')}</td>
-                            <td>
-                                <a href="${driveLink}" target="_blank" class="os-btn os-btn-sm" style="padding: 2px 8px; font-size: 0.65rem; background: rgba(255,255,255,0.03); border: 1px solid var(--os-border);">
-                                    <i class="fa-solid fa-folder-open"></i> Drive
-                                </a>
-                            </td>
-                            <td>${statusBadge}</td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="cell-mono">${c.id.toUpperCase()}</td>
+                        <td class="cell-primary safe-company"></td>
+                        <td class="safe-deliv" style="font-size: 0.75rem;"></td>
+                        <td>${renewal.toLocaleDateString('pt-BR')}</td>
+                        <td>
+                            <a class="safe-drive" target="_blank" class="os-btn os-btn-sm" style="padding: 2px 8px; font-size: 0.65rem; background: rgba(255,255,255,0.03); border: 1px solid var(--os-border);">
+                                <i class="fa-solid fa-folder-open"></i> Drive
+                            </a>
+                        </td>
+                        <td>${statusBadge}</td>
                     `;
+                    tr.querySelector('.safe-company').textContent = c.company_name;
+                    tr.querySelector('.safe-deliv').textContent = c.deliverables;
+                    tr.querySelector('.safe-drive').href = driveLink;
+                    tableContractsBody.appendChild(tr);
                 });
             }
-            tableContractsBody.innerHTML = html;
         }
 
         // 6. Renderizar Tabela 3: Pipeline de Leads e CRM Comercial
         const tableCommercialBody = document.querySelector('#table-exec-commercial tbody');
         if (tableCommercialBody) {
-            let html = '';
+            tableCommercialBody.replaceChildren();
             if (localLeads.length === 0) {
-                html = '<tr><td colspan="5" style="text-align:center; padding:20px; opacity:0.5;">Nenhum lead em negociação.</td></tr>';
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="5" style="text-align:center; padding:20px; opacity:0.5;">Nenhum lead em negociação.</td>';
+                tableCommercialBody.appendChild(tr);
             } else {
                 localLeads.forEach(l => {
                     let badge = '<span class="os-badge os-badge-neutral">' + l.status.replace('_', ' ') + '</span>';
@@ -200,21 +209,25 @@ async function loadExecutiveData() {
                     else if (l.status === 'proposta_enviada') badge = '<span class="os-badge os-badge-info">Proposta Enviada</span>';
                     else if (l.status === 'em_negociacao') badge = '<span class="os-badge os-badge-warning">Negociação</span>';
 
-                    html += `
-                        <tr>
-                            <td class="cell-primary">
-                                <div>${l.nome_lead}</div>
-                                <div style="font-size: 0.7rem; color: var(--os-text-muted);">${l.empresa} • ${l.contato}</div>
-                            </td>
-                            <td>${l.origem}</td>
-                            <td><span style="font-size: 0.7rem; border: 1px solid var(--os-border); padding: 2px 6px; border-radius: 4px;">${l.servico_interesse}</span></td>
-                            <td>${l.responsavel}</td>
-                            <td>${badge}</td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="cell-primary">
+                            <div class="safe-nome"></div>
+                            <div class="safe-empresa-contato" style="font-size: 0.7rem; color: var(--os-text-muted);"></div>
+                        </td>
+                        <td class="safe-origem"></td>
+                        <td><span class="safe-servico" style="font-size: 0.7rem; border: 1px solid var(--os-border); padding: 2px 6px; border-radius: 4px;"></span></td>
+                        <td class="safe-resp"></td>
+                        <td>${badge}</td>
                     `;
+                    tr.querySelector('.safe-nome').textContent = l.nome_lead;
+                    tr.querySelector('.safe-empresa-contato').textContent = `${l.empresa} • ${l.contato}`;
+                    tr.querySelector('.safe-origem').textContent = l.origem;
+                    tr.querySelector('.safe-servico').textContent = l.servico_interesse;
+                    tr.querySelector('.safe-resp').textContent = l.responsavel;
+                    tableCommercialBody.appendChild(tr);
                 });
             }
-            tableCommercialBody.innerHTML = html;
         }
 
         // 7. Renderizar Tabela 4: Estatísticas de Carga Operacional

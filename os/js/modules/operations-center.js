@@ -12,18 +12,22 @@ async function initPage() {
 
     await loadOperationsCenter();
 
-    document.getElementById('btn-sync-operations')?.addEventListener('click', async () => {
-        const btn = document.getElementById('btn-sync-operations');
-        const originalHTML = btn.innerHTML;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sincronizando...';
-        btn.disabled = true;
+    document.getElementById('btn-sync-operations')?.addEventListener('click', async () => { 
+        const btn = document.getElementById('btn-sync-operations'); 
+        const originalTextContent = [...btn.childNodes];
+        btn.replaceChildren();
+        const icon = document.createElement('i');
+        icon.className = 'fa-solid fa-spinner fa-spin';
+        btn.appendChild(icon);
+        btn.appendChild(document.createTextNode(' Sincronizando...'));
+        btn.disabled = true; 
         
-        // Simular sync e recarregar
-        setTimeout(async () => {
-            await loadOperationsCenter();
-            btn.innerHTML = originalHTML;
-            btn.disabled = false;
-        }, 800);
+        // Simular sync e recarregar 
+        setTimeout(async () => { 
+            await loadOperationsCenter(); 
+            btn.replaceChildren(...originalTextContent); 
+            btn.disabled = false; 
+        }, 800); 
     });
 }
 
@@ -83,17 +87,16 @@ async function loadOperationsCenter() {
         // --- RENDERIZAR TABELA 1: RISCO DOS CLIENTES ---
         const tableRiskBody = document.querySelector('#table-clients-risk tbody');
         if (tableRiskBody) {
-            let html = '';
-            if (mockProjects.length === 0) {
-                html = '<tr><td colspan="5" style="text-align:center; padding: 20px; opacity:0.5;">Nenhum cliente cadastrado.</td></tr>';
+            const activeProjects = mockProjects;
+            tableRiskBody.replaceChildren();
+            if (activeProjects.length === 0) {
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="5" style="text-align:center; padding: 20px; opacity:0.5;">Nenhum cliente ativo mapeado para automação IA.</td>';
+                tableRiskBody.appendChild(tr);
             } else {
-                mockProjects.forEach(p => {
-                    const cfg = clientConfigs[p.id] || { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Outros' };
+                activeProjects.forEach(p => {
+                    const cfg = clientConfigs[p.id] || { iaLimit: 10, iaBlocked: false, automationsPaused: false };
                     
-                    let statusBadge = '<span class="os-badge os-badge-success">Ativo</span>';
-                    if (cfg.status === 'pausado') statusBadge = '<span class="os-badge os-badge-neutral">Pausado</span>';
-                    else if (cfg.status === 'inativo') statusBadge = '<span class="os-badge os-badge-danger">Inativo</span>';
-
                     let iaBadge = cfg.iaBlocked 
                         ? '<span class="os-badge os-badge-danger">Bloqueada</span>' 
                         : '<span class="os-badge os-badge-success">Liberada</span>';
@@ -102,7 +105,6 @@ async function loadOperationsCenter() {
                         ? '<span class="os-badge os-badge-warning">Pausadas</span>' 
                         : '<span class="os-badge os-badge-success">Ativas</span>';
 
-                    // Ocupação IA no ciclo: ativos que ocupam limite (aprovado + publicado + aguardando_publicacao)
                     const clientAssets = mockAssets.filter(a => a.project_id === p.id || a.projectId === p.id);
                     const occupied = clientAssets.filter(a => ['aprovado', 'aguardando_publicacao', 'publicado'].includes(a.status)).length;
                     const limitWarning = occupied >= cfg.iaLimit ? 'color: var(--os-danger); font-weight:700;' : '';
@@ -111,18 +113,18 @@ async function loadOperationsCenter() {
                     if (p.tokenStatus === 'expirado') tokenStatusBadge = '<span class="os-badge os-badge-danger">Expirado</span>';
                     else if (p.tokenStatus === 'ausente') tokenStatusBadge = '<span class="os-badge os-badge-neutral">Ausente</span>';
 
-                    html += `
-                        <tr>
-                            <td class="cell-primary">${p.company_name || p.name}</td>
-                            <td style="${limitWarning}">${occupied} / ${cfg.iaLimit}</td>
-                            <td>${iaBadge}</td>
-                            <td>${autoBadge}</td>
-                            <td>${tokenStatusBadge}</td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="cell-primary safe-name"></td>
+                        <td style="${limitWarning}">${occupied} / ${cfg.iaLimit}</td>
+                        <td>${iaBadge}</td>
+                        <td>${autoBadge}</td>
+                        <td>${tokenStatusBadge}</td>
                     `;
+                    tr.querySelector('.safe-name').textContent = p.company_name || p.name;
+                    tableRiskBody.appendChild(tr);
                 });
             }
-            tableRiskBody.innerHTML = html;
         }
 
         // --- RENDERIZAR TABELA 2: BACKLOG DE CONTEÚDO & RELATÓRIOS ---
@@ -162,8 +164,11 @@ async function loadOperationsCenter() {
                 });
             });
 
+            tableContentBody.replaceChildren();
             if (backlogItems.length === 0) {
-                html = '<tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Nenhum conteúdo ou relatório pendente.</td></tr>';
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Nenhum conteúdo ou relatório pendente.</td>';
+                tableContentBody.appendChild(tr);
             } else {
                 backlogItems.slice(0, 8).forEach(item => {
                     let statusBadge = '<span class="os-badge os-badge-neutral">' + item.status + '</span>';
@@ -171,17 +176,19 @@ async function loadOperationsCenter() {
                     else if (item.status === 'aprovado' || item.status === 'aprovado_internamente') statusBadge = '<span class="os-badge os-badge-warning">Aprovado Interno</span>';
                     else if (item.status === 'aguardando_publicacao') statusBadge = '<span class="os-badge os-badge-warning">Aguardando Pub</span>';
 
-                    html += `
-                        <tr>
-                            <td class="cell-primary"><a href="${item.link}" style="color:#fff; text-decoration:none; border-bottom: 1px dotted var(--os-primary-dim);">${item.ref}</a></td>
-                            <td>${item.type}</td>
-                            <td>${statusBadge}</td>
-                            <td><span style="font-size:0.75rem; font-weight:700; color:var(--os-primary);">${item.action}</span></td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="cell-primary"><a class="safe-ref" style="color:#fff; text-decoration:none; border-bottom: 1px dotted var(--os-primary-dim);"></a></td>
+                        <td>${item.type}</td>
+                        <td>${statusBadge}</td>
+                        <td><span style="font-size:0.75rem; font-weight:700; color:var(--os-primary);">${item.action}</span></td>
                     `;
+                    const a = tr.querySelector('.safe-ref');
+                    a.href = item.link;
+                    a.textContent = item.ref;
+                    tableContentBody.appendChild(tr);
                 });
             }
-            tableContentBody.innerHTML = html;
         }
 
         // --- RENDERIZAR TABELA 3: APROVAÇÕES E DEMANDAS ---
@@ -212,8 +219,11 @@ async function loadOperationsCenter() {
                 });
             });
 
+            tableApprovalsBody.replaceChildren();
             if (list.length === 0) {
-                html = '<tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Nenhuma demanda ou aprovação externa pendente.</td></tr>';
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Nenhuma demanda ou aprovação externa pendente.</td>';
+                tableApprovalsBody.appendChild(tr);
             } else {
                 list.slice(0, 8).forEach(item => {
                     let badge = '<span class="os-badge os-badge-neutral">' + item.status + '</span>';
@@ -222,29 +232,33 @@ async function loadOperationsCenter() {
                     else if (item.status === 'aguardando') badge = '<span class="os-badge os-badge-neutral">Pendente Equipe</span>';
                     else if (item.status === 'pendente_cliente') badge = '<span class="os-badge os-badge-warning">Com Cliente</span>';
 
-                    html += `
-                        <tr>
-                            <td>${item.origem}</td>
-                            <td class="cell-primary"><a href="${item.link}" style="color:#fff; text-decoration:none; border-bottom: 1px dotted var(--os-primary-dim);">${item.ref}</a></td>
-                            <td>${badge}</td>
-                            <td><span style="font-size:0.75rem; font-weight:700; color:var(--os-primary);">${item.action}</span></td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${item.origem}</td>
+                        <td class="cell-primary"><a class="safe-ref" style="color:#fff; text-decoration:none; border-bottom: 1px dotted var(--os-primary-dim);"></a></td>
+                        <td>${badge}</td>
+                        <td><span style="font-size:0.75rem; font-weight:700; color:var(--os-primary);">${item.action}</span></td>
                     `;
+                    const a = tr.querySelector('.safe-ref');
+                    a.href = item.link;
+                    a.textContent = item.ref;
+                    tableApprovalsBody.appendChild(tr);
                 });
             }
-            tableApprovalsBody.innerHTML = html;
         }
 
         // --- RENDERIZAR TABELA 4: WEBHOOK ERRORS & ERRORS ---
         const tableWebhookErrorsBody = document.querySelector('#table-webhook-errors tbody');
         if (tableWebhookErrorsBody) {
-            let html = '';
             
             // Filtrar logs de erro operacionais reais ou simulados
             const errorLogs = allLogs.filter(l => l.severity === 'critical' || l.severity === 'warning' || l.action_type === 'WEBHOOK_REAL_FAILED' || l.action_type === 'SYSTEM_ERROR');
 
+            tableWebhookErrorsBody.replaceChildren();
             if (errorLogs.length === 0) {
-                html = '<tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5; color: var(--os-success);">Nenhum erro de conexão ou webhook registrado. Sistema estável.</td></tr>';
+                const tr = document.createElement('tr');
+                tr.innerHTML = '<td colspan="4" style="text-align:center; padding: 20px; opacity:0.5; color: var(--os-success);">Nenhum erro de conexão ou webhook registrado. Sistema estável.</td>';
+                tableWebhookErrorsBody.appendChild(tr);
             } else {
                 errorLogs.slice(0, 8).forEach(log => {
                     const time = log.timestamp ? log.timestamp.split('T')[1].substring(0, 5) : 'N/A';
@@ -257,17 +271,17 @@ async function loadOperationsCenter() {
                     if (typeof errorMsg === 'object') errorMsg = JSON.stringify(errorMsg);
                     if (errorMsg.length > 50) errorMsg = errorMsg.substring(0, 50) + '...';
 
-                    html += `
-                        <tr>
-                            <td class="cell-mono">${time}</td>
-                            <td class="cell-primary" style="font-size:0.75rem;">${log.action_type}</td>
-                            <td>${sevBadge}</td>
-                            <td style="font-size:0.7rem; font-family: var(--os-font-mono); color: var(--os-danger);">${errorMsg}</td>
-                        </tr>
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="cell-mono">${time}</td>
+                        <td class="cell-primary" style="font-size:0.75rem;">${log.action_type}</td>
+                        <td>${sevBadge}</td>
+                        <td class="safe-error-msg" style="font-size:0.7rem; font-family: var(--os-font-mono); color: var(--os-danger);"></td>
                     `;
+                    tr.querySelector('.safe-error-msg').textContent = errorMsg;
+                    tableWebhookErrorsBody.appendChild(tr);
                 });
             }
-            tableWebhookErrorsBody.innerHTML = html;
         }
 
     } catch (e) {

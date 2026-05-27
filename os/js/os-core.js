@@ -167,61 +167,67 @@ export const OS_UI = {
 
         // Mapear projeto ativo na topbar
         const currentProjectId = localStorage.getItem('fluxai_current_project_id');
-        let activeClientHtml = "";
-        let activeProj = null;
-        if (currentProjectId && currentProjectId !== 'todos') {
-            const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-            const supabaseProjects = JSON.parse(localStorage.getItem('fluxai_supabase_projects') || '[]');
-            activeProj = mockProjects.find(p => p.id === currentProjectId) || supabaseProjects.find(p => p.id === currentProjectId);
-            if (activeProj) {
-                const companyName = window.escapeHTML(activeProj.company_name || activeProj.name || 'Desconhecido');
-                activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: ${companyName.toUpperCase()}</span>`;
-            } else {
-                activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
+        let activeClientHtml = ""; 
+        let activeProj = null; 
+        let companyNameStr = 'TODOS OS CLIENTES';
+        if (currentProjectId && currentProjectId !== 'todos') { 
+            const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]'); 
+            const supabaseProjects = JSON.parse(localStorage.getItem('fluxai_supabase_projects') || '[]'); 
+            activeProj = mockProjects.find(p => p.id === currentProjectId) || supabaseProjects.find(p => p.id === currentProjectId); 
+            if (activeProj) { 
+                companyNameStr = (activeProj.company_name || activeProj.name || 'Desconhecido').toUpperCase();
             }
-        } else {
-            activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
-        }
-
-        const contextSwitcher = isSuperAdmin ? `
-            <div style="display:flex; align-items:center; gap:5px; margin-left:18px;">
-                <button onclick="window.__OSSetContext('MASTER')" title="Visão global" style="${btnStyle(context==='MASTER','var(--os-primary)')}">
-                    <i class="fa-solid fa-bolt"></i> Master
-                </button>
-                <button onclick="window.__OSSetContext('LABS')" title="Workspace interno FluxAI" style="${btnStyle(context==='LABS','rgba(139,92,246,0.9)')}">
-                    <i class="fa-solid fa-flask"></i> Labs
-                </button>
-                ${context === 'CLIENT' && activeProj ? `
-                <span style="font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid var(--os-primary); background:rgba(142,158,104,0.1); color:var(--os-primary); font-weight:800; text-transform:uppercase; letter-spacing:1px;">
-                    <i class="fa-solid fa-briefcase"></i> ${window.escapeHTML(activeProj.company_name || 'Cliente')}
-                </span>` : ''}
-            </div>` : '';
-
-        // --- Badges de Alertas ---
-        const pending = OSState.get('pendingApprovals') || 0;
-        const finAlerts = (OSState.get('financialAlerts') || []).length;
-        const approvalBadge = pending > 0 ? `<span style="background:var(--os-warning);color:#000;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:8px;">${pending} APROVAÇÕES</span>` : '';
-        const financeBadge = finAlerts > 0 ? `<span style="background:var(--os-danger);color:#fff;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:4px;">${finAlerts} ALERTA${finAlerts>1?'S':''}</span>` : '';
-
-        const html = `
-            <div class="os-topbar-left" style="display:flex;align-items:center;gap:15px;min-width:0;">
-                <button class="os-menu-toggle" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>
-                <div class="os-status-indicator" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
-                    <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}${activeClientHtml}
-                </div>
-                ${contextSwitcher}${approvalBadge}${financeBadge}
-            </div>
-            <div class="os-topbar-right">
-                <div class="os-user-profile" id="user-profile-menu" style="cursor:pointer;">
-                    <div class="os-avatar">${window.escapeHTML(initials)}</div>
-                    <span>${window.escapeHTML(user.full_name || user.email)}</span>
-                    <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;margin-left:8px;opacity:0.5;"></i>
-                </div>
-            </div>`;
-
-        document.querySelector('.os-topbar').innerHTML = html;
-
-        document.getElementById('mobile-menu-toggle')?.addEventListener('click', () => {
+        } 
+        activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: <span id="safe-client-name"></span></span>`; 
+ 
+        const contextSwitcher = isSuperAdmin ? ` 
+            <div style="display:flex; align-items:center; gap:5px; margin-left:18px;"> 
+                <button onclick="window.__OSSetContext('MASTER')" title="Visão global" style="${btnStyle(context==='MASTER','var(--os-primary)')}"> 
+                    <i class="fa-solid fa-bolt"></i> Master 
+                </button> 
+                <button onclick="window.__OSSetContext('LABS')" title="Workspace interno FluxAI" style="${btnStyle(context==='LABS','rgba(139,92,246,0.9)')}"> 
+                    <i class="fa-solid fa-flask"></i> Labs 
+                </button> 
+                ${context === 'CLIENT' && activeProj ? ` 
+                <span style="font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid var(--os-primary); background:rgba(142,158,104,0.1); color:var(--os-primary); font-weight:800; text-transform:uppercase; letter-spacing:1px;"> 
+                    <i class="fa-solid fa-briefcase"></i> <span id="safe-ctx-name"></span> 
+                </span>` : ''} 
+            </div>` : ''; 
+ 
+        // --- Badges de Alertas --- 
+        const pending = OSState.get('pendingApprovals') || 0; 
+        const finAlerts = (OSState.get('financialAlerts') || []).length; 
+        const approvalBadge = pending > 0 ? `<span style="background:var(--os-warning);color:#000;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:8px;">${pending} APROVAÇÕES</span>` : ''; 
+        const financeBadge = finAlerts > 0 ? `<span style="background:var(--os-danger);color:#fff;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:4px;">${finAlerts} ALERTA${finAlerts>1?'S':''}</span>` : ''; 
+ 
+        const html = ` 
+            <div class="os-topbar-left" style="display:flex;align-items:center;gap:15px;min-width:0;"> 
+                <button class="os-menu-toggle" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button> 
+                <div class="os-status-indicator" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"> 
+                    <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}${activeClientHtml} 
+                </div> 
+                ${contextSwitcher}${approvalBadge}${financeBadge} 
+            </div> 
+            <div class="os-topbar-right"> 
+                <div class="os-user-profile" id="user-profile-menu" style="cursor:pointer;"> 
+                    <div class="os-avatar" id="safe-avatar"></div> 
+                    <span id="safe-user-name"></span> 
+                    <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;margin-left:8px;opacity:0.5;"></i> 
+                </div> 
+            </div>`; 
+ 
+        document.querySelector('.os-topbar').innerHTML = html; 
+        
+        const safeClientNameEl = document.getElementById('safe-client-name');
+        if(safeClientNameEl) safeClientNameEl.textContent = companyNameStr;
+        const safeCtxNameEl = document.getElementById('safe-ctx-name');
+        if(safeCtxNameEl && activeProj) safeCtxNameEl.textContent = activeProj.company_name || 'Cliente';
+        const safeAvatarEl = document.getElementById('safe-avatar');
+        if(safeAvatarEl) safeAvatarEl.textContent = initials;
+        const safeUserNameEl = document.getElementById('safe-user-name');
+        if(safeUserNameEl) safeUserNameEl.textContent = user.full_name || user.email;
+ 
+        document.getElementById('mobile-menu-toggle')?.addEventListener('click', () => { 
             document.querySelector('.os-sidebar')?.classList.toggle('active');
         });
 
