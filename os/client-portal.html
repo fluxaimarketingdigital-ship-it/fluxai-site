@@ -557,13 +557,13 @@
 
         function isValidSupabaseUrl(url) {
             try {
+                if (!url) return false;
                 const parsed = new URL(url);
                 return (
                     parsed.protocol === 'https:' &&
-                    parsed.hostname.endsWith('.supabase.co') &&
+                    parsed.hostname === 'mufgwetfhfhhmhowbhjj.supabase.co' &&
                     !parsed.hostname.includes('example') &&
-                    !parsed.hostname.includes('mock') &&
-                    !parsed.hostname.includes('localhost')
+                    !parsed.hostname.includes('mock')
                 );
             } catch {
                 return false;
