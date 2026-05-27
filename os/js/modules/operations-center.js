@@ -37,10 +37,11 @@ function safeParseJSON(value, fallback = null) {
     if (typeof value !== 'string') return fallback;
     const trimmed = value.trim();
     if (!trimmed) return fallback;
+    if (!trimmed.startsWith('{') && !trimmed.startsWith('[')) return fallback;
     try {
         return JSON.parse(trimmed);
     } catch (error) {
-        console.warn('[SAFE_JSON_PARSE]', error.message);
+        // console.warn('[SAFE_JSON_PARSE]', error.message);
         return fallback;
     }
 }

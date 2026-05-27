@@ -184,6 +184,10 @@ function generateIARoadmap() {
 
 function renderDynamicFields() {
     const container = document.getElementById('dynamic-module-fields');
+    if (!container) {
+        console.warn('[ONBOARDING] container dinâmico não encontrado, renderização ignorada.');
+        return;
+    }
     const selected = Array.from(document.querySelectorAll('input[name="modules"]:checked')).map(i => i.value);
     
     container.innerHTML = '';
