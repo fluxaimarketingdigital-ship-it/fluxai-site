@@ -102,19 +102,7 @@ async function generateAudio(text, outputPath) {
     }
 }
 
-function createSegmentVideo(pngPath, mp3Path, outMp4Path) {
-    const args = [
-        '-y',
-        '-loop', '1', '-i', pngPath,
-        '-i', mp3Path,
-        '-c:v', 'libx264', '-tune', 'stillimage', '-c:a', 'aac', '-b:a', '192k',
-        '-pix_fmt', 'yuv420p',
-        '-shortest',
-        outMp4Path
-    ];
-    const res = spawnSync(ffmpegPath, args, { stdio: 'ignore' });
-    return res.status === 0;
-}
+// createSegmentVideo foi substituída pelo processo dinâmico no corpo da função
 
 function concatSegments(segmentFiles, outputPath) {
     const concatPath = path.join(TEMP_DIR, `${path.basename(outputPath, '.mp4')}_concat_list.txt`);
@@ -165,23 +153,66 @@ async function generateVideo(scenario, browser) {
 
         await new Promise(r => setTimeout(r, 600));
 
-        const pngPath = path.join(videoTempDir, `step_${stepNumStr}.png`);
-        const mp3Path = path.join(videoTempDir, `step_${stepNumStr}.mp3`);
-        const mp4Path = path.join(videoTempDir, `step_${stepNumStr}.mp4`);
-
-        await page.screenshot({ path: pngPath, type: 'png' });
-
-        if (stepIndex === 1) fs.copyFileSync(pngPath, path.join(VALIDATION_DIR, `${scenario.filename}_inicio.png`));
-        if (stepIndex === Math.floor(scenario.steps.length / 2)) fs.copyFileSync(pngPath, path.join(VALIDATION_DIR, `${scenario.filename}_meio.png`));
-        if (stepIndex === scenario.steps.length) fs.copyFileSync(pngPath, path.join(VALIDATION_DIR, `${scenario.filename}_fim.png`));
-
         const speechText = step.speech || step.caption;
+        const mp3Path = path.join(videoTempDir, `step_${stepNumStr}.mp3`);
         await generateAudio(speechText, mp3Path);
 
-        if (createSegmentVideo(pngPath, mp3Path, mp4Path)) {
+        const mp4Path = path.join(videoTempDir, `step_${stepNumStr}.mp4`);
+        const framePrefix = path.join(videoTempDir, `step_${stepNumStr}_frame_`);
+        const durationMs = (step.duration || 10) * 1000;
+        
+        let isCapturing = true;
+        let frameCount = 0;
+        const capturePromise = (async () => {
+            const startTime = Date.now();
+            while (Date.now() - startTime < durationMs && isCapturing) {
+                frameCount++;
+                const fPath = `${framePrefix}${String(frameCount).padStart(4, '0')}.png`;
+                try { await page.screenshot({ path: fPath, type: 'png' }); } catch(e){}
+                
+                if (frameCount === 1 && stepIndex === 1) fs.copyFileSync(fPath, path.join(VALIDATION_DIR, `${scenario.filename}_inicio.png`));
+                if (frameCount === 1 && stepIndex === Math.floor(scenario.steps.length / 2)) fs.copyFileSync(fPath, path.join(VALIDATION_DIR, `${scenario.filename}_meio.png`));
+                if (frameCount === 1 && stepIndex === scenario.steps.length) fs.copyFileSync(fPath, path.join(VALIDATION_DIR, `${scenario.filename}_fim.png`));
+
+                await new Promise(r => setTimeout(r, 200)); // ~5 fps
+            }
+        })();
+
+        if (step.actions) {
+            for (const act of step.actions) {
+                if (act.delay) await new Promise(r => setTimeout(r, act.delay));
+                try {
+                    if (act.type === 'click') {
+                        await page.evaluate((sel) => {
+                            const el = document.querySelector(sel);
+                            if(el) el.click();
+                        }, act.selector);
+                    } else if (act.type === 'type') {
+                        await page.type(act.selector, act.text, {delay: 50});
+                    } else if (act.type === 'hover') {
+                        await page.hover(act.selector);
+                    }
+                } catch(e) { console.warn('    ⚠️ Erro na ação:', act); }
+            }
+        }
+
+        await capturePromise;
+
+        const args = [
+            '-y',
+            '-framerate', '5',
+            '-i', `${framePrefix}%04d.png`,
+            '-i', mp3Path,
+            '-c:v', 'libx264', '-c:a', 'aac', '-b:a', '192k',
+            '-pix_fmt', 'yuv420p',
+            mp4Path
+        ];
+        const res = spawnSync(ffmpegPath, args, { stdio: 'ignore' });
+
+        if (res.status === 0) {
             segmentFiles.push(mp4Path);
         } else {
-            console.error(`    ❌ Falha ao compilar segmento ${stepIndex}`);
+            console.error(`    ❌ Falha ao compilar segmento dinâmico ${stepIndex}`);
             return { ok: false, reason: 'Falha no ffmpeg' };
         }
     }
