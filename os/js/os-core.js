@@ -335,7 +335,25 @@ export const OS_AUTH = {
      */
     check: async (requiredRole = null, requiredPermission = null) => {
         // 1. Tentar carregar contexto em memória (runtime)
-        const ctx = window.FLUXAI_RUNTIME_CONTEXT || null;
+        let ctx = window.FLUXAI_RUNTIME_CONTEXT || null;
+        
+        // 1.1 Se não houver contexto na memória, tentar reconstruir a partir da flag segura de mock
+        if (!ctx) {
+            const mockRole = sessionStorage.getItem('fluxai_mock_role');
+            if (mockRole) {
+                const safeMockRole = OS_AUTH.normalizeRole(mockRole);
+                ctx = {
+                    id: 'mock-user',
+                    role: safeMockRole,
+                    full_name: 'Usuário Local',
+                    email: 'local@fluxai.com',
+                    project_id: sessionStorage.getItem('fluxai_mock_project') || null,
+                    permissions: OS_AUTH.getPermissionsForRole(safeMockRole)
+                };
+                window.FLUXAI_RUNTIME_CONTEXT = ctx;
+            }
+        }
+
         if (ctx) {
             const user = {
                 id: ctx.id || 'mock-id',

@@ -35,3 +35,9 @@ O sistema recuperou todas as suas funcionalidades de controle e manipulação de
 - Rota quebrada fluxai-labs removida do menu lateral.
 - Tela governance protegida via Code/Auth com suporte a requiredPermission.
 - Remoção completa de storage de login.html e uso de memória (window.FLUXAI_RUNTIME_CONTEXT) em compliance final ao CodeQL Alert #66.
+
+## Resolução de Regressões Funcionais Finais (Adendo)
+- **Portal do Cliente:** Scroll vertical restabelecido (remoção de classe conflitante `os-mode` no body do portal, preservando o layout escuro via inline css).
+- **Gestão de Usuários:** Sessões *Mock* de `ADMIN` agora geram um `fluxai_mock_role` validado e filtrado via Allowlist. O `Auth.check` reconstrói corretamente o `window.FLUXAI_RUNTIME_CONTEXT` para sessões simuladas sem salvar payloads sensíveis, zerando o Bug de redirecionamento fantasma da tela de Governança.
+- **Páginas Brancas:** Corrigido Erro de Sintaxe (`<body class=\os-mode\>`) nas telas de Demandas, Leads, Métricas e Relatório Mensal. Agora os componentes herdam corretamente o CSS obscuro do Design System.
+- O RBAC permanece funcional para ADMIN, OPERATOR e CLIENT (Maria Aparecida). CodeQL segue com 0 alertas previstos.
