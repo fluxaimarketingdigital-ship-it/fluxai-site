@@ -506,95 +506,129 @@
 
                 // Garantir objeto de permissões válido
                 const activePerms = u.permissions || [];
-
-                // Renderizar checkboxes de permissão
-                let permissionGridHtml = '';
-                MODULES_METADATA.forEach(m => {
-                    const isChecked = activePerms.includes(m.id);
-                    permissionGridHtml += `
-                        <label class="permission-item ${isChecked ? 'active' : ''}" data-user-id="${u.id}" data-module-id="${m.id}">
-                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="window.togglePermission('${u.id}', '${m.id}', this.checked)" />
-                            <span>${m.label}</span>
-                        </label>
-                    `;
-                });
-
-                card.innerHTML = `
-                    <div class="user-card-header" onclick="this.parentElement.classList.toggle('expanded')">
-                        <div class="user-header">
-                            <div class="user-avatar safe-avatar"></div>
-                            <div class="user-info">
-                                <h3 class="safe-name"></h3>
-                                <p class="safe-email"></p>
-                            </div>
-                        </div>
-                        <div>
-                            <span class="role-badge ${roleClass}">${roleLabel}</span>
-                        </div>
-                        <div>
-                            <span style="font-size: 0.7rem; color: var(--os-text-muted);"><i class="fa-solid fa-key"></i> Chave: <span id="pass-${u.id}" class="mask-password">••••••••</span></span>
-                        </div>
-                        <div style="text-align: right; color: var(--os-text-muted);">
-                            <i class="fa-solid fa-chevron-down toggle-icon" style="transition: transform 0.3s ease;"></i>
-                        </div>
-                    </div>
-
-                    <div class="user-card-body">
-                        <!-- Bloco de Credenciais -->
-                        <div class="credentials-box" style="margin-bottom: 20px;">
-                            <div class="credential-row">
-                                <span class="credential-label">Login Operacional</span>
-                                <span class="credential-value safe-email-val" style="font-size: 0.8rem;"></span>
-                            </div>
-                            <div class="credential-row">
-                                <span class="credential-label">Chave de Acesso Externa</span>
-                                <span class="credential-value">
-                                    <button class="btn-credential-action safe-reveal-btn" title="Revelar Senha">
-                                        <i id="eye-icon-${u.id}" class="fa-solid fa-eye"></i> Revelar
-                                    </button>
-                                    <button class="btn-credential-action safe-copy-btn" title="Copiar Senha">
-                                        <i class="fa-solid fa-copy"></i> Copiar
-                                    </button>
-                                </span>
-                            </div>
-                        </div>
-
-                        <!-- Grade de Módulos Autorizados -->
-                        <div class="permissions-section">
-                            <div class="permissions-title">
-                                <span>Módulos Autorizados (RBAC)</span>
-                            </div>
-                            <div class="permissions-grid">
-                                ${permissionGridHtml}
-                            </div>
-                        </div>
-
-                        <!-- Botões de Ações do Cartão -->
-                        <div class="card-actions">
-                            <button class="btn-card-action btn-card-reset safe-reset-btn" title="Resetar senha para fluxai@2026">
-                                <i class="fa-solid fa-key"></i> Resetar Senha
-                            </button>
-                            <button class="btn-card-action safe-toggle-btn" title="Ativar / Inativar Contrato" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2);">
-                                <i class="fa-solid fa-toggle-on"></i> Ativar/Inativar
-                            </button>
-                            <button class="btn-card-action btn-card-delete safe-del-btn" title="Excluir Usuário" style="max-width: none;">
-                                <i class="fa-solid fa-trash-can"></i> Excluir
-                            </button>
-                        </div>
-                    </div>
+                const gridHtml = document.createElement('div');
+                gridHtml.className = 'permissions-grid';
+                MODULES_METADATA.forEach(m => { 
+                    const isChecked = activePerms.includes(m.id); 
+                    const lbl = document.createElement('label');
+                    lbl.className = `permission-item ${isChecked ? 'active' : ''}`;
+                    lbl.dataset.userId = u.id;
+                    lbl.dataset.moduleId = m.id;
+                    
+                    const inp = document.createElement('input');
+                    inp.type = 'checkbox';
+                    inp.checked = isChecked;
+                    inp.onchange = function() { window.togglePermission(u.id, m.id, this.checked); };
+                    lbl.appendChild(inp);
+                    
+                    const sp = document.createElement('span');
+                    sp.textContent = m.label;
+                    lbl.appendChild(sp);
+                    
+                    gridHtml.appendChild(lbl);
+                }); 
+ 
+                // Header do card
+                const header = document.createElement('div');
+                header.className = 'user-card-header';
+                header.onclick = function() { this.parentElement.classList.toggle('expanded'); };
+                
+                const uHeader = document.createElement('div');
+                uHeader.className = 'user-header';
+                
+                const avatarDiv = document.createElement('div');
+                avatarDiv.className = 'user-avatar safe-avatar';
+                avatarDiv.textContent = initials;
+                
+                const uInfo = document.createElement('div');
+                uInfo.className = 'user-info';
+                const h3Name = document.createElement('h3');
+                h3Name.className = 'safe-name';
+                h3Name.textContent = u.full_name || 'Usuário Sem Nome';
+                const pEmail = document.createElement('p');
+                pEmail.className = 'safe-email';
+                pEmail.textContent = u.email;
+                uInfo.appendChild(h3Name);
+                uInfo.appendChild(pEmail);
+                uHeader.appendChild(avatarDiv);
+                uHeader.appendChild(uInfo);
+                
+                const roleDiv = document.createElement('div');
+                const roleSpan = document.createElement('span');
+                roleSpan.className = `role-badge ${roleClass}`;
+                roleSpan.textContent = roleLabel;
+                roleDiv.appendChild(roleSpan);
+                
+                const keyDiv = document.createElement('div');
+                keyDiv.innerHTML = `<span style="font-size: 0.7rem; color: var(--os-text-muted);"><i class="fa-solid fa-key"></i> Chave: <span id="pass-${u.id}" class="mask-password">•••••••••</span></span>`;
+                
+                const caretDiv = document.createElement('div');
+                caretDiv.style.cssText = 'text-align: right; color: var(--os-text-muted);';
+                caretDiv.innerHTML = '<i class="fa-solid fa-chevron-down toggle-icon" style="transition: transform 0.3s ease;"></i>';
+                
+                header.appendChild(uHeader);
+                header.appendChild(roleDiv);
+                header.appendChild(keyDiv);
+                header.appendChild(caretDiv);
+                
+                // Body do card
+                const body = document.createElement('div');
+                body.className = 'user-card-body';
+                
+                body.innerHTML = `
+                        <!-- Bloco de Credenciais --> 
+                        <div class="credentials-box" style="margin-bottom: 20px;"> 
+                            <div class="credential-row"> 
+                                <span class="credential-label">Login Operacional</span> 
+                                <span class="credential-value safe-email-val" style="font-size: 0.8rem;"></span> 
+                            </div> 
+                            <div class="credential-row"> 
+                                <span class="credential-label">Chave de Acesso Externa</span> 
+                                <span class="credential-value"> 
+                                    <button class="btn-credential-action safe-reveal-btn" title="Revelar Senha"> 
+                                        <i id="eye-icon-${u.id}" class="fa-solid fa-eye"></i> Revelar 
+                                    </button> 
+                                    <button class="btn-credential-action safe-copy-btn" title="Copiar Senha"> 
+                                        <i class="fa-solid fa-copy"></i> Copiar 
+                                    </button> 
+                                </span> 
+                            </div> 
+                        </div> 
+ 
+                        <!-- Grade de Módulos Autorizados --> 
+                        <div class="permissions-section"> 
+                            <div class="permissions-title"> 
+                                <span>Módulos Autorizados (RBAC)</span> 
+                            </div> 
+                            <div class="safe-grid-container"></div>
+                        </div> 
+ 
+                        <!-- Botões de Ações do Cartão --> 
+                        <div class="card-actions"> 
+                            <button class="btn-card-action btn-card-reset safe-reset-btn" title="Resetar senha para fluxai@2026"> 
+                                <i class="fa-solid fa-key"></i> Resetar Senha 
+                            </button> 
+                            <button class="btn-card-action safe-toggle-btn" title="Ativar / Inativar Contrato" style="background: rgba(245,158,11,0.1); color: #f59e0b; border: 1px solid rgba(245,158,11,0.2);"> 
+                                <i class="fa-solid fa-toggle-on"></i> Ativar/Inativar 
+                            </button> 
+                            <button class="btn-card-action btn-card-delete safe-del-btn" title="Excluir Usuário" style="max-width: none;"> 
+                                <i class="fa-solid fa-trash-can"></i> Excluir 
+                            </button> 
+                        </div> 
                 `;
                 
-                card.querySelector('.safe-avatar').textContent = initials;
-                card.querySelector('.safe-name').textContent = u.full_name || 'Usuário Sem Nome';
-                card.querySelector('.safe-email').textContent = u.email;
-                card.querySelector('.safe-email-val').textContent = u.email;
+                body.querySelector('.safe-email-val').textContent = u.email;
+                body.querySelector('.safe-grid-container').replaceChildren(gridHtml);
                 
-                card.querySelector('.safe-reveal-btn').onclick = () => window.togglePasswordReveal(u.id, u.password);
-                card.querySelector('.safe-copy-btn').onclick = () => window.copyToClipboard(u.password);
-                card.querySelector('.safe-reset-btn').onclick = () => window.resetUserPassword(u.id);
-                card.querySelector('.safe-toggle-btn').onclick = () => window.toggleContractStatus(u.id, u.email);
-                card.querySelector('.safe-del-btn').onclick = () => window.deleteUser(u.id, u.email);
-
+                body.querySelector('.safe-reveal-btn').onclick = () => window.togglePasswordReveal(u.id, u.password); 
+                body.querySelector('.safe-copy-btn').onclick = () => window.copyToClipboard(u.password); 
+                body.querySelector('.safe-reset-btn').onclick = () => window.resetUserPassword(u.id); 
+                body.querySelector('.safe-toggle-btn').onclick = () => window.toggleContractStatus(u.id, u.email); 
+                body.querySelector('.safe-del-btn').onclick = () => window.deleteUser(u.id, u.email);
+                
+                card.appendChild(header);
+                card.appendChild(body);
+ 
                 container.appendChild(card);
             });
         };

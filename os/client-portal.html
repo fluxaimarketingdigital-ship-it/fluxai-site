@@ -770,25 +770,61 @@
         }
 
         async function renderFinanceList() {
-            const list = document.getElementById('portal-finance');
-            list.innerHTML = `
-                <div class="finance-item">
-                    <div class="f-date">10/Fev/2026</div>
-                    <div class="f-desc">Mensalidade Assessoria Completa</div>
-                    <div class="f-value">R$ 1.500,00</div>
-                    <button class="btn-upload-receipt" onclick="window.location.href='#'">
-                        <i class="fa-solid fa-upload"></i> Enviar Comprovante
-                    </button>
-                </div>
-                <div class="finance-item" style="opacity: 0.5;">
-                    <div class="f-date">10/Jan/2026</div>
-                    <div class="f-desc">Mensalidade Assessoria Completa</div>
-                    <div class="f-value">R$ 1.500,00</div>
-                    <div style="font-size: 0.7rem; font-weight: 800; color: #34d399; display: flex; align-items: center; justify-content: center; gap: 5px;">
-                        <i class="fa-solid fa-check-circle"></i> PAGO
-                    </div>
-                </div>
-            `;
+            const list = document.getElementById('portal-finance'); 
+            list.replaceChildren();
+            
+            const item1 = document.createElement('div');
+            item1.className = 'finance-item';
+            
+            const date1 = document.createElement('div');
+            date1.className = 'f-date';
+            date1.textContent = '10/Fev/2026';
+            
+            const desc1 = document.createElement('div');
+            desc1.className = 'f-desc';
+            desc1.textContent = 'Mensalidade Assessoria Completa';
+            
+            const val1 = document.createElement('div');
+            val1.className = 'f-value';
+            val1.textContent = 'R$ 1.500,00';
+            
+            const btn1 = document.createElement('button');
+            btn1.className = 'btn-upload-receipt';
+            btn1.onclick = () => window.location.href = '#';
+            btn1.innerHTML = '<i class="fa-solid fa-upload"></i> Enviar Comprovante';
+            
+            item1.appendChild(date1);
+            item1.appendChild(desc1);
+            item1.appendChild(val1);
+            item1.appendChild(btn1);
+            
+            const item2 = document.createElement('div');
+            item2.className = 'finance-item';
+            item2.style.opacity = '0.5';
+            
+            const date2 = document.createElement('div');
+            date2.className = 'f-date';
+            date2.textContent = '10/Jan/2026';
+            
+            const desc2 = document.createElement('div');
+            desc2.className = 'f-desc';
+            desc2.textContent = 'Mensalidade Assessoria Completa';
+            
+            const val2 = document.createElement('div');
+            val2.className = 'f-value';
+            val2.textContent = 'R$ 1.500,00';
+            
+            const statusDiv = document.createElement('div');
+            statusDiv.style.cssText = 'font-size: 0.7rem; font-weight: 800; color: #34d399; display: flex; align-items: center; justify-content: center; gap: 5px;';
+            statusDiv.innerHTML = '<i class="fa-solid fa-check-circle"></i> PAGO';
+            
+            item2.appendChild(date2);
+            item2.appendChild(desc2);
+            item2.appendChild(val2);
+            item2.appendChild(statusDiv);
+            
+            list.appendChild(item1);
+            list.appendChild(item2);
         }
 
         async function checkFinancialAlerts() {
@@ -863,7 +899,7 @@
                         const btn = document.createElement('button');
                         btn.style.cssText = 'background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s;';
                         btn.textContent = 'Ver Pautas & Estratégia';
-                        btn.onclick = () => window.location.href = `/os/content-engine.html?project=${projectId}`;
+                        btn.onclick = () => { window.location.href = '/os/content-engine.html?project=' + encodeURIComponent(projectId); };
                         banner.appendChild(btn);
                         
                         alertContainer.appendChild(banner);

@@ -860,16 +860,28 @@ function renderContractHealth(contracts, payments) {
             nextAction = 'N/A';
         }
 
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-                <td class="safe-client"></td>
-                <td><span class="health-pill ${healthClass}">${health}</span></td>
-                <td style="font-size: 0.7rem; color: ${finRisk === 'Nulo' ? 'var(--os-success)' : 'var(--os-warning)'};">${finRisk}</td>
-                <td style="font-size: 0.7rem; color: var(--os-success);">${opRisk}</td>
-                <td style="font-size: 0.7rem; color: var(--os-success);">Em Conformidade</td>
-                <td style="font-size: 0.75rem; font-weight: 700; color: var(--os-primary);">${nextAction}</td>
-        `;
-        tr.querySelector('.safe-client').textContent = c.client_name;
+        const tr = document.createElement('tr'); 
+        tr.innerHTML = ` 
+                <td class="safe-client"></td> 
+                <td><span class="health-pill safe-health"></span></td> 
+                <td class="safe-fin-risk" style="font-size: 0.7rem;"></td> 
+                <td class="safe-op-risk" style="font-size: 0.7rem; color: var(--os-success);"></td> 
+                <td style="font-size: 0.7rem; color: var(--os-success);">Em Conformidade</td> 
+                <td class="safe-next-action" style="font-size: 0.75rem; font-weight: 700; color: var(--os-primary);"></td> 
+        `; 
+        tr.querySelector('.safe-client').textContent = c.client_name; 
+        
+        const healthSpan = tr.querySelector('.safe-health');
+        healthSpan.className = `health-pill ${healthClass}`;
+        healthSpan.textContent = health;
+        
+        const finRiskTd = tr.querySelector('.safe-fin-risk');
+        finRiskTd.style.color = finRisk === 'Nulo' ? 'var(--os-success)' : 'var(--os-warning)';
+        finRiskTd.textContent = finRisk;
+        
+        tr.querySelector('.safe-op-risk').textContent = opRisk;
+        tr.querySelector('.safe-next-action').textContent = nextAction;
+        
         body.appendChild(tr);
     });
 }
@@ -923,22 +935,37 @@ function renderOperationalAlerts(contracts, payments) {
         return;
     }
 
-    alerts.forEach(a => {
-        const div = document.createElement('div');
-        div.className = `alert-item ${a.type}`;
-        div.innerHTML = `
-            <div class="alert-icon" style="color: ${a.type === 'critical' ? 'var(--os-danger)' : 'var(--os-warning)'};">
-                <i class="fa-solid ${a.type === 'critical' ? 'fa-triangle-exclamation' : 'fa-circle-info'}"></i>
-            </div>
-            <div class="alert-content">
-                <h4 class="safe-title"></h4>
-                <p class="safe-desc"></p>
-            </div>
-        `;
-        div.querySelector('.safe-title').textContent = a.title;
-        div.querySelector('.safe-desc').textContent = a.desc;
-        container.appendChild(div);
-    });
+    alerts.forEach(a => { 
+        const div = document.createElement('div'); 
+        div.className = `alert-item ${a.type}`; 
+        
+        const iconDiv = document.createElement('div');
+        iconDiv.className = 'alert-icon';
+        iconDiv.style.color = a.type === 'critical' ? 'var(--os-danger)' : 'var(--os-warning)';
+        
+        const iconI = document.createElement('i');
+        iconI.className = `fa-solid ${a.type === 'critical' ? 'fa-triangle-exclamation' : 'fa-circle-info'}`;
+        iconDiv.appendChild(iconI);
+        
+        const contentDiv = document.createElement('div');
+        contentDiv.className = 'alert-content';
+        
+        const titleH4 = document.createElement('h4');
+        titleH4.className = 'safe-title';
+        titleH4.textContent = a.title;
+        
+        const descP = document.createElement('p');
+        descP.className = 'safe-desc';
+        descP.textContent = a.desc;
+        
+        contentDiv.appendChild(titleH4);
+        contentDiv.appendChild(descP);
+        
+        div.appendChild(iconDiv);
+        div.appendChild(contentDiv);
+        
+        container.appendChild(div); 
+    }); 
 }
 
 async function logAction(action, targetId) {

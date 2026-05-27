@@ -527,29 +527,42 @@
                     document.getElementById('main-ui').style.display = 'none';
 
                     // ── FLUXO VISÍVEL AO CLIENTE ──────────────────────────────────────────
-                    // PLANEJAMENTO / REVISÃO GESTÃO / APROVAÇÃO ESTRATÉGICA
                     if (currentStatus === 'AJUSTE') { 
                         document.getElementById('success-title').innerText = 'Ajuste em Andamento'; 
                         const feedbackContainer = document.createElement('div');
                         feedbackContainer.style.cssText = 'background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff; margin-top:15px;';
-                        feedbackContainer.innerHTML = `<strong style="color:#60a5fa;">Seu Pedido de Ajuste:</strong><br>${window.escapeHTML(c.internal_notes || '')}`;
+                        
+                        const strong = document.createElement('strong');
+                        strong.style.color = '#60a5fa';
+                        strong.textContent = 'Seu Pedido de Ajuste:';
+                        feedbackContainer.appendChild(strong);
+                        feedbackContainer.appendChild(document.createElement('br'));
+                        feedbackContainer.appendChild(document.createTextNode(c.internal_notes || ''));
+                        
                         const msg = document.getElementById('success-message');
-                        msg.textContent = '✅ Seus apontamentos foram recebidos e nossa equipe já está aplicando os ajustes no planejamento. Assim que estiver pronto, você receberá acesso para uma nova rodada de aprovação.';
+                        msg.textContent = '👍 Seus apontamentos foram recebidos e nossa equipe já está aplicando os ajustes no planejamento. Assim que estiver pronto, você receberá acesso para uma nova rodada de aprovação.';
                         if (c.internal_notes) msg.appendChild(feedbackContainer);
                     } else if (currentStatus === 'PRODUÇÃO') { 
                         document.getElementById('success-title').innerText = 'Em Produção'; 
-                        document.getElementById('success-message').textContent = '🎬 Planejamento Aprovado com sucesso! Nossa equipe técnica já recebeu o briefing e está em fase de Produção Audiovisual / Design. Você receberá uma notificação assim que a arte final estiver pronta para sua validação.';
+                        document.getElementById('success-message').textContent = '✅ Planejamento Aprovado com sucesso! Nossa equipe técnica já recebeu o briefing e está em fase de Produção Audiovisual / Design. Você receberá uma notificação assim que a arte final estiver pronta para sua validação.';
                     } else if (currentStatus === 'AJUSTE DE PRODUÇÃO') { 
                         document.getElementById('success-title').innerText = 'Arte em Ajuste'; 
                         const feedbackContainer = document.createElement('div');
                         feedbackContainer.style.cssText = 'background:rgba(236,72,153,0.08); border:1px solid rgba(236,72,153,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff; margin-top:15px;';
-                        feedbackContainer.innerHTML = `<strong style="color:#ec4899;">Suas Observações:</strong><br>${window.escapeHTML(c.internal_notes || '')}`;
+                        
+                        const strong = document.createElement('strong');
+                        strong.style.color = '#ec4899';
+                        strong.textContent = 'Suas Observações:';
+                        feedbackContainer.appendChild(strong);
+                        feedbackContainer.appendChild(document.createElement('br'));
+                        feedbackContainer.appendChild(document.createTextNode(c.internal_notes || ''));
+                        
                         const msg = document.getElementById('success-message');
                         msg.textContent = '🎨 Nossa equipe de design está refinando a arte final com base nos seus apontamentos. Em breve estará disponível para sua aprovação.';
                         if (c.internal_notes) msg.appendChild(feedbackContainer);
                     } else if (currentStatus === 'PRONTO' || currentStatus === 'PUBLICADO') { 
-                        document.getElementById('success-title').innerText = currentStatus === 'PUBLICADO' ? '🚀 Publicado!' : '✅ Conteúdo Finalizado!'; 
-                        document.getElementById('success-message').innerText = currentStatus === 'PUBLICADO' ? 'Este conteúdo foi publicado nas plataformas conforme planejado. Acompanhe os resultados no seu dashboard.' : 'Este ativo foi aprovado e está pronto para publicação. Acompanhe o calendário para ver a data programada.'; 
+                        document.getElementById('success-title').textContent = currentStatus === 'PUBLICADO' ? '🚀 Publicado!' : '✅ Conteúdo Finalizado!'; 
+                        document.getElementById('success-message').textContent = currentStatus === 'PUBLICADO' ? 'Este conteúdo foi publicado nas plataformas conforme planejado. Acompanhe os resultados no seu dashboard.' : 'Este ativo foi aprovado e está pronto para publicação. Acompanhe o calendário para ver a data programada.'; 
                     } else { 
                         document.getElementById('success-title').innerText = 'Em Preparação Estratégica'; 
                         document.getElementById('success-message').textContent = 'Nossa equipe está finalizando os últimos ajustes estratégicos neste conteúdo para garantir a máxima qualidade antes de enviar para sua aprovação. Em breve você receberá acesso para revisar e aprovar.';
@@ -575,8 +588,18 @@
                 if (isFinalArt) {
                     document.getElementById('portal-subtitle').innerText = 'REVISÃO DE ARTE FINAL';
                     document.getElementById('asset-body-title').innerText = 'Arte Finalizada';
-                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE FINAL';
-                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
+                    const btnApp = document.getElementById('btn-approve-action');
+                    btnApp.replaceChildren();
+                    const iApp = document.createElement('i');
+                    iApp.className = 'fa-solid fa-circle-check';
+                    btnApp.appendChild(iApp);
+                    btnApp.appendChild(document.createTextNode(' APROVAR ARTE FINAL'));
+                    const btnRej = document.getElementById('btn-reject-action');
+                    btnRej.replaceChildren();
+                    const iRej = document.createElement('i');
+                    iRej.className = 'fa-solid fa-rotate-left';
+                    btnRej.appendChild(iRej);
+                    btnRej.appendChild(document.createTextNode(' SOLICITAR AJUSTE NA ARTE'));
                 } else {
                     document.getElementById('asset-body-title').innerText = 'Aprovação de Planejamento';
                 }
@@ -759,7 +782,7 @@
                     document.getElementById('success-message').innerText = message;
                     
                     const actionsContainer = document.getElementById('success-actions');
-                    actionsContainer.innerHTML = '';
+                    actionsContainer.replaceChildren();
                     const btnReturn = document.createElement('button');
                     btnReturn.className = 'btn-return';
                     btnReturn.innerText = 'VOLTAR AO CALENDÁRIO';
@@ -771,7 +794,11 @@
 
                 document.getElementById('btn-approve-action').onclick = async () => {
                     const btn = document.getElementById('btn-approve-action');
-                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+                    btn.replaceChildren();
+                        const iSpin = document.createElement('i');
+                        iSpin.className = 'fa-solid fa-spinner fa-spin';
+                        btn.appendChild(iSpin);
+                        btn.appendChild(document.createTextNode(' Processando...'));
                     btn.disabled = true;
 
                     try {
@@ -795,7 +822,7 @@
                         showFinalSuccess(nextStatus === 'PRONTO' ? 'Conteúdo Finalizado!' : 'Planejamento Aprovado!', 'A pauta seguiu para a próxima etapa.');
                     } catch (err) {
                         alert('Erro: ' + err.message);
-                        btn.innerHTML = 'Tentar Novamente';
+                        btn.textContent = 'Tentar Novamente';
                         btn.disabled = false;
                     }
                 };
@@ -816,7 +843,11 @@
                         return;
                     }
 
-                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+                    btn.replaceChildren();
+                        const iEnv = document.createElement('i');
+                        iEnv.className = 'fa-solid fa-spinner fa-spin';
+                        btn.appendChild(iEnv);
+                        btn.appendChild(document.createTextNode(' Enviando...'));
                     btn.disabled = true;
 
                     try {
@@ -853,7 +884,7 @@
                     } catch (err) {
                         console.error('[FEEDBACK_ERROR]', err);
                         alert('Erro ao enviar feedback: ' + err.message);
-                        btn.innerHTML = 'Tentar Novamente';
+                        btn.textContent = 'Tentar Novamente';
                         btn.disabled = false;
                     }
                 };
@@ -883,7 +914,14 @@
                         document.getElementById('success-title').innerText = 'Ajuste em Andamento';
                         const feedbackContainer = document.createElement('div');
                         feedbackContainer.style.cssText = 'background:rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff; margin-top:15px;';
-                        feedbackContainer.innerHTML = `<strong style="color:#60a5fa;">Seu Pedido de Ajuste:</strong><br>${window.escapeHTML(c.internal_notes || '')}`;
+                        
+                        const strong = document.createElement('strong');
+                        strong.style.color = '#60a5fa';
+                        strong.textContent = 'Seu Pedido de Ajuste:';
+                        feedbackContainer.appendChild(strong);
+                        feedbackContainer.appendChild(document.createElement('br'));
+                        feedbackContainer.appendChild(document.createTextNode(c.internal_notes || ''));
+
                         const msg = document.getElementById('success-message');
                         msg.textContent = '✅ Seus apontamentos foram recebidos e nossa equipe já está aplicando os ajustes no planejamento. Assim que estiver pronto, você receberá acesso para uma nova rodada de aprovação.';
                         if (c.internal_notes) msg.appendChild(feedbackContainer);
@@ -894,7 +932,14 @@
                         document.getElementById('success-title').innerText = 'Arte em Ajuste';
                         const feedbackContainer = document.createElement('div');
                         feedbackContainer.style.cssText = 'background:rgba(236,72,153,0.08); border:1px solid rgba(236,72,153,0.3); padding:15px; border-radius:8px; font-size:0.8rem; text-align:left; color:#fff; margin-top:15px;';
-                        feedbackContainer.innerHTML = `<strong style="color:#ec4899;">Suas Observações:</strong><br>${window.escapeHTML(c.internal_notes || '')}`;
+                        
+                        const strong = document.createElement('strong');
+                        strong.style.color = '#ec4899';
+                        strong.textContent = 'Suas Observações:';
+                        feedbackContainer.appendChild(strong);
+                        feedbackContainer.appendChild(document.createElement('br'));
+                        feedbackContainer.appendChild(document.createTextNode(c.internal_notes || ''));
+
                         const msg = document.getElementById('success-message');
                         msg.textContent = '🎨 Nossa equipe de design está refinando a arte final com base nos seus apontamentos. Em breve estará disponível para sua aprovação.';
                         if (c.internal_notes) msg.appendChild(feedbackContainer);
@@ -925,8 +970,18 @@
                 if (isFinalArt) {
                     document.getElementById('portal-subtitle').innerText = `REVISÃO DE ARTE FINAL: ${companyNameUpper}`;
                     document.getElementById('asset-body-title').innerText = 'Arte Finalizada';
-                    document.getElementById('btn-approve-action').innerHTML = '<i class="fa-solid fa-circle-check"></i> APROVAR ARTE FINAL';
-                    document.getElementById('btn-reject-action').innerHTML = '<i class="fa-solid fa-rotate-left"></i> SOLICITAR AJUSTE NA ARTE';
+                    const btnApp = document.getElementById('btn-approve-action');
+                    btnApp.replaceChildren();
+                    const iApp = document.createElement('i');
+                    iApp.className = 'fa-solid fa-circle-check';
+                    btnApp.appendChild(iApp);
+                    btnApp.appendChild(document.createTextNode(' APROVAR ARTE FINAL'));
+                    const btnRej = document.getElementById('btn-reject-action');
+                    btnRej.replaceChildren();
+                    const iRej = document.createElement('i');
+                    iRej.className = 'fa-solid fa-rotate-left';
+                    btnRej.appendChild(iRej);
+                    btnRej.appendChild(document.createTextNode(' SOLICITAR AJUSTE NA ARTE'));
                 } else {
                     document.getElementById('asset-body-title').innerText = 'Aprovação de Planejamento';
                 }
@@ -985,57 +1040,130 @@
                 
                 if (isFinalArt && c.metadata?.final_asset_url) {
                     const safeFinalUrl = c.metadata.final_asset_url.startsWith('http') ? window.escapeHTML(c.metadata.final_asset_url) : '#';
-                    document.getElementById('asset-caption').innerHTML = `
-                        <div style="background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 40px 30px; border-radius: 12px; text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 20px;">
-                            <i class="fa-solid fa-file-circle-check" style="font-size: 4rem; color: #8b5cf6; display: block;"></i>
-                            <h3 style="color: #fff; margin: 0; font-size: 1.2rem;">A Arte Final está pronta!</h3>
-                            <a href="${safeFinalUrl}" target="_blank" class="btn btn-approve" style="background: #8b5cf6; color: #fff; width: auto; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 35px; border-radius: 8px; font-weight: 800; text-decoration: none;">
-                                <i class="fa-solid fa-eye"></i> VISUALIZAR ARTE FINAL
-                            </a>
-                        </div>
-                    `;
+                    const captionContainer = document.getElementById('asset-caption');
+                    captionContainer.replaceChildren();
+                    
+                    const divBg = document.createElement('div');
+                    divBg.style.cssText = 'background: rgba(139, 92, 246, 0.1); border: 1px solid #8b5cf6; padding: 40px 30px; border-radius: 12px; text-align: center; margin-bottom: 25px; width: 100%; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: 20px;';
+                    
+                    const iIcon = document.createElement('i');
+                    iIcon.className = 'fa-solid fa-file-circle-check';
+                    iIcon.style.cssText = 'font-size: 4rem; color: #8b5cf6; display: block;';
+                    
+                    const h3Title = document.createElement('h3');
+                    h3Title.style.cssText = 'color: #fff; margin: 0; font-size: 1.2rem;';
+                    h3Title.textContent = 'A Arte Final está pronta!';
+                    
+                    const aLink = document.createElement('a');
+                    aLink.href = safeFinalUrl;
+                    aLink.target = '_blank';
+                    aLink.className = 'btn btn-approve';
+                    aLink.style.cssText = 'background: #8b5cf6; color: #fff; width: auto; display: inline-flex; align-items: center; justify-content: center; gap: 10px; padding: 14px 35px; border-radius: 8px; font-weight: 800; text-decoration: none;';
+                    const iLinkIcon = document.createElement('i');
+                    iLinkIcon.className = 'fa-solid fa-eye';
+                    aLink.appendChild(iLinkIcon);
+                    aLink.appendChild(document.createTextNode(' VISUALIZAR ARTE FINAL'));
+                    
+                    divBg.appendChild(iIcon);
+                    divBg.appendChild(h3Title);
+                    divBg.appendChild(aLink);
+                    
+                    captionContainer.appendChild(divBg);
                 } else {
-                    document.getElementById('asset-caption').innerHTML = roadmap;
+                    const caption = document.getElementById('asset-caption');
+                    caption.replaceChildren();
+                    const pre = document.createElement('pre');
+                    pre.style.whiteSpace = 'pre-wrap';
+                    pre.style.wordWrap = 'break-word';
+                    pre.style.fontFamily = 'inherit';
+                    pre.style.margin = '0';
+                    pre.textContent = c.caption;
+                    caption.appendChild(pre);
                 }
                 
                 const badge = document.getElementById('status-badge-container');
-                badge.innerHTML = isFinalArt ? `<span class="status-badge" style="background:rgba(139, 92, 246,0.15); color:#a78bfa; border:1px solid rgba(139,92,246,0.5);">AGUARDANDO SUA APROVAÇÃO</span>` : `<span class="status-badge" style="background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.5);">AGUARDANDO SUA APROVAÇÃO</span>`;
+                badge.replaceChildren();
+                const bSpan = document.createElement('span');
+                bSpan.className = 'status-badge';
+                bSpan.textContent = 'AGUARDANDO SUA APROVAÇÃO';
+                if (isFinalArt) {
+                    bSpan.style.cssText = 'background:rgba(139, 92, 246,0.15); color:#a78bfa; border:1px solid rgba(139,92,246,0.5);';
+                } else {
+                    bSpan.style.cssText = 'background:rgba(16,185,129,0.15); color:#10b981; border:1px solid rgba(16,185,129,0.5);';
+                }
+                badge.appendChild(bSpan);
 
                 // INJETAR MATRIZ DE AJUSTE
                 const schema = ADJUSTMENT_SCHEMA[prefix] || ADJUSTMENT_SCHEMA['REELS'];
                 const matrixContainer = document.getElementById('adjustment-matrix-container');
-                let matrixHtml = '';
+                matrixContainer.replaceChildren();
 
                 if (schema.sections) {
                     schema.sections.forEach(sec => {
-                        matrixHtml += `<span class="section-label">${sec.title}</span><div class="check-grid">`;
+                        const secLabel = document.createElement('span');
+                        secLabel.className = 'section-label';
+                        secLabel.textContent = sec.title;
+                        matrixContainer.appendChild(secLabel);
+                        
+                        const checkGrid = document.createElement('div');
+                        checkGrid.className = 'check-grid';
+                        
                         sec.items.forEach(item => {
-                            matrixHtml += `
-                                <label class="check-item">
-                                    <input type="checkbox" class="adj-check" data-cat="${sec.title}" value="${item}">
-                                    <span>${item}</span>
-                                </label>
-                            `;
+                            const lbl = document.createElement('label');
+                            lbl.className = 'check-item';
+                            
+                            const inp = document.createElement('input');
+                            inp.type = 'checkbox';
+                            inp.className = 'adj-check';
+                            inp.dataset.cat = sec.title;
+                            inp.value = item;
+                            lbl.appendChild(inp);
+                            
+                            const sp = document.createElement('span');
+                            sp.textContent = item;
+                            lbl.appendChild(sp);
+                            
+                            checkGrid.appendChild(lbl);
                         });
-                        matrixHtml += `</div>`;
+                        matrixContainer.appendChild(checkGrid);
                     });
                 }
 
                 if (schema.micro) {
-                    matrixHtml += `<span class="section-label" style="color:#60a5fa; border-color:rgba(96,165,250,0.2);">Microajustes Inteligentes</span><div class="micro-grid">`;
-                    schema.micro.forEach(m => {
-                        matrixHtml += `
-                            <div class="micro-item">
-                                <label>${m.title}</label>
-                                <div class="radio-group" data-nuance="${m.title}">
-                                    ${m.items.map(opt => `<div class="radio-opt" data-val="${opt}">${opt}</div>`).join('')}
-                                </div>
-                            </div>
-                        `;
-                    });
-                    matrixHtml += `</div>`;
-                }
-                matrixContainer.innerHTML = matrixHtml;
+                    const mLabel = document.createElement('span');
+                    mLabel.className = 'section-label';
+                    mLabel.style.cssText = 'color:#60a5fa; border-color:rgba(96,165,250,0.2);';
+                    mLabel.textContent = 'Microajustes Inteligentes';
+                    matrixContainer.appendChild(mLabel);
+                    
+                    const microGrid = document.createElement('div');
+                    microGrid.className = 'micro-grid';
+                    
+                    schema.micro.forEach(m => { 
+                        const mItem = document.createElement('div');
+                        mItem.className = 'micro-item';
+                        
+                        const lbl = document.createElement('label');
+                        lbl.textContent = m.title;
+                        mItem.appendChild(lbl);
+                        
+                        const rGroup = document.createElement('div');
+                        rGroup.className = 'radio-group';
+                        rGroup.dataset.nuance = m.title;
+                        
+                        m.items.forEach(opt => {
+                            const optDiv = document.createElement('div');
+                            optDiv.className = 'radio-opt';
+                            optDiv.dataset.val = opt;
+                            optDiv.textContent = opt;
+                            rGroup.appendChild(optDiv);
+                        });
+                        
+                        mItem.appendChild(rGroup);
+                        microGrid.appendChild(mItem);
+                    }); 
+                    matrixContainer.appendChild(microGrid);
+                } 
 
                 document.querySelectorAll('.radio-opt').forEach(opt => {
                     opt.onclick = function() {
@@ -1054,10 +1182,10 @@
                     document.getElementById('success-message').innerText = message;
                     
                     const actionsContainer = document.getElementById('success-actions');
-                    actionsContainer.innerHTML = '';
+                    actionsContainer.replaceChildren();
                     const btnReturn = document.createElement('button');
                     btnReturn.className = 'btn-return';
-                    btnReturn.innerHTML = 'VOLTAR AO CALENDÁRIO';
+                    btnReturn.textContent = 'VOLTAR AO CALENDÁRIO';
                     btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${c.project_id}`; };
                     actionsContainer.appendChild(btnReturn);
                     
@@ -1066,7 +1194,11 @@
 
                 document.getElementById('btn-approve-action').onclick = async () => {
                     const btn = document.getElementById('btn-approve-action');
-                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Processando...';
+                    btn.replaceChildren();
+                        const iSpin = document.createElement('i');
+                        iSpin.className = 'fa-solid fa-spinner fa-spin';
+                        btn.appendChild(iSpin);
+                        btn.appendChild(document.createTextNode(' Processando...'));
                     btn.disabled = true;
 
                     try {
@@ -1089,7 +1221,7 @@
                         showFinalSuccess(nextStatus === 'PRONTO' ? 'Conteúdo Finalizado!' : 'Planejamento Aprovado!', 'A pauta seguiu para a próxima etapa.');
                     } catch (err) {
                         alert('Erro: ' + err.message);
-                        btn.innerHTML = 'Tentar Novamente';
+                        btn.textContent = 'Tentar Novamente';
                         btn.disabled = false;
                     }
                 };
@@ -1110,7 +1242,11 @@
                         return;
                     }
 
-                    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+                    btn.replaceChildren();
+                        const iEnv = document.createElement('i');
+                        iEnv.className = 'fa-solid fa-spinner fa-spin';
+                        btn.appendChild(iEnv);
+                        btn.appendChild(document.createTextNode(' Enviando...'));
                     btn.disabled = true;
 
                     try {
@@ -1146,7 +1282,7 @@
                     } catch (err) {
                         console.error('[MOCK_FEEDBACK_ERROR]', err);
                         alert('Erro ao enviar feedback: ' + err.message);
-                        btn.innerHTML = 'Tentar Novamente';
+                        btn.textContent = 'Tentar Novamente';
                         btn.disabled = false;
                     }
                 };

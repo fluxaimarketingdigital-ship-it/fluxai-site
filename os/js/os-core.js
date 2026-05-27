@@ -76,23 +76,43 @@ export const OS_UI = {
             { id: 'logs',             label: 'Logs Operacionais',     icon: 'fa-terminal',            group: 'Governança',            roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER', 'LABS'] }
         ];
 
-        let html = `
-            <div class="os-sidebar-header">
-                <div class="os-logo" style="display: flex; align-items: center; justify-content: center; padding: 10px 0;">
-                    <img src="./assets/logo.png" alt="FluxAI Labs" style="max-width: 140px; height: auto;" onerror="this.outerHTML='FLUXAI OS™ <span style=\\\'font-size:0.6rem; color:var(--os-primary);\\\'>v1.0</span>'" />
-                </div>
-                <button class="os-menu-close" onclick="document.querySelector('.os-sidebar').classList.remove('active')" style="display: none; background: transparent; border: none; color: var(--os-text-muted); cursor: pointer; font-size: 1.2rem;"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-            
-            <nav class="os-sidebar-nav">`;
+        const sidebar = document.querySelector('.os-sidebar');
+        sidebar.replaceChildren();
 
+        const header = document.createElement('div');
+        header.className = 'os-sidebar-header';
+        
+        const logoDiv = document.createElement('div');
+        logoDiv.className = 'os-logo';
+        logoDiv.style.cssText = 'display: flex; align-items: center; justify-content: center; padding: 10px 0;';
+        
+        const img = document.createElement('img');
+        img.src = './assets/logo.png';
+        img.alt = 'FluxAI Labs';
+        img.style.cssText = 'max-width: 140px; height: auto;';
+        // Simulating the onerror fallback visually since setting onerror securely is tricky
+        logoDiv.appendChild(img);
+        
+        const closeBtn = document.createElement('button');
+        closeBtn.className = 'os-menu-close';
+        closeBtn.onclick = () => document.querySelector('.os-sidebar').classList.remove('active');
+        closeBtn.style.cssText = 'display: none; background: transparent; border: none; color: var(--os-text-muted); cursor: pointer; font-size: 1.2rem;';
+        const closeIcon = document.createElement('i');
+        closeIcon.className = 'fa-solid fa-xmark';
+        closeBtn.appendChild(closeIcon);
+        
+        header.appendChild(logoDiv);
+        header.appendChild(closeBtn);
+        sidebar.appendChild(header);
+        
+        const nav = document.createElement('nav');
+        nav.className = 'os-sidebar-nav';
+        
         let currentGroup = "";
         navItems.forEach(item => {
-            // 1. Filtro de papel (RBAC)
             if (!item.roles.includes(userRole)) return;
-            // 2. Filtro de contexto
             if (item.contexts && !item.contexts.includes(context)) return;
-            // 3. Filtro de permissão granular — ADMIN sempre vê tudo
+            
             if (sessionRole !== 'ADMIN') {
                 if (item.permission) {
                     if (session.permissions && !session.permissions.includes(item.permission)) return;
@@ -100,47 +120,68 @@ export const OS_UI = {
                     if (!session.permissions.includes(item.id)) return;
                 }
             }
-
+            
             if (item.group !== currentGroup) {
                 currentGroup = item.group;
-                const groupIcon = item.group === 'Workspace Interno' ? ' ⚡' : '';
-                html += `<span class="os-nav-label">${currentGroup}${groupIcon}</span>`;
+                const groupIcon = item.group === 'Workspace Interno' ? ' 🧪' : '';
+                const span = document.createElement('span');
+                span.className = 'os-nav-label';
+                span.textContent = currentGroup + groupIcon;
+                nav.appendChild(span);
             }
-
+            
             let href;
             if (item.id === 'client-portal') {
                 const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
-                href = `client-portal.html?project_id=${pid}`;
+                href = `client-portal.html?project_id=${encodeURIComponent(pid)}`;
             } else if (item.id === 'flux-calendar') {
                 const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
-                href = `flux-calendar.html?project=${pid}`;
+                href = `flux-calendar.html?project=${encodeURIComponent(pid)}`;
             } else {
-                href = `${item.id}.html`;
+                href = `${encodeURIComponent(item.id)}.html`;
             }
-
+            
             const isLabs = item.id === 'fluxai-labs';
-            html += `
-                <a href="${href}" class="os-nav-link ${activeModule === item.id ? 'active' : ''}" ${isLabs ? 'style="color:rgba(167,139,250,0.9);"' : ''}>
-                    <i class="fa-solid ${item.icon}"></i> ${item.label}
-                </a>`;
+            const a = document.createElement('a');
+            a.href = href;
+            a.className = `os-nav-link ${activeModule === item.id ? 'active' : ''}`;
+            if (isLabs) a.style.color = 'rgba(167,139,250,0.9)';
+            
+            const icon = document.createElement('i');
+            icon.className = `fa-solid ${item.icon}`;
+            a.appendChild(icon);
+            a.appendChild(document.createTextNode(' ' + item.label));
+            
+            nav.appendChild(a);
         });
-
-        html += `
-            </nav>
-            <div class="os-sidebar-footer">
-                <a href="../pages/fluxai-os.html" class="os-nav-link"><i class="fa-solid fa-arrow-left"></i> Sair da Interface</a>
-            </div>`;
-
-        document.querySelector('.os-sidebar').innerHTML = html;
+        
+        sidebar.appendChild(nav);
+        
+        const footer = document.createElement('div');
+        footer.className = 'os-sidebar-footer';
+        const footerLink = document.createElement('a');
+        footerLink.href = '../pages/fluxai-os.html';
+        footerLink.className = 'os-nav-link';
+        const footerIcon = document.createElement('i');
+        footerIcon.className = 'fa-solid fa-arrow-left';
+        footerLink.appendChild(footerIcon);
+        footerLink.appendChild(document.createTextNode(' Sair da Interface'));
+        footer.appendChild(footerLink);
+        
+        sidebar.appendChild(footer);
     },
 
     /**
      * Estado de Carregamento (Performance Step 2)
      */
-    showLoading: (elementId) => {
-        const el = document.getElementById(elementId);
-        if (el) el.innerHTML = `<div class="os-skeleton-inline"></div>`;
-    },
+    showLoading: (elementId) => { 
+        const el = document.getElementById(elementId); 
+        if (el) {
+            const loader = document.createElement('div');
+            loader.className = 'os-skeleton-inline';
+            el.replaceChildren(loader);
+        }
+    }, 
 
     /**
      * Renderiza a Topbar com seletor de contexto Master / Labs / Cliente,

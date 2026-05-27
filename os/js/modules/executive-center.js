@@ -231,25 +231,40 @@ async function loadExecutiveData() {
                 localLeads.forEach(l => {
                     let badge = '<span class="os-badge os-badge-neutral">' + l.status.replace('_', ' ') + '</span>';
                     if (l.status === 'fechado') badge = '<span class="os-badge os-badge-success">Fechado</span>';
-                    else if (l.status === 'proposta_enviada') badge = '<span class="os-badge os-badge-info">Proposta Enviada</span>';
-                    else if (l.status === 'em_negociacao') badge = '<span class="os-badge os-badge-warning">Negociação</span>';
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="cell-primary">
-                            <div class="safe-nome"></div>
-                            <div class="safe-empresa-contato" style="font-size: 0.7rem; color: var(--os-text-muted);"></div>
-                        </td>
-                        <td class="safe-origem"></td>
-                        <td><span class="safe-servico" style="font-size: 0.7rem; border: 1px solid var(--os-border); padding: 2px 6px; border-radius: 4px;"></span></td>
-                        <td class="safe-resp"></td>
-                        <td>${badge}</td>
-                    `;
-                    tr.querySelector('.safe-nome').textContent = l.nome_lead;
-                    tr.querySelector('.safe-empresa-contato').textContent = `${l.empresa} • ${l.contato}`;
-                    tr.querySelector('.safe-origem').textContent = l.origem;
-                    tr.querySelector('.safe-servico').textContent = l.servico_interesse;
-                    tr.querySelector('.safe-resp').textContent = l.responsavel;
+                    const statusVal = l.status.replace('_', ' ');
+                    
+                    const statusSpan = document.createElement('span');
+                    if (l.status === 'fechado') {
+                        statusSpan.className = 'os-badge os-badge-success';
+                        statusSpan.textContent = 'Fechado';
+                    } else if (l.status === 'proposta_enviada') {
+                        statusSpan.className = 'os-badge os-badge-info';
+                        statusSpan.textContent = 'Proposta Enviada';
+                    } else if (l.status === 'em_negociacao') {
+                        statusSpan.className = 'os-badge os-badge-warning';
+                        statusSpan.textContent = 'Negociação';
+                    } else {
+                        statusSpan.className = 'os-badge os-badge-neutral';
+                        statusSpan.textContent = statusVal;
+                    }
+ 
+                    const tr = document.createElement('tr'); 
+                    tr.innerHTML = ` 
+                        <td class="cell-primary"> 
+                            <div class="safe-nome"></div> 
+                            <div class="safe-empresa-contato" style="font-size: 0.7rem; color: var(--os-text-muted);"></div> 
+                        </td> 
+                        <td class="safe-origem"></td> 
+                        <td><span class="safe-servico" style="font-size: 0.7rem; border: 1px solid var(--os-border); padding: 2px 6px; border-radius: 4px;"></span></td> 
+                        <td class="safe-resp"></td> 
+                        <td class="safe-status-container"></td> 
+                    `; 
+                    tr.querySelector('.safe-nome').textContent = l.nome_lead; 
+                    tr.querySelector('.safe-empresa-contato').textContent = `${l.empresa} - ${l.contato}`; 
+                    tr.querySelector('.safe-origem').textContent = l.origem; 
+                    tr.querySelector('.safe-servico').textContent = l.servico_interesse; 
+                    tr.querySelector('.safe-resp').textContent = l.responsavel; 
+                    tr.querySelector('.safe-status-container').appendChild(statusSpan);
                     tableCommercialBody.appendChild(tr);
                 });
             }
@@ -271,25 +286,43 @@ async function loadExecutiveData() {
             const activeClientsNum = activeClients || 1;
             const avgLoad = ((pendingDemands + iaQueue + inReview) / activeClientsNum).toFixed(1);
             
-            let loadSeverity = '<span class="os-badge os-badge-success">Baixa</span>';
-            if (Number(avgLoad) > 4) loadSeverity = '<span class="os-badge os-badge-danger">Sobrecarga</span>';
-            else if (Number(avgLoad) > 2) loadSeverity = '<span class="os-badge os-badge-warning">Moderada</span>';
-
-            const indicators = [
-                { name: 'Carga Operacional por Cliente (Média)', value: `${avgLoad} entregas/ciclo`, severity: loadSeverity, status: 'Estável' },
-                { name: 'Fila de Postagens Assistidas (IA)', value: `${iaQueue} posts aguardando`, severity: iaQueue > 5 ? '<span class="os-badge os-badge-warning">Gargalo</span>' : '<span class="os-badge os-badge-success">Sob Controle</span>', status: 'Aguardando Operador' },
-                { name: 'Demandas Técnicas Pendentes', value: `${pendingDemands} abertas`, severity: pendingDemands > 10 ? '<span class="os-badge os-badge-danger">Alerta</span>' : '<span class="os-badge os-badge-success">OK</span>', status: 'Fila ativa' },
-                { name: 'Total de Clientes Gerenciados', value: `${activeClients} corporações`, severity: '<span class="os-badge os-badge-info">Portfólio</span>', status: 'Ativos no OS' }
+            const indicators = [ 
+                { name: 'Carga Operacional por Cliente (Média)', value: `${avgLoad} entregas/ciclo`, status: 'Estável' }, 
+                { name: 'Fila de Postagens Assistidas (IA)', value: `${iaQueue} posts aguardando`, status: 'Aguardando Operador' }, 
+                { name: 'Demandas Técnicas Pendentes', value: `${pendingDemands} abertas`, status: 'Fila ativa' }, 
+                { name: 'Total de Clientes Gerenciados', value: `${activeClients} corporações`, status: 'Ativos no OS' } 
             ];
-
-            tableOperationsBody.innerHTML = indicators.map(ind => `
-                <tr>
-                    <td class="cell-primary">${ind.name}</td>
-                    <td>${ind.value}</td>
-                    <td>${ind.severity}</td>
-                    <td style="font-size: 0.75rem; color: var(--os-text-muted);">${ind.status}</td>
-                </tr>
-            `).join('');
+            
+            tableOperationsBody.replaceChildren();
+            indicators.forEach((ind, i) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="cell-primary safe-name"></td> 
+                    <td class="safe-value"></td> 
+                    <td class="safe-severity-container"></td> 
+                    <td class="safe-status" style="font-size: 0.75rem; color: var(--os-text-muted);"></td> 
+                `;
+                tr.querySelector('.safe-name').textContent = ind.name;
+                tr.querySelector('.safe-value').textContent = ind.value;
+                tr.querySelector('.safe-status').textContent = ind.status;
+                
+                const sevSpan = document.createElement('span');
+                if (i === 0) {
+                    if (Number(avgLoad) > 4) { sevSpan.className = 'os-badge os-badge-danger'; sevSpan.textContent = 'Sobrecarga'; }
+                    else if (Number(avgLoad) > 2) { sevSpan.className = 'os-badge os-badge-warning'; sevSpan.textContent = 'Moderada'; }
+                    else { sevSpan.className = 'os-badge os-badge-success'; sevSpan.textContent = 'Baixa'; }
+                } else if (i === 1) {
+                    if (iaQueue > 5) { sevSpan.className = 'os-badge os-badge-warning'; sevSpan.textContent = 'Gargalo'; }
+                    else { sevSpan.className = 'os-badge os-badge-success'; sevSpan.textContent = 'Sob Controle'; }
+                } else if (i === 2) {
+                    if (pendingDemands > 10) { sevSpan.className = 'os-badge os-badge-danger'; sevSpan.textContent = 'Alerta'; }
+                    else { sevSpan.className = 'os-badge os-badge-success'; sevSpan.textContent = 'OK'; }
+                } else if (i === 3) {
+                    sevSpan.className = 'os-badge os-badge-info'; sevSpan.textContent = 'Portfólio';
+                }
+                tr.querySelector('.safe-severity-container').appendChild(sevSpan);
+                tableOperationsBody.appendChild(tr);
+            });
         }
 
     } catch (e) {

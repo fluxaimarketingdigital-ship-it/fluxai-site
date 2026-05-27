@@ -104,15 +104,15 @@ console.log("Starting security scan...");
 scanDirectory(__dirname);
 console.log(`Scan finished. Found ${results.length} occurrences.`);
 
-function escapeHTML(value) {
-    return String(value ?? "")
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;")
-        .replace(/`/g, "&#96;")
-        .replace(/\|/g, "\\|");
+function escapeHTML(value) { 
+  const str = String(value ?? "");
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;")
+    .replace(/`/g, "&#96;");
 }
 
 // Gerar formato markdown de tabela 
