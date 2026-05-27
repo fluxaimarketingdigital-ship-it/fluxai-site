@@ -112,55 +112,29 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script type="module">
         import { getSupabase } from './services/supabase-client.js';
         import { OS_LOGS_ENGINE } from './services/logs-engine.js';
+        import { OS_AUTH } from './js/os-core.js';
 
-        // Utilitário de hash
-        async function sha256(message) {
-            const msgBuffer = new TextEncoder().encode(message);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
-
-        // Inicializador de usuários locais em memória (sem localStorage para evitar alertas CodeQL)
-        let MEMORY_MOCK_USERS = null;
-        
-        const getMockUsers = () => { 
-            if (!MEMORY_MOCK_USERS) { 
-                MEMORY_MOCK_USERS = [ 
-                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] }, 
-                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] }, 
-                    { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'CLIENT', needsPasswordChange: false, permissions: ['client-portal'] } 
-                ]; 
-            } 
-            return MEMORY_MOCK_USERS; 
-        }; 
- 
-        const updateMockUserPassword = async (userId, newPassword) => { 
-            const mockUsers = getMockUsers(); 
-            const index = mockUsers.findIndex(u => u.id === userId); 
-            if (index !== -1) { 
-                mockUsers[index].passwordHash = await sha256(newPassword); 
-                delete mockUsers[index].password; // remove plain text legacy if any 
-                mockUsers[index].needsPasswordChange = false; 
-                return mockUsers[index]; 
-            } 
-            return null; 
-        };
-
-        // Força semente inicial de usuários locais
-        getMockUsers();
+        /**
+         * Allowlist local (espelha a de os-core.js) para mapear e-mail → role logo após login.
+         * Não contém senhas, tokens ou dados sensíveis.
+         */
+        const LOGIN_ALLOWED_USERS = Object.freeze({
+            'kassiadgomes@hotmail.com': { id: 'ADMIN_001', full_name: 'Kássia Gomes',   role: 'ADMIN',  project_id: 'FLUXAI_LABS_001' },
+            'admin@fluxai.com':         { id: 'ADMIN_002', full_name: 'Admin FluxAI',   role: 'ADMIN',  project_id: 'FLUXAI_LABS_001' },
+            'kassia@fluxai.com':        { id: 'ADMIN_003', full_name: 'Kássia Gomes',   role: 'ADMIN',  project_id: 'FLUXAI_LABS_001' },
+            'maria.nutri@gmail.com':    { id: 'CLIENT_002', full_name: 'Maria Aparecida', role: 'CLIENT', project_id: 'MARIA_APARECIDA_002' }
+        });
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = e.target.querySelector('button');
-            const originalTextContent = [...btn.childNodes];
-            
-            const email = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
+            const originalNodes = [...btn.childNodes];
+
+            const email = document.getElementById('username').value.trim().toLowerCase();
+            const password = document.getElementById('password').value;
 
             // Feedback Visual
             btn.replaceChildren();
@@ -170,148 +144,73 @@
             btn.appendChild(spinnerIcon);
             btn.disabled = true;
 
-            // 1. Verificar primeiro autenticação local na chave mock
-            const mockUsers = getMockUsers();
-            const localUser = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-
-            if (localUser) {
-                const enteredHash = await sha256(password);
-                const isPasswordValid = localUser.passwordHash 
-                    ? localUser.passwordHash === enteredHash 
-                    : localUser.password === password;
-
-                if (isPasswordValid) {
-                    if (localUser.needsPasswordChange) {
-                        // Exibir Modal de redefinição
-                        document.getElementById('resetUserId').value = localUser.id;
-                        document.getElementById('passwordResetModal').style.display = 'flex';
-                        
-                        // Resetar botão para estado normal
-                        btn.replaceChildren(...originalTextContent);
-                        btn.disabled = false;
-                        return;
-                    }
-
-                    // Autenticação local concluída com sucesso! 
-                    logUserIn(localUser.role, localUser.full_name, localUser.id, localUser.project_id); 
-                    return; 
-                } else {
-                    alert('Chave de Acesso incorreta para esta credencial.');
-                    if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                        OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Senha mock incorreta' }, 'warning');
-                    }
-                    btn.replaceChildren(...originalTextContent);
-                    btn.disabled = false;
-                    return;
-                }
-            }
-
-            // 2. Se não achou local, tenta Supabase se configurado
             const supabase = getSupabase();
             if (!supabase) {
-                alert('Falha na Autenticação: Credencial não encontrada localmente e Supabase offline.');
-                if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Supabase offline e sem credencial local' }, 'critical');
-                }
-                btn.replaceChildren(...originalTextContent);
+                alert('Falha na Autenticação: Serviço indisponível. Tente novamente em instantes.');
+                btn.replaceChildren(...originalNodes);
                 btn.disabled = false;
                 return;
             }
 
-            const { data, error } = await supabase.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
             if (error) {
                 alert('Falha na Autenticação: ' + error.message);
                 if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { email, reason: 'Erro Supabase auth: ' + error.message }, 'warning');
+                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { reason: 'Erro Supabase auth' }, 'warning');
                 }
-                btn.replaceChildren(...originalTextContent);
+                btn.replaceChildren(...originalNodes);
                 btn.disabled = false;
+                return;
+            }
+
+            // Login OK — construir contexto em RAM via allowlist (sem storage manual)
+            const knownProfile = LOGIN_ALLOWED_USERS[email] || null;
+            let safeRole, safeId, safeName, safeProjectId;
+
+            if (knownProfile) {
+                safeRole      = OS_AUTH.normalizeRole(knownProfile.role);
+                safeId        = knownProfile.id;
+                safeName      = knownProfile.full_name;
+                safeProjectId = knownProfile.project_id || null;
             } else {
+                // Buscar perfil no banco se não estiver na allowlist
                 try {
-                    // Buscar perfil para validar Role Real no banco de dados (tabela profiles)
-                    const { data: profile, error: profileError } = await supabase
+                    const { data: profile } = await supabase
                         .from('profiles')
-                        .select('role, full_name')
+                        .select('role, full_name, project_id')
                         .eq('id', data.user.id)
                         .single();
-
-                    const userRole = profile?.role || 'CLIENT';
-                    const userName = profile?.full_name || data.user.email;
-
-                    const finalUser = {
-                        id: data.user.id,
-                        full_name: userName,
-                        email: email,
-                        role: userRole,
-                        permissions: userRole === 'ADMIN' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] : 
-                                     userRole === 'OPERATOR' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] : ['client-portal']
-                    };
-
-                    logUserIn(finalUser.role, finalUser.full_name, finalUser.id, finalUser.project_id); 
-                } catch (profileErr) { 
-                    console.error('[LOGIN_PROFILE_ERROR]', profileErr); 
-                    logUserIn('CLIENT', email, data.user.id, null); 
-                } 
+                    safeRole      = OS_AUTH.normalizeRole(profile?.role);
+                    safeName      = profile?.full_name || email;
+                    safeId        = data.user.id;
+                    safeProjectId = profile?.project_id || null;
+                } catch {
+                    safeRole      = 'CLIENT';
+                    safeName      = email;
+                    safeId        = data.user.id;
+                    safeProjectId = null;
+                }
             }
-        });
 
-        // Função utilitária para registrar a sessão e redirecionar de acordo com a regra de negócios 
-        function logUserIn(userRole, userFullName, userId, userProjectId) { 
-            // Registrar log de Login com OS_LOGS_ENGINE 
-            if (typeof OS_LOGS_ENGINE !== 'undefined') { 
-                OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: userId, role: userRole }, false); 
-            } 
- 
-            // Criar e persistir contexto mínimo de sessão não sensível para controle de UI e RBAC
-            const uiContext = {
-                id: userId,
-                full_name: userFullName,
-                role: String(userRole || 'CLIENT'),
-                permissions: userRole === 'ADMIN' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] :  
-                             userRole === 'OPERATOR' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] : ['client-portal'],
-                session_started_at: new Date().toISOString()
+            // Construir contexto em RAM — zero storage manual
+            window.FLUXAI_RUNTIME_CONTEXT = {
+                id:          safeId,
+                email:       email,
+                full_name:   safeName,
+                role:        safeRole,
+                permissions: OS_AUTH.getPermissionsForRole(safeRole),
+                project_id:  safeProjectId
             };
-            if (userProjectId) {
-                uiContext.project_id = userProjectId;
-            }
-            // Contexto armazenado apenas em memória RAM (sem localStorage/sessionStorage — Exigência CodeQL)
-            window.FLUXAI_RUNTIME_CONTEXT = uiContext;
 
-            if (userRole === 'CLIENT') {  
-                window.location.href = `client-portal.html${userProjectId ? '?project_id=' + userProjectId : ''}`;  
-            } else {  
-                window.location.href = 'command-center.html';  
-            }  
-        } 
-
-        // Submissão do formulário de redefinição de senha
-        document.getElementById('passwordResetForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const userId = document.getElementById('resetUserId').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
-
-            if (newPassword !== confirmNewPassword) {
-                alert('As senhas não coincidem. Digite novamente.');
-                return;
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: safeId, role: safeRole }, false);
             }
 
-            if (newPassword === 'fluxai@2026') {
-                alert('Por favor, escolha uma senha diferente da padrão provisória.');
-                return;
-            }
-
-            const updatedUser = await updateMockUserPassword(userId, newPassword); 
-            if (updatedUser) { 
-                alert('Chave de Acesso pessoal salva com sucesso! Seja bem-vindo ao FluxAI OS".'); 
-                document.getElementById('passwordResetModal').style.display = 'none'; 
-                logUserIn(updatedUser.role, updatedUser.full_name, updatedUser.id, updatedUser.project_id); 
-            } else { 
-                alert('Erro ao atualizar senha local.');
+            if (safeRole === 'CLIENT') {
+                window.location.href = `client-portal.html${safeProjectId ? '?project_id=' + encodeURIComponent(safeProjectId) : ''}`;
+            } else {
+                window.location.href = 'command-center.html';
             }
         });
 

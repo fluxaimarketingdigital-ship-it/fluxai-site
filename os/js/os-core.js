@@ -312,6 +312,165 @@ export const OS_UI = {
 // CONTROLE DE ACESSO REAL (SUPABASE)
 import { getSupabase } from '../services/supabase-client.js';
 
+/**
+ * Allowlist segura de usuários autorizados.
+ * Não contém senhas, tokens ou dados sensíveis.
+ * Serve apenas para mapear e-mail autenticado (via Supabase Auth) para papel operacional.
+ * Qualquer e-mail não listado recebe role CLIENT por padrão.
+ */
+const FLUXAI_ALLOWED_USERS = Object.freeze({
+    'kassiadgomes@hotmail.com': {
+        id: 'ADMIN_001',
+        full_name: 'Kássia Gomes',
+        role: 'ADMIN',
+        permissions: ['*'],
+        project_id: 'FLUXAI_LABS_001'
+    },
+    'admin@fluxai.com': {
+        id: 'ADMIN_002',
+        full_name: 'Admin FluxAI',
+        role: 'ADMIN',
+        permissions: ['*'],
+        project_id: 'FLUXAI_LABS_001'
+    },
+    'kassia@fluxai.com': {
+        id: 'ADMIN_003',
+        full_name: 'Kássia Gomes',
+        role: 'ADMIN',
+        permissions: ['*'],
+        project_id: 'FLUXAI_LABS_001'
+    },
+    'maria.nutri@gmail.com': {
+        id: 'CLIENT_002',
+        full_name: 'Maria Aparecida',
+        role: 'CLIENT',
+        permissions: ['client_portal:view', 'delivery:approve', 'extra_service:request'],
+        project_id: 'MARIA_APARECIDA_002'
+    }
+});
+
+/**
+ * Bootstrap de Autenticação por Página.
+ * Chame no início de cada módulo protegido.
+ * Reconstrói window.FLUXAI_RUNTIME_CONTEXT via Supabase Auth (sem nenhum storage manual).
+ * @param {string|null} requiredRole - 'ADMIN' | 'OPERATOR' | 'CLIENT' | null
+ * @param {string|null} requiredPermission - permissão específica ou null
+ * @returns {object|null} user ou null após redirecionamento
+ */
+window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermission = null) {
+    // 1. Se já existe contexto em RAM (mesma SPA session), reusar
+    if (window.FLUXAI_RUNTIME_CONTEXT) {
+        return _applyRBAC(window.FLUXAI_RUNTIME_CONTEXT, requiredRole, requiredPermission);
+    }
+
+    // 2. Tentar reconstruir via Supabase Auth
+    const supabase = getSupabase();
+    if (!supabase) {
+        console.warn('[BOOTSTRAP] Supabase indisponível. Redirecionando para login.');
+        window.location.href = 'login.html';
+        return null;
+    }
+
+    let sessionUser = null;
+    try {
+        const { data } = await supabase.auth.getSession();
+        sessionUser = data?.session?.user || null;
+    } catch (err) {
+        console.warn('[BOOTSTRAP] Erro ao obter sessão Supabase:', err.message);
+    }
+
+    if (!sessionUser) {
+        console.warn('[BOOTSTRAP] Sem sessão Supabase ativa. Redirecionando para login.');
+        window.location.href = 'login.html';
+        return null;
+    }
+
+    const email = String(sessionUser.email || '').toLowerCase().trim();
+
+    // 3. Mapear e-mail para perfil operacional via allowlist (sem dados sensíveis)
+    const knownProfile = FLUXAI_ALLOWED_USERS[email] || null;
+    let safeRole, safePermissions, safeId, safeName, safeProjectId;
+
+    if (knownProfile) {
+        safeRole        = OS_AUTH.normalizeRole(knownProfile.role);
+        safePermissions = knownProfile.permissions.includes('*')
+                            ? OS_AUTH.getPermissionsForRole(safeRole)
+                            : knownProfile.permissions;
+        safeId          = knownProfile.id;
+        safeName        = knownProfile.full_name;
+        safeProjectId   = knownProfile.project_id || null;
+    } else {
+        // Tentar buscar perfil no banco de dados se não estiver na allowlist
+        try {
+            const { data: profile } = await supabase
+                .from('profiles')
+                .select('role, full_name, project_id')
+                .eq('id', sessionUser.id)
+                .single();
+            safeRole        = OS_AUTH.normalizeRole(profile?.role);
+            safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
+            safeId          = sessionUser.id;
+            safeName        = profile?.full_name || email;
+            safeProjectId   = profile?.project_id || null;
+        } catch {
+            // Fallback restritivo: CLIENT por padrão
+            safeRole        = 'CLIENT';
+            safePermissions = OS_AUTH.getPermissionsForRole('CLIENT');
+            safeId          = sessionUser.id;
+            safeName        = email;
+            safeProjectId   = null;
+        }
+    }
+
+    // 4. Construir contexto em RAM exclusivamente
+    window.FLUXAI_RUNTIME_CONTEXT = {
+        id:           safeId,
+        email:        email,
+        full_name:    safeName,
+        role:         safeRole,
+        permissions:  safePermissions,
+        project_id:   safeProjectId
+    };
+
+    return _applyRBAC(window.FLUXAI_RUNTIME_CONTEXT, requiredRole, requiredPermission);
+};
+
+/** Helper interno: aplica regras RBAC e bloqueia CLIENT em rotas internas */
+function _applyRBAC(user, requiredRole, requiredPermission) {
+    const CLIENT_BLOCKED_PATHS = [
+        'command-center', 'executive-center', 'contracts-finance',
+        'governance', 'governance-users', 'logs', 'clientes', 'leads',
+        'demandas', 'operations-center', 'onboarding', 'metricas',
+        'relatorio-mensal', 'content-engine', 'automation-hub'
+    ];
+
+    // Bloqueio de URL direta para CLIENT
+    if (user.role === 'CLIENT') {
+        const currentPath = window.location.pathname.toLowerCase();
+        const blocked = CLIENT_BLOCKED_PATHS.some(p => currentPath.includes(p));
+        if (blocked) {
+            console.warn('[RBAC] CLIENT bloqueado de rota interna:', currentPath);
+            window.location.href = 'access-denied.html';
+            return null;
+        }
+    }
+
+    // Validação de role requerida
+    if (requiredRole && user.role !== 'ADMIN') {
+        let hasAccess = user.role === requiredRole;
+        if (!hasAccess && requiredPermission && Array.isArray(user.permissions)) {
+            hasAccess = user.permissions.includes(requiredPermission);
+        }
+        if (!hasAccess) {
+            console.error('[RBAC] Acesso negado. Role insuficiente.', { user: user.role, required: requiredRole });
+            window.location.href = 'access-denied.html';
+            return null;
+        }
+    }
+
+    return user;
+}
+
 export const OS_AUTH = {
     normalizeRole: (value) => {
         const role = String(value || "").toUpperCase();
@@ -334,141 +493,10 @@ export const OS_AUTH = {
      * @param {string} requiredPermission - Permissão específica exigida
      */
     check: async (requiredRole = null, requiredPermission = null) => {
-        // 1. Tentar carregar contexto em memória RAM (runtime). Sem fallback em storage.
-        const ctx = window.FLUXAI_RUNTIME_CONTEXT || null;
-
-        if (ctx) {
-            const user = {
-                id: ctx.id || 'mock-id',
-                role: ctx.role || 'CLIENT',
-                full_name: ctx.full_name || 'Usuário Local',
-                email: ctx.email || 'local@fluxai.com',
-                project_id: ctx.project_id || null,
-                permissions: ctx.permissions || []
-            };
-
-            // Validação de RBAC 
-            if (user.role !== 'ADMIN') { 
-                let hasAccess = true;
-                if (requiredRole && user.role !== requiredRole) {
-                    hasAccess = false;
-                }
-                if (!hasAccess && requiredPermission && user.permissions && user.permissions.includes(requiredPermission)) {
-                    hasAccess = true; // Overridden by specific permission
-                }
-                if (requiredRole && !hasAccess) { 
-                    console.error('[AUTH] Acesso Negado. Nível ou permissão insuficiente.'); 
-                    window.location.href = 'access-denied.html'; 
-                    return null; 
-                } 
-            } 
-
-            // Bloqueio Global de URL Direta para CLIENT
-            if (user.role === 'CLIENT') {
-                const currentPath = window.location.pathname.toLowerCase();
-                if (!currentPath.includes('client-portal') && !currentPath.includes('access-denied') && !currentPath.includes('login') && currentPath.includes('/os/')) {
-                    console.warn('[AUTH] URL interna bloqueada para CLIENT.');
-                    window.location.href = 'client-portal.html' + (user.project_id ? '?project_id=' + user.project_id : '');
-                    return null;
-                }
-            }
-            return user; 
-        }
-
-        const supabase = getSupabase();
-        if (!supabase) {
-            console.warn('[AUTH] Supabase offline ou CDN ausente. Redirecionando para login.');
-            if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { reason: 'Supabase offline e sem sessão local' }, 'critical');
-            }
-            window.location.href = 'login.html';
-            return null;
-        }
-
-        let session = null;
-        try {
-            const { data } = await supabase.auth.getSession();
-            session = data.session;
-        } catch (err) {
-            console.warn('[AUTH] Erro ao conectar com Supabase auth. Redirecionando para login.', err);
-            if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { reason: 'Falha na conexão Supabase auth: ' + err.message }, 'critical');
-            }
-            window.location.href = 'login.html';
-            return null;
-        }
-        
-        if (!session) {
-            console.warn('[AUTH] Sessão não encontrada.');
-            window.location.href = 'login.html';
-            return null;
-        }
-
-        // Buscar perfil para validar Role
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-
-        const rawUser = { ...session.user, ...profile };
-        const safeRole = OS_AUTH.normalizeRole(rawUser.role);
-        const safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
-
-        window.FLUXAI_RUNTIME_CONTEXT = {
-            id: rawUser.id,
-            full_name: rawUser.full_name || 'Usuário',
-            role: safeRole,
-            permissions: safePermissions,
-            project_id: rawUser.project_id || null,
-            workspace_id: rawUser.workspace_id || null,
-            created_at: Date.now()
-        };
-
-        const user = window.FLUXAI_RUNTIME_CONTEXT;
-
-        // Validação de RBAC 
-        if (user.role !== 'ADMIN') { 
-            let hasAccess = true;
-            if (requiredRole && user.role !== requiredRole) {
-                hasAccess = false;
-            }
-            if (!hasAccess && requiredPermission && user.permissions && user.permissions.includes(requiredPermission)) {
-                hasAccess = true; // Overridden by specific permission
-            }
-            if (requiredRole && !hasAccess) { 
-                console.error('[AUTH] Acesso Negado. Nível ou permissão insuficiente.'); 
-                if (typeof OS_LOGS_ENGINE !== 'undefined') { 
-                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', {  
-                        user_id: user.id || user.email,  
-                        user_role: user.role,  
-                        required_role: requiredRole  
-                    }, 'critical'); 
-                } 
-                window.location.href = 'access-denied.html'; 
-                return null; 
-            } 
-        } 
-
-        // Bloqueio Global de URL Direta para CLIENT
-        if (user.role === 'CLIENT') {
-            const currentPath = window.location.pathname.toLowerCase();
-            if (!currentPath.includes('client-portal') && !currentPath.includes('access-denied') && !currentPath.includes('login') && currentPath.includes('/os/')) {
-                console.warn('[AUTH] URL interna bloqueada para CLIENT.');
-                if (typeof OS_LOGS_ENGINE !== 'undefined') { 
-                    OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', {  
-                        user_id: user.id || user.email,  
-                        user_role: user.role,  
-                        attempted_path: currentPath  
-                    }, 'critical'); 
-                }
-                window.location.href = 'client-portal.html' + (user.project_id ? '?project_id=' + user.project_id : '');
-                return null;
-            }
-        }
- 
-        return user; 
+        // Delegar ao bootstrap global (reconstrói contexto via Supabase Auth se necessário)
+        return window.OS_AUTH_BOOTSTRAP(requiredRole, requiredPermission);
     },
+
 
     /**
      * Logout Seguro
