@@ -133,23 +133,37 @@ async function loadExecutiveData() {
                         return (new Date() - new Date(p.due_date)) > 0;
                     });
                     
-                    let statusBadge = '<span class="os-badge os-badge-success">Em dia</span>';
-                    if (overdue) statusBadge = '<span class="os-badge os-badge-danger">Atrasado</span>';
-                    else if (pending > 0) statusBadge = '<span class="os-badge os-badge-warning">Pendente</span>';
-
-                    const dueDay = contract ? `Dia ${contract.due_day}` : 'N/A';
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="cell-primary safe-company"></td>
-                        <td class="cell-mono">${formatCurrency(value)}</td>
-                        <td class="cell-mono" style="color: var(--os-success);">${formatCurrency(paid)}</td>
-                        <td class="cell-mono" style="${pending > 0 ? 'color: var(--os-warning);' : ''}">${formatCurrency(pending)}</td>
-                        <td>${dueDay}</td>
-                        <td>${statusBadge}</td>
-                    `;
-                    tr.querySelector('.safe-company').textContent = proj.company_name;
-                    tableFinanceBody.appendChild(tr);
+                    const dueDay = contract ? `Dia ${contract.due_day}` : 'N/A'; 
+ 
+                    const tr = document.createElement('tr'); 
+                    tr.innerHTML = ` 
+                        <td class="cell-primary safe-company"></td> 
+                        <td class="cell-mono safe-value"></td> 
+                        <td class="cell-mono safe-paid" style="color: var(--os-success);"></td> 
+                        <td class="cell-mono safe-pending"></td> 
+                        <td class="safe-dueday"></td> 
+                        <td class="safe-status"></td> 
+                    `; 
+                    tr.querySelector('.safe-company').textContent = proj.company_name; 
+                    tr.querySelector('.safe-value').textContent = formatCurrency(value);
+                    tr.querySelector('.safe-paid').textContent = formatCurrency(paid);
+                    tr.querySelector('.safe-pending').textContent = formatCurrency(pending);
+                    if (pending > 0) tr.querySelector('.safe-pending').style.color = 'var(--os-warning)';
+                    tr.querySelector('.safe-dueday').textContent = dueDay;
+                    
+                    const statusSpan = document.createElement('span');
+                    if (overdue) {
+                        statusSpan.className = 'os-badge os-badge-danger';
+                        statusSpan.textContent = 'Atrasado';
+                    } else if (pending > 0) {
+                        statusSpan.className = 'os-badge os-badge-warning';
+                        statusSpan.textContent = 'Pendente';
+                    } else {
+                        statusSpan.className = 'os-badge os-badge-success';
+                        statusSpan.textContent = 'Em dia';
+                    }
+                    tr.querySelector('.safe-status').appendChild(statusSpan);
+                    tableFinanceBody.appendChild(tr); 
                 });
             }
         }
@@ -166,29 +180,40 @@ async function loadExecutiveData() {
                 mockContracts.forEach(c => {
                     const project = mockProjects.find(p => p.id === c.project_id);
                     const driveLink = project?.digital_infrastructure?.operational_links?.drive || '#';
-                    const renewal = new Date(c.created_at);
-                    renewal.setMonth(renewal.getMonth() + 6); // 6 meses de vigência padrão
+                    const renewal = new Date(c.created_at); 
+                    renewal.setMonth(renewal.getMonth() + 6); // 6 meses de vigência padrão 
+ 
+                    const tr = document.createElement('tr'); 
+                    tr.innerHTML = ` 
+                        <td class="cell-mono safe-id"></td> 
+                        <td class="cell-primary safe-company"></td> 
+                        <td class="safe-deliv" style="font-size: 0.75rem;"></td> 
+                        <td class="safe-renewal"></td> 
+                        <td> 
+                            <a class="safe-drive" target="_blank" class="os-btn os-btn-sm" style="padding: 2px 8px; font-size: 0.65rem; background: rgba(255,255,255,0.03); border: 1px solid var(--os-border);"> 
+                                <i class="fa-solid fa-folder-open"></i> Drive 
+                            </a> 
+                        </td> 
+                        <td class="safe-status"></td> 
+                    `; 
+                    tr.querySelector('.safe-id').textContent = c.id.toUpperCase();
+                    tr.querySelector('.safe-company').textContent = c.company_name; 
+                    tr.querySelector('.safe-deliv').textContent = c.deliverables; 
+                    tr.querySelector('.safe-renewal').textContent = renewal.toLocaleDateString('pt-BR');
+                    tr.querySelector('.safe-drive').href = driveLink; 
 
-                    let statusBadge = '<span class="os-badge os-badge-success">Ativo</span>';
-                    if (c.status === 'PAUSADO') statusBadge = '<span class="os-badge os-badge-warning">Pausado</span>';
-                    else if (c.status === 'CANCELADO') statusBadge = '<span class="os-badge os-badge-danger">Cancelado</span>';
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="cell-mono">${c.id.toUpperCase()}</td>
-                        <td class="cell-primary safe-company"></td>
-                        <td class="safe-deliv" style="font-size: 0.75rem;"></td>
-                        <td>${renewal.toLocaleDateString('pt-BR')}</td>
-                        <td>
-                            <a class="safe-drive" target="_blank" class="os-btn os-btn-sm" style="padding: 2px 8px; font-size: 0.65rem; background: rgba(255,255,255,0.03); border: 1px solid var(--os-border);">
-                                <i class="fa-solid fa-folder-open"></i> Drive
-                            </a>
-                        </td>
-                        <td>${statusBadge}</td>
-                    `;
-                    tr.querySelector('.safe-company').textContent = c.company_name;
-                    tr.querySelector('.safe-deliv').textContent = c.deliverables;
-                    tr.querySelector('.safe-drive').href = driveLink;
+                    const statusSpan = document.createElement('span');
+                    if (c.status === 'PAUSADO') {
+                        statusSpan.className = 'os-badge os-badge-warning';
+                        statusSpan.textContent = 'Pausado';
+                    } else if (c.status === 'CANCELADO') {
+                        statusSpan.className = 'os-badge os-badge-danger';
+                        statusSpan.textContent = 'Cancelado';
+                    } else {
+                        statusSpan.className = 'os-badge os-badge-success';
+                        statusSpan.textContent = 'Ativo';
+                    }
+                    tr.querySelector('.safe-status').appendChild(statusSpan);
                     tableContractsBody.appendChild(tr);
                 });
             }

@@ -125,32 +125,30 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Inicializador de usuários locais
-        const getMockUsers = () => {
-            let mock = localStorage.getItem('fluxai_mock_users');
-            if (!mock) {
-                const initialMock = [
-                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] },
-                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] },
-                    { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'CLIENT', needsPasswordChange: false, permissions: ['client-portal'] }
-                ];
-                localStorage.setItem('fluxai_mock_users', JSON.stringify(initialMock));
-                return initialMock;
-            }
-            return JSON.parse(mock);
-        };
-
-        const updateMockUserPassword = async (userId, newPassword) => {
-            const mockUsers = getMockUsers();
-            const index = mockUsers.findIndex(u => u.id === userId);
-            if (index !== -1) {
-                mockUsers[index].passwordHash = await sha256(newPassword);
-                delete mockUsers[index].password; // remove plain text legacy if any
-                mockUsers[index].needsPasswordChange = false;
-                localStorage.setItem('fluxai_mock_users', JSON.stringify(mockUsers));
-                return mockUsers[index];
-            }
-            return null;
+        // Inicializador de usuários locais em memória (sem localStorage para evitar alertas CodeQL)
+        let MEMORY_MOCK_USERS = null;
+        
+        const getMockUsers = () => { 
+            if (!MEMORY_MOCK_USERS) { 
+                MEMORY_MOCK_USERS = [ 
+                    { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] }, 
+                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] }, 
+                    { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', passwordHash: 'fe79d404866023dfaed7035f13a194e77c3f18612edb20102f80d3368445a7c1', role: 'CLIENT', needsPasswordChange: false, permissions: ['client-portal'] } 
+                ]; 
+            } 
+            return MEMORY_MOCK_USERS; 
+        }; 
+ 
+        const updateMockUserPassword = async (userId, newPassword) => { 
+            const mockUsers = getMockUsers(); 
+            const index = mockUsers.findIndex(u => u.id === userId); 
+            if (index !== -1) { 
+                mockUsers[index].passwordHash = await sha256(newPassword); 
+                delete mockUsers[index].password; // remove plain text legacy if any 
+                mockUsers[index].needsPasswordChange = false; 
+                return mockUsers[index]; 
+            } 
+            return null; 
         };
 
         // Força semente inicial de usuários locais
@@ -194,9 +192,9 @@
                         return;
                     }
 
-                    // Autenticação local concluída com sucesso!
-                    logUserIn(localUser);
-                    return;
+                    // Autenticação local concluída com sucesso! 
+                    logUserIn(localUser.role, localUser.full_name, localUser.id, localUser.project_id); 
+                    return; 
                 } else {
                     alert('Chave de Acesso incorreta para esta credencial.');
                     if (typeof OS_LOGS_ENGINE !== 'undefined') {
@@ -253,40 +251,24 @@
                                      userRole === 'OPERATOR' ? ['command-center', 'onboarding', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] : ['client-portal']
                     };
 
-                    logUserIn(finalUser);
-                } catch (profileErr) {
-                    console.error('[LOGIN_PROFILE_ERROR]', profileErr);
-                    logUserIn({
-                        id: data.user.id,
-                        full_name: data.user.email,
-                        email: email,
-                        role: 'CLIENT',
-                        permissions: ['client-portal']
-                    });
-                }
+                    logUserIn(finalUser.role, finalUser.full_name, finalUser.id, finalUser.project_id); 
+                } catch (profileErr) { 
+                    console.error('[LOGIN_PROFILE_ERROR]', profileErr); 
+                    logUserIn('CLIENT', email, data.user.id, null); 
+                } 
             }
         });
 
         // Função utilitária para registrar a sessão e redirecionar de acordo com a regra de negócios 
-        function logUserIn(user) { 
-            localStorage.setItem('fluxai_ui_context', JSON.stringify({ 
-                id: user.id, 
-                role: user.role,  
-                name: user.full_name, 
-                loginTime: new Date().toISOString(), 
-                project_id: user.project_id || null, 
-                permissions: user.permissions || [] 
-            })); 
- 
+        function logUserIn(userRole, userFullName, userId, userProjectId) { 
             // Registrar log de Login com OS_LOGS_ENGINE 
             if (typeof OS_LOGS_ENGINE !== 'undefined') { 
-                OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: user.id, role: user.role }, false); 
+                OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: userId, role: userRole }, false); 
             } 
  
-            // Sincronizar projeto ativo no localStorage se for cliente 
-            if (user.role === 'CLIENT' && user.project_id) { 
-                localStorage.setItem('fluxai_active_workspace', user.project_id); 
-                window.location.href = `client-portal.html?project_id=${user.project_id}`; 
+            // Sincronizar projeto ativo via query params (Removida persistência local para CodeQL) 
+            if (userRole === 'CLIENT' && userProjectId) { 
+                window.location.href = `client-portal.html?project_id=${userProjectId}`; 
             } else { 
                 window.location.href = 'command-center.html'; 
             } 
@@ -309,12 +291,12 @@
                 return;
             }
 
-            const updatedUser = await updateMockUserPassword(userId, newPassword);
-            if (updatedUser) {
-                alert('Chave de Acesso pessoal salva com sucesso! Seja bem-vindo ao FluxAI OS™.');
-                document.getElementById('passwordResetModal').style.display = 'none';
-                logUserIn(updatedUser);
-            } else {
+            const updatedUser = await updateMockUserPassword(userId, newPassword); 
+            if (updatedUser) { 
+                alert('Chave de Acesso pessoal salva com sucesso! Seja bem-vindo ao FluxAI OS".'); 
+                document.getElementById('passwordResetModal').style.display = 'none'; 
+                logUserIn(updatedUser.role, updatedUser.full_name, updatedUser.id, updatedUser.project_id); 
+            } else { 
                 alert('Erro ao atualizar senha local.');
             }
         });

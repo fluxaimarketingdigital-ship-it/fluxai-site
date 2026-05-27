@@ -331,65 +331,78 @@ function renderContentTable(contents) {
         const revCount = c.metadata?.revision_cycle || 1; 
         const versionLabel = `V${revCount}`; 
          
-        const strat = c.metadata?.strategic_approved ? '✅' : '❌'; 
-        const oper = c.metadata?.operational_approved ? '✅' : '❌'; 
-        const clie = c.metadata?.client_approved ? '✅' : '❌'; 
-         
-        const approvalsHtml = ` 
-            <div style="font-size:0.6rem; display:flex; gap:8px;" title="Estrutural | Técnico | Cliente"> 
-                <span>EST: ${strat}</span> 
-                <span>OPE: ${oper}</span> 
-                <span>CLI: ${clie}</span> 
-            </div> 
-        `; 
- 
-        const tr = document.createElement('tr');
-        tr.innerHTML = ` 
-                <td> 
-                    <div style="display:flex; align-items:center; gap:8px;"> 
-                        <div class="safe-title" style="font-weight: 700; color: #fff;"></div> 
-                        <span style="font-size: 0.5rem; background: ${revCount >= 3 ? 'var(--os-danger)' : '#222'}; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800; font-family:'JetBrains Mono';">${versionLabel}</span> 
-                    </div> 
-                    <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;"> 
-                        <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> ${scheduled} 
-                    </div> 
-                </td> 
-                <td><span class="status-badge" style="background:${getStatusBg(c.status)}; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem; font-weight: 800; white-space: nowrap;">${statusLabel}</span></td> 
-                <td> 
-                    <div class="safe-resp" style="font-size: 0.7rem; font-weight: 800; color: #fff;"></div> 
-                    <div style="font-size: 0.55rem; color: var(--os-text-muted); font-weight: 800;">${c.priority || 'MÉDIA'}</div> 
-                </td> 
-                <td style="font-size: 0.75rem; font-weight: 600;">${c.platform}</td> 
-                <td>${approvalsHtml}</td> 
-                <td> 
-                    <div class="action-btns" style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;"> 
-                        ${stdStatus === 'READY_TO_POST' ? ` 
-                            <button class="btn-mini safe-btn-pub" title="Ponte de Publicação" style="background: var(--os-primary); color: #000; border: none;"> 
-                                <i class="fa-solid fa-rocket"></i> 
-                            </button> 
-                        ` : ` 
-                            <button class="btn-mini safe-btn-force" title="Forçar Conclusão" style="background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);"> 
-                                <i class="fa-solid fa-circle-check"></i> 
-                            </button> 
-                        `} 
-                        <button class="btn-mini safe-btn-edit" title="Editar/Governar" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);"> 
-                            <i class="fa-solid fa-pen-to-square"></i> 
-                        </button> 
-                        <button class="btn-mini safe-btn-del" title="Excluir"> 
-                            <i class="fa-solid fa-trash"></i> 
-                        </button> 
-                    </div> 
-                </td> 
-        `; 
-        tr.querySelector('.safe-title').textContent = c.title;
-        tr.querySelector('.safe-resp').textContent = c.metadata?.responsible || 'Design';
+        const strat = c.metadata?.strategic_approved ? 'SIM' : 'NÃO';  
+        const oper = c.metadata?.operational_approved ? 'SIM' : 'NÃO';  
+        const clie = c.metadata?.client_approved ? 'SIM' : 'NÃO';  
+          
+        const tr = document.createElement('tr'); 
+        tr.innerHTML = `  
+                <td>  
+                    <div style="display:flex; align-items:center; gap:8px;">  
+                        <div class="safe-title" style="font-weight: 700; color: #fff;"></div>  
+                        <span class="safe-version" style="font-size: 0.5rem; color: #fff; padding: 2px 6px; border-radius: 2px; font-weight: 800; font-family:'JetBrains Mono';"></span>  
+                    </div>  
+                    <div style="font-size: 0.7rem; color: var(--os-primary); font-weight: 800; margin-top: 2px;">  
+                        <i class="fa-solid fa-calendar-day" style="font-size: 0.6rem; margin-right: 4px;"></i> <span class="safe-scheduled"></span>  
+                    </div>  
+                </td>  
+                <td><span class="status-badge safe-status" style="color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.6rem; font-weight: 800; white-space: nowrap;"></span></td>  
+                <td>  
+                    <div class="safe-resp" style="font-size: 0.7rem; font-weight: 800; color: #fff;"></div>  
+                    <div class="safe-priority" style="font-size: 0.55rem; color: var(--os-text-muted); font-weight: 800;"></div>  
+                </td>  
+                <td class="safe-platform" style="font-size: 0.75rem; font-weight: 600;"></td>  
+                <td>
+                    <div class="safe-approvals" style="font-size:0.6rem; display:flex; gap:8px;" title="Estrutural | Técnico | Cliente"></div>
+                </td>  
+                <td>  
+                    <div class="action-btns" style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">  
+                        <button class="btn-mini safe-btn-pub" title="Ponte de Publicação" style="display:none; background: var(--os-primary); color: #000; border: none;">  
+                            <i class="fa-solid fa-rocket"></i>  
+                        </button>  
+                        <button class="btn-mini safe-btn-force" title="Forçar Conclusão" style="display:none; background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">  
+                            <i class="fa-solid fa-circle-check"></i>  
+                        </button>  
+                        <button class="btn-mini safe-btn-edit" title="Editar/Governar" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">  
+                            <i class="fa-solid fa-pen-to-square"></i>  
+                        </button>  
+                        <button class="btn-mini safe-btn-del" title="Excluir">  
+                            <i class="fa-solid fa-trash"></i>  
+                        </button>  
+                    </div>  
+                </td>  
+        `;  
         
-        if (stdStatus === 'READY_TO_POST') {
-            tr.querySelector('.safe-btn-pub').onclick = () => window.openPublishBridge(c.id);
-        } else {
-            tr.querySelector('.safe-btn-force').onclick = () => window.forceReady(c.id);
-        }
-        tr.querySelector('.safe-btn-edit').onclick = () => window.openEditModal(c.id);
+        tr.querySelector('.safe-title').textContent = c.title; 
+        tr.querySelector('.safe-resp').textContent = c.metadata?.responsible || 'Design'; 
+        
+        const versionSpan = tr.querySelector('.safe-version');
+        versionSpan.textContent = versionLabel;
+        versionSpan.style.background = revCount >= 3 ? 'var(--os-danger)' : '#222';
+        
+        tr.querySelector('.safe-scheduled').textContent = scheduled;
+        
+        const statusSpan = tr.querySelector('.safe-status');
+        statusSpan.textContent = statusLabel;
+        statusSpan.style.background = getStatusBg(c.status);
+        
+        tr.querySelector('.safe-priority').textContent = c.priority || 'MÉDIA';
+        tr.querySelector('.safe-platform').textContent = c.platform;
+        
+        const approvalsDiv = tr.querySelector('.safe-approvals');
+        const spanStrat = document.createElement('span'); spanStrat.textContent = `EST: ${strat}`;
+        const spanOper = document.createElement('span'); spanOper.textContent = `OPE: ${oper}`;
+        const spanClie = document.createElement('span'); spanClie.textContent = `CLI: ${clie}`;
+        approvalsDiv.replaceChildren(spanStrat, spanOper, spanClie);
+         
+        if (stdStatus === 'READY_TO_POST') { 
+            tr.querySelector('.safe-btn-pub').style.display = 'inline-block';
+            tr.querySelector('.safe-btn-pub').onclick = () => window.openPublishBridge(c.id); 
+        } else { 
+            tr.querySelector('.safe-btn-force').style.display = 'inline-block';
+            tr.querySelector('.safe-btn-force').onclick = () => window.forceReady(c.id); 
+        } 
+        tr.querySelector('.safe-btn-edit').onclick = () => window.openEditModal(c.id); 
         tr.querySelector('.safe-btn-del').onclick = () => window.deleteAsset(c.id);
 
         body.appendChild(tr);

@@ -437,8 +437,11 @@ function bindEvents(app) {
     };
 }
 
-function showError(msg) {
-    document.getElementById('loading-state').innerHTML = `<p style="color: var(--os-danger); font-weight: 700;">${msg}</p>`;
-}
+function showError(msg) { 
+    const p = document.createElement('p');
+    p.style.cssText = 'color: var(--os-danger); font-weight: 700;';
+    p.textContent = msg;
+    document.getElementById('loading-state').replaceChildren(p); 
+} 
 
 initApproval();

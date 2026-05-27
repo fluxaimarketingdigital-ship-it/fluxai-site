@@ -137,13 +137,13 @@ const _saveLog = (key, entry) => {
                 warning: 'color: #f59e0b; font-weight: bold;',
                 critical: 'color: #ef4444; font-weight: bold; background: rgba(239, 68, 68, 0.1); padding: 2px 4px; border-radius: 3px;'
             };
-            const typeStr = safeEntry.simulated ? 'SIMULADO' : 'REAL';
-            console.log(
-                '%c[LOG:' + String(safeEntry.severity).toUpperCase() + '] [' + String(safeEntry.action_type) + '] [' + typeStr + '] %c' + String(safeEntry.source_page) + ' - ' + safeStringify(safeEntry.payload),
-                styles[safeEntry.severity] || '',
-                'color: #eee;'
-            );
-        }
+            const typeStr = safeEntry.simulated ? 'SIMULADO' : 'REAL'; 
+            const safeLevel = String(safeEntry.severity).toUpperCase();
+            const safeType = String(safeEntry.action_type);
+            const safeMessage = String(safeEntry.source_page).slice(0, 500);
+            
+            console.log("[FluxAI Log]", safeLevel, safeType, typeStr, safeMessage, safeStringify(safeEntry.payload)); 
+        } 
     } catch (e) {
         console.error('[OS_LOGS_ENGINE] Falha ao persistir log localmente:', e);
     }

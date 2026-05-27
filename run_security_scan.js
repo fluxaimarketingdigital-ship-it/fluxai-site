@@ -104,22 +104,26 @@ console.log("Starting security scan...");
 scanDirectory(__dirname);
 console.log(`Scan finished. Found ${results.length} occurrences.`);
 
-// Gerar formato markdown de tabela
-let mdTable = "| Arquivo | Linha | Termo | Trecho de Código | Classificação |\n";
-mdTable += "|:---|:---:|:---:|:---|:---:|\n";
+function escapeHTML(value) {
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;")
+        .replace(/`/g, "&#96;")
+        .replace(/\|/g, "\\|");
+}
 
-results.forEach(res => {
-    // Escapa caracteres markdown na snippet
-    const safeSnippet = String(res.snippet)
-        .replace(/&/g, '&amp;') 
-        .replace(/</g, '&lt;') 
-        .replace(/>/g, '&gt;') 
-        .replace(/"/g, '&quot;') 
-        .replace(/'/g, '&#x27;') 
-        .replace(/`/g, '&#x60;') 
-        .replace(/\|/g, '\\|'); 
-    mdTable += `| [${path.basename(res.file)}](${res.file}) | ${res.line} | \`${res.term}\` | \`${safeSnippet}\` | ${res.classification} |\n`;
-});
+// Gerar formato markdown de tabela 
+let mdTable = "| Arquivo | Linha | Termo | Trecho de Código | Classificação |\n"; 
+mdTable += "|:---|:---:|:---:|:---|:---:|\n"; 
+ 
+results.forEach(res => { 
+    // Escapa caracteres markdown na snippet 
+    const safeSnippet = escapeHTML(res.snippet);  
+    mdTable += `| [${path.basename(res.file)}](${res.file}) | ${res.line} | \`${res.term}\` | \`${safeSnippet}\` | ${res.classification} |\n`; 
+}); 
 
 fs.writeFileSync('scan_results.md', mdTable);
 console.log("Results saved to scan_results.md");

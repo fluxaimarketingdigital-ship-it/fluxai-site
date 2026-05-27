@@ -320,46 +320,61 @@ function renderPayments(payments) {
  
         const statusClass = p.status === 'PAGO' ? 'status-pago' : (diffDays < 0 ? 'status-atrasado' : 'status-pendente'); 
  
-        const tr = document.createElement('tr');
-        tr.innerHTML = ` 
-                <td> 
-                    <div class="safe-client" style="font-weight: 700;"></div> 
-                    <div class="safe-company" style="font-size: 0.7rem; color: var(--os-text-muted);"></div> 
-                </td> 
-                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(p.amount_due)}</td> 
-                <td>${dueDate.toLocaleDateString('pt-BR')}</td> 
-                <td style="font-size: 0.7rem; text-transform: uppercase;">${p.payment_method || 'Pix'}</td> 
-                <td><span class="status-badge ${statusClass}">${p.status}</span></td> 
-                <td style="${delayClass} font-size: 0.75rem;">${delayText}</td> 
-                <td> 
-                    <div class="action-btns" style="justify-content: flex-end;"> 
-                        ${!isPaid ? ` 
-                            <button class="btn-mini btn-whatsapp safe-wpp" title="Lembrar WhatsApp"> 
-                                <i class="fa-brands fa-whatsapp"></i> 
-                            </button> 
-                            <button class="btn-mini safe-pay" title="Marcar Recebido"> 
-                                <i class="fa-solid fa-check"></i> 
-                            </button> 
-                        ` : ` 
-                             <button class="btn-mini" title="Gerar Recibo"><i class="fa-solid fa-file-invoice"></i></button> 
-                        `} 
-                        <button class="btn-mini safe-doc" title="Abrir Contrato"> 
-                            <i class="fa-solid fa-file-pdf"></i> 
-                        </button> 
-                        <button class="btn-mini safe-work" title="Abrir Workspace"> 
-                            <i class="fa-solid fa-briefcase"></i> 
-                        </button> 
-                    </div> 
-                </td> 
-        `; 
-        tr.querySelector('.safe-client').textContent = p.contracts?.client_name || 'Desconhecido';
-        tr.querySelector('.safe-company').textContent = p.contracts?.company_name || '';
-        
-        if(!isPaid) {
-            tr.querySelector('.safe-wpp').onclick = () => window.sendWhatsAppBilling(p.id);
-            tr.querySelector('.safe-pay').onclick = () => window.markAsPaid(p.id, p.amount_due);
+        const tr = document.createElement('tr'); 
+        tr.innerHTML = `  
+                <td>  
+                    <div class="safe-client" style="font-weight: 700;"></div>  
+                    <div class="safe-company" style="font-size: 0.7rem; color: var(--os-text-muted);"></div>  
+                </td>  
+                <td class="safe-amount" style="font-family: var(--os-font-mono); font-weight: 600;"></td>  
+                <td class="safe-duedate"></td>  
+                <td class="safe-method" style="font-size: 0.7rem; text-transform: uppercase;"></td>  
+                <td><span class="status-badge safe-status"></span></td>  
+                <td class="safe-delay" style="font-size: 0.75rem;"></td>  
+                <td>  
+                    <div class="action-btns" style="justify-content: flex-end;">  
+                        <button class="btn-mini btn-whatsapp safe-wpp" title="Lembrar WhatsApp" style="display:none;">  
+                            <i class="fa-brands fa-whatsapp"></i>  
+                        </button>  
+                        <button class="btn-mini safe-pay" title="Marcar Recebido" style="display:none;">  
+                            <i class="fa-solid fa-check"></i>  
+                        </button>  
+                        <button class="btn-mini safe-receipt" title="Gerar Recibo" style="display:none;">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </button>  
+                        <button class="btn-mini safe-doc" title="Abrir Contrato">  
+                            <i class="fa-solid fa-file-pdf"></i>  
+                        </button>  
+                        <button class="btn-mini safe-work" title="Abrir Workspace">  
+                            <i class="fa-solid fa-briefcase"></i>  
+                        </button>  
+                    </div>  
+                </td>  
+        `;  
+        tr.querySelector('.safe-client').textContent = p.contracts?.client_name || 'Desconhecido'; 
+        tr.querySelector('.safe-company').textContent = p.contracts?.company_name || ''; 
+        tr.querySelector('.safe-amount').textContent = formatCurrency(p.amount_due);
+        tr.querySelector('.safe-duedate').textContent = dueDate.toLocaleDateString('pt-BR');
+        tr.querySelector('.safe-method').textContent = p.payment_method || 'Pix';
+        tr.querySelector('.safe-status').textContent = p.status;
+        tr.querySelector('.safe-status').className = 'status-badge ' + statusClass;
+        tr.querySelector('.safe-delay').textContent = delayText;
+        if (diffDays >= 0 && p.status !== 'PAGO') {
+            tr.querySelector('.safe-delay').style.color = 'var(--os-text-muted)';
+        } else if (diffDays < 0 && p.status !== 'PAGO') {
+            tr.querySelector('.safe-delay').style.color = 'var(--os-danger)';
+            tr.querySelector('.safe-delay').style.fontWeight = '700';
         }
-        tr.querySelector('.safe-doc').onclick = () => window.generateContractDoc(p.contract_id);
+         
+        if(!isPaid) { 
+            tr.querySelector('.safe-wpp').style.display = 'inline-block';
+            tr.querySelector('.safe-pay').style.display = 'inline-block';
+            tr.querySelector('.safe-wpp').onclick = () => window.sendWhatsAppBilling(p.id); 
+            tr.querySelector('.safe-pay').onclick = () => window.markAsPaid(p.id, p.amount_due); 
+        } else {
+            tr.querySelector('.safe-receipt').style.display = 'inline-block';
+        }
+        tr.querySelector('.safe-doc').onclick = () => window.generateContractDoc(p.contract_id); 
         tr.querySelector('.safe-work').onclick = () => window.open('/os/content-engine.html?project=' + p.contracts?.project_id, '_blank');
         
         body.appendChild(tr);
@@ -411,37 +426,41 @@ function renderContracts(contracts) {
             deliverablesHtmlNode.querySelector('.safe-base').textContent = deliverables;
         } 
  
-        const tr = document.createElement('tr');
-        tr.innerHTML = ` 
-                <td> 
-                    <div class="safe-company" style="font-weight: 700;"></div> 
-                    <div class="safe-client" style="font-size: 0.7rem; color: var(--os-text-muted);"></div> 
-                </td> 
-                <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">ENGENHARIA DE CONTEÚDO</td> 
-                <td class="safe-deliv-container" style="font-size: 0.75rem;"></td> 
-                <td style="font-family: var(--os-font-mono); font-weight: 600;">${formatCurrency(val)}</td> 
-                <td><span class="status-badge" style="background: rgba(255,255,255,0.05);">${c.status}</span></td> 
-                <td>${startDate}</td> 
-                <td>${renewalDate}</td> 
-                <td> 
-                    <div class="action-btns" style="justify-content: flex-end;"> 
-                        <a class="safe-portal btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Ver Portal Cliente"> 
-                            <i class="fa-solid fa-briefcase"></i> 
-                        </a> 
-                        <button class="btn-mini safe-pdf" title="Abrir Contrato"> 
-                            <i class="fa-solid fa-file-pdf"></i> 
-                        </button> 
-                        <button class="btn-mini safe-edit" title="Editar"> 
-                            <i class="fa-solid fa-pen-to-square"></i> 
-                        </button> 
-                    </div> 
-                </td> 
-        `; 
-        tr.querySelector('.safe-company').textContent = c.company_name;
-        tr.querySelector('.safe-client').textContent = c.client_name;
-        tr.querySelector('.safe-deliv-container').appendChild(deliverablesHtmlNode);
-        tr.querySelector('.safe-portal').href = "/os/client-portal.html?project_id=" + c.project_id;
-        tr.querySelector('.safe-pdf').onclick = () => window.generateContractDoc(c.id);
+        const tr = document.createElement('tr'); 
+        tr.innerHTML = `  
+                <td>  
+                    <div class="safe-company" style="font-weight: 700;"></div>  
+                    <div class="safe-client" style="font-size: 0.7rem; color: var(--os-text-muted);"></div>  
+                </td>  
+                <td style="font-size: 0.7rem; font-weight: 700; color: var(--os-primary);">ENGENHARIA DE CONTEÚDO</td>  
+                <td class="safe-deliv-container" style="font-size: 0.75rem;"></td>  
+                <td class="safe-val" style="font-family: var(--os-font-mono); font-weight: 600;"></td>  
+                <td><span class="status-badge safe-status" style="background: rgba(255,255,255,0.05);"></span></td>  
+                <td class="safe-start"></td>  
+                <td class="safe-renewal"></td>  
+                <td>  
+                    <div class="action-btns" style="justify-content: flex-end;">  
+                        <a class="safe-portal btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Ver Portal Cliente">  
+                            <i class="fa-solid fa-briefcase"></i>  
+                        </a>  
+                        <button class="btn-mini safe-pdf" title="Abrir Contrato">  
+                            <i class="fa-solid fa-file-pdf"></i>  
+                        </button>  
+                        <button class="btn-mini safe-edit" title="Editar">  
+                            <i class="fa-solid fa-pen-to-square"></i>  
+                        </button>  
+                    </div>  
+                </td>  
+        `;  
+        tr.querySelector('.safe-company').textContent = c.company_name; 
+        tr.querySelector('.safe-client').textContent = c.client_name; 
+        tr.querySelector('.safe-val').textContent = formatCurrency(val);
+        tr.querySelector('.safe-status').textContent = c.status;
+        tr.querySelector('.safe-start').textContent = startDate;
+        tr.querySelector('.safe-renewal').textContent = renewalDate;
+        tr.querySelector('.safe-deliv-container').appendChild(deliverablesHtmlNode); 
+        tr.querySelector('.safe-portal').href = "/os/client-portal.html?project_id=" + c.project_id; 
+        tr.querySelector('.safe-pdf').onclick = () => window.generateContractDoc(c.id); 
         tr.querySelector('.safe-edit').onclick = () => window.editContract(c.id);
         
         body.appendChild(tr);
