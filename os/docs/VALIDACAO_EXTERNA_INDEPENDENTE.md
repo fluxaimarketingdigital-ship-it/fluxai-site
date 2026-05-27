@@ -26,7 +26,7 @@ Esta matriz serve como painel de controle executivo para acompanhar o progresso 
 | Ferramenta | O que valida | Como executar | Evidência esperada | Status | Risco | Próxima ação |
 |:---|:---|:---|:---|:---:|:---:|:---|
 | **Lighthouse / PageSpeed** | Performance, SEO, Acessibilidade e Melhores Práticas | Via painel online apontando para ambiente homologação local/staging. | `.pdf` e `.png` dos scores finais. | ✅ **APROVADO** | Baixo | **Módulo Encerrado**. Próxima validação: **Snyk**. |
-| **Snyk** | Vulnerabilidades em dependências Open Source (`package.json`) | Via CLI local no diretório raiz do projeto. | Log de saída no terminal e arquivo `snyk_report.md`. | ⏳ Pendente | — | Executar Snyk test. |
+| **Snyk** | Vulnerabilidades em dependências Open Source (`package.json`) | Via CLI local no diretório raiz do projeto. | Log de saída no terminal e arquivo `RELATORIO_SNYK.md`. | ✅ **APROVADO** | Baixo | **Módulo Encerrado**. Próxima validação: **GitHub CodeQL**. |
 | **GitHub CodeQL** | Análise estática de código (SAST) em busca de falhas lógicas e de segurança | Rodar workflow no repositório simulado ou local. | Arquivo SARIF e print do painel de alertas. | ⏳ Pendente | — | Configurar CodeQL local. |
 | **SonarCloud** | Qualidade de código (Code Smells, Cobertura, Bugs) | Integração via token temporário ou uso do SonarLint local. | Dashboard do Quality Gate exportado. | ⏳ Pendente | — | Executar SonarScanner. |
 | **OWASP ZAP** | Teste de Intrusão Dinâmico (DAST) em ambiente operacional | Ataque controlado contra `localhost` ou ambiente staging isolado. | Relatório PDF do OWASP com achados DAST. | ⏳ Pendente | — | Iniciar varredura DAST. |
