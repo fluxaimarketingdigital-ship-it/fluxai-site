@@ -405,7 +405,6 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
     }
 
     // 3. Mapear e-mail para perfil operacional via allowlist (sem dados sensíveis)
-    const knownProfile = FLUXAI_ALLOWED_USERS[email] || null;
     let safeRole, safePermissions, safeId, safeName, safeProjectId;
 
     if (knownProfile) {
