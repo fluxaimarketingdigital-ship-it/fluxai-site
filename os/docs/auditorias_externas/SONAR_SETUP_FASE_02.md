@@ -43,3 +43,5 @@ Para que o pipeline execute com sucesso no próximo `push` para a branch `main` 
 1. O administrador do projeto deve **configurar o repositório no SonarCloud** e definir o token no GitHub Secrets.
 2. O código recém enviado disparará a primeira análise automatizada.
 3. Aguardar o relatório baseline gerado pelo Sonar. Nenhuma correção no código deve ser efetuada até o laudo conclusivo desta primeira rodada estar documentado.
+
+Primeira execução Sonar autorizada após cadastro do SONAR_TOKEN no GitHub Secrets.
