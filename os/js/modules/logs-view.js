@@ -173,9 +173,23 @@ function clearLocalLogs() {
     renderLogsTable();
 }
 
+function safeParseJSON(value, fallback = null) {
+    if (value == null) return fallback;
+    if (typeof value === 'object') return value;
+    if (typeof value !== 'string') return fallback;
+    const trimmed = value.trim();
+    if (!trimmed) return fallback;
+    try {
+        return JSON.parse(trimmed);
+    } catch (error) {
+        console.warn('[SAFE_JSON_PARSE]', error.message);
+        return fallback;
+    }
+}
+
 function loadAndRenderLogs() {
     try {
-        let allLogs = JSON.parse(localStorage.getItem('fluxai_logs_all') || '[]');
+        let allLogs = safeParseJSON(localStorage.getItem('fluxai_logs_all'), []);
         
         // Se a localStorage estiver vazia, popular com logs simulados para melhor usabilidade na demonstração
         if (allLogs.length === 0) {

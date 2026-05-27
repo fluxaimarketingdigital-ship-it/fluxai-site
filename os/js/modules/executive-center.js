@@ -64,6 +64,10 @@ async function loadExecutiveData() {
         const overdueAmount = overduePayments.reduce((acc, p) => acc + Number(p.amount_due || 0), 0);
         const defaultRate = totalExpected > 0 ? ((overdueAmount / totalExpected) * 100).toFixed(1) : '0.0';
 
+        const activeClientsCount = activeContracts.length;
+        const lateCount = overduePayments.length;
+        const mockFinancialStats = { mrr_total: mrr };
+
         // 3. Renderizar KPIs Executivos
         const kpiGrid = document.getElementById('executive-kpi-grid');
             const kpi1 = document.createElement('div');
@@ -172,21 +176,21 @@ tr.appendChild(td);
                     
                     const td1 = document.createElement('td');
                     td1.className = 'cell-mono';
-                    td1.textContent = c.id.toUpperCase();
+                    td1.textContent = (contract?.id || proj.id).toUpperCase();
                     tr.appendChild(td1);
 
                     const td2 = document.createElement('td');
                     td2.className = 'cell-primary';
-                    td2.textContent = c.company_name;
+                    td2.textContent = proj.company_name;
                     tr.appendChild(td2);
 
                     const td3 = document.createElement('td');
                     td3.style.fontSize = '0.75rem';
-                    td3.textContent = c.deliverables;
+                    td3.textContent = contract?.deliverables || 'N/A';
                     tr.appendChild(td3);
 
                     const td4 = document.createElement('td');
-                    td4.textContent = renewal.toLocaleDateString('pt-BR');
+                    td4.textContent = new Date().toLocaleDateString('pt-BR');
                     tr.appendChild(td4);
 
                     const td5 = document.createElement('td');
@@ -194,7 +198,7 @@ tr.appendChild(td);
                     aDrive.target = '_blank';
                     aDrive.className = 'os-btn os-btn-sm';
                     aDrive.style.cssText = 'padding: 2px 8px; font-size: 0.65rem; background: rgba(255,255,255,0.03); border: 1px solid var(--os-border);';
-                    aDrive.href = driveLink;
+                    aDrive.href = proj.drive_folder_id ? `https://drive.google.com/drive/folders/${proj.drive_folder_id}` : '#';
                     const iFolder = document.createElement('i');
                     iFolder.className = 'fa-solid fa-folder-open';
                     aDrive.appendChild(iFolder);
@@ -207,10 +211,11 @@ tr.appendChild(td);
                     tr.appendChild(td6); 
 
                     const statusSpan = document.createElement('span');
-                    if (c.status === 'PAUSADO') {
+                    const cStatus = contract?.status || 'PAUSADO';
+                    if (cStatus === 'PAUSADO') {
                         statusSpan.className = 'os-badge os-badge-warning';
                         statusSpan.textContent = 'Pausado';
-                    } else if (c.status === 'CANCELADO') {
+                    } else if (cStatus === 'CANCELADO') {
                         statusSpan.className = 'os-badge os-badge-danger';
                         statusSpan.textContent = 'Cancelado';
                     } else {

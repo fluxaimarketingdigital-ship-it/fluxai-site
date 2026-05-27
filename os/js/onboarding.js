@@ -542,8 +542,8 @@ async function handleOnboarding(e) {
             await supabase.from('content_assets').insert(pautas);
 
             // ── SERVIÇO EXTRA (Operational Linking™) ──
-            const extraValue = Number(raw.finance_extra_services_value) || 0;
-            if (extraValue > 0 && raw.finance_extra_services_type && contract) {
+            const serviceExtraValue = Number(raw.finance_extra_services_value) || 0;
+            if (serviceExtraValue > 0 && raw.finance_extra_services_type && contract) {
                 const serviceTypeKey = raw.finance_extra_services_type
                     .replace('[FluxAI Labs] ', '').replace('[FluxAI] ', '')
                     .toUpperCase().replace(/[\s\-\/\(\)]/g, '_').substring(0, 20);
@@ -551,7 +551,7 @@ async function handleOnboarding(e) {
                     project_id: project.id,
                     contract_id: contract.id,
                     service_type: serviceTypeKey,
-                    service_value: extraValue,
+                    service_value: serviceExtraValue,
                     deadline: null,
                     responsible: raw.responsible_comercial || 'Admin FluxAI'
                 });

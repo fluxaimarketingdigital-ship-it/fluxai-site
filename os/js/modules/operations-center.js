@@ -31,15 +31,29 @@ async function initPage() {
     });
 }
 
+function safeParseJSON(value, fallback = null) {
+    if (value == null) return fallback;
+    if (typeof value === 'object') return value;
+    if (typeof value !== 'string') return fallback;
+    const trimmed = value.trim();
+    if (!trimmed) return fallback;
+    try {
+        return JSON.parse(trimmed);
+    } catch (error) {
+        console.warn('[SAFE_JSON_PARSE]', error.message);
+        return fallback;
+    }
+}
+
 async function loadOperationsCenter() {
     try {
         // 1. Carregar Coleções Locais
-        const clientConfigs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
-        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-        const mockDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands') || '[]');
-        const mockReports = JSON.parse(localStorage.getItem('fluxai_mock_reports') || '[]');
-        const allLogs = JSON.parse(localStorage.getItem('fluxai_logs_all') || '[]');
+        const clientConfigs = safeParseJSON(localStorage.getItem('fluxai_client_configs'), {});
+        const mockProjects = safeParseJSON(localStorage.getItem('fluxai_mock_projects'), []);
+        const mockAssets = safeParseJSON(localStorage.getItem('fluxai_mock_assets'), []);
+        const mockDemands = safeParseJSON(localStorage.getItem('fluxai_mock_demands'), []);
+        const mockReports = safeParseJSON(localStorage.getItem('fluxai_mock_reports'), []);
+        const allLogs = safeParseJSON(localStorage.getItem('fluxai_logs_all'), []);
 
         // 2. Carregar Aprovações do Supabase se disponível
         let pendingApprovals = [];
