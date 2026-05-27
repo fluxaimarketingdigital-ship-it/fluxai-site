@@ -68,7 +68,7 @@ export const OS_UI = {
             { id: 'flux-calendar',    label: 'Calendário Editorial',  icon: 'fa-calendar-days',       group: 'Produção & Conteúdo',   roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS','CLIENT'] },
             { id: 'relatorio-mensal', label: 'Relatório Mensal',      icon: 'fa-file-signature',      group: 'Métricas & Relatórios', roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
             { id: 'metricas',         label: 'Métricas Inbound',      icon: 'fa-chart-pie',           group: 'Métricas & Relatórios', roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'fluxai-labs',      label: 'FluxAI Labs',           icon: 'fa-flask',               group: 'Workspace Interno',     roles: ['ADMIN'],             contexts: ['MASTER','LABS'], permission: 'fluxai-labs-workspace' },
+            
             { id: 'client-portal',    label: 'Portal do Cliente',     icon: 'fa-briefcase',           group: 'Interface de Valor',    roles: ['ADMIN', 'CLIENT'],   contexts: ['MASTER','CLIENT'] },
             { id: 'contracts-finance',label: 'Contratos & Financeiro',icon: 'fa-file-invoice-dollar', group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
             { id: 'governance',       label: 'Governança',            icon: 'fa-user-shield',         group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
@@ -313,47 +313,65 @@ export const OS_UI = {
 import { getSupabase } from '../services/supabase-client.js';
 
 export const OS_AUTH = {
+    normalizeRole: (value) => {
+        const role = String(value || "").toUpperCase();
+        if (role === "ADMIN") return "ADMIN";
+        if (role === "OPERATOR") return "OPERATOR";
+        if (role === "CLIENT") return "CLIENT";
+        return "CLIENT";
+    },
+    getPermissionsForRole: (role) => {
+        const permissionsByRole = {
+            ADMIN: ["command-center", "onboarding", "content-engine", "crm-intelligence", "analytics", "automation-hub", "contracts-finance", "client-portal", "governance", "governance-users"],
+            OPERATOR: ["command-center", "onboarding", "content-engine", "crm-intelligence", "analytics", "automation-hub"],
+            CLIENT: ["client-portal"]
+        };
+        return permissionsByRole[role] || permissionsByRole.CLIENT;
+    },
     /**
      * Validação de Sessão e RBAC
      * @param {string} requiredRole - Cargo mínimo exigido para a página
+     * @param {string} requiredPermission - Permissão específica exigida
      */
-    check: async (requiredRole = null) => {
-        // 1. Tentar carregar sessão local do sessionStorage
-        const localSession = sessionStorage.getItem('fluxai_ui_context');
-        if (localSession) {
-            try {
-                const sessionData = JSON.parse(localSession);
-                const user = {
-                    id: sessionData.id || 'mock-id',
-                    role: sessionData.role || 'CLIENT',
-                    full_name: sessionData.full_name || 'Usuário Local',
-                    email: sessionData.email || 'local@fluxai.com',
-                    project_id: sessionData.project_id || null,
-                    permissions: sessionData.permissions || []
-                };
+    check: async (requiredRole = null, requiredPermission = null) => {
+        // 1. Tentar carregar contexto em memória (runtime)
+        const ctx = window.FLUXAI_RUNTIME_CONTEXT || null;
+        if (ctx) {
+            const user = {
+                id: ctx.id || 'mock-id',
+                role: ctx.role || 'CLIENT',
+                full_name: ctx.full_name || 'Usuário Local',
+                email: ctx.email || 'local@fluxai.com',
+                project_id: ctx.project_id || null,
+                permissions: ctx.permissions || []
+            };
 
-                // Validação de RBAC 
-                if (requiredRole && user.role !== 'ADMIN') { 
-                    if (user.role !== requiredRole) { 
-                        console.error('[AUTH] Acesso Negado. Nível insuficiente.'); 
-                        window.location.href = 'access-denied.html'; 
-                        return null; 
-                    } 
-                } 
-
-                // Bloqueio Global de URL Direta para CLIENT
-                if (user.role === 'CLIENT') {
-                    const currentPath = window.location.pathname.toLowerCase();
-                    if (!currentPath.includes('client-portal') && !currentPath.includes('access-denied') && !currentPath.includes('login') && currentPath.includes('/os/')) {
-                        console.warn('[AUTH] URL interna bloqueada para CLIENT.');
-                        window.location.href = 'client-portal.html' + (user.project_id ? '?project_id=' + user.project_id : '');
-                        return null;
-                    }
+            // Validação de RBAC 
+            if (user.role !== 'ADMIN') { 
+                let hasAccess = true;
+                if (requiredRole && user.role !== requiredRole) {
+                    hasAccess = false;
                 }
-                return user; 
-            } catch (err) {
-                console.error('[AUTH] Erro ao ler fluxai_ui_context', err);
+                if (!hasAccess && requiredPermission && user.permissions && user.permissions.includes(requiredPermission)) {
+                    hasAccess = true; // Overridden by specific permission
+                }
+                if (requiredRole && !hasAccess) { 
+                    console.error('[AUTH] Acesso Negado. Nível ou permissão insuficiente.'); 
+                    window.location.href = 'access-denied.html'; 
+                    return null; 
+                } 
+            } 
+
+            // Bloqueio Global de URL Direta para CLIENT
+            if (user.role === 'CLIENT') {
+                const currentPath = window.location.pathname.toLowerCase();
+                if (!currentPath.includes('client-portal') && !currentPath.includes('access-denied') && !currentPath.includes('login') && currentPath.includes('/os/')) {
+                    console.warn('[AUTH] URL interna bloqueada para CLIENT.');
+                    window.location.href = 'client-portal.html' + (user.project_id ? '?project_id=' + user.project_id : '');
+                    return null;
+                }
             }
+            return user; 
         }
 
         const supabase = getSupabase();
@@ -392,12 +410,33 @@ export const OS_AUTH = {
             .eq('id', session.user.id)
             .single();
 
-        const user = { ...session.user, ...profile };
+        const rawUser = { ...session.user, ...profile };
+        const safeRole = OS_AUTH.normalizeRole(rawUser.role);
+        const safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
+
+        window.FLUXAI_RUNTIME_CONTEXT = {
+            id: rawUser.id,
+            full_name: rawUser.full_name || 'Usuário',
+            role: safeRole,
+            permissions: safePermissions,
+            project_id: rawUser.project_id || null,
+            workspace_id: rawUser.workspace_id || null,
+            created_at: Date.now()
+        };
+
+        const user = window.FLUXAI_RUNTIME_CONTEXT;
 
         // Validação de RBAC 
-        if (requiredRole && user.role !== 'ADMIN') { 
-            if (user.role !== requiredRole) { 
-                console.error('[AUTH] Acesso Negado. Nível insuficiente.'); 
+        if (user.role !== 'ADMIN') { 
+            let hasAccess = true;
+            if (requiredRole && user.role !== requiredRole) {
+                hasAccess = false;
+            }
+            if (!hasAccess && requiredPermission && user.permissions && user.permissions.includes(requiredPermission)) {
+                hasAccess = true; // Overridden by specific permission
+            }
+            if (requiredRole && !hasAccess) { 
+                console.error('[AUTH] Acesso Negado. Nível ou permissão insuficiente.'); 
                 if (typeof OS_LOGS_ENGINE !== 'undefined') { 
                     OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', {  
                         user_id: user.id || user.email,  
@@ -418,8 +457,8 @@ export const OS_AUTH = {
                 if (typeof OS_LOGS_ENGINE !== 'undefined') { 
                     OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', {  
                         user_id: user.id || user.email,  
-                        reason: 'Tentativa de URL direta restrita por CLIENT',
-                        path: currentPath
+                        user_role: user.role,  
+                        attempted_path: currentPath  
                     }, 'critical'); 
                 }
                 window.location.href = 'client-portal.html' + (user.project_id ? '?project_id=' + user.project_id : '');

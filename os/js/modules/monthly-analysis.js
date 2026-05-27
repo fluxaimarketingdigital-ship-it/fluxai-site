@@ -103,7 +103,7 @@ async function loadReports() {
 
 window.transitionReport = async (reportId, currentStatus, targetStatus) => {
     try {
-        const uiContext = JSON.parse(sessionStorage.getItem('fluxai_ui_context') || '{}');
+        const uiContext = window.FLUXAI_RUNTIME_CONTEXT || {};
         const role = uiContext.role || 'OPERATOR';
         
         const transResult = await StatusEngine.transition('relatorios', reportId, currentStatus, targetStatus, { role });

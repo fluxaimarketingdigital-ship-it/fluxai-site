@@ -278,9 +278,8 @@
             if (userProjectId) {
                 uiContext.project_id = userProjectId;
             }
-            sessionStorage.setItem('fluxai_ui_context', JSON.stringify(uiContext));
-
-            // Sincronizar projeto ativo via query params
+            // Não utilizar storage persistente para contexto derivado do auth (Exigência CodeQL)
+            window.FLUXAI_RUNTIME_CONTEXT = uiContext;
             if (userRole === 'CLIENT') {  
                 window.location.href = `client-portal.html${userProjectId ? '?project_id=' + userProjectId : ''}`;  
             } else {  

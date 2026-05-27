@@ -24,3 +24,10 @@ Este documento relata as correções aplicadas no FluxAI OS™ para solucionar a
 - As mitigações estruturais aprovadas pelo **CodeQL (High = 0)** permanecem intactas (sem `innerHTML` dinâmico inseguro, validação de URL no `href` em vigor, nenhum storage em texto limpo de material criptográfico).
 - A auditoria **Snyk Cloud** segue com 0 vulnerabilidades.
 - Testes manuais confirmaram a completa separação de contexto entre `ADMIN`, `OPERATOR` e `CLIENT`.
+
+
+## Adendo Final: Regressões Visuais, Rotas e RBAC
+- Fundo branco indevido corrigido nas páginas Demandas, Leads, Métricas e Relatório Mensal.
+- Rota quebrada fluxai-labs removida do menu lateral.
+- Tela governance protegida via Code/Auth com suporte a requiredPermission.
+- Remoção completa de storage de login.html e uso de memória (window.FLUXAI_RUNTIME_CONTEXT) em compliance final ao CodeQL Alert #66.

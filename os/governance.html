@@ -181,7 +181,7 @@
         
         async function initPage() {
             // 1. Validar Acesso Real (Apenas ADMIN pode acessar Governança)
-            const user = await OS_AUTH.check('ADMIN');
+            const user = await OS_AUTH.check('ADMIN', 'governance');
             if (!user) return;
 
             // 2. Renderizar Base Global

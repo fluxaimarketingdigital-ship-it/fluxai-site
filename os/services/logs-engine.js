@@ -108,7 +108,7 @@ const _detectEnv = () => {
 
 const _getCurrentSession = () => {
     try {
-        const raw = sessionStorage.getItem('fluxai_ui_context');
+        const raw = window.FLUXAI_RUNTIME_CONTEXT ? JSON.stringify(window.FLUXAI_RUNTIME_CONTEXT) : null;
         if (raw) return JSON.parse(raw);
     } catch (e) {}
     return null;

@@ -23,3 +23,10 @@ O sistema superou todas as premissas de UX e Controle de Acesso (RBAC) quebradas
 **APROVADO PARA PRÓXIMA FASE DE VALIDAÇÃO EXTERNA**
 
 **Justificativa:** O acesso de usuários `CLIENT` foi completamente blindado, botões funcionais do Financeiro voltaram a ser responsivos e a UI (scroll, object string) opera conforme as validações exigidas. Nenhum token vaza para o localStorage e o CodeQL mantém tolerância zero a strings DOM.
+
+
+## Adendo Final: Regressões Visuais, Rotas e RBAC
+- Fundo branco indevido corrigido nas páginas Demandas, Leads, Métricas e Relatório Mensal.
+- Rota quebrada fluxai-labs removida do menu lateral.
+- Tela governance protegida via Code/Auth com suporte a requiredPermission.
+- Remoção completa de storage de login.html e uso de memória (window.FLUXAI_RUNTIME_CONTEXT) em compliance final ao CodeQL Alert #66.

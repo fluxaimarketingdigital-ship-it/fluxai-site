@@ -28,3 +28,10 @@ Após profunda reestruturação DOM nos arquivos internos para mitigar os alerta
 
 ## Conclusão da Mesa Auditora
 O sistema recuperou todas as suas funcionalidades de controle e manipulação de interface, eliminando falhas visuais sem comprometer a política de *zero-trust DOM* recém introduzida pelas exigências da CyberSegurança (Snyk e GitHub CodeQL).
+
+
+## Adendo Final: Regressões Visuais, Rotas e RBAC
+- Fundo branco indevido corrigido nas páginas Demandas, Leads, Métricas e Relatório Mensal.
+- Rota quebrada fluxai-labs removida do menu lateral.
+- Tela governance protegida via Code/Auth com suporte a requiredPermission.
+- Remoção completa de storage de login.html e uso de memória (window.FLUXAI_RUNTIME_CONTEXT) em compliance final ao CodeQL Alert #66.

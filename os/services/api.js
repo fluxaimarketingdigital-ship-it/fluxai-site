@@ -11,7 +11,7 @@ export const ApiService = {
      */
     request: async (endpoint, options = {}) => {
         const url = `${BASE_URL}${endpoint}`;
-        const uiContext = JSON.parse(sessionStorage.getItem('fluxai_ui_context') || '{}');
+        const uiContext = window.FLUXAI_RUNTIME_CONTEXT || {};
         
         const defaultHeaders = {
             'Content-Type': 'application/json',
