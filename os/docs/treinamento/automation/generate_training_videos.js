@@ -118,7 +118,11 @@ function concatSegments(segmentFiles, outputPath) {
 }
 
 async function generateVideo(scenario, browser) {
-    const videoTempDir = path.join(TEMP_DIR, `video_${scenario.id}`);
+    const safeId = String(scenario.id).replace(/[^a-zA-Z0-9_-]/g, '');
+    const safeFilename = String(scenario.filename).replace(/[^a-zA-Z0-9_-]/g, '');
+    scenario.filename = safeFilename;
+
+    const videoTempDir = path.join(TEMP_DIR, `video_${safeId}`);
     fs.mkdirSync(videoTempDir, { recursive: true });
 
     const page = await browser.newPage();

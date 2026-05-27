@@ -124,7 +124,13 @@ async function initPage() {
 
     // Obter cliente da URL
     const urlParams = new URLSearchParams(window.location.search);
-    activeClientId = urlParams.get('client_id') || 'FLUXAI_LABS_001';
+    let rawClientId = urlParams.get('client_id') || 'FLUXAI_LABS_001';
+    
+    // Mitigação de Prototype Pollution: Bloquear chaves perigosas
+    if (rawClientId === '__proto__' || rawClientId === 'constructor' || rawClientId === 'prototype') {
+        rawClientId = 'FLUXAI_LABS_001';
+    }
+    activeClientId = rawClientId;
 
     await loadClientData();
     setupEventListeners();
@@ -132,7 +138,11 @@ async function initPage() {
 
 async function loadClientData() {
     // Buscar detalhes do cliente
-    let client = CLIENT_COCKPIT_MOCKS[activeClientId];
+    let client = null;
+    if (Object.prototype.hasOwnProperty.call(CLIENT_COCKPIT_MOCKS, activeClientId)) {
+        client = CLIENT_COCKPIT_MOCKS[activeClientId];
+    }
+    
     if (!client) {
         // Fallback para labs se ID não bater
         activeClientId = 'FLUXAI_LABS_001';
@@ -141,7 +151,7 @@ async function loadClientData() {
     
     // Carregar configurações reais persistentes em localStorage
     const configs = getClientConfigs();
-    if (configs[activeClientId]) {
+    if (configs && Object.prototype.hasOwnProperty.call(configs, activeClientId)) {
         client.status = configs[activeClientId].status;
         client.iaMetrics.limit = configs[activeClientId].iaLimit;
         iaBlocked = configs[activeClientId].iaBlocked;

@@ -50,6 +50,7 @@ export const EVENT_TYPES = {
 
 export const OPERATION_LOGS_CONFIG = {
     maxEntries: 500,
+    maxPayloadSize: 2000,
     storageKeys: {
         USER_ACTIONS: 'fluxai_logs_user_actions',
         WEBHOOKS: 'fluxai_logs_webhooks',
@@ -58,6 +59,44 @@ export const OPERATION_LOGS_CONFIG = {
         ALL: 'fluxai_logs_all'
     }
 };
+
+const SENSITIVE_KEYS = ['token', 'access_token', 'refresh_token', 'authorization', 'password', 'senha', 'secret', 'apikey', 'api_key', 'webhook', 'email', 'phone', 'telefone', 'cpf', 'cnpj'];
+
+function redactSensitiveFields(obj) {
+    if (obj === null || typeof obj !== 'object') return obj;
+    if (Array.isArray(obj)) return obj.map(redactSensitiveFields);
+    
+    const redacted = {};
+    for (const key in obj) {
+        if (Object.prototype.hasOwnProperty.call(obj, key)) {
+            const lowerKey = String(key).toLowerCase();
+            const isSensitive = SENSITIVE_KEYS.some(k => lowerKey.includes(k));
+            if (isSensitive && typeof obj[key] === 'string' && obj[key].length > 0) {
+                redacted[key] = '[REDACTED]';
+            } else if (typeof obj[key] === 'object') {
+                redacted[key] = redactSensitiveFields(obj[key]);
+            } else {
+                redacted[key] = obj[key];
+            }
+        }
+    }
+    return redacted;
+}
+
+function safeStringify(obj) {
+    const cache = new Set();
+    const str = JSON.stringify(obj, (key, value) => {
+        if (typeof value === 'object' && value !== null) {
+            if (cache.has(value)) return '[Circular]';
+            cache.add(value);
+        }
+        return value;
+    });
+    if (str && str.length > OPERATION_LOGS_CONFIG.maxPayloadSize) {
+        return str.substring(0, OPERATION_LOGS_CONFIG.maxPayloadSize) + '...[TRUNCATED]';
+    }
+    return str || '';
+}
 
 const _detectEnv = () => {
     if (typeof window === 'undefined') return 'PRODUCTION';
@@ -77,15 +116,18 @@ const _getCurrentSession = () => {
 
 const _saveLog = (key, entry) => {
     try {
+        // Redigir payload antes de qualquer processamento
+        const safeEntry = { ...entry, payload: redactSensitiveFields(entry.payload) };
+
         // Salvar na categoria específica
         const specificLogs = JSON.parse(localStorage.getItem(key) || '[]');
-        specificLogs.unshift(entry);
-        localStorage.setItem(key, JSON.stringify(specificLogs.slice(0, OPERATION_LOGS_CONFIG.maxEntries)));
+        specificLogs.unshift(safeEntry);
+        localStorage.setItem(key, safeStringify(specificLogs.slice(0, OPERATION_LOGS_CONFIG.maxEntries)));
 
         // Salvar na timeline consolidada de todos os logs
         const allLogs = JSON.parse(localStorage.getItem(OPERATION_LOGS_CONFIG.storageKeys.ALL) || '[]');
-        allLogs.unshift(entry);
-        localStorage.setItem(OPERATION_LOGS_CONFIG.storageKeys.ALL, JSON.stringify(allLogs.slice(0, OPERATION_LOGS_CONFIG.maxEntries)));
+        allLogs.unshift(safeEntry);
+        localStorage.setItem(OPERATION_LOGS_CONFIG.storageKeys.ALL, safeStringify(allLogs.slice(0, OPERATION_LOGS_CONFIG.maxEntries)));
 
         // Printar no console em ambiente de DEV/STAGING
         const env = _detectEnv();
@@ -95,10 +137,10 @@ const _saveLog = (key, entry) => {
                 warning: 'color: #f59e0b; font-weight: bold;',
                 critical: 'color: #ef4444; font-weight: bold; background: rgba(239, 68, 68, 0.1); padding: 2px 4px; border-radius: 3px;'
             };
-            const typeStr = entry.simulated ? 'SIMULADO' : 'REAL';
+            const typeStr = safeEntry.simulated ? 'SIMULADO' : 'REAL';
             console.log(
-                `%c[LOG:${entry.severity.toUpperCase()}] [${entry.action_type}] [${typeStr}] %c${entry.source_page} - ${JSON.stringify(entry.payload)}`,
-                styles[entry.severity] || '',
+                `%c[LOG:${safeEntry.severity.toUpperCase()}] [${safeEntry.action_type}] [${typeStr}] %c${safeEntry.source_page} - ${safeStringify(safeEntry.payload)}`,
+                styles[safeEntry.severity] || '',
                 'color: #eee;'
             );
         }

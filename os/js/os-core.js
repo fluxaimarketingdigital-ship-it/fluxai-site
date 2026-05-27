@@ -6,6 +6,21 @@ import { OSState } from '/os/js/os-state.js';
 import { OS_CONFIG } from '/os/config/os-config.js';
 import { OS_LOGS_ENGINE } from '/os/services/logs-engine.js';
 
+/**
+ * Função utilitária de segurança global para prevenir XSS
+ */
+window.escapeHTML = function(str) {
+    if (str === null || str === undefined) return '';
+    return String(str).replace(/[&<>'"]/g, function(s) {
+        return {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            "'": '&#39;',
+            '"': '&quot;'
+        }[s];
+    });
+};
 
 // Projeto interno da FluxAI Labs (INTERNAL_WORKSPACE)
 export const FLUXAI_LABS_PROJECT = {
@@ -159,7 +174,7 @@ export const OS_UI = {
             const supabaseProjects = JSON.parse(localStorage.getItem('fluxai_supabase_projects') || '[]');
             activeProj = mockProjects.find(p => p.id === currentProjectId) || supabaseProjects.find(p => p.id === currentProjectId);
             if (activeProj) {
-                const companyName = activeProj.company_name || activeProj.name || 'Desconhecido';
+                const companyName = window.escapeHTML(activeProj.company_name || activeProj.name || 'Desconhecido');
                 activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: ${companyName.toUpperCase()}</span>`;
             } else {
                 activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
@@ -178,7 +193,7 @@ export const OS_UI = {
                 </button>
                 ${context === 'CLIENT' && activeProj ? `
                 <span style="font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid var(--os-primary); background:rgba(142,158,104,0.1); color:var(--os-primary); font-weight:800; text-transform:uppercase; letter-spacing:1px;">
-                    <i class="fa-solid fa-briefcase"></i> ${activeProj.company_name || 'Cliente'}
+                    <i class="fa-solid fa-briefcase"></i> ${window.escapeHTML(activeProj.company_name || 'Cliente')}
                 </span>` : ''}
             </div>` : '';
 
@@ -198,8 +213,8 @@ export const OS_UI = {
             </div>
             <div class="os-topbar-right">
                 <div class="os-user-profile" id="user-profile-menu" style="cursor:pointer;">
-                    <div class="os-avatar">${initials}</div>
-                    <span>${user.full_name || user.email}</span>
+                    <div class="os-avatar">${window.escapeHTML(initials)}</div>
+                    <span>${window.escapeHTML(user.full_name || user.email)}</span>
                     <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;margin-left:8px;opacity:0.5;"></i>
                 </div>
             </div>`;
@@ -232,14 +247,14 @@ export const OS_UI = {
         
         const html = `
             <div class="os-widget-header">
-                <span class="os-widget-label">${data.label}</span>
-                ${data.trend ? `<i class="fa-solid ${trendIcon} ${trendClass}"></i>` : `<i class="fa-solid ${data.icon || 'fa-chart-line'}" style="opacity:0.3"></i>`}
+                <span class="os-widget-label">${window.escapeHTML(data.label)}</span>
+                ${data.trend ? `<i class="fa-solid ${trendIcon} ${trendClass}"></i>` : `<i class="fa-solid ${window.escapeHTML(data.icon || 'fa-chart-line')}" style="opacity:0.3"></i>`}
             </div>
             <div class="os-metric">
-                <div class="os-metric-value">${data.value || '0'}</div>
+                <div class="os-metric-value">${window.escapeHTML(data.value || '0')}</div>
                 <div class="os-metric-meta">
-                    ${data.trend ? `<span class="${trendClass}">${data.trend}</span>` : ''} 
-                    ${data.meta ? `<span style="color: var(--os-text-muted);">${data.meta}</span>` : ''}
+                    ${data.trend ? `<span class="${trendClass}">${window.escapeHTML(data.trend)}</span>` : ''} 
+                    ${data.meta ? `<span style="color: var(--os-text-muted);">${window.escapeHTML(data.meta)}</span>` : ''}
                 </div>
             </div>`;
         const container = document.getElementById(containerId);

@@ -606,7 +606,7 @@
                 opts += '<option value="DEMANDA_NORMAL">Demanda Regular (Inclusa no Plano/Contrato)</option>';
                 opts += '<optgroup label="Serviços Extras (Avulsos - Faturamento Adicional)">';
                 window.mockCatalogoServicos.filter(s => s.permite_orcamento).forEach(s => {
-                    opts += `<option value="${s.servico_id}">${s.nome_servico}</option>`;
+                    opts += `<option value="${window.escapeHTML(s.servico_id)}">${window.escapeHTML(s.nome_servico)}</option>`;
                 });
                 opts += '<option value="SRV_EXTRA_CUSTOM">Outro Serviço Extra Customizado</option>';
                 opts += '</optgroup>';
@@ -815,7 +815,7 @@
                                     <div>
                                         <h4 style="margin:0; font-size:0.85rem; color:#fff; font-weight:800;">Lembrete de Vencimento Próximo</h4>
                                         <p style="margin:3px 0 0 0; font-size:0.7rem; color:var(--os-text-muted);">
-                                            Sua recorrência mensal no valor de R$ ${activePayment.amount_due.toFixed(2)} vence em 2 dias (${dueDate.toLocaleDateString('pt-BR')}).
+                                            Sua recorrência mensal no valor de R$ ${window.escapeHTML(activePayment.amount_due.toFixed(2))} vence em 2 dias (${window.escapeHTML(dueDate.toLocaleDateString('pt-BR'))}).
                                         </p>
                                     </div>
                                 </div>
@@ -832,11 +832,11 @@
                                     <div>
                                         <h4 style="margin:0; font-size:0.85rem; color:#fff; font-weight:800;">Recorrência com Vencimento Hoje!</h4>
                                         <p style="margin:3px 0 0 0; font-size:0.7rem; color:var(--os-text-muted);">
-                                            Sua mensalidade no valor de R$ ${activePayment.amount_due.toFixed(2)} vence hoje. Efetue o pagamento via PIX para manter seus disparos e automações ativos.
+                                            Sua mensalidade no valor de R$ ${window.escapeHTML(activePayment.amount_due.toFixed(2))} vence hoje. Efetue o pagamento via PIX para manter seus disparos e automações ativos.
                                         </p>
                                     </div>
                                 </div>
-                                <button onclick="openPixModal(${activePayment.amount_due}, '${activeContract.company_name}')" style="background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.3);">
+                                <button onclick="openPixModal(${window.escapeHTML(activePayment.amount_due)}, '${window.escapeHTML(activeContract.company_name)}')" style="background:var(--os-primary); border:none; color:#000; padding:10px 20px; border-radius:4px; font-size:0.7rem; font-weight:800; cursor:pointer; text-transform:uppercase; letter-spacing:1px; transition:0.2s; box-shadow: 0 4px 15px rgba(142, 158, 104, 0.3);">
                                     Pagar com PIX <i class="fa-solid fa-qrcode" style="margin-left:4px;"></i>
                                 </button>
                             </div>
