@@ -1,150 +1,213 @@
-import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
-
-const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "https://fluxaidigital.com.br",
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
-}
+};
 
-const ROUTE_ENV_MAP: Record<string, string> = {
+const WEBHOOK_SECRET_MAP: Record<string, string> = {
   DEMAND_SUBMISSION: "MAKE_WEBHOOK_DEMAND_SUBMISSION",
   LEAD_CAPTURE: "MAKE_WEBHOOK_LEAD_CAPTURE",
   CLIENT_ONBOARDING: "MAKE_WEBHOOK_CLIENT_ONBOARDING",
   SERVICE_EXTRA_REQUEST: "MAKE_WEBHOOK_SERVICE_EXTRA_REQUEST",
   IA_CREDITOS_CONTROLE: "MAKE_WEBHOOK_IA_CREDITOS_CONTROLE",
-  AI_OPERATIONAL_CONTROL: "MAKE_WEBHOOK_AI_OPERATIONAL_CONTROL",
   SERVICE_EXTRA_APPROVAL: "MAKE_WEBHOOK_SERVICE_EXTRA_APPROVAL",
   IA_GUARDRAIL: "MAKE_WEBHOOK_IA_GUARDRAIL",
   PLANEJAMENTO_CONTEUDO: "MAKE_WEBHOOK_PLANEJAMENTO_CONTEUDO",
   CALENDARIO_POSTAGENS: "MAKE_WEBHOOK_CALENDARIO_POSTAGENS",
-  GPT_GERACOES_LOG: "MAKE_WEBHOOK_GPT_GERACOES_LOG"
+  GPT_GERACOES_LOG: "MAKE_WEBHOOK_GPT_GERACOES_LOG",
+};
+
+function jsonResponse(body: unknown, status = 200) {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: {
+      ...corsHeaders,
+      "Content-Type": "application/json",
+    },
+  });
 }
 
-const PUBLIC_ROUTES = ["LEAD_CAPTURE"]
-
-serve(async (req) => {
-  // 1. CORS Preflight
-  if (req.method === "OPTIONS") {
-    return new Response(null, { status: 204, headers: CORS_HEADERS })
-  }
+Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
 
   try {
-    // 2. Validate Method
+    if (req.method === "OPTIONS") {
+      return new Response("ok", { headers: corsHeaders });
+    }
+
     if (req.method !== "POST") {
-      return new Response(JSON.stringify({ error: "Method Not Allowed" }), { 
-        status: 405, 
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" } 
-      })
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Method not allowed",
+          requestId,
+        },
+        405
+      );
     }
 
-    // 3. Validate Content-Type
-    const contentType = req.headers.get("content-type")
-    if (!contentType || !contentType.includes("application/json")) {
-      return new Response(JSON.stringify({ error: "Unsupported Media Type" }), { 
-        status: 415, 
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" } 
-      })
-    }
-
-    // 4. Parse Body
     let body;
+
     try {
-      body = await req.json()
-    } catch (e) {
-      return new Response(JSON.stringify({ error: "Invalid JSON payload" }), { 
-        status: 400, 
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" } 
-      })
+      body = await req.json();
+    } catch {
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Invalid JSON body",
+          requestId,
+        },
+        400
+      );
     }
 
-    const { route, client_id, source, payload } = body
+    const { route, payload } = body ?? {};
 
-    // 5. Validate Required Fields
-    if (!route || !source || !payload) {
-      return new Response(JSON.stringify({ error: "Missing required fields" }), { 
-        status: 400, 
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" } 
-      })
-    }
-
-    // 6. Validate Source
-    if (source !== "fluxai_os") {
-      return new Response(JSON.stringify({ error: "Invalid source" }), { 
-        status: 403, 
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" } 
-      })
-    }
-
-    // 7. Validate Route against Allowlist
-    const envKey = ROUTE_ENV_MAP[route]
-    if (!envKey) {
-      return new Response(JSON.stringify({ error: "Forbidden route" }), { 
-        status: 403, 
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" } 
-      })
-    }
-
-    // 8. Auth Validation
-    const isPublic = PUBLIC_ROUTES.includes(route)
-    if (!isPublic) {
-      const authHeader = req.headers.get("authorization")
-      if (!authHeader || !authHeader.startsWith("Bearer ")) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), { 
-          status: 401, 
-          headers: { ...CORS_HEADERS, "Content-Type": "application/json" } 
-        })
-      }
-      // TODO (Fase 03.1E/03.1F): Validar o JWT usando o Supabase Auth Client
-    }
-
-    // 9. Read Environment Variable
-    const webhookUrl = Deno.env.get(envKey)
-    if (!webhookUrl) {
-      // Retorna 500 generico sem expor nomes de variavel ou detalhes
-      return new Response(JSON.stringify({ error: "Webhook route is not configured" }), { 
-        status: 500, 
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" } 
-      })
-    }
-
-    // 10. Forward to Make
-    const sanitizedPayload = {
+    console.log("make-proxy:start", {
+      requestId,
       route,
-      client_id: client_id || "ANONYMOUS",
-      source,
-      payload,
-      received_at: new Date().toISOString()
+      hasPayload: Boolean(payload),
+    });
+
+    if (!route || typeof route !== "string") {
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Missing route",
+          requestId,
+        },
+        400
+      );
     }
 
+    const secretName = WEBHOOK_SECRET_MAP[route];
+
+    if (!secretName) {
+      console.log("make-proxy:invalid-route", {
+        requestId,
+        route,
+      });
+
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Invalid route",
+          route,
+          requestId,
+        },
+        400
+      );
+    }
+
+    const webhookUrl = Deno.env.get(secretName);
+
+    if (!webhookUrl) {
+      console.log("make-proxy:missing-secret", {
+        requestId,
+        route,
+        secretName,
+      });
+
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Missing webhook secret",
+          route,
+          requestId,
+        },
+        500
+      );
+    }
+
+    if (!webhookUrl.startsWith("https://")) {
+      console.log("make-proxy:invalid-secret-url", {
+        requestId,
+        route,
+        secretName,
+      });
+
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Invalid webhook URL",
+          route,
+          requestId,
+        },
+        500
+      );
+    }
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 8000);
+
+    let makeResponse: Response;
+
     try {
-      const makeResponse = await fetch(webhookUrl, {
+      makeResponse = await fetch(webhookUrl, {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "X-FluxAI-Proxy": "supabase-edge-function",
+          "X-FluxAI-Route": route,
+          "X-FluxAI-Request-Id": requestId,
         },
-        body: JSON.stringify(sanitizedPayload)
-      })
-
-      if (!makeResponse.ok) {
-        throw new Error(`Upstream returned ${makeResponse.status}`)
-      }
-
-      return new Response(JSON.stringify({ ok: true, route, status: "forwarded" }), {
-        status: 200,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" }
-      })
-
+        body: JSON.stringify(payload ?? {}),
+        signal: controller.signal,
+      });
     } catch (error) {
-      return new Response(JSON.stringify({ ok: false, error: "Upstream webhook failed" }), {
-        status: 502,
-        headers: { ...CORS_HEADERS, "Content-Type": "application/json" }
-      })
+      clearTimeout(timeout);
+
+      console.log("make-proxy:make-fetch-error", {
+        requestId,
+        route,
+        error: error instanceof Error ? error.message : String(error),
+      });
+
+      return jsonResponse(
+        {
+          ok: false,
+          error: "Make webhook request failed",
+          route,
+          requestId,
+        },
+        502
+      );
     }
 
+    clearTimeout(timeout);
+
+    const responseText = await makeResponse.text();
+
+    console.log("make-proxy:make-response", {
+      requestId,
+      route,
+      status: makeResponse.status,
+      ok: makeResponse.ok,
+    });
+
+    return jsonResponse(
+      {
+        ok: makeResponse.ok,
+        route,
+        requestId,
+        makeStatus: makeResponse.status,
+        makeResponse: responseText.slice(0, 500),
+      },
+      makeResponse.ok ? 200 : 502
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
-      status: 500,
-      headers: { ...CORS_HEADERS, "Content-Type": "application/json" }
-    })
+    console.log("make-proxy:unhandled-error", {
+      requestId,
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    return jsonResponse(
+      {
+        ok: false,
+        error: "Unhandled proxy error",
+        requestId,
+      },
+      500
+    );
   }
-})
+});
