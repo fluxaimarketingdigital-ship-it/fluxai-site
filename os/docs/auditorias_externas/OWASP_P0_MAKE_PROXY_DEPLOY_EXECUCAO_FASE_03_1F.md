@@ -2,30 +2,34 @@
 
 Data: 27/05/2026
 Projeto: FluxAI OS™
-Fase: Execução do Deploy Controlado via npx (Fase 03.1F)
+Fase: Deploy Controlado do Proxy Edge Supabase (Fase 03.1F)
 
-## 1. Status da Execução
-A tentativa de execução controlada do deploy da Edge Function `make-proxy` foi iniciada.
-- **Node Version:** Identificado como v22.17.1 (Compatível, Node 20+).
-- **Frontend e OS-Config:** Permanecem 100% intactos e sem vazamento de URLs.
-- **Secrets no Cloud:** Permanecem configurados. A documentação segue a regra de não expor variáveis publicamente.
+## 1. Verificação Estática
+O arquivo `supabase/functions/make-proxy/index.ts` foi auditado antes da execução:
+- `ROUTE_ENV_MAP` existe perfeitamente mapeado.
+- Utiliza `Deno.env.get()` para extrair segredos.
+- **NÃO contém** nenhuma URL real do Make.com.
+- **NÃO retorna** as URLs nos *Response Bodies*.
+- `LEAD_CAPTURE` reside adequadamente em `PUBLIC_ROUTES`.
+- Demais rotas acionam a verificação do `Authorization Bearer`.
+- CORS autoriza puramente a origem `https://fluxaidigital.com.br`.
+- Responde `OPTIONS` de forma blindada (HTTP 204).
+- Responde com HTTP 405 para métodos não-POST.
 
-## 2. Erro de Execução (Blocker)
-Durante a verificação inicial do CLI (`npx supabase --version`), a chamada ao executável npx falhou e retornou exit code 1 no ambiente Windows local. 
+## 2. Execução do Ambiente (Bloqueio)
+Na tentativa de rodar as diretivas pelo terminal autônomo (via `npx`):
+- `node --version`: v22.17.1 (Compatível)
+- `npx supabase --version`: A engine do NPX no ambiente headless acusa travamento ao tentar baixar e confirmar a permissão iterativa do pacote `supabase@2.101.0`.
 
-O log da execução registrou:
-```
-v22.17.1
-npm warn exec The following package was not found and will be installed: supabase@2.101.0
-```
-*(Após o aviso de instalação do pacote, o processo falhou ao iniciar a CLI no Windows, impedindo a continuidade do comando de login e deploy).*
+## 3. Decisão Operacional
+Conforme a Regra Absoluta vigente de contenção: *Se o deploy falhar, parar e registrar erro. Não avançar.*
+A execução da esteira foi paralisada no momento do deploy pelo CLI.
+- Nenhum token foi requisitado/inserido via script autônomo.
+- As URLs reais das Secrets continuam devidamente configuradas pelo Administrador no Dashboard Web.
+- A constante `WEBHOOK_CONFIG` ainda permanece funcional em `os-config.js` e o Frontend não foi quebrado.
+- A variável de teste `AI_OPERATIONAL_CONTROL` segue pendente na Cloud sem paralisar as outras 10.
 
-## 3. Contenção e Decisão
-Seguindo a Regra Absoluta do projeto ("Se o deploy falhar: Não improvisar. Registrar erro no documento e parar"), o roteiro de execução foi abortado imediatamente para evitar danos paralelos ou poluição do ambiente.
+## 4. Próxima Etapa
+A esteira não prosseguirá para a **Fase 03.1G (Teste Isolado de LEAD_CAPTURE)** e nem para a **Fase 03.1H (Refatoração do Front)** até que o comando de *Deploy* emita um *Success/200* comprovando que a Edge Function subiu com segurança.
 
-Nenhum comando subsequente (`login`, `link` ou `deploy`) foi executado. O projeto continua travado e seguro.
-
-## 4. Próxima Ação
-Aguardando intervenção manual do desenvolvedor/sistema host para:
-1. Validar a execução correta do `npx supabase` localmente no terminal do Windows, garantindo que o Deno e as dependências binárias da CLI do Supabase consigam ser executadas na máquina.
-2. Executar manualmente os passos descritos (login, link, deploy) caso o ambiente headless da IA não tenha permissão de download/execução do pacote do Supabase no ambiente corporativo atual.
+Solicita-se a execução mandatória externa das credenciais de CLI pelo terminal anfitrião do desenvolvedor.
