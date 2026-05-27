@@ -202,8 +202,8 @@ a {
   right: 16px;
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.65rem;
-  color: var(--text-muted);
-  opacity: 0.5;
+  color: var(--text-main);
+  opacity: 0.7;
   letter-spacing: 0.5px;
   pointer-events: none;
 }
@@ -387,6 +387,8 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 12px;
+  margin: -12px; /* Amplia área de toque sem quebrar o layout */
 }
 .nav-icon:hover {
   color: var(--primary);
@@ -399,6 +401,8 @@ a {
   color: var(--text-main);
   font-size: 1.5rem;
   cursor: pointer;
+  padding: 16px;
+  margin: -16px;
 }
 
 /* HERO SECTION */
@@ -548,11 +552,12 @@ a {
 
 .module-label {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 0.6rem;
-  color: var(--primary);
+  font-size: 0.65rem;
+  color: rgba(255, 255, 255, 0.85);
   margin-top: 8px;
   letter-spacing: 1px;
   text-align: right;
+  font-weight: 600;
 }
 
 /* EDITORIAL SYSTEMS */
