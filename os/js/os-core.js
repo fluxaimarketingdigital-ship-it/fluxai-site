@@ -108,6 +108,9 @@ export const OS_UI = {
         const nav = document.createElement('nav');
         nav.className = 'os-sidebar-nav';
         
+        // Helper para rotas seguras (suporta clean URLs em produção)
+        const getRoute = (baseName, params = '') => window.location.pathname.endsWith('.html') ? `${baseName}.html${params}` : `${baseName}${params}`;
+
         let currentGroup = "";
         navItems.forEach(item => {
             if (!item.roles.includes(userRole)) return;
@@ -133,12 +136,12 @@ export const OS_UI = {
             let href;
             if (item.id === 'client-portal') {
                 const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
-                href = `client-portal.html?project_id=${encodeURIComponent(pid)}`;
+                href = getRoute('client-portal', pid ? `?project_id=${encodeURIComponent(pid)}` : '');
             } else if (item.id === 'flux-calendar') {
                 const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
-                href = `flux-calendar.html?project=${encodeURIComponent(pid)}`;
+                href = getRoute('flux-calendar', pid ? `?project=${encodeURIComponent(pid)}` : '');
             } else {
-                href = `${encodeURIComponent(item.id)}.html`;
+                href = getRoute(encodeURIComponent(item.id));
             }
             
             const isLabs = item.id === 'fluxai-labs';
@@ -358,6 +361,8 @@ const FLUXAI_ALLOWED_USERS = Object.freeze({
  * @returns {object|null} user ou null após redirecionamento
  */
 window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermission = null) {
+    const getRoute = (baseName) => window.location.pathname.endsWith('.html') ? `${baseName}.html` : baseName;
+
     // 1. Se já existe contexto em RAM (mesma SPA session), reusar
     if (window.FLUXAI_RUNTIME_CONTEXT) {
         return _applyRBAC(window.FLUXAI_RUNTIME_CONTEXT, requiredRole, requiredPermission);
@@ -367,25 +372,37 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
     const supabase = getSupabase();
     if (!supabase) {
         console.warn('[BOOTSTRAP] Supabase indisponível. Redirecionando para login.');
-        window.location.href = 'login.html';
+        window.location.href = getRoute('login');
         return null;
     }
 
     let sessionUser = null;
+    let sessionObj = null;
     try {
         const { data } = await supabase.auth.getSession();
+        sessionObj = data?.session || null;
         sessionUser = data?.session?.user || null;
     } catch (err) {
         console.warn('[BOOTSTRAP] Erro ao obter sessão Supabase:', err.message);
     }
 
+    const email = sessionUser ? String(sessionUser.email || '').toLowerCase().trim() : null;
+    const knownProfile = email ? (FLUXAI_ALLOWED_USERS[email] || null) : null;
+
+    console.log("[AUTH_BOOTSTRAP]", {
+        route: window.location.pathname,
+        hasSession: !!sessionObj,
+        hasUser: !!sessionUser,
+        email: email,
+        mappedUser: !!knownProfile,
+        role: knownProfile?.role || null
+    });
+
     if (!sessionUser) {
         console.warn('[BOOTSTRAP] Sem sessão Supabase ativa. Redirecionando para login.');
-        window.location.href = 'login.html';
+        window.location.href = getRoute('login');
         return null;
     }
-
-    const email = String(sessionUser.email || '').toLowerCase().trim();
 
     // 3. Mapear e-mail para perfil operacional via allowlist (sem dados sensíveis)
     const knownProfile = FLUXAI_ALLOWED_USERS[email] || null;
@@ -437,20 +454,17 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
 
 /** Helper interno: aplica regras RBAC e bloqueia CLIENT em rotas internas */
 function _applyRBAC(user, requiredRole, requiredPermission) {
-    const CLIENT_BLOCKED_PATHS = [
-        'command-center', 'executive-center', 'contracts-finance',
-        'governance', 'governance-users', 'logs', 'clientes', 'leads',
-        'demandas', 'operations-center', 'onboarding', 'metricas',
-        'relatorio-mensal', 'content-engine', 'automation-hub'
-    ];
+    const getRoute = (baseName) => window.location.pathname.endsWith('.html') ? `${baseName}.html` : baseName;
 
     // Bloqueio de URL direta para CLIENT
     if (user.role === 'CLIENT') {
         const currentPath = window.location.pathname.toLowerCase();
-        const blocked = CLIENT_BLOCKED_PATHS.some(p => currentPath.includes(p));
-        if (blocked) {
+        // Permite client-portal, access-denied, login
+        const isAllowed = currentPath.includes('client-portal') || currentPath.includes('access-denied') || currentPath.includes('login');
+        
+        if (!isAllowed) {
             console.warn('[RBAC] CLIENT bloqueado de rota interna:', currentPath);
-            window.location.href = 'access-denied.html';
+            window.location.href = getRoute('client-portal');
             return null;
         }
     }
@@ -463,7 +477,7 @@ function _applyRBAC(user, requiredRole, requiredPermission) {
         }
         if (!hasAccess) {
             console.error('[RBAC] Acesso negado. Role insuficiente.', { user: user.role, required: requiredRole });
-            window.location.href = 'access-denied.html';
+            window.location.href = getRoute('access-denied');
             return null;
         }
     }
@@ -494,7 +508,7 @@ export const OS_AUTH = {
      */
     check: async (requiredRole = null, requiredPermission = null) => {
         // Delegar ao bootstrap global (reconstrói contexto via Supabase Auth se necessário)
-        return window.OS_AUTH_BOOTSTRAP(requiredRole, requiredPermission);
+        return await window.OS_AUTH_BOOTSTRAP(requiredRole, requiredPermission);
     },
 
 
@@ -523,7 +537,8 @@ export const OS_AUTH = {
                 console.warn('[AUTH] Erro no logout Supabase', err);
             }
         }
-        window.location.href = 'login.html';
+        const hasExt = window.location.pathname.endsWith('.html');
+        window.location.href = hasExt ? 'login.html' : 'login';
     }
 };
 

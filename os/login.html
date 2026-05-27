@@ -207,10 +207,13 @@
                 OS_LOGS_ENGINE.userAction('AUTH_LOGIN', { user_id: safeId, role: safeRole }, false);
             }
 
+            const getRoute = (baseName, params = '') => window.location.pathname.endsWith('.html') ? `${baseName}.html${params}` : `${baseName}${params}`;
+
             if (safeRole === 'CLIENT') {
-                window.location.href = `client-portal.html${safeProjectId ? '?project_id=' + encodeURIComponent(safeProjectId) : ''}`;
+                const q = safeProjectId ? `?project_id=${encodeURIComponent(safeProjectId)}` : '';
+                window.location.href = getRoute('client-portal', q);
             } else {
-                window.location.href = 'command-center.html';
+                window.location.href = getRoute('command-center');
             }
         });
 
