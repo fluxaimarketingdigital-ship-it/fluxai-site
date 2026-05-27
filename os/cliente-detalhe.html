@@ -8,70 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
-        :root {
-            --os-primary: #8e9e68;
-            --os-bg: #050705;
-            --os-surface: rgba(12, 15, 12, 0.95);
-            --os-border: rgba(142, 158, 104, 0.15);
-            --os-text: #e0e0e0;
-            --os-text-muted: #787878;
-            --os-success: #8e9e68;
-            --os-warning: #d97706;
-            --os-danger: #ef4444;
-            --os-info: #3b82f6;
-            --os-font-mono: 'JetBrains Mono', monospace;
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--os-bg);
-            color: var(--os-text);
-            overflow: hidden;
-        }
-
-        .os-shell {
-            display: flex;
-            height: 100vh;
-        }
-
-        .os-sidebar {
-            width: 280px;
-            background: rgba(10, 12, 10, 0.95);
-            backdrop-filter: blur(20px);
-            border-right: 1px solid var(--os-border);
-            z-index: 100;
-        }
-
-        .os-viewport-wrapper {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .os-topbar {
-            height: 70px;
-            background: rgba(8, 10, 8, 0.8);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid var(--os-border);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 40px;
-            z-index: 90;
-        }
-
-        .os-viewport {
-            flex: 1;
-            padding: 30px 40px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 25px;
-        }
-
         /* HEADER */
         .cockpit-header {
             display: flex;
@@ -496,7 +432,7 @@
                         <div class="ia-metric-row">
                             <div class="ia-metric-card">
                                 <div class="ia-metric-val" id="ia-limit-total">10</div>
-                                <div class="ia-metric-lbl">Limite total</div>
+                                <div class="ia-metric-lbl">Limite Operacional Contratado</div>
                             </div>
                             <div class="ia-metric-card">
                                 <div class="ia-metric-val" id="ia-limit-approved">0</div>
@@ -512,11 +448,11 @@
                             </div>
                         </div>
                         <div style="font-size: 0.7rem; color: var(--os-text-muted); line-height: 1.4; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.03); padding-bottom: 10px;">
-                            <strong>Regra de Limites:</strong> Rascunhos/Em Revisão não ocupam o limite operacional. Aprovados ocupam o limite contratado. Publicados ocupam definitivamente no ciclo.
+                            <strong>Regra de Limites:</strong> Rascunhos/Em Revisão não ocupam o limite operacional contratado. Aprovados ocupam o limite operacional contratado. Publicados ocupam definitivamente no ciclo.
                         </div>
                         <div style="display:flex; gap: 8px;">
                             <button id="btn-toggle-ia" class="control-btn"><i class="fa-solid fa-ban"></i> Bloquear IA</button>
-                            <button id="btn-adjust-limit" class="control-btn"><i class="fa-solid fa-arrows-spin"></i> Liberar Limite</button>
+                            <button id="btn-adjust-limit" class="control-btn"><i class="fa-solid fa-arrows-spin"></i> Liberar Limite Operacional Contratado</button>
                         </div>
                     </div>
                     
@@ -620,8 +556,8 @@
     <!-- Limit Adjust Modal -->
     <div id="limit-modal" class="os-modal">
         <div class="os-modal-content">
-            <h3 style="margin: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--os-primary);">Ajustar Limite Operacional IA</h3>
-            <p style="font-size: 0.7rem; color: var(--os-text-muted); margin: 0 0 10px;">Informe o novo limite de geração de IA a ser disponibilizado para este cliente no ciclo atual.</p>
+            <h3 style="margin: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--os-primary);">Ajustar Limite Operacional Contratado</h3>
+            <p style="font-size: 0.7rem; color: var(--os-text-muted); margin: 0 0 10px;">Informe o novo limite operacional contratado a ser disponibilizado para este cliente no ciclo atual.</p>
             <input type="number" id="input-new-limit" class="modal-input" placeholder="Novo limite (ex: 15)" />
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
                 <button class="control-btn" onclick="document.getElementById('limit-modal').style.display='none'">Cancelar</button>

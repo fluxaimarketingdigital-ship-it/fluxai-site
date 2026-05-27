@@ -22,7 +22,8 @@ async function loadDemands() {
             return;
         }
 
-        let html = `<table>
+        let html = `<div class="os-table-wrapper">
+            <table class="os-table">
             <thead>
                 <tr>
                     <th>Data</th>
@@ -37,19 +38,34 @@ async function loadDemands() {
             <tbody>`;
 
         demands.forEach(d => {
-            const prioClass = d.priority === 'alta' ? 'alta' : 'media';
+            let prioBadge = '';
+            if (d.priority === 'alta') {
+                prioBadge = '<span class="os-badge os-badge-danger">Alta</span>';
+            } else if (d.priority === 'media') {
+                prioBadge = '<span class="os-badge os-badge-warning">Média</span>';
+            } else {
+                prioBadge = '<span class="os-badge os-badge-success">Baixa</span>';
+            }
+
+            let statusBadge = `<span class="os-badge os-badge-neutral">${d.status}</span>`;
+            if (d.status === 'concluido' || d.status === 'entregue') {
+                statusBadge = `<span class="os-badge os-badge-success">${d.status}</span>`;
+            } else if (d.status === 'em_andamento') {
+                statusBadge = `<span class="os-badge os-badge-info">${d.status}</span>`;
+            }
+
             html += `<tr>
-                <td style="color: var(--os-text-muted);">${d.date}</td>
-                <td style="color: var(--os-text-muted);">${d.id}</td>
-                <td style="font-weight: 600; color: #fff;">${d.clientId}</td>
+                <td class="cell-mono">${d.date}</td>
+                <td class="cell-mono">${d.id}</td>
+                <td class="cell-primary">${d.clientId}</td>
                 <td>${d.title}</td>
-                <td><span class="badge ${prioClass}">${d.priority}</span></td>
-                <td><span class="badge" style="background: rgba(255,255,255,0.1); color: #ccc;">${d.status}</span></td>
+                <td>${prioBadge}</td>
+                <td>${statusBadge}</td>
                 <td>${d.deadline}</td>
             </tr>`;
         });
 
-        html += `</tbody></table>`;
+        html += `</tbody></table></div>`;
         container.innerHTML = html;
     } catch (e) {
         console.error(e);

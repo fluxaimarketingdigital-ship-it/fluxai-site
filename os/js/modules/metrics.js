@@ -25,34 +25,62 @@ async function loadMetrics() {
 
         // Instagram
         if (metrics.instagram) {
-            html += `<div class="os-widget half"><span class="os-widget-label">Instagram Diário</span><table>
-                <thead><tr><th>Cliente</th><th>Seguidores Novos</th><th>Alcance</th></tr></thead><tbody>
-                ${metrics.instagram.map(m => `<tr><td style="color:#fff;">${m.cliente_id}</td><td>${m.seguidores_novos}</td><td>${m.alcance}</td></tr>`).join('')}
-                </tbody></table></div>`;
+            html += `<div class="os-widget half">
+                <span class="os-widget-label">Instagram Diário</span>
+                <div class="os-table-wrapper" style="margin-top: 15px;">
+                    <table class="os-table">
+                        <thead><tr><th>Cliente</th><th>Seguidores Novos</th><th>Alcance</th></tr></thead>
+                        <tbody>
+                            ${metrics.instagram.map(m => `<tr><td class="cell-primary">${m.cliente_id}</td><td class="cell-mono">${m.seguidores_novos}</td><td class="cell-mono">${m.alcance}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
         }
         
         // Meta Ads
         if (metrics.metaAds) {
-            html += `<div class="os-widget half"><span class="os-widget-label">Meta Ads</span><table>
-                <thead><tr><th>Cliente</th><th>Investimento</th><th>CPL</th></tr></thead><tbody>
-                ${metrics.metaAds.map(m => `<tr><td style="color:#fff;">${m.cliente_id}</td><td>R$ ${m.investimento}</td><td>R$ ${m.cpl}</td></tr>`).join('')}
-                </tbody></table></div>`;
+            html += `<div class="os-widget half">
+                <span class="os-widget-label">Meta Ads</span>
+                <div class="os-table-wrapper" style="margin-top: 15px;">
+                    <table class="os-table">
+                        <thead><tr><th>Cliente</th><th>Investimento</th><th>CPL</th></tr></thead>
+                        <tbody>
+                            ${metrics.metaAds.map(m => `<tr><td class="cell-primary">${m.cliente_id}</td><td class="cell-mono">R$ ${m.investimento}</td><td class="cell-mono">R$ ${m.cpl}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
         }
 
         // GA4
         if (metrics.ga4) {
-            html += `<div class="os-widget half"><span class="os-widget-label">Google Analytics 4</span><table>
-                <thead><tr><th>Cliente</th><th>Sessões</th><th>Conversões</th></tr></thead><tbody>
-                ${metrics.ga4.map(m => `<tr><td style="color:#fff;">${m.cliente_id}</td><td>${m.sessoes}</td><td>${m.conversoes}</td></tr>`).join('')}
-                </tbody></table></div>`;
+            html += `<div class="os-widget half">
+                <span class="os-widget-label">Google Analytics 4</span>
+                <div class="os-table-wrapper" style="margin-top: 15px;">
+                    <table class="os-table">
+                        <thead><tr><th>Cliente</th><th>Sessões</th><th>Conversões</th></tr></thead>
+                        <tbody>
+                            ${metrics.ga4.map(m => `<tr><td class="cell-primary">${m.cliente_id}</td><td class="cell-mono">${m.sessoes}</td><td class="cell-mono">${m.conversoes}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
         }
 
         // Search Console
         if (metrics.searchConsole) {
-            html += `<div class="os-widget half"><span class="os-widget-label">Google Search Console</span><table>
-                <thead><tr><th>Cliente</th><th>Impressões</th><th>Cliques</th></tr></thead><tbody>
-                ${metrics.searchConsole.map(m => `<tr><td style="color:#fff;">${m.cliente_id}</td><td>${m.impressoes_organicas}</td><td>${m.cliques_organicos}</td></tr>`).join('')}
-                </tbody></table></div>`;
+            html += `<div class="os-widget half">
+                <span class="os-widget-label">Google Search Console</span>
+                <div class="os-table-wrapper" style="margin-top: 15px;">
+                    <table class="os-table">
+                        <thead><tr><th>Cliente</th><th>Impressões</th><th>Cliques</th></tr></thead>
+                        <tbody>
+                            ${metrics.searchConsole.map(m => `<tr><td class="cell-primary">${m.cliente_id}</td><td class="cell-mono">${m.impressoes_organicas}</td><td class="cell-mono">${m.cliques_organicos}</td></tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>`;
         }
 
         container.innerHTML = html;

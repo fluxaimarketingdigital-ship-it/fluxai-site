@@ -8,40 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <style>
-        :root {
-            --os-primary: #8e9e68;
-            --os-bg: #050705;
-            --os-surface: rgba(12, 15, 12, 0.95);
-            --os-border: rgba(142, 158, 104, 0.15);
-            --os-text: #e0e0e0;
-            --os-text-muted: #787878;
-            --os-success: #8e9e68;
-            --os-warning: #d97706;
-            --os-danger: #ef4444;
-            --os-info: #3b82f6;
-            --os-font-mono: 'JetBrains Mono', monospace;
-        }
-
-        body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background-color: var(--os-bg);
-            color: var(--os-text);
-            overflow: hidden;
-        }
-
-        .os-shell { display: flex; height: 100vh; }
-        .os-sidebar { width: 280px; background: rgba(10, 12, 10, 0.95); backdrop-filter: blur(20px); border-right: 1px solid var(--os-border); z-index: 100; }
-        .os-viewport-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .os-topbar { height: 70px; background: rgba(8, 10, 8, 0.8); backdrop-filter: blur(15px); border-bottom: 1px solid var(--os-border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 90; }
-        .os-viewport { flex: 1; padding: 30px 40px; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
-
-        .os-page-title h1 { font-size: 1.8rem; font-weight: 700; margin: 0; color: #fff; letter-spacing: -0.5px; }
-        .os-page-title p { color: var(--os-text-muted); font-size: 0.85rem; margin-top: 4px; }
-
-        .os-widget { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 6px; padding: 20px; }
-        .os-widget-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: var(--os-primary); margin-bottom: 15px; display: block; }
-
         /* CONTROL PANEL */
         .controls-row {
             display: flex;

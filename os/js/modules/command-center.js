@@ -90,7 +90,8 @@ async function loadCommandCenter() {
 
         // Render Client Health Table
         const healthContainer = document.getElementById('health-table-container');
-        let healthHtml = `<table>
+        let healthHtml = `<div class="os-table-wrapper">
+            <table class="os-table">
             <thead>
                 <tr>
                     <th>Cliente</th>
@@ -110,14 +111,14 @@ async function loadCommandCenter() {
             else badgeStyle = 'background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);';
 
             healthHtml += `<tr>
-                <td style="font-weight: 600; color: #fff;">${s.cliente_id}</td>
+                <td class="cell-primary">${s.cliente_id}</td>
                 <td>${s.servico}</td>
                 <td><span style="font-size:0.65rem; border:1px solid var(--os-border); padding:2px 6px; border-radius:4px;">${s.status_operacional.replace('_', ' ')}</span></td>
-                <td><span class="badge" style="${badgeStyle}">${s.criticidade}</span></td>
+                <td><span class="os-badge" style="${badgeStyle}">${s.criticidade}</span></td>
                 <td style="color: var(--os-text-muted); font-size:0.75rem;">${s.acao_recomendada}</td>
             </tr>`;
         });
-        healthHtml += `</tbody></table>`;
+        healthHtml += `</tbody></table></div>`;
         healthContainer.innerHTML = healthHtml;
 
     } catch (e) {

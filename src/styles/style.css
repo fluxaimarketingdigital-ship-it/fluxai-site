@@ -1,4 +1,4 @@
-﻿/* CUSTOM SCROLLBAR - PadrÃ£o FluxAI */
+/* CUSTOM SCROLLBAR - PadrÃ£o FluxAI */
 ::-webkit-scrollbar { width: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-white); }
 ::-webkit-scrollbar-thumb { 
@@ -98,8 +98,6 @@ body {
   background-color: var(--bg-white);
   line-height: 1.6;
   overflow-x: hidden;
-  opacity: 0;
-  transition: opacity 1s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -111,9 +109,6 @@ h1, h2, h3, h4, h5, h6 {
 
 h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); margin-bottom: 20px; }
 h3 { font-size: clamp(1.4rem, 3vw, 1.8rem); margin-bottom: 16px; }
-body.loaded {
-  opacity: 1;
-}
 
 img {
   max-width: 100%;

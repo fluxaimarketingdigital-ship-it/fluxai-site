@@ -1,32 +1,3 @@
-export const SHEETS_CONFIG = {
-    // Configurações futuras para conexão via API da Google Sheets ou via webhook
-    apiUrl: '',
-    apiKey: '',
-    mockEnabled: true, // Mantém true enquanto usamos mock data
-    tabs: {
-        CLIENTES: 'CLIENTES_CONFIG',
-        SERVICOS: 'SERVICOS_CLIENTES',
-        ROTAS: 'ROTAS_AUTOMACOES',
-        DEMANDAS: 'DEMANDAS_CLIENTES',
-        LEADS_SITE: 'LEADS_SITE',
-        GA4: 'GA4_DIARIO',
-        CLARITY: 'CLARITY_DIARIO',
-        SEARCH_CONSOLE: 'SEARCH_CONSOLE_DIARIO',
-        INSTAGRAM: 'INSTAGRAM_DIARIO',
-        META_ADS: 'META_ADS_DIARIO',
-        STATUS: 'STATUS_MONITOR_DIARIO',
-        ANALISE_MENSAL: 'ANALISE_MENSAL_CLIENTE',
-        ARQUIVOS: 'CLIENTES_ARQUIVOS',
-        ESTRATEGIA: 'CLIENTES_ESTRATEGIA',
-        CONTRATOS: 'CONTRATOS_CLIENTES',
-        SERVICOS_EXTRAS: 'SERVICOS_EXTRAS_CLIENTES',
-        DNA_GPT: 'DNA_CLIENTE_GPT',
-        PLANEJAMENTO: 'PLANEJAMENTO_CONTEUDO',
-        CALENDARIO: 'CALENDARIO_POSTAGENS',
-        GPT_LOG: 'GPT_GERACOES_LOG',
-        LEADS_CLIENTES: 'LEADS_CLIENTES',
-        IA_CREDITOS: 'IA_CREDITOS_CLIENTE',
-        IA_CONTROLE: 'IA_GERACOES_CONTROLE',
-        CATALOGO: 'CATALOGO_SERVICOS_FLUXAI'
-    }
-};
+import { OS_CONFIG } from '../config/os-config.js';
+export const SHEETS_CONFIG = OS_CONFIG.sheets;
+

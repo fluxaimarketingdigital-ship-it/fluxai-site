@@ -1,0 +1,5 @@
+file 'C:/Users/BRENDA/Desktop/Identidade Visual FluxAI/FLUXAI_SITE/os/docs/treinamento/videos/temp/video_07/step_001.mp4'
+file 'C:/Users/BRENDA/Desktop/Identidade Visual FluxAI/FLUXAI_SITE/os/docs/treinamento/videos/temp/video_07/step_002.mp4'
+file 'C:/Users/BRENDA/Desktop/Identidade Visual FluxAI/FLUXAI_SITE/os/docs/treinamento/videos/temp/video_07/step_003.mp4'
+file 'C:/Users/BRENDA/Desktop/Identidade Visual FluxAI/FLUXAI_SITE/os/docs/treinamento/videos/temp/video_07/step_004.mp4'
+file 'C:/Users/BRENDA/Desktop/Identidade Visual FluxAI/FLUXAI_SITE/os/docs/treinamento/videos/temp/video_07/step_005.mp4'

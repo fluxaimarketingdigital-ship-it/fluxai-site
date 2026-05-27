@@ -67,7 +67,7 @@ export const FEATURE_FLAGS = {
     // Fonte de dados
     mockData:             ENVIRONMENT_CONFIG.isDev,   // true em dev, false em prod
     sendRealWebhooks:     false,                      // GLOBALMENTE DESATIVADO por padrão para segurança
-    enabledRealWebhooks:  ['LEAD_CAPTURE', 'DEMAND_SUBMISSION', 'CLIENT_ONBOARDING', 'SERVICE_EXTRA_REQUEST', 'SERVICE_EXTRA_APPROVAL'], // Apenas estes webhooks listados disparam real (homologação gradual)
+    enabledRealWebhooks:  ['LEAD_CAPTURE', 'DEMAND_SUBMISSION', 'CLIENT_ONBOARDING', 'SERVICE_EXTRA_REQUEST', 'SERVICE_EXTRA_APPROVAL', 'AI_OPERATIONAL_CONTROL'], // Apenas estes webhooks listados disparam real (homologação gradual)
     useSupabaseAuth:      true,   // Supabase é o auth primário (fallback: mock users)
     useSheetsAPI:         false,  // Google Sheets API direta (fase 2)
     useMakeWebhooks:      true,   // Webhooks Make como canal de escrita
@@ -121,25 +121,26 @@ export const WEBHOOK_CONFIG = {
     SERVICE_EXTRA_REQUEST: 'https://hook.us2.make.com/rplnhe37vqvzcjh6gu92ltpvr8rirean',
 
     // 11_FLUXAI_IA_CREDITOS_CONTROLE (Controle de créditos e consumo de IA)
-    IA_CREDITOS_CONTROLE: '',
+    IA_CREDITOS_CONTROLE: 'https://hook.us2.make.com/667mka2gvio5g6fpe1mgi39j5rmxeoo4',
+    AI_OPERATIONAL_CONTROL: 'https://hook.us2.make.com/667mka2gvio5g6fpe1mgi39j5rmxeoo4',
 
     // 12_FLUXAI_SERVICO_EXTRA_APROVACAO (Aprovação de orçamento de serviço extra)
     SERVICE_EXTRA_APPROVAL: 'https://hook.us2.make.com/tpmta55my8fjptkue3oll3y2e3aykrr6',
 
     // 13_FLUXAI_IA_GUARDRAIL (Auditoria de qualidade e segurança do prompt de IA)
-    IA_GUARDRAIL: '',
+    IA_GUARDRAIL: 'https://hook.us2.make.com/v19wgjtxye8uqpfkcmauag4s7wjdz767',
 
     // 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC (Sincronização de arquivos do Google Drive)
     CLIENTES_ARQUIVOS_SYNC: '',
 
     // 15_FLUXAI_PLANEJAMENTO_CONTEUDO (Aprovação e ajustes de pautas/planejamento)
-    PLANEJAMENTO_CONTEUDO: '',
+    PLANEJAMENTO_CONTEUDO: 'https://hook.us2.make.com/ggmqkgpb7ea13dw5i1jprrnyox24u5ba',
 
     // 16_FLUXAI_CALENDARIO_POSTAGENS (Aprovação final e publicação de posts)
-    CALENDARIO_POSTAGENS: '',
+    CALENDARIO_POSTAGENS: 'https://hook.us2.make.com/hxbcsiiti62ha5erdxbp24tats04vti5',
 
     // 17_FLUXAI_GPT_GERACOES_LOG (Log de geração e uso do GPT)
-    GPT_GERACOES_LOG: '',
+    GPT_GERACOES_LOG: 'https://hook.us2.make.com/g5l7uhmgir0uhs5v4d9xdfk6jgha5smy',
 
     // 18_FLUXAI_LEADS_CLIENTES (Leads gerados/atualizados dentro da carteira do cliente)
     LEADS_CLIENTES: '',
@@ -174,10 +175,13 @@ export const WEBHOOK_CONFIG = {
                 : 'CALENDARIO_POSTAGENS';
         } else if (webhookKey === 'SERVICE_EXTRA_INTERNAL') {
             targetKey = 'SERVICE_EXTRA_APPROVAL';
+        } else if (webhookKey === 'IA_CREDITOS_CONTROLE') {
+            targetKey = 'AI_OPERATIONAL_CONTROL';
         }
 
-        const isReal = FEATURE_FLAGS.sendRealWebhooks || 
-                       (Array.isArray(FEATURE_FLAGS.enabledRealWebhooks) && FEATURE_FLAGS.enabledRealWebhooks.includes(targetKey));
+        const isReal = (FEATURE_FLAGS.sendRealWebhooks || 
+                       (Array.isArray(FEATURE_FLAGS.enabledRealWebhooks) && FEATURE_FLAGS.enabledRealWebhooks.includes(targetKey))) &&
+                       WEBHOOK_CONFIG._isConfigured(targetKey);
         const isSimulated = !isReal;
         
         if (typeof console !== 'undefined') {

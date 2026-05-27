@@ -7,26 +7,7 @@
     <link rel="stylesheet" href="./styles/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-    <style>
-        :root { --os-primary: #8e9e68; --os-bg: #050705; --os-surface: rgba(15, 18, 15, 0.7); --os-border: rgba(142, 158, 104, 0.15); --os-text: #e0e0e0; --os-text-muted: #888; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background-color: var(--os-bg); color: var(--os-text); overflow: hidden; }
-        .os-bg-glow { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at 0% 0%, rgba(142, 158, 104, 0.15) 0%, transparent 40%), radial-gradient(circle at 100% 100%, rgba(142, 158, 104, 0.1) 0%, transparent 40%); z-index: -1; }
-        .os-shell { display: flex; height: 100vh; }
-        .os-sidebar { width: 280px; background: rgba(10, 12, 10, 0.8); backdrop-filter: blur(20px); border-right: 1px solid var(--os-border); z-index: 100; }
-        .os-viewport-wrapper { flex: 1; display: flex; flex-direction: column; overflow: hidden; position: relative; }
-        .os-topbar { height: 70px; background: rgba(10, 12, 10, 0.4); backdrop-filter: blur(15px); border-bottom: 1px solid var(--os-border); display: flex; align-items: center; justify-content: space-between; padding: 0 40px; z-index: 90; }
-        .os-viewport { flex: 1; padding: 40px; overflow-y: auto; }
-        .os-page-title h1 { font-size: 2.2rem; font-weight: 800; margin: 0; background: linear-gradient(to right, #fff, var(--os-primary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .os-page-title p { color: var(--os-text-muted); font-size: 0.9rem; margin-top: 5px; }
-        .os-widget { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 16px; padding: 20px; margin-top: 30px; position: relative; overflow: hidden; }
-        .os-widget-label { font-size: 0.65rem; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: var(--os-primary); }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { text-align: left; padding: 12px; border-bottom: 1px solid var(--os-border); font-size: 0.85rem; }
-        th { color: var(--os-text-muted); font-weight: 600; text-transform: uppercase; font-size: 0.7rem; letter-spacing: 1px; }
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .badge.novo { background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
-        .badge.em_negociacao { background: rgba(59, 130, 246, 0.1); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3); }
-    </style>
+
 </head>
 <body>
     <div class="os-bg-glow"></div>

@@ -66,8 +66,78 @@ function bindEvents(app) {
         );
         
         if (!transitionResult.success) {
-            alert(`Erro na transição: ${transitionResult.error}`);
+            alert(`Erro de Governança: Transição inválida.\nMotivo: ${transitionResult.error}`);
             return;
+        }
+
+        const isReal = OS_CONFIG.flags.sendRealWebhooks || 
+                       (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(transitionResult.webhook));
+
+        // Disparar webhook real ANTES de qualquer persistência no banco
+        if (transitionResult.webhook) {
+            const payload = {
+                approval_id: app.id,
+                project_id: app.project_id,
+                type: app.type,
+                status: 'aprovado',
+                feedback: null,
+                timestamp: new Date().toISOString()
+            };
+            const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+            if (!response.success && isReal) {
+                console.error('[DELIVERY_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
+
+                OS_LOGS_ENGINE.userAction(
+                    'WEBHOOK_REAL_FAILED',
+                    'client-approval',
+                    { webhook: transitionResult.webhook, error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'GOVERNANCE_ABORTED',
+                    'client-approval',
+                    { action: 'aprovar_entrega', reason: 'Falha no webhook real de integração' },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.security(
+                    'SECURITY_WARNING',
+                    { 
+                        action: 'aprovacao_entrega_cancelada_erro_conexao', 
+                        client_id: app.project_id, 
+                        role: 'CLIENT', 
+                        error: response.error,
+                        timestamp: new Date().toISOString()
+                    },
+                    'critical'
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'ROLLBACK_STARTED',
+                    'client-approval',
+                    { reason: 'Falha na resposta do webhook', client_id: app.project_id, preserved_status: app.status },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'ROLLBACK_COMPLETED',
+                    'client-approval',
+                    { client_id: app.project_id, restored_status: app.status, local_db_status: 'CONSISTENT_UNMODIFIED' },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado.`);
+                return;
+            }
         }
 
         try {
@@ -79,20 +149,19 @@ function bindEvents(app) {
                 'client-approval',
                 { id: app.id, type: app.type, client_id: app.project_id },
                 'CLIENT',
-                null
+                app.project_id,
+                false
             );
 
-            // Disparar webhook simulado/real
-            if (transitionResult.webhook) {
-                const payload = {
-                    approval_id: app.id,
-                    project_id: app.project_id,
-                    type: app.type,
-                    status: 'aprovado',
-                    feedback: null,
-                    timestamp: new Date().toISOString()
-                };
-                await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+            if (isReal) {
+                OS_LOGS_ENGINE.userAction(
+                    'WEBHOOK_REAL_SUCCESS',
+                    'client-approval',
+                    { webhook: transitionResult.webhook },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
             }
 
             alert('Aprovado com sucesso! Obrigado.');
@@ -132,8 +201,78 @@ function bindEvents(app) {
         );
         
         if (!transitionResult.success) {
-            alert(`Erro na transição: ${transitionResult.error}`);
+            alert(`Erro de Governança: Transição inválida.\nMotivo: ${transitionResult.error}`);
             return;
+        }
+
+        const isReal = OS_CONFIG.flags.sendRealWebhooks || 
+                       (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(transitionResult.webhook));
+
+        // Disparar webhook real ANTES de qualquer persistência no banco
+        if (transitionResult.webhook) {
+            const payload = {
+                approval_id: app.id,
+                project_id: app.project_id,
+                type: app.type,
+                status: 'alteracao',
+                feedback: feedback,
+                timestamp: new Date().toISOString()
+            };
+            const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+            if (!response.success && isReal) {
+                console.error('[DELIVERY_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
+
+                OS_LOGS_ENGINE.userAction(
+                    'WEBHOOK_REAL_FAILED',
+                    'client-approval',
+                    { webhook: transitionResult.webhook, error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'GOVERNANCE_ABORTED',
+                    'client-approval',
+                    { action: 'solicitar_alteracao', reason: 'Falha no webhook real de integração' },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.security(
+                    'SECURITY_WARNING',
+                    { 
+                        action: 'solicitacao_alteracao_cancelada_erro_conexao', 
+                        client_id: app.project_id, 
+                        role: 'CLIENT', 
+                        error: response.error,
+                        timestamp: new Date().toISOString()
+                    },
+                    'critical'
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'ROLLBACK_STARTED',
+                    'client-approval',
+                    { reason: 'Falha na resposta do webhook', client_id: app.project_id, preserved_status: app.status },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'ROLLBACK_COMPLETED',
+                    'client-approval',
+                    { client_id: app.project_id, restored_status: app.status, local_db_status: 'CONSISTENT_UNMODIFIED' },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado.`);
+                return;
+            }
         }
 
         try {
@@ -148,20 +287,19 @@ function bindEvents(app) {
                 'client-approval',
                 { id: app.id, type: app.type, client_id: app.project_id, feedback },
                 'CLIENT',
-                null
+                app.project_id,
+                false
             );
 
-            // Disparar webhook
-            if (transitionResult.webhook) {
-                const payload = {
-                    approval_id: app.id,
-                    project_id: app.project_id,
-                    type: app.type,
-                    status: 'alteracao',
-                    feedback: feedback,
-                    timestamp: new Date().toISOString()
-                };
-                await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+            if (isReal) {
+                OS_LOGS_ENGINE.userAction(
+                    'WEBHOOK_REAL_SUCCESS',
+                    'client-approval',
+                    { webhook: transitionResult.webhook },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
             }
 
             alert('Solicitação de alteração enviada. Vamos ajustar e te avisar!');
@@ -185,8 +323,78 @@ function bindEvents(app) {
         );
         
         if (!transitionResult.success) {
-            alert(`Erro na transição: ${transitionResult.error}`);
+            alert(`Erro de Governança: Transição inválida.\nMotivo: ${transitionResult.error}`);
             return;
+        }
+
+        const isReal = OS_CONFIG.flags.sendRealWebhooks || 
+                       (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(transitionResult.webhook));
+
+        // Disparar webhook real ANTES de qualquer persistência no banco
+        if (transitionResult.webhook) {
+            const payload = {
+                approval_id: app.id,
+                project_id: app.project_id,
+                type: app.type,
+                status: 'rejeitado',
+                feedback: null,
+                timestamp: new Date().toISOString()
+            };
+            const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+            if (!response.success && isReal) {
+                console.error('[DELIVERY_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
+
+                OS_LOGS_ENGINE.userAction(
+                    'WEBHOOK_REAL_FAILED',
+                    'client-approval',
+                    { webhook: transitionResult.webhook, error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'GOVERNANCE_ABORTED',
+                    'client-approval',
+                    { action: 'rejeitar_entrega', reason: 'Falha no webhook real de integração' },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.security(
+                    'SECURITY_WARNING',
+                    { 
+                        action: 'rejeicao_entrega_cancelada_erro_conexao', 
+                        client_id: app.project_id, 
+                        role: 'CLIENT', 
+                        error: response.error,
+                        timestamp: new Date().toISOString()
+                    },
+                    'critical'
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'ROLLBACK_STARTED',
+                    'client-approval',
+                    { reason: 'Falha na resposta do webhook', client_id: app.project_id, preserved_status: app.status },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'ROLLBACK_COMPLETED',
+                    'client-approval',
+                    { client_id: app.project_id, restored_status: app.status, local_db_status: 'CONSISTENT_UNMODIFIED' },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
+
+                alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado.`);
+                return;
+            }
         }
 
         try {
@@ -198,20 +406,19 @@ function bindEvents(app) {
                 'client-approval',
                 { id: app.id, type: app.type, client_id: app.project_id },
                 'CLIENT',
-                null
+                app.project_id,
+                false
             );
 
-            // Disparar webhook
-            if (transitionResult.webhook) {
-                const payload = {
-                    approval_id: app.id,
-                    project_id: app.project_id,
-                    type: app.type,
-                    status: 'rejeitado',
-                    feedback: null,
-                    timestamp: new Date().toISOString()
-                };
-                await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+            if (isReal) {
+                OS_LOGS_ENGINE.userAction(
+                    'WEBHOOK_REAL_SUCCESS',
+                    'client-approval',
+                    { webhook: transitionResult.webhook },
+                    'CLIENT',
+                    app.project_id,
+                    false
+                );
             }
 
             alert('Material reprovado.');

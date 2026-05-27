@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Executive Center</title>
+    <link rel="stylesheet" href="./styles/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body class="os-mode">
+    <div class="os-bg-glow"></div>
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+
+        <div class="os-viewport-wrapper">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-header">
+                    <div class="os-page-title">
+                        <h1 class="gradient">Executive Center</h1>
+                        <p>Gestão executiva corporativa, métricas de crescimento, financeiro consolidado e análise de LTV/Churn.</p>
+                    </div>
+                </div>
+
+                <!-- KPI EXECUTIVE GRID -->
+                <div class="os-widget-grid" id="executive-kpi-grid">
+                    <div class="os-widget" style="grid-column: span 3; opacity: 0.5;">
+                        Carregando KPIs...
+                    </div>
+                </div>
+
+                <div class="os-widget-grid" style="margin-top: 24px;">
+                    <!-- FINANCIAL SUMMARY CARD -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Saúde Financeira por Cliente</span>
+                            <i class="fa-solid fa-file-invoice-dollar" style="opacity: 0.5;"></i>
+                        </div>
+                        <div class="os-table-wrapper">
+                            <table class="os-table" id="table-exec-finance">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Valor Contratado</th>
+                                        <th>Valor Recebido</th>
+                                        <th>Valor em Aberto</th>
+                                        <th>Vencimento</th>
+                                        <th>Status Financeiro</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="6" style="text-align:center; padding: 20px; opacity:0.5;">Carregando dados financeiros...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- CONTRACT CONTROL CARD -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Gestão de Contratos de Clientes</span>
+                            <i class="fa-solid fa-file-contract" style="opacity: 0.5;"></i>
+                        </div>
+                        <div class="os-table-wrapper">
+                            <table class="os-table" id="table-exec-contracts">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Cliente / Razão</th>
+                                        <th>Entregáveis Acordados</th>
+                                        <th>Renovação</th>
+                                        <th>Drive</th>
+                                        <th>Status Contrato</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="6" style="text-align:center; padding: 20px; opacity:0.5;">Carregando contratos...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- COMERCIAL FUNNEL CARD -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Pipeline de Leads e CRM Comercial</span>
+                            <i class="fa-solid fa-funnel-dollar" style="opacity: 0.5;"></i>
+                        </div>
+                        <div class="os-table-wrapper">
+                            <table class="os-table" id="table-exec-commercial">
+                                <thead>
+                                    <tr>
+                                        <th>Lead</th>
+                                        <th>Origem</th>
+                                        <th>Interesse</th>
+                                        <th>Responsável</th>
+                                        <th>Status Comercial</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5" style="text-align:center; padding: 20px; opacity:0.5;">Carregando funil comercial...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- INTERNAL OPERATIONS CAPACITY CARD -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Estatísticas de Carga Operacional</span>
+                            <i class="fa-solid fa-chart-line" style="opacity: 0.5;"></i>
+                        </div>
+                        <div class="os-table-wrapper">
+                            <table class="os-table" id="table-exec-operations">
+                                <thead>
+                                    <tr>
+                                        <th>Indicador Operacional</th>
+                                        <th>Métrica Atual</th>
+                                        <th>Severidade</th>
+                                        <th>Status Operacional</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Carregando métricas operacionais...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="./js/modules/executive-center.js"></script>
+</body>
+</html>

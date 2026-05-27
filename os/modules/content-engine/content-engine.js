@@ -140,8 +140,11 @@ export async function initEngine() {
                 const selectedId = document.getElementById('project-filter').value;
                 if (!selectedId) return alert('Selecione um cliente específico para enviar o lembrete direto.');
                 const portalLink = `${window.location.origin}/os/client-portal.html?project_id=${selectedId}`;
-                const msg = `Olá! 🚀%0A%0APassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.%0A%0AConfira aqui seu calendário atualizado:%0A${portalLink}`;
-                window.open(`https://wa.me/?text=${msg}`, '_blank');
+                const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+                const project = mockProjects.find(p => p.id === selectedId);
+                const phone = project?.digital_infrastructure?.operational_links?.whatsapp || '';
+                const msgText = `Olá! 🚀\n\nPassando para lembrar que temos conteúdos aguardando sua aprovação no portal da FluxAI.\n\nConfira aqui seu calendário atualizado:\n${portalLink}`;
+                window.triggerWhatsAppContact(phone, msgText);
             };
         }
 
@@ -555,8 +558,37 @@ window.openEditModal = async (id) => {
         const metaGrid = document.getElementById('edit-asset-meta-fields');
         if (metaGrid) {
             metaGrid.style.display = 'grid';
-            metaGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
+            metaGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
             metaGrid.style.gap = '20px';
+
+            const currentLogical = mapToStandardStatus(c.status).toLowerCase();
+            const currentStatusObj = StatusEngine.resolve('conteudos', currentLogical);
+            const allowedTransitions = STATUS_SYSTEM.conteudos[currentLogical]?.allowedTransitions || [];
+
+            const statusSelectorHtml = `
+                <div>
+                    <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">STATUS OPERACIONAL (GOVERNANÇA)</label>
+                    <select id="edit-asset-status-selector" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
+                        <option value="${c.status}">${currentStatusObj.label} (Atual)</option>
+                        ${allowedTransitions.map(target => {
+                            const targetRes = StatusEngine.resolve('conteudos', target);
+                            let dbStatusVal = target.toUpperCase();
+                            if (target === 'draft_planning') dbStatusVal = 'PLANEJAMENTO';
+                            else if (target === 'internal_review') dbStatusVal = 'REVISÃO GESTÃO';
+                            else if (target === 'client_review_planning') dbStatusVal = 'APROVAÇÃO PLANEJAMENTO';
+                            else if (target === 'client_revision_planning') dbStatusVal = 'AJUSTE';
+                            else if (target === 'in_production') dbStatusVal = 'PRODUÇÃO';
+                            else if (target === 'client_revision_content') dbStatusVal = 'AJUSTE DE PRODUÇÃO';
+                            else if (target === 'internal_qa') dbStatusVal = 'REVISÃO INTERNA FINAL';
+                            else if (target === 'client_review_content') dbStatusVal = 'APROVAÇÃO FINAL';
+                            else if (target === 'ready_to_post') dbStatusVal = 'PRONTO';
+                            else if (target === 'posted') dbStatusVal = 'PUBLICADO';
+                            return `<option value="${dbStatusVal}">Mudar para: ${targetRes.label}</option>`;
+                        }).join('')}
+                    </select>
+                </div>
+            `;
+
             metaGrid.innerHTML = `
                 <div>
                     <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONSÁVEL</label>
@@ -579,6 +611,7 @@ window.openEditModal = async (id) => {
                         <option value="ALTA">ALTA</option>
                     </select>
                 </div>
+                ${statusSelectorHtml}
             `;
 
             document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || 'Design';
@@ -684,6 +717,19 @@ window.rejectAndFreezeVersion = async (id) => {
 
 window.saveAssetEdit = async () => {
     try {
+        const userRole = OS_AUTH.user?.role || 'OPERATOR';
+        
+        // Rígida Governança e RBAC: CLIENT bloqueado
+        if (userRole === 'CLIENT') {
+            alert('Acesso negado: Perfil CLIENT não tem autorização para gerenciar ou aprovar IA/conteúdos.');
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { action: 'tentativa_negada_salvamento_edicao', asset_id: editingAssetId, role: userRole },
+                'critical'
+            );
+            return;
+        }
+
         const title = document.getElementById('edit-asset-title').value;
         const caption = document.getElementById('edit-asset-caption').value;
         const ref = document.getElementById('edit-asset-ref').value;
@@ -720,19 +766,176 @@ window.saveAssetEdit = async () => {
             versions: versions
         };
 
+        const statusSelectEl = document.getElementById('edit-asset-status-selector');
+        let nextStatus = statusSelectEl ? statusSelectEl.value : currentAssetData.status;
+
+        // Sobrescrita lógica pelas checkboxes
+        const std = mapToStandardStatus(currentAssetData.status);
+        if (strat && oper && clie) {
+            nextStatus = 'PRONTO';
+        } else if (strat && oper && !clie && std !== 'CLIENT_REVIEW_CONTENT') {
+            nextStatus = 'APROVAÇÃO FINAL';
+        }
+
         let updatePayload = {
             title,
             caption: versions[currentAssetData.metadata?.version || 'V1']?.caption || caption,
             priority,
-            metadata: newMetadata
+            metadata: newMetadata,
+            status: nextStatus
         };
 
-        // Mapear status dinâmicos
-        const std = mapToStandardStatus(currentAssetData.status);
-        if (strat && oper && clie) {
-            updatePayload.status = 'READY_TO_POST';
-        } else if (strat && oper && !clie && std !== 'CLIENT_REVIEW_CONTENT') {
-            updatePayload.status = 'CLIENT_REVIEW_CONTENT';
+        const currentLogical = mapToStandardStatus(currentAssetData.status).toLowerCase();
+        const targetLogical = mapToStandardStatus(nextStatus).toLowerCase();
+
+        if (currentLogical !== targetLogical) {
+            const validation = StatusEngine.validateTransition('conteudos', currentLogical, targetLogical, userRole);
+            if (!validation.valid) {
+                alert('Transição inválida: ' + validation.reason);
+                return;
+            }
+
+            // Determinar webhook PLANEJAMENTO_CONTEUDO ou CALENDARIO_POSTAGENS
+            const isPlanning = targetLogical.includes('planning') || 
+                               ['draft_planning', 'internal_review', 'internal_revision', 'client_review_planning', 'client_revision_planning', 'planning_approved'].includes(targetLogical);
+            const webhookKey = isPlanning ? 'PLANEJAMENTO_CONTEUDO' : 'CALENDARIO_POSTAGENS';
+
+            const payload = {
+                client_id: currentAssetData.project_id || currentProject,
+                asset_id: editingAssetId,
+                title: title,
+                status_anterior: currentAssetData.status,
+                status_novo: nextStatus,
+                logical_transition: `${currentLogical}->${targetLogical}`,
+                timestamp: new Date().toISOString()
+            };
+
+            const response = await OS_CONFIG.webhooks.send(webhookKey, payload);
+            const isWebhookReal = (OS_CONFIG.flags.sendRealWebhooks || 
+                                  (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(webhookKey))) &&
+                                  OS_CONFIG.webhooks._isConfigured(webhookKey);
+
+            if (!response.success) {
+                // Rollback block em caso de falha de conexão
+                OS_LOGS_ENGINE.userAction(
+                    'WEBHOOK_REAL_FAILED',
+                    'content-engine',
+                    { webhook: webhookKey, error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                    userRole,
+                    currentAssetData.project_id || currentProject,
+                    false
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'GOVERNANCE_ABORTED',
+                    'content-engine',
+                    { action: 'salvar_edicao_status', reason: 'Falha no webhook real de integração', asset_id: editingAssetId },
+                    userRole,
+                    currentAssetData.project_id || currentProject,
+                    false
+                );
+
+                OS_LOGS_ENGINE.security(
+                    'SECURITY_WARNING',
+                    { 
+                        action: 'transicao_status_cancelada_erro_conexao', 
+                        client_id: currentAssetData.project_id || currentProject, 
+                        role: userRole, 
+                        asset_id: editingAssetId,
+                        error: response.error,
+                        timestamp: new Date().toISOString()
+                    },
+                    'critical'
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'ROLLBACK_STARTED',
+                    'content-engine',
+                    { 
+                        reason: 'Falha na resposta do webhook de transição de status',
+                        client_id: currentAssetData.project_id || currentProject, 
+                        asset_id: editingAssetId,
+                        preserved_status: currentAssetData.status
+                    },
+                    userRole,
+                    currentAssetData.project_id || currentProject,
+                    false
+                );
+
+                OS_LOGS_ENGINE.userAction(
+                    'ROLLBACK_COMPLETED',
+                    'content-engine',
+                    { 
+                        client_id: currentAssetData.project_id || currentProject, 
+                        asset_id: editingAssetId,
+                        restored_status: currentAssetData.status,
+                        local_db_status: 'CONSISTENT_UNMODIFIED'
+                    },
+                    userRole,
+                    currentAssetData.project_id || currentProject,
+                    false
+                );
+
+                alert('Erro de conexão com o Webhook. Transição abortada e estado anterior mantido.');
+                return;
+            }
+
+            // Webhook real success
+            OS_LOGS_ENGINE.userAction(
+                'WEBHOOK_REAL_SUCCESS',
+                'content-engine',
+                { webhook: webhookKey, status: response.status || 200 },
+                userRole,
+                currentAssetData.project_id || currentProject,
+                !isWebhookReal
+            );
+
+            // Gravar logs específicos
+            if (targetLogical === 'internal_review' || targetLogical === 'client_review_planning') {
+                OS_LOGS_ENGINE.userAction(
+                    'PLANNING_REVIEW_STARTED',
+                    'content-engine',
+                    { asset_id: editingAssetId },
+                    userRole,
+                    currentAssetData.project_id || currentProject,
+                    !isWebhookReal
+                );
+            } else if (targetLogical === 'planning_approved') {
+                OS_LOGS_ENGINE.userAction(
+                    'PLANNING_APPROVED',
+                    'content-engine',
+                    { asset_id: editingAssetId },
+                    userRole,
+                    currentAssetData.project_id || currentProject,
+                    !isWebhookReal
+                );
+            } else if (targetLogical === 'ready_to_post') {
+                OS_LOGS_ENGINE.userAction(
+                    'CONTENT_SCHEDULED',
+                    'content-engine',
+                    { asset_id: editingAssetId },
+                    userRole,
+                    currentAssetData.project_id || currentProject,
+                    !isWebhookReal
+                );
+                OS_LOGS_ENGINE.userAction(
+                    'CALENDAR_ITEM_CREATED',
+                    'content-engine',
+                    { asset_id: editingAssetId },
+                    userRole,
+                    currentAssetData.project_id || currentProject,
+                    !isWebhookReal
+                );
+            }
+
+            OS_LOGS_ENGINE.userAction(
+                'STATUS_CHANGED',
+                'content-engine',
+                { asset_id: editingAssetId, from: currentLogical, to: targetLogical },
+                userRole,
+                currentAssetData.project_id || currentProject,
+                !isWebhookReal
+            );
         }
 
         const supabase = getSupabase();
@@ -752,20 +955,19 @@ window.saveAssetEdit = async () => {
                 mockAssets[idx].caption = updatePayload.caption;
                 mockAssets[idx].priority = priority;
                 mockAssets[idx].metadata = newMetadata;
-                if (updatePayload.status) {
-                    mockAssets[idx].status = updatePayload.status;
-                }
+                mockAssets[idx].status = nextStatus;
                 localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
             }
         }
 
         // Timeline log
-        injectTimelineEvent(currentAssetData.project_id, 'EDIT_ATiVO', `Ativo "${title}" governado. Fases: Estratégico (${strat ? 'OK' : 'Pendente'}), Técnico (${oper ? 'OK' : 'Pendente'}), Cliente (${clie ? 'OK' : 'Pendente'})`);
+        injectTimelineEvent(currentAssetData.project_id, 'EDIT_ATIVO', `Ativo "${title}" governado. Novo Status: "${nextStatus}"`);
 
         closeEditModal();
         loadContent();
     } catch (e) {
         sLog('Erro ao salvar: ' + e.message);
+        alert('Erro ao salvar edição: ' + e.message);
     }
 };
 
@@ -878,12 +1080,58 @@ function renderIntelligenceTab() {
     }
 }
 
+function mapAssetStatusToGia(status) {
+    const std = String(status || '').toUpperCase();
+    if (std === 'DRAFT_PLANNING' || std === 'RASCUNHO') return 'rascunho';
+    if (std === 'POSTED' || std === 'PUBLICADO') return 'publicado';
+    if (std === 'READY_TO_POST' || std === 'AGUARDANDO_PUBLICACAO') return 'aguardando_publicacao';
+    if (std === 'PLANNING_APPROVED' || std === 'APROVADO' || std === 'CONTENT_APPROVED' || std === 'PRODUCTION_QUEUE' || std === 'IN_PRODUCTION' || std === 'INTERNAL_QA') return 'aprovado';
+    if (std === 'DESCARTADO') return 'descartado';
+    return 'em_revisao';
+}
+
 window.forceReady = async (id) => {
     if (!confirm('Deseja marcar este ativo como PRONTO para publicação?')) return;
     try {
         const currentAsset = window.loadedContents?.find(item => item.id === id) || {};
         const currentLogical = mapToStandardStatus(currentAsset.status || '').toLowerCase();
         const userRole = OS_AUTH.user?.role || 'OPERATOR';
+
+        // Validar RBAC
+        if (userRole === 'CLIENT') {
+            alert('Acesso negado: Perfil CLIENT não tem autorização para gerenciar ou aprovar IA.');
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { action: 'tentativa_negada_aprovacao_ia', asset_id: id, role: userRole },
+                'critical'
+            );
+            return;
+        }
+
+        // Validar Limite Operacional Contratado
+        const configs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
+        const clientConf = configs[currentProject] || { iaLimit: 20 };
+        const clientLimit = clientConf.iaLimit || 0;
+
+        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+        const clientAssets = mockAssets.filter(a => a && a.project_id === currentProject);
+        let countApproved = 0;
+        let countPublished = 0;
+        clientAssets.forEach(asset => {
+            const gia = mapAssetStatusToGia(asset.status);
+            if (gia === 'aprovado' || gia === 'aguardando_publicacao') countApproved++;
+            else if (gia === 'publicado') countPublished++;
+        });
+
+        if (countApproved + countPublished >= clientLimit) {
+            alert(`Erro de Governança: Limite operacional contratado atingido (${countApproved + countPublished}/${clientLimit}). Não é possível aprovar novos conteúdos IA.`);
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { action: 'limite_ia_excedido', client_id: currentProject, limite: clientLimit, ocupacao: countApproved + countPublished },
+                'warning'
+            );
+            return;
+        }
 
         const transitionResult = await StatusEngine.transition(
             'conteudos',
@@ -898,6 +1146,90 @@ window.forceReady = async (id) => {
             return;
         }
 
+        // Disparar webhook de controle de IA
+        const payload = {
+            client_id: currentProject,
+            asset_id: id,
+            title: currentAsset.title,
+            platform: currentAsset.platform,
+            status_ia: 'aguardando_publicacao',
+            action: 'IA_GENERATION_APPROVED',
+            limite_anterior: clientLimit,
+            limite_novo: clientLimit,
+            timestamp: new Date().toISOString()
+        };
+
+        const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
+
+        if (!response.success) {
+            // WEBHOOK_REAL_FAILED
+            OS_LOGS_ENGINE.userAction(
+                'WEBHOOK_REAL_FAILED',
+                'content-engine',
+                { webhook: 'AI_OPERATIONAL_CONTROL', error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // GOVERNANCE_ABORTED
+            OS_LOGS_ENGINE.userAction(
+                'GOVERNANCE_ABORTED',
+                'content-engine',
+                { action: 'aprovacao_ia', reason: 'Falha no webhook real de integração', asset_id: id },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // SECURITY_WARNING
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { 
+                    action: 'aprovacao_ia_cancelada_erro_conexao', 
+                    client_id: currentProject, 
+                    role: userRole, 
+                    asset_id: id,
+                    error: response.error,
+                    timestamp: new Date().toISOString()
+                },
+                'critical'
+            );
+
+            // ROLLBACK_STARTED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_STARTED',
+                'content-engine',
+                { 
+                    reason: 'Falha na resposta do webhook de aprovação',
+                    client_id: currentProject, 
+                    asset_id: id,
+                    preserved_status: currentAsset.status
+                },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // ROLLBACK_COMPLETED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_COMPLETED',
+                'content-engine',
+                { 
+                    client_id: currentProject, 
+                    asset_id: id,
+                    restored_status: currentAsset.status,
+                    local_db_status: 'CONSISTENT_UNMODIFIED'
+                },
+                userRole,
+                currentProject,
+                false
+            );
+
+            alert('Erro de conexão com o Make/Webhook. Aprovação abortada e estado anterior mantido.');
+            return;
+        }
+
         const supabase = getSupabase();
         let error = null;
         try {
@@ -908,7 +1240,6 @@ window.forceReady = async (id) => {
         }
 
         if (error) {
-            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
             const idx = mockAssets.findIndex(item => item.id === id);
             if (idx >= 0) {
                 mockAssets[idx].status = 'READY_TO_POST';
@@ -916,25 +1247,33 @@ window.forceReady = async (id) => {
             }
         }
         
-        // Registrar log de governança
+        // Registrar logs de sucesso
         OS_LOGS_ENGINE.userAction(
-            'AI_GENERATION_APPROVED',
+            'IA_GENERATION_APPROVED',
             'content-engine',
             { asset_id: id, action: 'force_ready' },
             userRole,
-            currentProject
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
         );
 
-        // Disparar webhook simulado se configurado
-        if (transitionResult.webhook) {
-            const payload = {
-                asset_id: id,
-                project_id: currentProject,
-                status: 'READY_TO_POST',
-                timestamp: new Date().toISOString()
-            };
-            await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
-        }
+        OS_LOGS_ENGINE.userAction(
+            'LIMIT_OCCUPIED',
+            'content-engine',
+            { asset_id: id, action: 'occupy_limit', limit: clientLimit, ocupacao: countApproved + countPublished + 1 },
+            userRole,
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
+
+        OS_LOGS_ENGINE.userAction(
+            'WEBHOOK_REAL_SUCCESS',
+            'content-engine',
+            { webhook: 'AI_OPERATIONAL_CONTROL', status: response.status || 200 },
+            userRole,
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
 
         sLog('Ativo forçado para READY_TO_POST.');
         loadContent();
@@ -944,17 +1283,33 @@ window.forceReady = async (id) => {
 };
 
 window.deleteAsset = async (id) => {
-    if (!confirm('Deseja excluir este ativo da esteira?')) return;
     try {
         const currentAsset = window.loadedContents?.find(item => item.id === id) || {};
         const currentLogical = mapToStandardStatus(currentAsset.status || '').toLowerCase();
         const userRole = OS_AUTH.user?.role || 'OPERATOR';
 
-        let currentGiaStatus = 'rascunho';
-        if (currentLogical === 'draft_planning' || currentLogical === 'rascunho') currentGiaStatus = 'rascunho';
-        else if (currentLogical === 'internal_review' || currentLogical === 'em_revisao') currentGiaStatus = 'em_revisao';
-        else if (currentLogical === 'planning_approved' || currentLogical === 'aprovado') currentGiaStatus = 'aprovado';
-        else if (currentLogical === 'posted' || currentLogical === 'publicado') currentGiaStatus = 'publicado';
+        // Validar RBAC
+        if (userRole === 'CLIENT') {
+            alert('Acesso negado: Perfil CLIENT não tem autorização para excluir conteúdos ou liberar limite.');
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { action: 'tentativa_negada_exclusao_ia', asset_id: id, role: userRole },
+                'critical'
+            );
+            return;
+        }
+
+        let currentGiaStatus = mapAssetStatusToGia(currentAsset.status);
+
+        // Exigir confirmação manual se já estiver aprovado/aguardando
+        const isOccupying = (currentGiaStatus === 'aprovado' || currentGiaStatus === 'aguardando_publicacao');
+        if (isOccupying) {
+            if (!confirm('Esta pauta já foi aprovada e está ocupando limite operacional. Deseja realmente descartá-la e liberar o limite operacional contratado? (Exige confirmação interna)')) {
+                return;
+            }
+        } else {
+            if (!confirm('Deseja excluir este ativo da esteira?')) return;
+        }
 
         const transitionResult = await StatusEngine.transition(
             'geracao_ia',
@@ -966,6 +1321,94 @@ window.deleteAsset = async (id) => {
 
         if (!transitionResult.success) {
             alert('Erro de validação de transição: ' + transitionResult.error);
+            return;
+        }
+
+        const configs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
+        const clientConf = configs[currentProject] || { iaLimit: 20 };
+        const clientLimit = clientConf.iaLimit || 0;
+
+        // Enviar webhook de controle operacional de IA
+        const payload = {
+            client_id: currentProject,
+            asset_id: id,
+            title: currentAsset.title,
+            platform: currentAsset.platform,
+            status_ia: 'descartado',
+            action: 'IA_GENERATION_DISCARDED',
+            limite_anterior: clientLimit,
+            limite_novo: clientLimit,
+            timestamp: new Date().toISOString()
+        };
+
+        const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
+
+        if (!response.success) {
+            // WEBHOOK_REAL_FAILED
+            OS_LOGS_ENGINE.userAction(
+                'WEBHOOK_REAL_FAILED',
+                'content-engine',
+                { webhook: 'AI_OPERATIONAL_CONTROL', error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // GOVERNANCE_ABORTED
+            OS_LOGS_ENGINE.userAction(
+                'GOVERNANCE_ABORTED',
+                'content-engine',
+                { action: 'descarte_ia', reason: 'Falha no webhook real de integração', asset_id: id },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // SECURITY_WARNING
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { 
+                    action: 'descarte_ia_cancelada_erro_conexao', 
+                    client_id: currentProject, 
+                    role: userRole, 
+                    asset_id: id,
+                    error: response.error,
+                    timestamp: new Date().toISOString()
+                },
+                'critical'
+            );
+
+            // ROLLBACK_STARTED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_STARTED',
+                'content-engine',
+                { 
+                    reason: 'Falha na resposta do webhook de descarte',
+                    client_id: currentProject, 
+                    asset_id: id,
+                    preserved_status: currentAsset.status
+                },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // ROLLBACK_COMPLETED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_COMPLETED',
+                'content-engine',
+                { 
+                    client_id: currentProject, 
+                    asset_id: id,
+                    restored_status: currentAsset.status,
+                    local_db_status: 'CONSISTENT_UNMODIFIED'
+                },
+                userRole,
+                currentProject,
+                false
+            );
+
+            alert('Erro de conexão com o Make/Webhook. Descarte abortado e estado anterior mantido.');
             return;
         }
 
@@ -984,25 +1427,44 @@ window.deleteAsset = async (id) => {
             localStorage.setItem('fluxai_mock_assets', JSON.stringify(filtered));
         }
 
-        // Registrar log de governança
+        // Registrar logs
         OS_LOGS_ENGINE.userAction(
-            'AI_GENERATION_DELETED',
+            'IA_GENERATION_DISCARDED',
             'content-engine',
             { asset_id: id, action: 'delete' },
             userRole,
-            currentProject
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
         );
 
-        // Disparar webhook simulado se configurado
-        if (transitionResult.webhook) {
-            const payload = {
-                asset_id: id,
-                project_id: currentProject,
-                status: 'descartado',
-                timestamp: new Date().toISOString()
-            };
-            await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+        if (isOccupying) {
+            OS_LOGS_ENGINE.userAction(
+                'LIMIT_RELEASED',
+                'content-engine',
+                { asset_id: id, action: 'release_limit', reason: 'exclusao' },
+                userRole,
+                currentProject,
+                !OS_CONFIG.flags.sendRealWebhooks
+            );
         }
+
+        OS_LOGS_ENGINE.userAction(
+            'GOVERNANCE_ACTION',
+            'content-engine',
+            { action: 'descarte_confirmado', asset_id: id },
+            userRole,
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
+
+        OS_LOGS_ENGINE.userAction(
+            'WEBHOOK_REAL_SUCCESS',
+            'content-engine',
+            { webhook: 'AI_OPERATIONAL_CONTROL', status: response.status || 200 },
+            userRole,
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
 
         loadContent();
     } catch (e) {
@@ -1014,6 +1476,17 @@ async function runAiPlanner() {
     const selectedId = document.getElementById('project-filter').value;
     if (!selectedId) {
         alert('Selecione um cliente específico para gerar pautas com IA.');
+        return;
+    }
+
+    const userRole = OS_AUTH.user?.role || 'OPERATOR';
+    if (userRole === 'CLIENT') {
+        alert('Acesso negado: Perfil CLIENT não tem autorização para gerar pautas com IA.');
+        OS_LOGS_ENGINE.security(
+            'SECURITY_WARNING',
+            { action: 'tentativa_negada_geracao_ia', client_id: selectedId, role: userRole },
+            'critical'
+        );
         return;
     }
 
@@ -1030,7 +1503,6 @@ async function runAiPlanner() {
     try {
         sLog(`[IA_PLANNER] Executando planejamento de IA para o cliente ${selectedId}, serviço: ${serviceKey}`);
         
-        // Chamar o gerador do planner
         const generated = await AIPlanner.generatePlan(selectedId, serviceKey, 1);
         if (!generated || generated.length === 0) {
             throw new Error('Nenhuma pauta pôde ser gerada para o escopo selecionado.');
@@ -1038,7 +1510,91 @@ async function runAiPlanner() {
 
         const newAsset = generated[0];
         
-        // Injetar rascunho de IA (rascunho inicial) no banco ou no mock
+        // Webhook de controle operacional de IA
+        const configs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
+        const clientConf = configs[selectedId] || { iaLimit: 20 };
+        const clientLimit = clientConf.iaLimit || 0;
+
+        const payload = {
+            client_id: selectedId,
+            asset_id: newAsset.id || 'mock_id',
+            title: newAsset.title,
+            platform: newAsset.platform,
+            status_ia: 'rascunho',
+            action: 'IA_GENERATION_CREATED',
+            limite_anterior: clientLimit,
+            limite_novo: clientLimit,
+            timestamp: new Date().toISOString()
+        };
+
+        const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
+
+        if (!response.success) {
+            // WEBHOOK_REAL_FAILED
+            OS_LOGS_ENGINE.userAction(
+                'WEBHOOK_REAL_FAILED',
+                'content-engine',
+                { webhook: 'AI_OPERATIONAL_CONTROL', error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                userRole,
+                selectedId,
+                false
+            );
+
+            // GOVERNANCE_ABORTED
+            OS_LOGS_ENGINE.userAction(
+                'GOVERNANCE_ABORTED',
+                'content-engine',
+                { action: 'geracao_ia_rascunho', reason: 'Falha no webhook real de integração', client_id: selectedId },
+                userRole,
+                selectedId,
+                false
+            );
+
+            // SECURITY_WARNING
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { 
+                    action: 'geracao_ia_rascunho_cancelada_erro_conexao', 
+                    client_id: selectedId, 
+                    role: userRole, 
+                    error: response.error,
+                    timestamp: new Date().toISOString()
+                },
+                'critical'
+            );
+
+            // ROLLBACK_STARTED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_STARTED',
+                'content-engine',
+                { 
+                    reason: 'Falha na resposta do webhook de criação de IA',
+                    client_id: selectedId, 
+                    preserved_status: 'none'
+                },
+                userRole,
+                selectedId,
+                false
+            );
+
+            // ROLLBACK_COMPLETED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_COMPLETED',
+                'content-engine',
+                { 
+                    client_id: selectedId, 
+                    restored_status: 'none',
+                    local_db_status: 'CONSISTENT_UNMODIFIED'
+                },
+                userRole,
+                selectedId,
+                false
+            );
+
+            alert('Erro de conexão com o Make/Webhook. Geração abortada e estado anterior mantido.');
+            return;
+        }
+
         const supabase = getSupabase();
         let error = null;
         try {
@@ -1049,26 +1605,32 @@ async function runAiPlanner() {
         }
 
         if (error) {
-            // Fallback Mock LocalStorage
             const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
             newAsset.id = 'asset_mock_' + Date.now();
             mockAssets.unshift(newAsset);
             localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
         }
 
-        // Registrar log de criação de pauta em rascunho (não ocupa limite operacional)
+        // Registrar logs de sucesso
         OS_LOGS_ENGINE.userAction(
-            'AI_GENERATION_STATUS',
+            'IA_GENERATION_STATUS',
             'content-engine',
-            { action: 'generate_draft', service: serviceKey, client_id: selectedId },
-            OS_AUTH.user?.role || 'OPERATOR',
+            { action: 'generate_draft', service: serviceKey, client_id: selectedId, asset_id: newAsset.id },
+            userRole,
+            selectedId,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
+
+        OS_LOGS_ENGINE.userAction(
+            'WEBHOOK_REAL_SUCCESS',
+            'content-engine',
+            { webhook: 'AI_OPERATIONAL_CONTROL', status: response.status || 200 },
+            userRole,
             selectedId,
             !OS_CONFIG.flags.sendRealWebhooks
         );
 
         sLog('[IA_PLANNER] Pauta em rascunho criada com sucesso.');
-        
-        // Atualizar lista
         await loadContent();
     } catch (err) {
         sLog('[IA_PLANNER] Erro na geração: ' + err.message);
@@ -1083,7 +1645,252 @@ async function runAiPlanner() {
 
 window.runAiPlanner = runAiPlanner;
 
+// ─────────────────────────────────────────────────────────────────
+// 4. PONTE DE PUBLICAÇÃO MANUAL ASSISTIDA
+// ─────────────────────────────────────────────────────────────────
+
+let activePublishAssetId = null;
+
+window.openPublishBridge = (id) => {
+    const asset = window.loadedContents?.find(item => item.id === id);
+    if (!asset) {
+        alert('Conteúdo não encontrado.');
+        return;
+    }
+
+    activePublishAssetId = id;
+
+    // Preencher data e hora programada
+    const scheduled = asset.scheduled_at 
+        ? new Date(asset.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+        : 'Não agendado';
+    document.getElementById('pub-scheduled-time').innerText = scheduled;
+
+    // Legenda, hashtags, CTA e caminho do arquivo consolidados
+    const captionText = asset.caption || asset.description || '';
+    const hashtags = asset.metadata?.hashtags || '#fluxai #inteligenciaartificial';
+    const cta = asset.metadata?.cta || 'Acesse o link na bio para saber mais!';
+    const filePath = asset.metadata?.file_path || `Drive: Maria Aparecida/entregas/${asset.title}.mp4`;
+
+    const fullPreview = `📝 LEGENDA:\n${captionText}\n\n🏷️ HASHTAGS:\n${hashtags}\n\n🎯 CTA:\n${cta}\n\n📁 CAMINHO DO ARQUIVO:\n${filePath}`;
+    document.getElementById('pub-caption-preview').value = fullPreview;
+
+    // Links de Canva e Instagram/Plataforma
+    const btnOpenAssets = document.getElementById('btn-open-assets');
+    const btnOpenAccount = document.getElementById('btn-open-account');
+
+    if (btnOpenAssets) {
+        btnOpenAssets.onclick = () => {
+            const link = asset.metadata?.canva_link || asset.metadata?.drive_link || 'https://canva.com';
+            window.open(link, '_blank');
+        };
+    }
+
+    if (btnOpenAccount) {
+        btnOpenAccount.onclick = () => {
+            const link = asset.metadata?.instagram_link || 'https://instagram.com';
+            window.open(link, '_blank');
+        };
+    }
+
+    // Exibir o modal
+    document.getElementById('pub-modal-overlay').style.display = 'flex';
+};
+
+// Evento fechar modal
+document.getElementById('close-pub-modal')?.addEventListener('click', () => {
+    document.getElementById('pub-modal-overlay').style.display = 'none';
+    activePublishAssetId = null;
+});
+
+// Evento copiar legenda
+document.getElementById('btn-copy-caption')?.addEventListener('click', () => {
+    const caption = document.getElementById('pub-caption-preview').value;
+    navigator.clipboard.writeText(caption).then(() => {
+        alert('Legenda copiada com sucesso para a área de transferência!');
+    }).catch(err => {
+        alert('Erro ao copiar legenda: ' + err.message);
+    });
+});
+
+// Evento confirmar publicação
+document.getElementById('btn-confirm-pub')?.addEventListener('click', async () => {
+    if (!activePublishAssetId) return;
+    
+    const userRole = OS_AUTH.user?.role || 'OPERATOR';
+    if (userRole === 'CLIENT') {
+        alert('Acesso negado: Perfil CLIENT não tem autorização para realizar publicações ou operar IA.');
+        OS_LOGS_ENGINE.security(
+            'SECURITY_WARNING',
+            { action: 'tentativa_negada_publicacao_ia', asset_id: activePublishAssetId, role: userRole },
+            'critical'
+        );
+        return;
+    }
+
+    if (!confirm('Deseja realmente confirmar a publicação deste conteúdo? O limite operacional deste ciclo será consumido de forma definitiva.')) {
+        return;
+    }
+
+    const id = activePublishAssetId;
+    const asset = window.loadedContents?.find(item => item.id === id);
+    if (!asset) return;
+
+    const btnConfirm = document.getElementById('btn-confirm-pub');
+    const originalHtml = btnConfirm.innerHTML;
+    btnConfirm.disabled = true;
+    btnConfirm.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO WEBHOOK...';
+
+    try {
+        const configs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
+        const clientConf = configs[currentProject] || { iaLimit: 20 };
+        const clientLimit = clientConf.iaLimit || 0;
+
+        // Disparar webhook
+        const payload = {
+            client_id: currentProject,
+            asset_id: id,
+            title: asset.title,
+            platform: asset.platform,
+            status_ia: 'publicado',
+            action: 'IA_GENERATION_PUBLISHED',
+            limite_anterior: clientLimit,
+            limite_novo: clientLimit,
+            timestamp: new Date().toISOString()
+        };
+
+        const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
+
+        if (!response.success) {
+            // WEBHOOK_REAL_FAILED
+            OS_LOGS_ENGINE.userAction(
+                'WEBHOOK_REAL_FAILED',
+                'content-engine',
+                { webhook: 'AI_OPERATIONAL_CONTROL', error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // GOVERNANCE_ABORTED
+            OS_LOGS_ENGINE.userAction(
+                'GOVERNANCE_ABORTED',
+                'content-engine',
+                { action: 'publicacao_ia', reason: 'Falha no webhook real de integração', asset_id: id },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // SECURITY_WARNING
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { 
+                    action: 'publicacao_ia_cancelada_erro_conexao', 
+                    client_id: currentProject, 
+                    role: userRole, 
+                    asset_id: id,
+                    error: response.error,
+                    timestamp: new Date().toISOString()
+                },
+                'critical'
+            );
+
+            // ROLLBACK_STARTED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_STARTED',
+                'content-engine',
+                { 
+                    reason: 'Falha na resposta do webhook de publicação',
+                    client_id: currentProject, 
+                    asset_id: id,
+                    preserved_status: asset.status
+                },
+                userRole,
+                currentProject,
+                false
+            );
+
+            // ROLLBACK_COMPLETED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_COMPLETED',
+                'content-engine',
+                { 
+                    client_id: currentProject, 
+                    asset_id: id,
+                    restored_status: asset.status,
+                    local_db_status: 'CONSISTENT_UNMODIFIED'
+                },
+                userRole,
+                currentProject,
+                false
+            );
+
+            alert('Erro de conexão com o Make/Webhook. Publicação abortada e estado anterior mantido.');
+            return;
+        }
+
+        const supabase = getSupabase();
+        let error = null;
+        try {
+            const res = await supabase.from('content_assets').update({ status: 'posted' }).eq('id', id);
+            error = res.error;
+        } catch (e) {
+            error = e;
+        }
+
+        if (error) {
+            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+            const idx = mockAssets.findIndex(item => item.id === id);
+            if (idx >= 0) {
+                mockAssets[idx].status = 'posted';
+                localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+            }
+        }
+
+        // Registrar logs de sucesso
+        OS_LOGS_ENGINE.userAction(
+            'IA_GENERATION_PUBLISHED',
+            'content-engine',
+            { asset_id: id, action: 'publish_post' },
+            userRole,
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
+
+        OS_LOGS_ENGINE.userAction(
+            'GOVERNANCE_ACTION',
+            'content-engine',
+            { action: 'publicacao_confirmada', asset_id: id },
+            userRole,
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
+
+        OS_LOGS_ENGINE.userAction(
+            'WEBHOOK_REAL_SUCCESS',
+            'content-engine',
+            { webhook: 'AI_OPERATIONAL_CONTROL', status: response.status || 200 },
+            userRole,
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
+
+        alert('Publicação confirmada com sucesso!');
+        document.getElementById('pub-modal-overlay').style.display = 'none';
+        activePublishAssetId = null;
+        
+        await loadContent();
+    } catch (err) {
+        alert('Erro ao confirmar publicação: ' + err.message);
+    } finally {
+        btnConfirm.disabled = false;
+        btnConfirm.innerHTML = originalHtml;
+    }
+});
+
 initEngine();
+
 async function setupRealtime() { 
     const supabase = getSupabase(); 
     if (realtimeChannel) { 

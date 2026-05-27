@@ -327,7 +327,7 @@ export const STATUS_SYSTEM = {
             description: 'Gerado como rascunho. Não ocupa limite operacional.',
             allowedTransitions: ['em_revisao', 'descartado'],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
-            webhook: '',
+            webhook: 'AI_OPERATIONAL_CONTROL',
             action: 'AI_GENERATION_STATUS'
         },
         em_revisao: {
@@ -338,19 +338,30 @@ export const STATUS_SYSTEM = {
             description: 'Em revisão pelo operador. Não ocupa limite operacional.',
             allowedTransitions: ['aprovado', 'descartado'],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
-            webhook: '',
+            webhook: 'AI_OPERATIONAL_CONTROL',
             action: 'AI_GENERATION_STATUS'
         },
         aprovado: {
             value: 'aprovado',
-            label: 'Aprovado',
+            label: 'Aprovado Interno',
             badge: 'warning',
             color: '#f59e0b',
             description: 'Aprovado internamente, ocupa o limite operacional contratado.',
+            allowedTransitions: ['aguardando_publicacao', 'descartado'],
+            authorizedRoles: ['ADMIN', 'OPERATOR'],
+            webhook: 'AI_OPERATIONAL_CONTROL',
+            action: 'AI_GENERATION_APPROVED'
+        },
+        aguardando_publicacao: {
+            value: 'aguardando_publicacao',
+            label: 'Aguardando Publicação',
+            badge: 'warning',
+            color: '#d97706',
+            description: 'Aguardando publicação. Ocupa o limite operacional contratado.',
             allowedTransitions: ['publicado', 'descartado'],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
-            webhook: '',
-            action: 'AI_GENERATION_APPROVED'
+            webhook: 'AI_OPERATIONAL_CONTROL',
+            action: 'AI_GENERATION_STATUS'
         },
         publicado: {
             value: 'publicado',
@@ -360,7 +371,7 @@ export const STATUS_SYSTEM = {
             description: 'Publicado ou entregue, ocupa definitivamente o limite operacional daquele ciclo/contrato.',
             allowedTransitions: [],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
-            webhook: '',
+            webhook: 'AI_OPERATIONAL_CONTROL',
             action: 'AI_GENERATION_STATUS'
         },
         descartado: {
@@ -368,10 +379,10 @@ export const STATUS_SYSTEM = {
             label: 'Descartado',
             badge: 'neutral',
             color: '#6b7280',
-            description: 'Descartado pelo operador. Se descartado após aprovação, a liberação de espaço do limite de geração requer confirmação interna manual da equipe (espaço liberado por exclusão).',
+            description: 'Descartado pelo operador.',
             allowedTransitions: [],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
-            webhook: '',
+            webhook: 'AI_OPERATIONAL_CONTROL',
             action: 'AI_GENERATION_DELETED'
         }
     },

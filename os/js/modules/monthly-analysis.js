@@ -108,28 +108,113 @@ window.transitionReport = async (reportId, currentStatus, targetStatus) => {
         
         const transResult = await StatusEngine.transition('relatorios', reportId, currentStatus, targetStatus, { role });
         if (!transResult.success) {
-            alert(`Erro na transição de status: ${transResult.error}`);
+            alert(`Erro de Governança: Transição inválida.\nMotivo: ${transResult.error}`);
             return;
         }
 
-        // Log da ação
-        if (typeof OS_LOGS_ENGINE !== 'undefined') {
-            OS_LOGS_ENGINE.userAction('REPORT_STATUS_UPDATED', { id: reportId, current: currentStatus, target: targetStatus }, !OS_CONFIG.flags.sendRealWebhooks);
-        }
+        const isReal = OS_CONFIG.flags.sendRealWebhooks || 
+                       (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes('REPORT_STATUS_UPDATE'));
 
-        // Webhook
-        await OS_CONFIG.webhooks.send('REPORT_STATUS_UPDATE', {
+        // Disparar webhook de integração real ANTES de qualquer persistência local
+        const webhookResponse = await OS_CONFIG.webhooks.send('REPORT_STATUS_UPDATE', {
             event: 'report_status_updated',
             timestamp: new Date().toISOString(),
             data: { id: reportId, current: currentStatus, target: targetStatus }
         });
 
-        // Atualizar status localmente no mock
+        // Se o webhook real falhar, executamos o Rollback Block e cancelamos a transição
+        if (!webhookResponse.success && isReal) {
+            console.error('[REPORT_STATUS_UPDATE] Falha no webhook real. Abortando transição.', webhookResponse.error);
+
+            // 1. WEBHOOK_REAL_FAILED
+            OS_LOGS_ENGINE.userAction(
+                'WEBHOOK_REAL_FAILED',
+                'monthly-analysis',
+                { webhook: 'REPORT_STATUS_UPDATE', error: webhookResponse.error || 'Erro Desconhecido', status: webhookResponse.status || 0 },
+                role,
+                reportId,
+                false
+            );
+
+            // 2. GOVERNANCE_ABORTED
+            OS_LOGS_ENGINE.userAction(
+                'GOVERNANCE_ABORTED',
+                'monthly-analysis',
+                { action: 'transicao_relatorio_mensal', reason: 'Falha no webhook real de integração', report: reportId },
+                role,
+                reportId,
+                false
+            );
+
+            // 3. SECURITY_WARNING
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { 
+                    action: 'transicao_relatorio_cancelada_erro_conexao', 
+                    client_id: reportId, 
+                    role: role, 
+                    error: webhookResponse.error,
+                    timestamp: new Date().toISOString()
+                },
+                'critical'
+            );
+
+            // 4. ROLLBACK_STARTED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_STARTED',
+                'monthly-analysis',
+                { reason: 'Falha na resposta do webhook de relatório', client_id: reportId, preserved_status: currentStatus },
+                role,
+                reportId,
+                false
+            );
+
+            // 5. ROLLBACK_COMPLETED
+            OS_LOGS_ENGINE.userAction(
+                'ROLLBACK_COMPLETED',
+                'monthly-analysis',
+                { client_id: reportId, restored_status: currentStatus, local_db_status: 'CONSISTENT_UNMODIFIED' },
+                role,
+                reportId,
+                false
+            );
+
+            alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${webhookResponse.error || 'O servidor retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado no banco.`);
+            return;
+        }
+
+        // Se sucesso, persite localmente
         let mockReports = JSON.parse(localStorage.getItem('fluxai_mock_reports') || '[]');
         const idx = mockReports.findIndex(r => r.clientId === reportId || r.id === reportId);
         if (idx > -1) {
             mockReports[idx].status = targetStatus;
             localStorage.setItem('fluxai_mock_reports', JSON.stringify(mockReports));
+        }
+
+        // Registrar logs de transição com base no novo status
+        let logEvent = 'REPORT_STATUS_UPDATED';
+        if (targetStatus === 'em_revisao') logEvent = 'REPORT_REVIEW_STARTED';
+        else if (targetStatus === 'aprovado_internamente') logEvent = 'REPORT_APPROVED';
+        else if (targetStatus === 'enviado_ao_cliente') logEvent = 'REPORT_RELEASED';
+
+        OS_LOGS_ENGINE.userAction(
+            logEvent,
+            'monthly-analysis',
+            { id: reportId, current: currentStatus, target: targetStatus },
+            role,
+            reportId,
+            !webhookResponse.success || webhookResponse.simulated
+        );
+
+        if (isReal && webhookResponse.success) {
+            OS_LOGS_ENGINE.userAction(
+                'WEBHOOK_REAL_SUCCESS',
+                'monthly-analysis',
+                { webhook: 'REPORT_STATUS_UPDATE', response_status: webhookResponse.status || 200 },
+                role,
+                reportId,
+                false
+            );
         }
 
         alert('Status do relatório atualizado com sucesso!');

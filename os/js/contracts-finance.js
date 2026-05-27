@@ -410,7 +410,7 @@ function renderContracts(contracts) {
                 <td>${renewalDate}</td>
                 <td>
                     <div class="action-btns" style="justify-content: flex-end;">
-                        <a href="/os/workspace.html?project=${c.project_id}" class="btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Ver Workspace Cliente">
+                        <a href="/os/client-portal.html?project_id=${c.project_id}" class="btn-mini" style="display:inline-flex; align-items:center; justify-content:center; text-decoration:none;" title="Ver Portal Cliente">
                             <i class="fa-solid fa-briefcase"></i>
                         </a>
                         <button class="btn-mini" title="Abrir Contrato" onclick="window.generateContractDoc('${c.id}')">
@@ -739,7 +739,7 @@ window.sendWhatsAppBilling = async (paymentId) => {
         msg = `Olá, ${p.contracts.client_name}. Tudo bem?\n\nIdentificamos que o pagamento da sua mensalidade FluxAI no valor de ${formatCurrency(p.amount_due)} (vencimento ${dueDate.toLocaleDateString('pt-BR')}) encontra-se pendente.\n\nPara mantermos o seu ecossistema ativo, por favor realize o pagamento via PIX (CNPJ):\n\n*45.291.901/0001-88*\n\nSe já efetuou o pagamento, por favor desconsidere este aviso e nos envie o comprovante.`;
     }
 
-    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, '_blank');
+    window.triggerWhatsAppContact(whatsapp, msg);
 };
 
 window.markAsPaid = async (paymentId, amount) => {

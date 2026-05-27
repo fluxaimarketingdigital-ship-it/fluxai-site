@@ -42,24 +42,23 @@ export const OS_UI = {
 
         // contexts: em quais contextos o item aparece
         const navItems = [
-            { id: 'command-center',   label: 'Centro de Comando',     icon: 'fa-gauge-high',          group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'onboarding-cliente',label: 'Novo Cliente',         icon: 'fa-user-plus',           group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'clientes',         label: 'Clientes',              icon: 'fa-users',               group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'demandas',         label: 'Demandas',              icon: 'fa-list-check',          group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'leads',            label: 'Leads',                 icon: 'fa-funnel-dollar',       group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'metricas',         label: 'Métricas',              icon: 'fa-chart-pie',           group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'relatorio-mensal', label: 'Relatório Mensal',      icon: 'fa-file-signature',      group: 'Operação Make',         roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
-            { id: 'onboarding',       label: 'Onboarding Estratégico',icon: 'fa-address-card',         group: 'Núcleo Estratégico',    roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER', 'LABS'] },
-            { id: 'content-engine',   label: 'Motor de Conteúdo',     icon: 'fa-pen-nib',             group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS','CLIENT'] },
-            { id: 'crm-intelligence', label: 'Inteligência de CRM',   icon: 'fa-users-gear',          group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },
-            { id: 'automation-hub',   label: 'Central de Automação',  icon: 'fa-robot',               group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER'] },
-            { id: 'analytics',        label: 'Análise de Dados',      icon: 'fa-chart-line',          group: 'Módulos Operacionais',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'command-center',   label: 'Command Center',        icon: 'fa-terminal',            group: 'Núcleo Estratégico',    roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'operations-center',label: 'Operations Center',     icon: 'fa-gauge-high',          group: 'Núcleo Estratégico',    roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'executive-center', label: 'Executive Center',      icon: 'fa-crown',               group: 'Núcleo Estratégico',    roles: ['ADMIN'],             contexts: ['MASTER'] },
+            { id: 'onboarding',       label: 'Onboarding Estratégico',icon: 'fa-user-plus',           group: 'Operação de Clientes',  roles: ['ADMIN'],             contexts: ['MASTER','LABS'] },
+            { id: 'clientes',         label: 'Clientes',              icon: 'fa-users',               group: 'Operação de Clientes',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'demandas',         label: 'Demandas',              icon: 'fa-list-check',          group: 'Operação de Clientes',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'leads',            label: 'Leads',                 icon: 'fa-funnel-dollar',       group: 'Operação de Clientes',  roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'content-engine',   label: 'Motor de Conteúdo',     icon: 'fa-pen-nib',             group: 'Produção & Conteúdo',   roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS','CLIENT'] },
+            { id: 'flux-calendar',    label: 'Calendário Editorial',  icon: 'fa-calendar-days',       group: 'Produção & Conteúdo',   roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS','CLIENT'] },
+            { id: 'relatorio-mensal', label: 'Relatório Mensal',      icon: 'fa-file-signature',      group: 'Métricas & Relatórios', roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
+            { id: 'metricas',         label: 'Métricas Inbound',      icon: 'fa-chart-pie',           group: 'Métricas & Relatórios', roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
             { id: 'fluxai-labs',      label: 'FluxAI Labs',           icon: 'fa-flask',               group: 'Workspace Interno',     roles: ['ADMIN'],             contexts: ['MASTER','LABS'], permission: 'fluxai-labs-workspace' },
             { id: 'client-portal',    label: 'Portal do Cliente',     icon: 'fa-briefcase',           group: 'Interface de Valor',    roles: ['ADMIN', 'CLIENT'],   contexts: ['MASTER','CLIENT'] },
             { id: 'contracts-finance',label: 'Contratos & Financeiro',icon: 'fa-file-invoice-dollar', group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
             { id: 'governance',       label: 'Governança',            icon: 'fa-user-shield',         group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
             { id: 'governance-users', label: 'Gestão de Usuários',    icon: 'fa-users-cog',           group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
-            { id: 'logs',             label: 'Logs Operacionais',     icon: 'fa-terminal',            group: 'Governança',            roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER', 'LABS'] },
+            { id: 'logs',             label: 'Logs Operacionais',     icon: 'fa-terminal',            group: 'Governança',            roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER', 'LABS'] }
         ];
 
         let html = `
@@ -97,6 +96,9 @@ export const OS_UI = {
             if (item.id === 'client-portal') {
                 const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
                 href = `client-portal.html?project_id=${pid}`;
+            } else if (item.id === 'flux-calendar') {
+                const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
+                href = `flux-calendar.html?project=${pid}`;
             } else {
                 href = `${item.id}.html`;
             }
@@ -126,34 +128,45 @@ export const OS_UI = {
     },
 
     /**
-     * Renderiza a Topbar padrão
-    /**
-     * Renderiza a Topbar com seletor de contexto Master / Labs / Cliente
-     * e badges de alertas operacionais.
+     * Renderiza a Topbar com seletor de contexto Master / Labs / Cliente,
+     * indicador de estado de cliente ativo e badges de alertas.
      */
     renderTopbar: async () => {
-        // Lê sessão diretamente do localStorage para não disparar redirect
         let user = null;
         try {
-            const raw = localStorage.getItem('fluxai_session');
-            if (raw) user = JSON.parse(raw);
+            user = await OS_AUTH.check();
         } catch(e) {}
-        if (!user) {
-            // Sem sessão: topbar vazio mas sem redirecionar
-            return;
-        }
+        if (!user) return;
+
         user.full_name = user.full_name || user.name || user.email || 'Admin';
 
         const initials = (user.full_name || user.email || '??')
             .split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
 
         const context = OSState.get('activeContext') || 'MASTER';
-        const activeProject = OSState.get('activeProject');
         const isSuperAdmin = ['SUPER_ADMIN', 'ADMIN'].includes(user.role);
 
         // --- Seletor de Contexto ---
         const btnStyle = (active, color) =>
             `font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid ${active ? color : 'var(--os-border)'}; background:${active ? color : 'rgba(255,255,255,0.04)'}; color:${active ? (color === 'var(--os-primary)' ? '#000' : '#fff') : 'var(--os-text-muted)'}; cursor:pointer; font-weight:800; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;`;
+
+        // Mapear projeto ativo na topbar
+        const currentProjectId = localStorage.getItem('fluxai_current_project_id');
+        let activeClientHtml = "";
+        let activeProj = null;
+        if (currentProjectId && currentProjectId !== 'todos') {
+            const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+            const supabaseProjects = JSON.parse(localStorage.getItem('fluxai_supabase_projects') || '[]');
+            activeProj = mockProjects.find(p => p.id === currentProjectId) || supabaseProjects.find(p => p.id === currentProjectId);
+            if (activeProj) {
+                const companyName = activeProj.company_name || activeProj.name || 'Desconhecido';
+                activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: ${companyName.toUpperCase()}</span>`;
+            } else {
+                activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
+            }
+        } else {
+            activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
+        }
 
         const contextSwitcher = isSuperAdmin ? `
             <div style="display:flex; align-items:center; gap:5px; margin-left:18px;">
@@ -163,9 +176,9 @@ export const OS_UI = {
                 <button onclick="window.__OSSetContext('LABS')" title="Workspace interno FluxAI" style="${btnStyle(context==='LABS','rgba(139,92,246,0.9)')}">
                     <i class="fa-solid fa-flask"></i> Labs
                 </button>
-                ${context === 'CLIENT' && activeProject ? `
+                ${context === 'CLIENT' && activeProj ? `
                 <span style="font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid var(--os-primary); background:rgba(142,158,104,0.1); color:var(--os-primary); font-weight:800; text-transform:uppercase; letter-spacing:1px;">
-                    <i class="fa-solid fa-briefcase"></i> ${activeProject.company_name || 'Cliente'}
+                    <i class="fa-solid fa-briefcase"></i> ${activeProj.company_name || 'Cliente'}
                 </span>` : ''}
             </div>` : '';
 
@@ -176,15 +189,17 @@ export const OS_UI = {
         const financeBadge = finAlerts > 0 ? `<span style="background:var(--os-danger);color:#fff;font-size:0.5rem;font-weight:900;padding:2px 7px;border-radius:10px;margin-left:4px;">${finAlerts} ALERTA${finAlerts>1?'S':''}</span>` : '';
 
         const html = `
-            <div class="os-topbar-left" style="display:flex;align-items:center;gap:15px;">
+            <div class="os-topbar-left" style="display:flex;align-items:center;gap:15px;min-width:0;">
                 <button class="os-menu-toggle" id="mobile-menu-toggle"><i class="fa-solid fa-bars"></i></button>
-                <div class="os-status-indicator"><span class="os-dot"></span> ${OS_CONFIG.status}</div>
+                <div class="os-status-indicator" style="white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}${activeClientHtml}
+                </div>
                 ${contextSwitcher}${approvalBadge}${financeBadge}
             </div>
             <div class="os-topbar-right">
                 <div class="os-user-profile" id="user-profile-menu" style="cursor:pointer;">
                     <div class="os-avatar">${initials}</div>
-                    <span>${user ? (user.full_name || user.email) : 'Visitante'}</span>
+                    <span>${user.full_name || user.email}</span>
                     <i class="fa-solid fa-chevron-down" style="font-size:0.7rem;margin-left:8px;opacity:0.5;"></i>
                 </div>
             </div>`;
@@ -355,54 +370,48 @@ export const OS_AUTH = {
     }
 };
 
-// Extensão de UI para dados reais
-const originalRenderTopbar = OS_UI.renderTopbar;
-OS_UI.renderTopbar = async () => {
-    const user = await OS_AUTH.check();
-    if (!user) return;
-
-    const initials = user.full_name ? user.full_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase() : '??';
+/**
+ * Ponte Manual Assistida do WhatsApp
+ * Copia o texto para a área de transferência, registra o log de governança e abre o WhatsApp Web.
+ */
+window.triggerWhatsAppContact = (phone, message) => {
+    const cleanPhone = String(phone).replace(/\D/g, '');
     
-    // Mapear projeto ativo na topbar
-    const currentProjectId = localStorage.getItem('fluxai_current_project_id');
-    let activeClientHtml = "";
-    let activeProj = null;
-    if (currentProjectId && currentProjectId !== 'todos') {
-        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-        const supabaseProjects = JSON.parse(localStorage.getItem('fluxai_supabase_projects') || '[]');
-        activeProj = mockProjects.find(p => p.id === currentProjectId) || supabaseProjects.find(p => p.id === currentProjectId);
-        if (activeProj) {
-            const companyName = activeProj.company_name || activeProj.name || 'Desconhecido';
-            activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: ${companyName.toUpperCase()}</span>`;
-        } else {
-            activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
-        }
+    // Copiar mensagem para área de transferência
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(message)
+            .then(() => console.log('[WHATSAPP] Mensagem copiada com sucesso.'))
+            .catch(err => console.error('[WHATSAPP] Erro ao copiar mensagem:', err));
     } else {
-        activeClientHtml = ` &nbsp;|&nbsp; <span style="color: var(--os-primary); font-weight: 800;"><i class="fa-solid fa-briefcase"></i> CLIENTE: TODOS OS CLIENTES</span>`;
-    }
-
-    const html = `
-        <div class="os-topbar-left">
-            <div class="os-status-indicator">
-                <span class="os-dot"></span> ESTADO_OPERACIONAL: ${OS_CONFIG.status}${activeClientHtml}
-            </div>
-        </div>
-        <div class="os-topbar-right">
-            <div class="os-user-profile" id="user-profile-menu" style="cursor: pointer;">
-                <div class="os-avatar">${initials}</div>
-                <span>${user.full_name || user.email}</span>
-                <i class="fa-solid fa-chevron-down" style="font-size: 0.7rem; margin-left: 8px; opacity: 0.5;"></i>
-            </div>
-        </div>`;
-    
-    document.querySelector('.os-topbar').innerHTML = html;
-
-    // Listener para logout (opcional, para UI futura)
-    document.getElementById('user-profile-menu').onclick = () => {
-        if(confirm('Deseja encerrar a sessão operacional?')) {
-            OS_AUTH.logout();
+        try {
+            const el = document.createElement('textarea');
+            el.value = message;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            console.log('[WHATSAPP] Mensagem copiada (textarea fallback).');
+        } catch (e) {
+            console.error('[WHATSAPP] Falha no fallback de cópia:', e);
         }
-    };
-
+    }
+    
+    // Registrar log
+    if (typeof OS_LOGS_ENGINE !== 'undefined') {
+        OS_LOGS_ENGINE.userAction(
+            'CONTACT_INTENTION_LOGGED',
+            'whatsapp-ponte',
+            { phone: cleanPhone, message_length: message.length },
+            localStorage.getItem('fluxai_session') ? JSON.parse(localStorage.getItem('fluxai_session')).role : 'OPERATOR',
+            localStorage.getItem('fluxai_current_project_id') || null,
+            false // simulated = false (log real de governança)
+        );
+    }
+    
+    alert(`Mensagem copiada para a área de transferência!\n\nRedirecionando para o WhatsApp Web para envio manual pelo operador.`);
+    window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
 };
+
+
+
 

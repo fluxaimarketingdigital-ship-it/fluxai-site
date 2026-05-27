@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FluxAI OS™ | Centro de Operações</title>
+    <link rel="stylesheet" href="./styles/interface.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body class="os-mode">
+    <div class="os-bg-glow"></div>
+    <div class="os-shell">
+        <aside class="os-sidebar"></aside>
+
+        <div class="os-viewport-wrapper">
+            <header class="os-topbar"></header>
+
+            <main class="os-viewport">
+                <div class="os-page-header">
+                    <div class="os-page-title">
+                        <h1 class="gradient">Centro de Operações</h1>
+                        <p>Visão sistêmica operacional: gargalos, falhas, backlog e monitoramento do FluxAI OS™.</p>
+                    </div>
+                    <div>
+                        <button id="btn-sync-operations" class="os-btn os-btn-outline os-btn-sm">
+                            <i class="fa-solid fa-arrows-rotate"></i> Sincronizar Painel
+                        </button>
+                    </div>
+                </div>
+
+                <!-- KPI METRICS GRID -->
+                <div class="os-widget-grid" id="operations-kpi-grid">
+                    <div class="os-widget" style="grid-column: span 3;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Clientes Críticos</span>
+                            <i class="fa-solid fa-triangle-exclamation" style="color:var(--os-danger)"></i>
+                        </div>
+                        <div class="os-metric">
+                            <div class="os-metric-value" id="kpi-critical-clients">-</div>
+                            <div class="os-metric-meta">Pausados ou bloqueados</div>
+                        </div>
+                    </div>
+                    <div class="os-widget" style="grid-column: span 3;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Fila de IA</span>
+                            <i class="fa-solid fa-robot" style="color:var(--os-primary)"></i>
+                        </div>
+                        <div class="os-metric">
+                            <div class="os-metric-value" id="kpi-ia-queue">-</div>
+                            <div class="os-metric-meta">Aguardando publicação</div>
+                        </div>
+                    </div>
+                    <div class="os-widget" style="grid-column: span 3;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Aprovações Externas</span>
+                            <i class="fa-solid fa-user-check" style="color:var(--os-info)"></i>
+                        </div>
+                        <div class="os-metric">
+                            <div class="os-metric-value" id="kpi-pending-approvals">-</div>
+                            <div class="os-metric-meta">Decisões pendentes</div>
+                        </div>
+                    </div>
+                    <div class="os-widget" style="grid-column: span 3;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Automações / Falhas</span>
+                            <i class="fa-solid fa-network-wired" style="color:var(--os-warning)"></i>
+                        </div>
+                        <div class="os-metric">
+                            <div class="os-metric-value" id="kpi-automation-errors">-</div>
+                            <div class="os-metric-meta">Falhas graves registradas</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="os-widget-grid">
+                    <!-- SEÇÃO 1: CLIENTES COM RISCO / LIMITES -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Status de Risco dos Clientes</span>
+                            <i class="fa-solid fa-users" style="opacity: 0.5;"></i>
+                        </div>
+                        <div class="os-table-wrapper">
+                            <table class="os-table" id="table-clients-risk">
+                                <thead>
+                                    <tr>
+                                        <th>Cliente</th>
+                                        <th>Limite IA</th>
+                                        <th>IA Status</th>
+                                        <th>Automações</th>
+                                        <th>Integração</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="5" style="text-align:center; padding: 20px; opacity:0.5;">Carregando informações...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 2: CONTEÚDO E RELATÓRIOS PENDENTES -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Backlog de Conteúdo & Relatórios</span>
+                            <i class="fa-solid fa-pen-fancy" style="opacity: 0.5;"></i>
+                        </div>
+                        <div class="os-table-wrapper">
+                            <table class="os-table" id="table-content-backlog">
+                                <thead>
+                                    <tr>
+                                        <th>Identificador</th>
+                                        <th>Tipo</th>
+                                        <th>Status Atual</th>
+                                        <th>Ação Recomendada</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Carregando backlog...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 3: SOLICITAÇÕES PENDENTES E DEMANDAS -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Aprovações do Cliente & Demandas</span>
+                            <i class="fa-solid fa-list-check" style="opacity: 0.5;"></i>
+                        </div>
+                        <div class="os-table-wrapper">
+                            <table class="os-table" id="table-approvals-demands">
+                                <thead>
+                                    <tr>
+                                        <th>Origem</th>
+                                        <th>Referência</th>
+                                        <th>Status</th>
+                                        <th>Ação</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Carregando demandas...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- SEÇÃO 4: FALHAS DE WEBHOOK E ALERTAS CRÍTICOS -->
+                    <div class="os-widget" style="grid-column: span 6;">
+                        <div class="os-widget-header">
+                            <span class="os-widget-label">Monitoramento de Erros e Falhas</span>
+                            <i class="fa-solid fa-bug" style="opacity: 0.5;"></i>
+                        </div>
+                        <div class="os-table-wrapper">
+                            <table class="os-table" id="table-webhook-errors">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>Evento / Ação</th>
+                                        <th>Severidade</th>
+                                        <th>Detalhe do Erro</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td colspan="4" style="text-align:center; padding: 20px; opacity:0.5;">Carregando logs de erros...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="./js/modules/operations-center.js"></script>
+</body>
+</html>
