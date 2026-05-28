@@ -52,8 +52,9 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 - **Estados de erro:** Falha no carregamento dos cards de KPIs.
 - **Validação de permissão:** Acesso negado para CLIENT.
 - **Risco funcional:** Exibição incorreta de dados mascarando a saúde do negócio.
-- **Ajustes necessários:** [Em aberto]
-- **Prioridade:** [Em aberto]
+- **Ajustes necessários:** Adicionar feedback visual quando falhar a conexão com SheetsService/API, substituindo estado eterno de sincronização por mensagem clara de falha controlada.
+- **Prioridade:** P2 (UX / Feedback operacional)
+- **Status da Validação:** 🟢 Homologado (Aprovado com ressalva em backlog)
 
 ### 3. Client Portal
 - **Objetivo operacional:** Painel seguro, transparente e restrito para clientes acompanharem demandas.
