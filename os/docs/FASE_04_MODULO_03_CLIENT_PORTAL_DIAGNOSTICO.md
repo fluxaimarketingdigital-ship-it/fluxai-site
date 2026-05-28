@@ -2,74 +2,128 @@
 
 **Data da Validação:** 27 de Maio de 2026
 **Módulo:** 3. Client Portal (Interface de Valor)
-**Status Geral:** 🟡 Aprovado com Ressalvas (Cross-Tenant Frontend IDOR)
+**Status Geral:** 🔴 Atenção Crítica (Falha P0 / IDOR)
 
 ## 📊 Matriz de Validação E2E
 
-### Teste 1: Acesso Restrito (CLIENT)
-- **Cenário testado:** Acesso direto à rota `/os/client-portal` por um usuário de papel `CLIENT`.
-- **Resultado esperado:** Acesso autorizado. Botão "Voltar ao painel" (exclusivo para Admins/Operadores) deve sumir.
-- **Resultado observado:** O framework avalia corretamente o escopo via `OS_AUTH.check('CLIENT')`. A lógica esconde o botão lateral se a role for igual a `CLIENT`.
+### Teste 1: Acesso Restrito ao Próprio Portal
+- **Cenário testado:** Cliente acessando sua rota padrão (`/os/client-portal`).
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** Acesso concedido e botão administrativo "Voltar ao Painel" oculto.
+- **Resultado observado:** A função `OS_AUTH.check('CLIENT')` libera a tela. O bloco `init()` oculta proativamente o botão `.btn-back-portal` caso `session.role === 'CLIENT'`.
 - **Evidência:** `client-portal.html` (Linhas 548 e 581-584).
 - **Status:** Aprovado ✅
 - **Prioridade:** N/A
-- **Recomendação:** Autorização visual e sistêmica atestada.
+- **Recomendação:** Autorização base funcional.
 
-### Teste 2: Acesso Proxy (ADMIN / OPERATOR)
-- **Cenário testado:** Operador acessando o portal para visualizar como o cliente vê.
-- **Resultado esperado:** O portal carrega os dados e mantém o botão "Voltar ao painel" visível.
-- **Resultado observado:** Funciona perfeitamente. Como a regra `check('CLIENT')` autoriza cargos superiores na cadeia de herança, o operador entra e o botão persiste.
-- **Evidência:** `client-portal.html` (Linhas 581-584).
+### Teste 2: Cross-Tenant Data Leak (IDOR via URL)
+- **Cenário testado:** Cliente logado tenta forçar acesso ao painel de outro cliente alterando `?project_id=XXX` na URL.
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** Sistema bloqueia a renderização e injeta o `project_id` original atrelado ao JWT/Sessão do usuário logado.
+- **Resultado observado:** O script extrai cegamente a variável `projectId` da URL (`new URLSearchParams`). **Não há cruzamento de segurança** com o `OS_AUTH.user.project_id`. Se a conexão de banco cair (ou estiver em Mocks), o cliente visualiza a interface populada com os dados de outra empresa (exposição de Mocks cruzados).
+- **Evidência:** `client-portal.html` (Linhas 556-557 e fallback em 611-622).
+- **Status:** Falha ❌
+- **Prioridade:** P0 (Risco Severo Front-End)
+- **Recomendação:** Adicionar validação no `init()`: Se role = CLIENT e `projectId` da URL for diferente do `user.project_id`, reescrever a URL e forçar o ID do usuário.
+
+### Teste 3: Visão Proxy (ADMIN / OPERATOR)
+- **Cenário testado:** Operador acessando o portal para monitorar a visão do cliente.
+- **Perfil usado:** ADMIN / OPERATOR
+- **Resultado esperado:** Dados carregam e botão "Voltar ao painel" permanece visível, sem prender o Operador no portal do cliente.
+- **Resultado observado:** A lógica condicional apenas esconde o botão se a role for exata e estritamente `CLIENT`. Para Admin, o botão fica.
+- **Evidência:** `client-portal.html` (Linha 581).
 - **Status:** Aprovado ✅
 - **Prioridade:** N/A
-- **Recomendação:** Visão proxy operando normalmente.
+- **Recomendação:** Visão proxy operante.
 
-### Teste 3: Processamento e Empty States (Métricas e Calendário)
-- **Cenário testado:** Renderização dos KPIs (Alcance, ROI, Engajamento).
-- **Resultado esperado:** Renderizar sem quebras de layout.
-- **Resultado observado:** O layout e os dados fixos renderizam perfeitamente na *grid*, mesmo sob a falha da conexão do banco. O calendário tático possui a correta marcação das classes de "Dias vazios" e "Dias com Eventos".
-- **Evidência:** UI Mockup no HTML (Linhas 332-356 e 423-503).
+### Teste 4: Empty State para Cliente Novo
+- **Cenário testado:** Renderização para cliente recém-cadastrado sem dados.
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** Interface limpa informando que os dados/dashboards estão sendo gerados.
+- **Resultado observado:** Não há lógica de Empty State real implementada; a página hoje joga valores `hardcoded` fakes (ex: '14.2K') no DOM incondicionalmente no fim do carregamento.
+- **Evidência:** `client-portal.html` (Linhas 624-628).
+- **Status:** Atenção ⚠️
+- **Prioridade:** P2 / Backlog UX
+- **Recomendação:** Os valores fixos devem ser injetados apenas se não houver dados. Remover hardcode futuro.
+
+### Teste 5: Fallback Controlado e Realista
+- **Cenário testado:** Supabase fora do ar ou dados vazios do servidor.
+- **Perfil usado:** ADMIN / CLIENT
+- **Resultado esperado:** Fallback local aparece como fallback, sem fingir ser dado real e oficial validado.
+- **Resultado observado:** O script avisa silenciosamente no console que ativou "Fallback LocalStorage Mocks" mas a UI exibe o dashboard normal pro usuário (com dados frios), gerando risco de interpretação equivocada por parte do cliente.
+- **Evidência:** `client-portal.html` (Linhas 611-622).
+- **Status:** Atenção ⚠️
+- **Prioridade:** P2
+- **Recomendação:** Adicionar flag visual ("Modo Offline / Dados Cacheados") caso caia no catch.
+
+### Teste 6: Vazamento Estratégico (Segregação de Visão)
+- **Cenário testado:** Inspeção da página `client-portal` em busca de tokens, prompts ou logs restritos.
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** O portal não deve trafegar segredos, IA prompts ou logs da operação interna.
+- **Resultado observado:** A página não importa nem expõe o `webhook-dispatcher` puro (apenas o enviador restrito do `os-config.js`). Não constam chaves de IA nem rotas do backend no HTML.
+- **Evidência:** Source Code Review do componente.
 - **Status:** Aprovado ✅
 - **Prioridade:** N/A
-- **Recomendação:** UI blindada contra falhas de render.
+- **Recomendação:** Isolamento perimetral de contexto garantido.
 
-### Teste 4: Emissão de Demanda (Webhook e Estado)
-- **Cenário testado:** Cliente clica em "Adicionar Nova Demanda" e submete o formulário.
-- **Resultado esperado:** Bloqueio do botão, registro no log de governança (`OS_LOGS_ENGINE`) e envio real do webhook proxy (`make-proxy`).
-- **Resultado observado:** Executado com maestria. O portal distingue `DEMANDA_NORMAL` de serviços de faturamento extra, validando a transição de status no `StatusEngine` e reportando via Webhook com IDs gerados (`dem_xxx`). Se estiver mockado, grava a demanda no LocalStorage.
-- **Evidência:** `submitDemanda()` (Linhas 671-800).
+### Teste 7: Fluxo de Serviço Extra (Orçamento vs Compra Automática)
+- **Cenário testado:** Submissão do formulário de solicitação de novo serviço.
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** O pedido deve ser classificado como "solicitado" (orçamento) e não faturado diretamente.
+- **Resultado observado:** O script cruza os tipos, marca como `DEMANDA_NORMAL` ou extra (`isExtra`), direciona para o webhook `SERVICE_EXTRA_REQUEST` com *targetStatus* = `'solicitado'` e registra o log `EXTRA_SERVICE_REQUESTED`.
+- **Evidência:** `client-portal.html` (Linhas 705-720).
 - **Status:** Aprovado ✅
 - **Prioridade:** N/A
-- **Recomendação:** Máquina de faturamento/demanda íntegra.
+- **Recomendação:** O fluxo de "pedir orçamento" está protegido.
 
-### Teste 5: Alertas Financeiros e PIX Dinâmico
-- **Cenário testado:** Simulação de um título vencendo ou prestes a vencer.
-- **Resultado esperado:** Aparição do banner com integração ao botão do PIX e WhatsApp.
-- **Resultado observado:** A lógica do `checkFinancialAlerts()` lê os contratos e os pagamentos pendentes, calcula a diferença de dias para o vencimento (`diffDays === 0` ou `diffDays === 2`) e injeta banners vermelhos/amarelos chamativos. A modal PIX preenche as informações corretamente.
-- **Evidência:** Linhas 862-1031.
+### Teste 8: Geração IA Direta (Proibição)
+- **Cenário testado:** Tentativa de um cliente acionar processamento GPT/IA pelo seu painel.
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** Ausência completa dessa capacidade.
+- **Resultado observado:** Não existem funções, botões ou imports do `openai` ou similares no front-end do portal. O cliente é mero consumidor passivo do resultado produzido pelo operador.
+- **Evidência:** Inspeção visual e DOM parsing.
 - **Status:** Aprovado ✅
 - **Prioridade:** N/A
-- **Recomendação:** Esteira de retenção operacional ativa.
+- **Recomendação:** Restrição de consumo operacional validada.
 
-### Teste 6: Vulnerabilidade Cross-Tenant (IDOR Simulado)
-- **Cenário testado:** O `Cliente A` digita maliciosamente na barra de endereços: `?project_id=id_do_cliente_b`.
-- **Resultado esperado:** O front-end deveria barrar a tentativa cruzando o `project_id` da URL com o `user.project_id` salvo na RAM, ou o banco recusa a consulta.
-- **Resultado observado:** O código extrai a constante `projectId` da URL via `URLSearchParams` (linha 557) e utiliza isso cegamente.
-  - Se o Supabase estiver online: O *Row Level Security (RLS)* no banco bloqueia a *Query* impedindo o vazamento severo, caindo no `catch (err)`.
-  - No `catch (err)`, o front-end aciona o "Fallback Mock do LocalStorage" buscando pela chave `projectId` alterada da URL.
-- **Risco:** No ambiente Mock/Fallback, um cliente manipulador visualizaria a UI sob o nome da empresa de outro. Em produção real o RLS do Supabase estanca o pior cenário, mas o front-end deveria checar a sessão do usuário logado contra o ID requisitado.
-- **Evidência:** `client-portal.html` (Linha 557 e 611-622).
-- **Status:** Atenção ⚠️ (Cross-Tenant Reference no Front-End)
-- **Prioridade:** P1 (Segurança Operacional Front-End / Lógica)
-- **Recomendação:** Na função `init()`, adicionar uma checagem de isolamento: se a role for `CLIENT` e o `projectId` requisitado for diferente do `OS_AUTH.user.project_id`, abortar ou forçar a adoção do projeto oficial do usuário logado.
+### Teste 9: Aprovação de Planejamento Interno (Proibição)
+- **Cenário testado:** Tentativa de um cliente aceitar/rejeitar cronograma via portal.
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** A visão do calendário deve ser "Read-Only" ou "Follow-Up".
+- **Resultado observado:** O calendário (linhas 423-503) é estritamente de visualização via CSS grid, não possuindo funções de edição ou clique ativo submetendo formulários (`div class="calendar-event"`).
+- **Evidência:** Code Review (`client-portal.html`).
+- **Status:** Aprovado ✅
+- **Prioridade:** N/A
+- **Recomendação:** Interface passiva segura.
+
+### Teste 10: Feedback Visual de Conexão com Supabase
+- **Cenário testado:** Supabase recusa conexão (Token expirado ou falha de rede).
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** Feedback explícito no portal de que os dados reais não carregaram.
+- **Resultado observado:** Quando o Supabase falha, o código joga pro `catch`, que não renderiza nenhum toast/modal ou banner vermelho pro usuário. Apenas substitui o conteúdo pela leitura do LocalStorage silenciosamente.
+- **Evidência:** `client-portal.html` (Linhas 611-622).
+- **Status:** Atenção ⚠️
+- **Prioridade:** P2 / Backlog UX
+- **Recomendação:** Necessário injetar aviso de erro de rede em tela caso a requisição inicial do `init()` retorne throw/error.
+
+### Teste 11: Integridade do Console F12
+- **Cenário testado:** Acesso da página pelo cliente sob rede limpa.
+- **Perfil usado:** CLIENT
+- **Resultado esperado:** Zero erros críticos vermelhos (Bloqueios CORS, CSP, Vazamentos).
+- **Resultado observado:** O refatoramento de CSP da Fase 03 cobriu perfeitamente o tráfego desta página. Sem ofensores críticos.
+- **Evidência:** Histórico ZAP e Testes Locais.
+- **Status:** Aprovado ✅
+- **Prioridade:** N/A
+- **Recomendação:** Política de hardening operando bem.
 
 ---
 
 ## 🏁 Parecer e Próximos Passos
-O **Módulo 3: Client Portal** representa o ponto máximo de entrega de valor visual e transparência ao cliente da FluxAI. Toda a orquestração de formulários extras, faturamento (alertas PIX) e emissão de demandas via webhooks proxy operam dentro da conformidade esperada. 
+O **Módulo 3: Client Portal** possui um layout de excelente nível e cumpre sua premissa de ocultar do cliente o acesso ao motor (Métricas falsas/verdadeiras, orçamentos, webhooks), mas reprova na validação primária de segurança no front-end (Testes 2, 4, 5 e 10).
 
 **Riscos Identificados:**
-- O front-end confia excessivamente no parâmetro da URL (`?project_id=`) para carregar o escopo. Embora mitigado pelo RLS em produção ativa, gera uma brecha técnica em ambiente de mock/fallback que deve ser tratada como **P1** (Ajuste de Cross-Tenant).
+- **[P0]** Furo de segurança IDOR (Teste 2): O cliente tem a capacidade técnica de ver Mocks ou causar colisão alterando o `project_id` na URL. Deve ser corrigido obrigatoriamente antes da liberação total.
+- **[P2]** Ausência de Empty States, feedbacks falsos e falta de aviso em falhas de rede.
 
-- **Nenhum código do Code Freeze foi desrespeitado** durante o levantamento destas deficiências.
-- Solicito a deliberação da diretoria: aprovamos o Módulo 3 registrando o P1 no Backlog da Fase 04, ou realizamos o ajuste de validação IDOR no front-end antes de seguir? O próximo passo, se liberado, é o **Módulo 4 (Onboarding)**.
+**Decisão:** Módulo reprovado em auditoria secundária (Devido à falha P0 do Teste 2).
+Aguardando autorização da diretoria para propor a solução no código para sanar a falha de segurança antes de prosseguir com a Fase 04.
