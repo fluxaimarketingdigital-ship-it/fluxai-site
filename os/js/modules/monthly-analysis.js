@@ -44,87 +44,148 @@ async function loadReports() {
         const reports = reportsRaw.filter(r => r.clientId === curProj || r.project_id === curProj);
 
         if (reports.length === 0) {
-            container.innerHTML = '<div style="opacity: 0.5; width: 100%; text-align: center;">Nenhum relatório encontrado para este cliente. <button class="os-btn os-btn-primary" onclick="window.createDraft()">GERAR RASCUNHO</button></div>';
+            container.textContent = '';
+            const emptyDiv = document.createElement('div');
+            emptyDiv.style.cssText = 'opacity: 0.5; width: 100%; text-align: center;';
+            emptyDiv.textContent = 'Nenhum relatório encontrado para este cliente. ';
+            const btnDraft = document.createElement('button');
+            btnDraft.className = 'os-btn os-btn-primary';
+            btnDraft.textContent = 'GERAR RASCUNHO';
+            btnDraft.onclick = () => window.createDraft();
+            emptyDiv.appendChild(btnDraft);
+            container.appendChild(emptyDiv);
             return;
         }
 
-        let html = '';
-
+        container.textContent = '';
         reports.forEach(r => {
             const statusConfig = StatusEngine.resolve('relatorios', r.status);
-            const statusBadge = StatusEngine.renderBadge('relatorios', r.status);
-
-            let buttonsHtml = '';
-            const allowed = statusConfig.allowedTransitions || [];
             
+            const widget = document.createElement('div');
+            widget.className = 'os-widget half';
+            
+            const card = document.createElement('div');
+            card.className = 'report-card';
+            
+            const header = document.createElement('div');
+            header.className = 'report-header';
+            
+            const headerLeft = document.createElement('div');
+            const title = document.createElement('div');
+            title.className = 'report-title';
+            title.textContent = r.clientId;
+            const meta = document.createElement('div');
+            meta.className = 'report-meta';
+            meta.textContent = r.month;
+            headerLeft.appendChild(title);
+            headerLeft.appendChild(meta);
+            
+            const headerRight = document.createElement('div');
+            const badgeSpan = document.createElement('span');
+            badgeSpan.className = 'os-badge os-badge-' + (statusConfig.color || 'neutral');
+            badgeSpan.textContent = statusConfig.label || r.status;
+            headerRight.appendChild(badgeSpan);
+            
+            header.appendChild(headerLeft);
+            header.appendChild(headerRight);
+            
+            const stats = document.createElement('div');
+            stats.className = 'report-stats';
+            
+            const stat1 = document.createElement('div'); stat1.className = 'stat-box';
+            const val1 = document.createElement('div'); val1.className = 'stat-value'; val1.textContent = (r.reach / 1000).toFixed(1) + 'k';
+            const lbl1 = document.createElement('div'); lbl1.className = 'stat-label'; lbl1.textContent = 'Alcance';
+            stat1.appendChild(val1); stat1.appendChild(lbl1);
+            
+            const stat2 = document.createElement('div'); stat2.className = 'stat-box';
+            const val2 = document.createElement('div'); val2.className = 'stat-value'; val2.textContent = r.followers;
+            const lbl2 = document.createElement('div'); lbl2.className = 'stat-label'; lbl2.textContent = 'Seguidores';
+            stat2.appendChild(val2); stat2.appendChild(lbl2);
+            
+            const stat3 = document.createElement('div'); stat3.className = 'stat-box';
+            const val3 = document.createElement('div'); val3.className = 'stat-value'; val3.textContent = r.contentPublished;
+            const lbl3 = document.createElement('div'); lbl3.className = 'stat-label'; lbl3.textContent = 'Posts';
+            stat3.appendChild(val3); stat3.appendChild(lbl3);
+            
+            stats.appendChild(stat1); stats.appendChild(stat2); stats.appendChild(stat3);
+            
+            const content = document.createElement('div');
+            content.className = 'report-content';
+            
+            const h4_1 = document.createElement('h4'); h4_1.textContent = 'O que Aconteceu?';
+            const p_1 = document.createElement('p'); p_1.textContent = r.whatHappened || 'Resumo executivo do mês não preenchido...';
+            
+            const h4_2 = document.createElement('h4'); h4_2.textContent = 'Por que Aconteceu? (Diagnóstico Executivo)';
+            const p_2 = document.createElement('p'); p_2.textContent = r.executiveDiagnostic;
+            
+            const h4_3 = document.createElement('h4'); h4_3.textContent = 'Impacto & Riscos';
+            const p_3 = document.createElement('p'); p_3.textContent = r.risks || 'Análise de risco não preenchida...';
+            
+            const h4_4 = document.createElement('h4'); h4_4.textContent = 'Oportunidades & Decisão Próximo Mês';
+            const p_4 = document.createElement('p'); p_4.textContent = r.nextMonthDecision;
+            
+            const h4_5 = document.createElement('h4'); h4_5.textContent = 'Próximos Passos';
+            const p_5 = document.createElement('p'); p_5.textContent = r.priorities;
+            
+            content.appendChild(h4_1); content.appendChild(p_1);
+            content.appendChild(h4_2); content.appendChild(p_2);
+            content.appendChild(h4_3); content.appendChild(p_3);
+            content.appendChild(h4_4); content.appendChild(p_4);
+            content.appendChild(h4_5); content.appendChild(p_5);
+            
+            const footer = document.createElement('div');
+            footer.style.cssText = 'margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; text-align: right; display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px;';
+            
+            const actionSpan = document.createElement('span');
+            actionSpan.style.cssText = 'font-size: 0.65rem; color: var(--os-text-muted); margin-right: auto;';
+            actionSpan.textContent = 'Ações de Estado:';
+            footer.appendChild(actionSpan);
+            
+            const allowed = statusConfig.allowedTransitions || [];
             allowed.forEach(target => {
                 const targetRes = StatusEngine.resolve('relatorios', target);
-                buttonsHtml += `
-                    <button onclick="window.transitionReport('${r.id || r.clientId}', '${r.status}', '${target}')" 
-                            style="background: rgba(142, 158, 104, 0.1); border: 1px solid var(--os-primary); color: var(--os-primary); padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 0.65rem; text-transform: uppercase; margin-left: 8px; transition: all 0.2s;">
-                        Mudar para: ${targetRes.label}
-                    </button>
-                `;
+                const btnTransition = document.createElement('button');
+                btnTransition.style.cssText = 'background: rgba(142, 158, 104, 0.1); border: 1px solid var(--os-primary); color: var(--os-primary); padding: 6px 12px; border-radius: 4px; font-weight: 700; cursor: pointer; font-size: 0.65rem; text-transform: uppercase; margin-left: 8px; transition: all 0.2s;';
+                btnTransition.textContent = 'Mudar para: ' + targetRes.label;
+                btnTransition.onclick = () => window.transitionReport(r.id || r.clientId, r.status, target);
+                footer.appendChild(btnTransition);
             });
-
-            html += `
-            <div class="os-widget half">
-                <div class="report-card">
-                    <div class="report-header">
-                        <div>
-                            <div class="report-title">${r.clientId}</div>
-                            <div class="report-meta">${r.month}</div>
-                        </div>
-                        <div>${statusBadge}</div>
-                    </div>
-                    
-                    <div class="report-stats">
-                        <div class="stat-box">
-                            <div class="stat-value">${(r.reach / 1000).toFixed(1)}k</div>
-                            <div class="stat-label">Alcance</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">${r.followers}</div>
-                            <div class="stat-label">Seguidores</div>
-                        </div>
-                        <div class="stat-box">
-                            <div class="stat-value">${r.contentPublished}</div>
-                            <div class="stat-label">Posts</div>
-                        </div>
-                    </div>
-
-                    <div class="report-content">
-                        <h4>O que Aconteceu?</h4>
-                        <p>${r.whatHappened || 'Resumo executivo do mês não preenchido...'}</p>
-                        
-                        <h4>Por que Aconteceu? (Diagnóstico Executivo)</h4>
-                        <p>${r.executiveDiagnostic}</p>
-
-                        <h4>Impacto & Riscos</h4>
-                        <p>${r.risks || 'Análise de risco não preenchida...'}</p>
-                        
-                        <h4>Oportunidades & Decisão Próximo Mês</h4>
-                        <p>${r.nextMonthDecision}</p>
-                        
-                        <h4>Próximos Passos</h4>
-                        <p>${r.priorities}</p>
-                    </div>
-                    
-                    <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; text-align: right; display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px;">
-                        <span style="font-size: 0.65rem; color: var(--os-text-muted); margin-right: auto;">Ações de Estado:</span>
-                        ${buttonsHtml}
-                        <button style="background: rgba(255,255,255,0.05); border: 1px solid var(--os-border); color: #fff; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.65rem; text-transform: uppercase;">Editar Rascunho</button>
-                        ${(r.status === 'aprovado_internamente' || r.status === 'liberado_cliente' || r.status === 'enviado_cliente') ? `<button onclick="window.printReport('${r.id || r.clientId}')" style="background: var(--os-primary); border: none; color: #000; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.65rem; text-transform: uppercase;"><i class="fa-solid fa-print"></i> Imprimir/Exportar</button>` : ''}
-                    </div>
-                </div>
-            </div>`;
+            
+            const btnEdit = document.createElement('button');
+            btnEdit.style.cssText = 'background: rgba(255,255,255,0.05); border: 1px solid var(--os-border); color: #fff; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.65rem; text-transform: uppercase;';
+            btnEdit.textContent = 'Editar Rascunho';
+            footer.appendChild(btnEdit);
+            
+            if (r.status === 'aprovado_internamente' || r.status === 'liberado_cliente' || r.status === 'enviado_cliente') {
+                const btnPrint = document.createElement('button');
+                btnPrint.style.cssText = 'background: var(--os-primary); border: none; color: #000; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.65rem; text-transform: uppercase;';
+                
+                const iconPrint = document.createElement('i');
+                iconPrint.className = 'fa-solid fa-print';
+                iconPrint.style.marginRight = '4px';
+                
+                btnPrint.appendChild(iconPrint);
+                btnPrint.appendChild(document.createTextNode(' Imprimir/Exportar'));
+                btnPrint.onclick = () => window.printReport(r.id || r.clientId);
+                footer.appendChild(btnPrint);
+            }
+            
+            card.appendChild(header);
+            card.appendChild(stats);
+            card.appendChild(content);
+            card.appendChild(footer);
+            widget.appendChild(card);
+            
+            container.appendChild(widget);
         });
-
-        container.innerHTML = html;
     } catch (e) {
         console.error(e);
         OS_LOGS_ENGINE.userAction('REPORT_DATA_FAILED', 'monthly-analysis', { error: e.message }, 'SYSTEM', curProj || 'unknown', true);
-        container.innerHTML = '<div style="color: var(--os-danger); width: 100%; text-align: center; padding: 20px;">Falha de API/Conexão: Dados Pendentes / Fonte Indisponível.</div>';
+        container.textContent = '';
+        const errDiv = document.createElement('div');
+        errDiv.style.cssText = 'color: var(--os-danger); width: 100%; text-align: center; padding: 20px;';
+        errDiv.textContent = 'Falha de API/Conexão: Dados Pendentes / Fonte Indisponível.';
+        container.appendChild(errDiv);
     }
 }
 

@@ -60,7 +60,11 @@ async function loadProjects() {
 
         const select = document.getElementById('project-filter');
         if (select) {
-            select.innerHTML = '<option value="">Selecione um Cliente...</option>';
+            select.textContent = '';
+            const opt = document.createElement('option');
+            opt.value = "";
+            opt.textContent = "Selecione um Cliente...";
+            select.appendChild(opt);
             projects.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.id;
@@ -77,11 +81,19 @@ async function loadDemands() {
     const container = document.getElementById('demands-table-container');
 
     if (!currentProject) {
-        container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--os-text-muted);">Selecione um cliente/projeto no topo para visualizar as demandas.</div>';
+        container.textContent = '';
+        const msg = document.createElement('div');
+        msg.style.cssText = "padding:40px; text-align:center; color:var(--os-text-muted);";
+        msg.textContent = "Selecione um cliente/projeto no topo para visualizar as demandas.";
+        container.appendChild(msg);
         return;
     }
 
-    container.innerHTML = '<div style="opacity: 0.5; padding:20px;">Sincronizando com Google Sheets via Make...</div>';
+    container.textContent = '';
+    const msgSync = document.createElement('div');
+    msgSync.style.cssText = "opacity: 0.5; padding:20px;";
+    msgSync.textContent = "Sincronizando com Google Sheets via Make...";
+    container.appendChild(msgSync);
 
     try {
         let demands = await SheetsService.fetchDemands();
@@ -102,38 +114,50 @@ async function loadDemands() {
         window.loadedDemands = demands;
 
         if (demands.length === 0) {
-            container.innerHTML = '<div style="padding:40px; text-align:center; color:var(--os-text-muted);">Nenhuma demanda encontrada neste projeto.</div>';
+            container.textContent = '';
+            const msgEmpty = document.createElement('div');
+            msgEmpty.style.cssText = "padding:40px; text-align:center; color:var(--os-text-muted);";
+            msgEmpty.textContent = "Nenhuma demanda encontrada neste projeto.";
+            container.appendChild(msgEmpty);
             return;
         }
 
-        let html = `<div class="os-table-wrapper">
-            <table class="os-table">
-            <thead>
-                <tr>
-                    <th>Data</th>
-                    <th>ID Demanda</th>
-                    <th>Título</th>
-                    <th>Prioridade</th>
-                    <th>Status</th>
-                    <th>Prazo</th>
-                    <th style="text-align:right;">Ações</th>
-                </tr>
-            </thead>
-            <tbody id="demands-tbody"></tbody>
-            </table></div>`;
-
-        container.innerHTML = html;
+        container.textContent = '';
+        const wrapper = document.createElement('div');
+        wrapper.className = "os-table-wrapper";
+        const table = document.createElement('table');
+        table.className = "os-table";
+        const thead = document.createElement('thead');
+        const trH = document.createElement('tr');
+        const th1 = document.createElement('th'); th1.textContent = "Data";
+        const th2 = document.createElement('th'); th2.textContent = "ID Demanda";
+        const th3 = document.createElement('th'); th3.textContent = "Título";
+        const th4 = document.createElement('th'); th4.textContent = "Prioridade";
+        const th5 = document.createElement('th'); th5.textContent = "Status";
+        const th6 = document.createElement('th'); th6.textContent = "Prazo";
+        const th7 = document.createElement('th'); th7.style.textAlign = "right"; th7.textContent = "Ações";
+        trH.appendChild(th1); trH.appendChild(th2); trH.appendChild(th3); trH.appendChild(th4); trH.appendChild(th5); trH.appendChild(th6); trH.appendChild(th7);
+        thead.appendChild(trH);
+        table.appendChild(thead);
+        const tbody = document.createElement('tbody');
+        tbody.id = "demands-tbody";
+        table.appendChild(tbody);
+        wrapper.appendChild(table);
+        container.appendChild(wrapper);
         const tbody = document.getElementById('demands-tbody');
 
         demands.forEach(d => {
-            let prioBadge = '';
-            if (d.priority === 'alta') prioBadge = '<span class="os-badge os-badge-danger">Alta</span>';
-            else if (d.priority === 'media') prioBadge = '<span class="os-badge os-badge-warning">Média</span>';
-            else prioBadge = '<span class="os-badge os-badge-success">Baixa</span>';
+            const spanPrio = document.createElement('span');
+            spanPrio.className = "os-badge";
+            if (d.priority === 'alta') { spanPrio.classList.add('os-badge-danger'); spanPrio.textContent = 'Alta'; }
+            else if (d.priority === 'media') { spanPrio.classList.add('os-badge-warning'); spanPrio.textContent = 'Média'; }
+            else { spanPrio.classList.add('os-badge-success'); spanPrio.textContent = 'Baixa'; }
 
-            let statusBadge = `<span class="os-badge os-badge-neutral">${d.status}</span>`;
-            if (d.status === 'concluido' || d.status === 'entregue') statusBadge = `<span class="os-badge os-badge-success">${d.status}</span>`;
-            else if (d.status === 'em_andamento') statusBadge = `<span class="os-badge os-badge-info">Em Andamento</span>`;
+            const spanStatus = document.createElement('span');
+            spanStatus.className = "os-badge";
+            if (d.status === 'concluido' || d.status === 'entregue') { spanStatus.classList.add('os-badge-success'); spanStatus.textContent = d.status; }
+            else if (d.status === 'em_andamento') { spanStatus.classList.add('os-badge-info'); spanStatus.textContent = 'Em Andamento'; }
+            else { spanStatus.classList.add('os-badge-neutral'); spanStatus.textContent = d.status; }
 
             const tr = document.createElement('tr');
             const td1 = document.createElement('td');
@@ -149,10 +173,10 @@ async function loadDemands() {
             td3.textContent = d.title;
 
             const td4 = document.createElement('td');
-            td4.innerHTML = prioBadge; // prioBadge is statically controlled safe HTML above
+            td4.appendChild(spanPrio);
 
             const td5 = document.createElement('td');
-            td5.innerHTML = statusBadge; // statusBadge is statically controlled safe HTML above
+            td5.appendChild(spanStatus);
 
             const td6 = document.createElement('td');
             td6.className = "safe-deadline";
@@ -201,7 +225,11 @@ async function loadDemands() {
 
     } catch (e) {
         console.error(e);
-        container.innerHTML = '<div style="color: var(--os-danger); padding:20px;">Erro ao carregar demandas.</div>';
+        container.textContent = '';
+        const msgErr = document.createElement('div');
+        msgErr.style.cssText = "color: var(--os-danger); padding:20px;";
+        msgErr.textContent = "Erro ao carregar demandas.";
+        container.appendChild(msgErr);
     }
 }
 
@@ -219,7 +247,11 @@ async function submitNewDemand() {
     }
 
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> CRIANDO...';
+    btn.textContent = '';
+    const icn = document.createElement('i');
+    icn.className = "fa-solid fa-spinner fa-spin";
+    btn.appendChild(icn);
+    btn.appendChild(document.createTextNode(" CRIANDO..."));
 
     const demandId = 'dem_' + Date.now();
     const newDemand = {
@@ -278,7 +310,7 @@ async function submitNewDemand() {
         alert('Erro fatal ao criar demanda: ' + e.message);
     } finally {
         btn.disabled = false;
-        btn.innerHTML = 'CRIAR DEMANDA';
+        btn.textContent = 'CRIAR DEMANDA';
     }
 }
 

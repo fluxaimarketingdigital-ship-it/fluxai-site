@@ -221,7 +221,9 @@ async function loadProjects() {
 
         const select = document.getElementById('project-filter');
         if (select) {
-            select.innerHTML = '<option value="">Todos os Projetos</option>';
+            select.textContent = '';
+            const opt = document.createElement('option'); opt.value = ''; opt.textContent = 'Todos os Projetos';
+            select.appendChild(opt);
             window.allProjects.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.id;
@@ -234,7 +236,9 @@ async function loadProjects() {
         window.allProjects = [];
         const select = document.getElementById('project-filter');
         if (select) {
-            select.innerHTML = '<option value="">Sem projetos cadastrados</option>';
+            select.textContent = '';
+            const opt = document.createElement('option'); opt.value = ''; opt.textContent = 'Sem projetos cadastrados';
+            select.appendChild(opt);
         }
     }
 }
@@ -283,7 +287,11 @@ window.updateIAGovDashboard = async () => {
     const govTotal = document.getElementById('ia-gov-total');
     if (!govTotal) return; // tab was hidden
     if (!currentProject) {
-        document.getElementById('ia-gov-table-body').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:50px; color:#444;">Selecione um projeto para carregar a auditoria.</td></tr>';
+        const tbody = document.getElementById('ia-gov-table-body');
+        tbody.textContent = '';
+        const tr = document.createElement('tr');
+        const td = document.createElement('td'); td.colSpan = 5; td.style.cssText = 'text-align:center; padding:50px; color:#444;'; td.textContent = 'Selecione um projeto para carregar a auditoria.';
+        tr.appendChild(td); tbody.appendChild(tr);
         govTotal.textContent = '--';
         document.getElementById('ia-gov-available').textContent = '--';
         document.getElementById('ia-gov-occupied').textContent = '--';
@@ -309,9 +317,12 @@ window.updateIAGovDashboard = async () => {
     const clientAssets = mockAssets.filter(a => a.project_id === currentProject && a.metadata?.ai_generated);
     
     if (clientAssets.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:50px; color:#444;">Nenhuma geração de IA encontrada neste escopo.</td></tr>';
+        tableBody.textContent = '';
+        const trEmpty = document.createElement('tr');
+        const tdEmpty = document.createElement('td'); tdEmpty.colSpan = 5; tdEmpty.style.cssText = 'text-align:center; padding:50px; color:#444;'; tdEmpty.textContent = 'Nenhuma geração de IA encontrada neste escopo.';
+        trEmpty.appendChild(tdEmpty); tableBody.appendChild(trEmpty);
     } else {
-        tableBody.innerHTML = '';
+        tableBody.textContent = '';
         clientAssets.forEach(a => {
             const tr = document.createElement('tr');
             let impact = 'Nenhum';
@@ -462,7 +473,9 @@ function renderContentTable(contents) {
     
     if (!contents || contents.length === 0) { 
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td colspan="6" style="text-align:center; padding: 40px; color:var(--os-text-muted);">Nenhum ativo estratégico provido neste workspace.</td>`;
+        tr.textContent = '';
+        const tdEmptyAsset = document.createElement('td'); tdEmptyAsset.colSpan = 6; tdEmptyAsset.style.cssText = 'text-align:center; padding: 40px; color:var(--os-text-muted);'; tdEmptyAsset.textContent = 'Nenhum ativo estratégico provido neste workspace.';
+        tr.appendChild(tdEmptyAsset);
         body.replaceChildren(tr); 
         return; 
     } 
@@ -669,7 +682,7 @@ window.openEditModal = async (id) => {
         
         // Seletor de Versão
         const selector = document.getElementById('edit-asset-version-selector');
-        selector.innerHTML = '';
+        selector.textContent = '';
         Object.keys(versions).forEach(v => {
             const opt = document.createElement('option');
             opt.value = v;
@@ -745,17 +758,35 @@ window.openEditModal = async (id) => {
             history.forEach(h => {
                 const hDiv = document.createElement('div');
                 hDiv.style.cssText = 'padding:10px; border-bottom:1px solid #222; font-size:0.7rem;';
-                hDiv.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                        <b class="safe-h-title" style="color:#ef4444"></b>
-                        <span style="opacity:0.5;">${new Date(h.date).toLocaleString('pt-BR')}</span>
-                    </div>
-                    <div class="safe-h-note" style="color:#eee; line-height:1.4;"></div>
-                    <div class="safe-h-author" style="font-size:0.6rem; opacity:0.4; margin-top:3px;"></div>
-                `;
-                hDiv.querySelector('.safe-h-title').textContent = h.type === 'CLIENT' ? '📌 REJEITADO PELO CLIENTE' : '🛡️ AJUSTE';
-                hDiv.querySelector('.safe-h-note').textContent = h.note;
-                hDiv.querySelector('.safe-h-author').textContent = `Por: ${h.author}`;
+                
+                const topDiv = document.createElement('div');
+                topDiv.style.cssText = 'display:flex; justify-content:space-between; margin-bottom:5px;';
+                
+                const bTitle = document.createElement('b');
+                bTitle.className = 'safe-h-title';
+                bTitle.style.color = '#ef4444';
+                bTitle.textContent = h.type === 'CLIENT' ? '📌 REJEITADO PELO CLIENTE' : '🛡️ AJUSTE';
+                
+                const spanDate = document.createElement('span');
+                spanDate.style.opacity = '0.5';
+                spanDate.textContent = new Date(h.date).toLocaleString('pt-BR');
+                
+                topDiv.appendChild(bTitle); topDiv.appendChild(spanDate);
+                
+                const noteDiv = document.createElement('div');
+                noteDiv.className = 'safe-h-note';
+                noteDiv.style.cssText = 'color:#eee; line-height:1.4;';
+                noteDiv.textContent = h.note;
+                
+                const authorDiv = document.createElement('div');
+                authorDiv.className = 'safe-h-author';
+                authorDiv.style.cssText = 'font-size:0.6rem; opacity:0.4; margin-top:3px;';
+                authorDiv.textContent = 'Por: ' + h.author;
+                
+                hDiv.appendChild(topDiv);
+                hDiv.appendChild(noteDiv);
+                hDiv.appendChild(authorDiv);
+                
                 historyContainer.appendChild(hDiv);
             });
         } else {
@@ -788,31 +819,38 @@ window.openEditModal = async (id) => {
             metaGrid.replaceChildren();
 
             const respDiv = document.createElement('div');
-            respDiv.innerHTML = `
-                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">RESPONSÁVEL</label> 
-                <select id="edit-asset-responsible" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;"> 
-                    <option value="Design">Design</option> 
-                    <option value="Audiovisual">Audiovisual</option> 
-                    <option value="Estrategista">Estrategista</option> 
-                    <option value="Gestor de Tráfego">Gestor de Tráfego</option> 
-                </select> 
-            `;
+            const respLabel = document.createElement('label');
+            respLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;';
+            respLabel.textContent = 'RESPONSÁVEL';
+            const respSel = document.createElement('select');
+            respSel.id = 'edit-asset-responsible';
+            respSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;';
+            ['Design', 'Audiovisual', 'Estrategista', 'Gestor de Tráfego'].forEach(optTxt => {
+                const opt = document.createElement('option'); opt.value = optTxt; opt.textContent = optTxt; respSel.appendChild(opt);
+            });
+            respDiv.appendChild(respLabel); respDiv.appendChild(respSel);
             
             const deadlineDiv = document.createElement('div');
-            deadlineDiv.innerHTML = `
-                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRAZO DE APROVAÇÃO</label> 
-                <input type="datetime-local" id="edit-asset-deadline" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;"> 
-            `;
+            const deadlineLabel = document.createElement('label');
+            deadlineLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;';
+            deadlineLabel.textContent = 'PRAZO DE APROVAÇÃO';
+            const deadlineInput = document.createElement('input');
+            deadlineInput.type = 'datetime-local';
+            deadlineInput.id = 'edit-asset-deadline';
+            deadlineInput.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;';
+            deadlineDiv.appendChild(deadlineLabel); deadlineDiv.appendChild(deadlineInput);
             
             const priorityDiv = document.createElement('div');
-            priorityDiv.innerHTML = `
-                <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;">PRIORIDADE</label> 
-                <select id="edit-asset-priority" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;"> 
-                    <option value="BAIXA">BAIXA</option> 
-                    <option value="MÉDIA">MÉDIA</option> 
-                    <option value="ALTA">ALTA</option> 
-                </select> 
-            `;
+            const prioLabel = document.createElement('label');
+            prioLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;';
+            prioLabel.textContent = 'PRIORIDADE';
+            const prioSel = document.createElement('select');
+            prioSel.id = 'edit-asset-priority';
+            prioSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;';
+            ['BAIXA', 'MÉDIA', 'ALTA'].forEach(optTxt => {
+                const opt = document.createElement('option'); opt.value = optTxt; opt.textContent = optTxt; prioSel.appendChild(opt);
+            });
+            priorityDiv.appendChild(prioLabel); priorityDiv.appendChild(prioSel);
             
             const statusDiv = document.createElement('div');
             const statusLabel = document.createElement('label');
@@ -1269,17 +1307,34 @@ function renderTimelineTab() {
         const div = document.createElement('div');
         div.style.cssText = `background:rgba(255,255,255,0.02); border:1px solid var(--os-border); border-left: 3px solid ${typeColor}; padding:15px; border-radius:6px; font-family:'JetBrains Mono', monospace; font-size:0.75rem; margin-bottom: 8px;`;
         
-        div.innerHTML = ` 
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;"> 
-                <strong class="safe-title" style="color:${typeColor}"></strong> 
-                <span style="opacity:0.4; font-size:0.65rem;">${new Date(t.date).toLocaleString('pt-BR')}</span> 
-            </div> 
-            <div class="safe-desc" style="color:#ddd; margin-top:5px; line-height:1.4;"></div> 
-            <div class="safe-author" style="font-size:0.6rem; opacity:0.4; margin-top:5px; text-align:right;"></div> 
-        `; 
-        div.querySelector('.safe-title').textContent = t.title;
-        div.querySelector('.safe-desc').textContent = t.description;
-        div.querySelector('.safe-author').textContent = `Autor: ${t.author}`;
+        const topDiv = document.createElement('div');
+        topDiv.style.cssText = 'display:flex; justify-content:space-between; align-items:center; margin-bottom:5px;';
+        
+        const strongTitle = document.createElement('strong');
+        strongTitle.className = 'safe-title';
+        strongTitle.style.color = typeColor;
+        strongTitle.textContent = t.title;
+        
+        const spanDate = document.createElement('span');
+        spanDate.style.cssText = 'opacity:0.4; font-size:0.65rem;';
+        spanDate.textContent = new Date(t.date).toLocaleString('pt-BR');
+        
+        topDiv.appendChild(strongTitle); topDiv.appendChild(spanDate);
+        
+        const descDiv = document.createElement('div');
+        descDiv.className = 'safe-desc';
+        descDiv.style.cssText = 'color:#ddd; margin-top:5px; line-height:1.4;';
+        descDiv.textContent = t.description;
+        
+        const authorDiv = document.createElement('div');
+        authorDiv.className = 'safe-author';
+        authorDiv.style.cssText = 'font-size:0.6rem; opacity:0.4; margin-top:5px; text-align:right;';
+        authorDiv.textContent = 'Autor: ' + t.author;
+        
+        div.appendChild(topDiv);
+        div.appendChild(descDiv);
+        div.appendChild(authorDiv);
+        
         feed.appendChild(div);
     }); 
 }
@@ -1308,18 +1363,23 @@ function renderIntelligenceTab() {
         ];
         data.forEach(d => {
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="safe-t" style="font-weight:700; color:#fff;"></td>
-                <td class="safe-v"></td>
-                <td class="safe-r" style="color:${d.rc};"></td>
-                <td class="safe-l"></td>
-                <td class="safe-s" style="font-weight:800; color:var(--os-primary);"></td>
-            `;
-            tr.querySelector('.safe-t').textContent = d.t;
-            tr.querySelector('.safe-v').textContent = d.v;
-            tr.querySelector('.safe-r').textContent = d.r;
-            tr.querySelector('.safe-l').textContent = d.l;
-            tr.querySelector('.safe-s').textContent = d.s;
+            
+            const td1 = document.createElement('td');
+            td1.className = 'safe-t'; td1.style.cssText = 'font-weight:700; color:#fff;'; td1.textContent = d.t;
+            
+            const td2 = document.createElement('td');
+            td2.className = 'safe-v'; td2.textContent = d.v;
+            
+            const td3 = document.createElement('td');
+            td3.className = 'safe-r'; td3.style.color = d.rc; td3.textContent = d.r;
+            
+            const td4 = document.createElement('td');
+            td4.className = 'safe-l'; td4.textContent = d.l;
+            
+            const td5 = document.createElement('td');
+            td5.className = 'safe-s'; td5.style.cssText = 'font-weight:800; color:var(--os-primary);'; td5.textContent = d.s;
+            
+            tr.appendChild(td1); tr.appendChild(td2); tr.appendChild(td3); tr.appendChild(td4); tr.appendChild(td5);
             rankingBody.appendChild(tr);
         });
     } 
@@ -1753,10 +1813,11 @@ async function runAiPlanner() {
     const serviceKey = serviceSelect ? serviceSelect.value : 'ALL';
 
     const btnAi = document.getElementById('btn-ai-planner');
-    const originalText = btnAi ? btnAi.innerHTML : '';
+    const originalText = btnAi ? btnAi.textContent : '';
     if (btnAi) {
-        btnAi.disabled = true;
-        btnAi.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GERANDO...';
+        btnAi.textContent = '';
+        const spinIcon = document.createElement('i'); spinIcon.className = 'fa-solid fa-spinner fa-spin';
+        btnAi.appendChild(spinIcon); btnAi.appendChild(document.createTextNode(' GERANDO...'));
     }
 
     try {
@@ -1906,7 +1967,7 @@ async function runAiPlanner() {
     } finally {
         if (btnAi) {
             btnAi.disabled = false;
-            btnAi.innerHTML = originalText;
+            btnAi.textContent = originalText;
         }
     }
 }
@@ -2005,9 +2066,11 @@ document.getElementById('btn-confirm-pub')?.addEventListener('click', async () =
     if (!asset) return;
 
     const btnConfirm = document.getElementById('btn-confirm-pub');
-    const originalHtml = btnConfirm.innerHTML;
+    const originalHtml = btnConfirm.textContent;
     btnConfirm.disabled = true;
-    btnConfirm.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO WEBHOOK...';
+    btnConfirm.textContent = '';
+    const spIcon = document.createElement('i'); spIcon.className = 'fa-solid fa-spinner fa-spin';
+    btnConfirm.appendChild(spIcon); btnConfirm.appendChild(document.createTextNode(' ENVIANDO WEBHOOK...'));
 
     try {
         const limits = await window.calculateIACredits(currentProject);
@@ -2162,7 +2225,7 @@ document.getElementById('btn-confirm-pub')?.addEventListener('click', async () =
         alert('Erro ao confirmar publicação: ' + err.message);
     } finally {
         btnConfirm.disabled = false;
-        btnConfirm.innerHTML = originalHtml;
+        btnConfirm.textContent = originalHtml;
     }
 });
 

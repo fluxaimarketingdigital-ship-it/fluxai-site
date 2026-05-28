@@ -692,8 +692,12 @@ window.saveContractEdit = async () => {
     
     if (btnSubmit.disabled) return;
     btnSubmit.disabled = true;
-    const originalText = btnSubmit.innerHTML;
-    btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+    const originalText = btnSubmit.textContent;
+    btnSubmit.textContent = '';
+    const icon = document.createElement('i');
+    icon.className = 'fa-solid fa-spinner fa-spin';
+    btnSubmit.appendChild(icon);
+    btnSubmit.appendChild(document.createTextNode(' Salvando...'));
 
     try {
         const payload = {
@@ -796,7 +800,7 @@ window.saveContractEdit = async () => {
         alert("ERRO CRÍTICO: Não foi possível processar a edição. Tente novamente.");
     } finally {
         btnSubmit.disabled = false;
-        btnSubmit.innerHTML = originalText;
+        btnSubmit.textContent = originalText;
     }
 };
 
@@ -832,7 +836,7 @@ window.generateContractDoc = (contractId) => {
         extrasHtmlNode = extrasWrapper; // We'll append this down below
     }
 
-    contentDiv.innerHTML = ''; // clear it
+    contentDiv.textContent = ''; // clear it
     
     const headerDiv = document.createElement('div');
     headerDiv.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;";
