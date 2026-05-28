@@ -195,7 +195,7 @@ window.createDraft = async () => {
     
     let reportsRaw = JSON.parse(localStorage.getItem('fluxai_mock_reports') || '[]');
     reportsRaw.push({
-        id: 'REP_' + (crypto.getRandomValues(new Uint32Array(1))[0] % 10000),
+        id: 'REP_' + crypto.getRandomValues(new Uint32Array(1))[0].toString(36).toUpperCase(),
         clientId: curProj,
         month: new Date().toLocaleString('pt-BR', { month: 'long', year: 'numeric' }),
         status: 'rascunho_fluxai',
