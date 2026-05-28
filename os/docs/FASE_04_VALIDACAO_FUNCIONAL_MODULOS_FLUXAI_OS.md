@@ -123,7 +123,7 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 - **Risco funcional:** Vazamento de webhook keys e tokens em raw payloads.
 - **Ajustes necessários:** Resolvido (Nível de acesso subido para ADMIN, Redaction visual de secrets ativada).
 - **Prioridade:** Resolvido (P1 mitigado).
-- **Status da Validação:** 🟢 Homologado (Pós-Patch de Acesso)
+- **Status da Validação:** 🟢 Homologado (Aprovado após mitigação de acesso e redaction visual)
 
 ### 8. Serviços Extras
 - **Objetivo operacional:** Fluxo de up-sell e contratação de demandas fora do escopo padrão.
