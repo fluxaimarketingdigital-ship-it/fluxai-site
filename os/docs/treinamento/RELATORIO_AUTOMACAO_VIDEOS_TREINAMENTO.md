@@ -1,6 +1,6 @@
 # RELATÓRIO TÉCNICO DE AUTOMAÇÃO — VÍDEOS DE TREINAMENTO
 
-**Data:** 27/05/2026, 00:51:31
+**Data:** 28/05/2026, 12:17:39
 **Status:** Todos os vídeos foram gerados com narração sintética Neural (pt-BR-FranciscaNeural) via Edge TTS.
 
 ## Resumo de Geração

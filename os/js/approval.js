@@ -3,7 +3,59 @@ import { StatusEngine } from '../config/status-system.js';
 import { OS_LOGS_ENGINE } from '../services/logs-engine.js';
 import { OS_CONFIG } from '../config/os-config.js';
 
-async function initApproval() {
+async function handleWebhookFailure(app, response, transitionResult, actionName) {
+    console.error('[DELIVERY_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
+
+    OS_LOGS_ENGINE.userAction(
+        'WEBHOOK_REAL_FAILED',
+        'client-approval',
+        { webhook: transitionResult.webhook, error: response.error || 'Erro Desconhecido', status: response.status || 0 },
+        'CLIENT',
+        app.project_id,
+        false
+    );
+
+    OS_LOGS_ENGINE.userAction(
+        'GOVERNANCE_ABORTED',
+        'client-approval',
+        { action: actionName, reason: 'Falha no webhook real de integração' },
+        'CLIENT',
+        app.project_id,
+        false
+    );
+
+    OS_LOGS_ENGINE.security(
+        'SECURITY_WARNING',
+        { 
+            action: actionName + '_cancelada_erro_conexao', 
+            client_id: app.project_id, 
+            role: 'CLIENT', 
+            error: response.error,
+            timestamp: new Date().toISOString()
+        },
+        'critical'
+    );
+
+    OS_LOGS_ENGINE.userAction(
+        'ROLLBACK_STARTED',
+        'client-approval',
+        { reason: 'Falha na resposta do webhook', client_id: app.project_id, preserved_status: app.status },
+        'CLIENT',
+        app.project_id,
+        false
+    );
+
+    OS_LOGS_ENGINE.userAction(
+        'ROLLBACK_COMPLETED',
+        'client-approval',
+        { client_id: app.project_id, restored_status: app.status, local_db_status: 'CONSISTENT_UNMODIFIED' },
+        'CLIENT',
+        app.project_id,
+        false
+    );
+
+    alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado.`);
+}async function initApproval() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
@@ -92,57 +144,7 @@ function bindEvents(app) {
             };
             const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
             if (!response.success && isReal) {
-                console.error('[DELIVERY_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
-
-                OS_LOGS_ENGINE.userAction(
-                    'WEBHOOK_REAL_FAILED',
-                    'client-approval',
-                    { webhook: transitionResult.webhook, error: response.error || 'Erro Desconhecido', status: response.status || 0 },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'GOVERNANCE_ABORTED',
-                    'client-approval',
-                    { action: 'aprovar_entrega', reason: 'Falha no webhook real de integração' },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.security(
-                    'SECURITY_WARNING',
-                    { 
-                        action: 'aprovacao_entrega_cancelada_erro_conexao', 
-                        client_id: app.project_id, 
-                        role: 'CLIENT', 
-                        error: response.error,
-                        timestamp: new Date().toISOString()
-                    },
-                    'critical'
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'ROLLBACK_STARTED',
-                    'client-approval',
-                    { reason: 'Falha na resposta do webhook', client_id: app.project_id, preserved_status: app.status },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'ROLLBACK_COMPLETED',
-                    'client-approval',
-                    { client_id: app.project_id, restored_status: app.status, local_db_status: 'CONSISTENT_UNMODIFIED' },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado.`);
+                await handleWebhookFailure(app, response, transitionResult, 'aprovar_entrega');
                 return;
             }
         }
@@ -227,57 +229,7 @@ function bindEvents(app) {
             };
             const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
             if (!response.success && isReal) {
-                console.error('[DELIVERY_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
-
-                OS_LOGS_ENGINE.userAction(
-                    'WEBHOOK_REAL_FAILED',
-                    'client-approval',
-                    { webhook: transitionResult.webhook, error: response.error || 'Erro Desconhecido', status: response.status || 0 },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'GOVERNANCE_ABORTED',
-                    'client-approval',
-                    { action: 'solicitar_alteracao', reason: 'Falha no webhook real de integração' },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.security(
-                    'SECURITY_WARNING',
-                    { 
-                        action: 'solicitacao_alteracao_cancelada_erro_conexao', 
-                        client_id: app.project_id, 
-                        role: 'CLIENT', 
-                        error: response.error,
-                        timestamp: new Date().toISOString()
-                    },
-                    'critical'
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'ROLLBACK_STARTED',
-                    'client-approval',
-                    { reason: 'Falha na resposta do webhook', client_id: app.project_id, preserved_status: app.status },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'ROLLBACK_COMPLETED',
-                    'client-approval',
-                    { client_id: app.project_id, restored_status: app.status, local_db_status: 'CONSISTENT_UNMODIFIED' },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado.`);
+                await handleWebhookFailure(app, response, transitionResult, 'solicitar_alteracao');
                 return;
             }
         }
@@ -349,57 +301,7 @@ function bindEvents(app) {
             };
             const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
             if (!response.success && isReal) {
-                console.error('[DELIVERY_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
-
-                OS_LOGS_ENGINE.userAction(
-                    'WEBHOOK_REAL_FAILED',
-                    'client-approval',
-                    { webhook: transitionResult.webhook, error: response.error || 'Erro Desconhecido', status: response.status || 0 },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'GOVERNANCE_ABORTED',
-                    'client-approval',
-                    { action: 'rejeitar_entrega', reason: 'Falha no webhook real de integração' },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.security(
-                    'SECURITY_WARNING',
-                    { 
-                        action: 'rejeicao_entrega_cancelada_erro_conexao', 
-                        client_id: app.project_id, 
-                        role: 'CLIENT', 
-                        error: response.error,
-                        timestamp: new Date().toISOString()
-                    },
-                    'critical'
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'ROLLBACK_STARTED',
-                    'client-approval',
-                    { reason: 'Falha na resposta do webhook', client_id: app.project_id, preserved_status: app.status },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                OS_LOGS_ENGINE.userAction(
-                    'ROLLBACK_COMPLETED',
-                    'client-approval',
-                    { client_id: app.project_id, restored_status: app.status, local_db_status: 'CONSISTENT_UNMODIFIED' },
-                    'CLIENT',
-                    app.project_id,
-                    false
-                );
-
-                alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado.`);
+                await handleWebhookFailure(app, response, transitionResult, 'rejeitar_entrega');
                 return;
             }
         }

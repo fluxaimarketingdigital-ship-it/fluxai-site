@@ -225,7 +225,7 @@ export async function activateExtraService({ project_id, contract_id, service_ty
 
 function injectPautasLocal(pautas) {
     const mock = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-    pautas.forEach(p => mock.push({ id: 'a_ext_' + Date.now() + Math.random(), ...p, created_at: new Date().toISOString() }));
+    pautas.forEach(p => mock.push({ id: 'a_ext_' + Date.now() + crypto.getRandomValues(new Uint32Array(1))[0].toString(36), ...p, created_at: new Date().toISOString() }));
     localStorage.setItem('fluxai_mock_assets', JSON.stringify(mock));
 }
 

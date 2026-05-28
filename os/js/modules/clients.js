@@ -140,7 +140,7 @@ function setupEventListeners() {
                 if (isApproval) {
                     // Preparar payload para o webhook de aprovação real
                     const payload = {
-                        id: "extra_app_" + Math.random().toString(36).substr(2, 9),
+                        id: "extra_app_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36),
                         client_id: clientId,
                         cliente_id: clientId,
                         cliente_nome: (document.querySelector(`#extra-client-id option[value="${clientId}"]`) || {}).text || clientId,
