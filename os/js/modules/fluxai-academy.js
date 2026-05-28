@@ -11,32 +11,32 @@ const ACADEMY_VIDEOS = [
         title: 'Visão Geral do FluxAI OS™',
         desc: 'Neste vídeo, você aprenderá a navegar pelas principais telas do sistema, entender os contextos (Master, Labs e Cliente) e configurar seu perfil básico.',
         roles: ['ADMIN', 'OPERATOR', 'CLIENT'],
-        embedUrl: '', // Deixe vazio para usar o placeholder simulado
-        duration: '04:15'
+        videoUrl: './docs/treinamento/videos/03_exports_finais/FLUXAI_ACADEMY_01_VISAO_GERAL.mp4',
+        duration: '01:15'
     },
     {
         id: 'vid_02_clientes',
         title: 'Portal do Cliente: Aprovações e Entregas',
         desc: 'Tutorial focado nos clientes finais: como acessar o Client Portal, revisar conteúdos gerados pelo Motor, solicitar ajustes e aprovar relatórios mensais.',
         roles: ['ADMIN', 'OPERATOR', 'CLIENT'],
-        embedUrl: '',
-        duration: '05:30'
+        videoUrl: './docs/treinamento/videos/03_exports_finais/FLUXAI_ACADEMY_02_PORTAL_CLIENTE.mp4',
+        duration: '01:00'
     },
     {
         id: 'vid_03_operacao',
         title: 'Command Center & Demandas',
         desc: 'Para operadores e gestores internos: como processar demandas, criar checklists avançados, mudar os status de kanban e gerenciar tarefas pendentes.',
         roles: ['ADMIN', 'OPERATOR'],
-        embedUrl: '',
-        duration: '08:45'
+        videoUrl: './docs/treinamento/videos/03_exports_finais/FLUXAI_ACADEMY_03_COMMAND_CENTER_DEMANDAS.mp4',
+        duration: '01:00'
     },
     {
         id: 'vid_04_financas',
         title: 'Contratos e Serviços Extras',
         desc: 'Exclusivo para ADMIN: Como criar contratos recorrentes baseados em valor, lançar serviços avulsos da tabela e emitir recibos instantâneos via OS.',
         roles: ['ADMIN'],
-        embedUrl: '',
-        duration: '06:20'
+        videoUrl: './docs/treinamento/videos/03_exports_finais/FLUXAI_ACADEMY_04_CONTRATOS_FINANCEIRO.mp4',
+        duration: '01:00'
     }
 ];
 
@@ -112,8 +112,8 @@ window.loadAcademyVideo = (id) => {
 
     // Atualizar Player
     const wrapper = document.getElementById('academy-video-wrapper');
-    if (video.embedUrl) {
-        wrapper.innerHTML = `<iframe src="${video.embedUrl}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+    if (video.videoUrl) {
+        wrapper.innerHTML = `<video controls autoplay style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none;"><source src="${video.videoUrl}" type="video/mp4">Seu navegador não suporta vídeos.</video>`;
     } else {
         // Placeholder visual para quando não houver vídeo gravado
         wrapper.innerHTML = `
