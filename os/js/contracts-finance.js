@@ -1,5 +1,10 @@
 import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
 import { getSupabase } from '/os/services/supabase-client.js';
+import { OS_LOGS_ENGINE } from '/os/js/modules/os-logs.js';
+import { OS_CONFIG } from '/os/config/os-config.js';
+
+window.OS_LOGS_ENGINE = OS_LOGS_ENGINE;
+window.OS_CONFIG = OS_CONFIG;
 
 function formatCurrency(value) {
     const number = Number(value || 0);
@@ -599,7 +604,6 @@ function renderOperationalAlerts(contracts, payments) {
         return;
     }
 
-    alerts.forEach(a => { 
         const div = document.createElement('div'); 
         div.className = `alert-item ${a.type}`; 
         
@@ -632,17 +636,217 @@ function renderOperationalAlerts(contracts, payments) {
     }); 
 }
 
-async function logAction(action, targetId) {
-    const supabase = getSupabase();
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) return;
+// ==========================================
+// LÓGICA DA MODAL E C.R.U.D MVP
+// ==========================================
+
+window.switchTab = (tabId) => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content-section').forEach(s => s.style.display = 'none');
     
-    await supabase.from('audit_logs').insert([{
-        user_id: session.user.id,
-        action: action,
-        module: 'finance',
-        target_id: targetId
-    }]);
-}
+    event.currentTarget.classList.add('active');
+    document.getElementById(`tab-content-${tabId}`).style.display = 'block';
+};
+
+window.closeEditContractModal = () => {
+    document.getElementById('edit-contract-modal').style.display = 'none';
+    document.getElementById('edit-contract-form').reset();
+};
+
+window.editContract = (contractId) => {
+    const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+    const contract = mockContracts.find(c => c.id === contractId);
+    if (!contract) return;
+    
+    document.getElementById('edit-contract-id').value = contract.id;
+    document.getElementById('edit-project-id').value = contract.project_id || '';
+    document.getElementById('edit-monthly-fee').value = contract.contract_value || '';
+    document.getElementById('edit-payment-day').value = contract.due_day || 5;
+    document.getElementById('edit-contract-deliverables').value = contract.deliverables || '';
+    
+    // Cadastro da marca (mock projects array)
+    const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+    const project = mockProjects.find(p => p.id === contract.project_id);
+    if (project) {
+        document.getElementById('edit-brand-name').value = project.company_name || '';
+        document.getElementById('edit-brand-segment').value = project.segment || '';
+        document.getElementById('edit-link-instagram').value = project.digital_infrastructure?.operational_links?.instagram || '';
+        document.getElementById('edit-link-whatsapp').value = project.digital_infrastructure?.operational_links?.whatsapp || '';
+        document.getElementById('edit-link-drive').value = project.digital_infrastructure?.operational_links?.drive || '';
+        document.getElementById('edit-link-canva').value = project.digital_infrastructure?.operational_links?.canva || '';
+        document.getElementById('edit-link-website').value = project.digital_infrastructure?.operational_links?.website || '';
+    }
+    
+    document.getElementById('edit-contract-modal').style.display = 'flex';
+    window.switchTab('contrato'); // Ensure first tab is active
+    
+    if (window.OS_LOGS_ENGINE) {
+        window.OS_LOGS_ENGINE.userAction('CONTRACT_EDIT_STARTED', `Visualizando contrato ${contract.id}`);
+    }
+};
+
+window.saveContractEdit = async () => {
+    const contractId = document.getElementById('edit-contract-id').value;
+    const btnSubmit = document.querySelector('#edit-contract-form button[type="submit"]');
+    
+    if (btnSubmit.disabled) return;
+    btnSubmit.disabled = true;
+    const originalText = btnSubmit.innerHTML;
+    btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+
+    try {
+        const payload = {
+            id: contractId,
+            contract_value: parseFloat(document.getElementById('edit-monthly-fee').value),
+            due_day: parseInt(document.getElementById('edit-payment-day').value, 10),
+            deliverables: document.getElementById('edit-contract-deliverables').value,
+            updated_at: new Date().toISOString()
+        };
+        
+        // Verifica se há serviço extra preenchido
+        const extraType = document.getElementById('edit-extra-type').value;
+        let extraServicePayload = null;
+        if (extraType && extraType !== "") {
+            extraServicePayload = {
+                extra_id: 'ext_' + Math.random().toString(36).substr(2, 9),
+                type: extraType,
+                value: parseFloat(document.getElementById('edit-extra-value').value || 0),
+                approved_value: parseFloat(document.getElementById('edit-extra-approved-value').value || 0),
+                status: document.getElementById('edit-extra-status').value || 'solicitado',
+                owner: document.getElementById('edit-extra-owner').value || 'Pendente',
+                deadline_days: parseInt(document.getElementById('edit-extra-deadline').value || 0, 10),
+                ai_credits: parseInt(document.getElementById('edit-extra-ai-credits').value || 0, 10),
+                impact: document.getElementById('edit-extra-impact').value || 'baixo',
+                description: document.getElementById('edit-extra-desc').value || '',
+                drive_link: document.getElementById('edit-extra-drive-link').value || '',
+                created_at: new Date().toISOString()
+            };
+        }
+
+        const supabase = getSupabase();
+        let remoteSuccess = false;
+
+        // Tentativa de update no Supabase se existir
+        if (supabase) {
+            try {
+                // Update contrato base
+                const { error: errUpdate } = await supabase.from('contracts').update(payload).eq('id', contractId);
+                
+                // Se houver serviço extra, a arquitetura futura será a tabela SERVICOS_EXTRAS_CLIENTES.
+                // Como isso é MVP, nós não vamos forçar query complexa aqui, simularemos que o webhook resolve
+                // a injeção ou salvamos em local_storage.
+                if (!errUpdate) remoteSuccess = true;
+            } catch (e) {
+                console.warn('[FINANCE_UPDATE] Erro remoto ao atualizar.', e);
+            }
+        }
+
+        // Simulação do Webhook Engine
+        let webhookSuccess = false;
+        try {
+            const webhookPayload = { event: 'FINANCE_UPDATE', payload, extra_service: extraServicePayload };
+            if (window.OS_CONFIG && window.OS_CONFIG.webhooks) {
+                const res = await window.OS_CONFIG.webhooks.send('FINANCE_UPDATE', webhookPayload);
+                webhookSuccess = res && res.success;
+            } else {
+                // Mock success
+                webhookSuccess = true;
+            }
+        } catch (e) {
+            console.warn('[FINANCE_WEBHOOK] Falha.', e);
+        }
+
+        // UPDATE LOCAL STORAGE (MOCK)
+        let mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+        const idx = mockContracts.findIndex(c => c.id === contractId);
+        if (idx !== -1) {
+            mockContracts[idx] = { ...mockContracts[idx], ...payload };
+            if (extraServicePayload) {
+                if (!mockContracts[idx].extras) mockContracts[idx].extras = [];
+                mockContracts[idx].extras.push(extraServicePayload);
+            }
+            localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
+        }
+
+        // Fail-Safe / Fallback UI & Logs
+        if (!remoteSuccess || !webhookSuccess) {
+            alert("⚠️ MODO OFFLINE / FALLBACK: O contrato foi atualizado localmente como rascunho, mas a automação falhou ou o banco não confirmou.");
+            if (window.OS_LOGS_ENGINE) {
+                window.OS_LOGS_ENGINE.userAction('CONTRACT_UPDATE_FAILED', 'Falha na confirmação de webhooks ou banco - salvo localmente.');
+            }
+        } else {
+            if (window.OS_LOGS_ENGINE) {
+                window.OS_LOGS_ENGINE.userAction('CONTRACT_UPDATED', `Contrato ${contractId} modificado.`);
+                if (extraServicePayload) {
+                    window.OS_LOGS_ENGINE.userAction('SERVICE_EXTRA_ADDED', `Serviço ${extraType} no status ${extraServicePayload.status}`);
+                    if (extraServicePayload.status === 'aprovado') {
+                         window.OS_LOGS_ENGINE.userAction('SERVICE_EXTRA_APPROVED', `Serviço Extra aprovado com valor de R$ ${extraServicePayload.approved_value}`);
+                    }
+                }
+            }
+        }
+
+        // Reload data
+        await loadFinanceData();
+        window.closeEditContractModal();
+        
+    } catch (err) {
+        console.error('[FINANCE_SAVE_ERROR]', err);
+        alert("ERRO CRÍTICO: Não foi possível processar a edição. Tente novamente.");
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = originalText;
+    }
+};
+
+window.generateContractDoc = (contractId) => {
+    const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+    const contract = mockContracts.find(c => c.id === contractId);
+    if (!contract) return;
+    
+    if (window.OS_LOGS_ENGINE) {
+        window.OS_LOGS_ENGINE.userAction('CONTRACT_DOC_REQUESTED', `Geração de recibo HTML simples para ${contractId}`);
+    }
+
+    const contentDiv = document.getElementById('receipt-content');
+    
+    let extrasHtml = '';
+    if (contract.extras && contract.extras.length > 0) {
+        extrasHtml = `<h4 style="margin: 15px 0 5px 0; color: var(--os-primary);">Serviços Extras / Avulsos Lançados:</h4>
+                      <ul style="padding-left: 20px; color: var(--os-text-muted);">`;
+        contract.extras.forEach(ext => {
+            extrasHtml += `<li><strong>${ext.type}</strong> - Valor: ${formatCurrency(ext.value)} (Status: ${ext.status.toUpperCase()})</li>`;
+        });
+        extrasHtml += `</ul>`;
+    }
+
+    contentDiv.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div>
+                <p><strong>Para o Cliente:</strong><br>${contract.client_name}<br><span style="color:var(--os-text-muted);">${contract.company_name}</span></p>
+            </div>
+            <div style="text-align: right;">
+                <p><strong>Contrato Ref:</strong> #${contract.id.toUpperCase()}<br><strong>Status:</strong> ${contract.status}</p>
+            </div>
+        </div>
+        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px; border: 1px solid var(--os-border); margin-bottom: 20px;">
+            <p style="margin: 0;"><strong>Escopo Recorrente Acordado:</strong><br>${contract.deliverables.replace(/\\n/g, '<br>')}</p>
+        </div>
+        <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-family: var(--os-font-mono); font-weight: 700; border-top: 1px solid var(--os-border); padding-top: 15px;">
+            <span>Valor Mensal Base:</span>
+            <span>${formatCurrency(contract.contract_value)}</span>
+        </div>
+        ${extrasHtml}
+    `;
+
+    document.getElementById('receipt-date').innerText = new Date().toLocaleString('pt-BR');
+    document.getElementById('receipt-hash').innerText = btoa(contractId + Date.now()).substring(0, 16).toUpperCase();
+    
+    document.getElementById('receipt-modal').style.display = 'flex';
+};
+
+window.printReceipt = () => {
+    window.print();
+};
 
 initFinance();
