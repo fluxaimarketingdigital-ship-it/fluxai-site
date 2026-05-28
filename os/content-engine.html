@@ -90,6 +90,7 @@
                     <button class="os-tab-btn" onclick="window.switchTab('calendario-operacional')"><i class="fa-solid fa-clapperboard"></i> Calendário Operacional</button>
                     <button class="os-tab-btn" onclick="window.switchTab('timeline-operacional')"><i class="fa-solid fa-timeline"></i> Timeline Operacional</button>
                     <button class="os-tab-btn" onclick="window.switchTab('intelligence')"><i class="fa-solid fa-chart-line"></i> Content Intelligence™</button>
+                    <button class="os-tab-btn" id="tab-btn-ia-gov" onclick="window.switchTab('ia-governance')"><i class="fa-solid fa-microchip"></i> Governança de IA & Créditos</button>
                 </div>
 
                 <div id="tab-esteira" class="os-widget" style="padding: 0; background: transparent; border: none;">
@@ -140,6 +141,49 @@
                         <div id="timeline-operational-feed" style="display:flex; flex-direction:column; gap:15px; max-height: 500px; overflow-y: auto; padding-right:10px;">
                             <!-- Injetado via JS -->
                         </div>
+                    </div>
+                </div>
+
+                <!-- ABA GOVERNANÇA DE IA -->
+                <div id="tab-ia-governance" style="display: none;">
+                    <div class="os-widget-grid" style="margin-bottom:30px; display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px;">
+                        <div class="os-widget" style="grid-column: span 3; text-align:center; padding: 20px 15px;">
+                            <h4 style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; margin-bottom:10px; font-weight:800; letter-spacing:1px;">Limite Total (Contrato + Extras)</h4>
+                            <span style="font-size:1.6rem; font-weight:900; color:#fff;" id="ia-gov-total">--</span>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 3; text-align:center; padding: 20px 15px;">
+                            <h4 style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; margin-bottom:10px; font-weight:800; letter-spacing:1px;">Disponível (P/ Gerar)</h4>
+                            <span style="font-size:1.6rem; font-weight:900; color:var(--os-success);" id="ia-gov-available">--</span>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 3; text-align:center; padding: 20px 15px;">
+                            <h4 style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; margin-bottom:10px; font-weight:800; letter-spacing:1px;">Ocupado (Em Revisão)</h4>
+                            <span style="font-size:1.6rem; font-weight:900; color:var(--os-warning);" id="ia-gov-occupied">--</span>
+                        </div>
+                        <div class="os-widget" style="grid-column: span 3; text-align:center; padding: 20px 15px;">
+                            <h4 style="font-size:0.6rem; color:var(--os-text-muted); text-transform:uppercase; margin-bottom:10px; font-weight:800; letter-spacing:1px;">Consumido (Definitivo)</h4>
+                            <span style="font-size:1.6rem; font-weight:900; color:var(--os-primary);" id="ia-gov-consumed">--</span>
+                        </div>
+                    </div>
+
+                    <div class="os-widget" style="padding:25px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                            <h3 style="color:var(--os-primary); font-size:0.85rem; margin:0; font-weight:800; text-transform:uppercase; letter-spacing:0.5px;"><i class="fa-solid fa-list-ol"></i> Histórico de Auditoria IA</h3>
+                            <button id="btn-manual-credit" class="btn-ai" onclick="window.manualCreditAdjustment()" style="height:30px; font-size:0.65rem; background:rgba(255,255,255,0.05); color:#fff; border:1px solid #444; display:none;"><i class="fa-solid fa-plus-minus"></i> Ajuste Manual (ADMIN)</button>
+                        </div>
+                        <table class="pipeline-table" style="margin-top:0;">
+                            <thead>
+                                <tr>
+                                    <th>ID Geração</th>
+                                    <th>Status (IA)</th>
+                                    <th>Origem Limite</th>
+                                    <th>Impacto</th>
+                                    <th>Ação / Timestamp</th>
+                                </tr>
+                            </thead>
+                            <tbody id="ia-gov-table-body">
+                                <tr><td colspan="5" style="text-align:center; padding:50px; color:#444;">Selecione um projeto para carregar a auditoria.</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 

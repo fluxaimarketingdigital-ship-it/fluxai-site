@@ -127,16 +127,17 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 
 ### 8. Serviços Extras
 - **Objetivo operacional:** Fluxo de up-sell e contratação de demandas fora do escopo padrão.
-- **Perfil de usuário permitido:** ADMIN, OPERATOR, CLIENT.
-- **Fluxo esperado:** Cliente solicita → Operador orça → Cliente aprova → Operador entrega.
-- **Dados utilizados:** Catálogo de serviços, Orçamentos.
-- **Integrações envolvidas:** Webhook Make.
-- **Estados vazios:** Nenhum serviço extra solicitado no mês.
-- **Estados de erro:** Falha na aprovação do orçamento.
-- **Validação de permissão:** Cliente só pode ver e solicitar para si mesmo.
-- **Risco funcional:** Perda de oportunidade de receita por falha no envio da solicitação.
-- **Ajustes necessários:** [Em aberto]
-- **Prioridade:** [Em aberto]
+- **Perfil de usuário permitido:** ADMIN.
+- **Fluxo esperado:** Disparo de intenção de compra ou registro de serviço adicional.
+- **Dados utilizados:** Escopo extra, valor.
+- **Integrações envolvidas:** API de faturamento (via Webhooks).
+- **Estados vazios:** Sem serviços extras lançados.
+- **Estados de erro:** Falha no disparo do webhook de cobrança.
+- **Validação de permissão:** Acesso negado para OPERATOR e CLIENT.
+- **Risco funcional:** Cobrança indevida ou falha no registro de upsell.
+- **Ajustes necessários:** Resolvido (CRUD implementado, Modal de upsell ativada, Fail-Safe aplicado).
+- **Prioridade:** Resolvido (P1 mitigado).
+- **Status da Validação:** 🟢 Homologado após recuperação técnica (Aprovado).
 
 ### 9. IA Créditos / Governança GPT
 - **Objetivo operacional:** Gestão do pool de créditos de IA e controle de gastos.

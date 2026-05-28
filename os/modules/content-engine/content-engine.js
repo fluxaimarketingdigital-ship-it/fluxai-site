@@ -131,6 +131,12 @@ export async function initEngine() {
             if (btnCopy) btnCopy.style.display = 'flex';
         }
 
+        const userRole = OS_AUTH.user?.role || 'OPERATOR';
+        const tabIaGov = document.getElementById('tab-btn-ia-gov');
+        if (userRole === 'CLIENT' && tabIaGov) {
+            tabIaGov.style.display = 'none';
+        }
+
         await loadContent();
         setupRealtime();
 
@@ -189,7 +195,7 @@ export async function initEngine() {
 }
 
 function switchTab(tab) {
-    const tabs = ['esteira', 'calendario-estrategico', 'calendario-operacional', 'timeline-operacional', 'intelligence'];
+    const tabs = ['esteira', 'calendario-estrategico', 'calendario-operacional', 'timeline-operacional', 'intelligence', 'ia-governance'];
     tabs.forEach(t => {
         const el = document.getElementById(`tab-${t}`);
         if (el) el.style.display = t === tab ? 'block' : 'none';
@@ -232,6 +238,121 @@ async function loadProjects() {
         }
     }
 }
+
+window.calculateIACredits = async (clientId) => {
+    let baseLimit = 0;
+    let extraLimit = 0;
+    let manualLimit = 0;
+
+    const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+    const contract = mockContracts.find(c => c.client_id === clientId);
+    if (contract) {
+        baseLimit = parseInt(contract.ia_credits || 0, 10);
+        const extras = contract.extras || [];
+        extras.forEach(ext => {
+            if (ext.status === 'aprovado' && ext.ai_credits) {
+                extraLimit += parseInt(ext.ai_credits, 10);
+            }
+        });
+    }
+
+    const manualAdjustments = JSON.parse(localStorage.getItem('fluxai_ia_manual_adjustments') || '{}');
+    manualLimit = parseInt(manualAdjustments[clientId] || 0, 10);
+
+    const totalLimit = baseLimit + extraLimit + manualLimit;
+
+    let occupied = 0; 
+    let consumed = 0; 
+    const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+    const clientAssets = mockAssets.filter(a => a.project_id === clientId && a.metadata?.ai_generated);
+
+    clientAssets.forEach(asset => {
+        const status = asset.status;
+        const stdStatus = mapToStandardStatus(status);
+        if (['aprovado_interno', 'em_revisao_fluxai', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(status) || ['REVIEW', 'READY_TO_POST'].includes(stdStatus)) {
+            occupied++;
+        } else if (['publicado', 'POSTED'].includes(stdStatus) || status === 'publicado') {
+            consumed++;
+        }
+    });
+
+    return { total: totalLimit, occupied, consumed, available: totalLimit - (occupied + consumed), base: baseLimit, extra: extraLimit, manual: manualLimit };
+};
+
+window.updateIAGovDashboard = async () => {
+    const govTotal = document.getElementById('ia-gov-total');
+    if (!govTotal) return; // tab was hidden
+    if (!currentProject) {
+        document.getElementById('ia-gov-table-body').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:50px; color:#444;">Selecione um projeto para carregar a auditoria.</td></tr>';
+        govTotal.textContent = '--';
+        document.getElementById('ia-gov-available').textContent = '--';
+        document.getElementById('ia-gov-occupied').textContent = '--';
+        document.getElementById('ia-gov-consumed').textContent = '--';
+        return;
+    }
+
+    const credits = await window.calculateIACredits(currentProject);
+    
+    govTotal.textContent = credits.total;
+    document.getElementById('ia-gov-available').textContent = credits.available;
+    document.getElementById('ia-gov-occupied').textContent = credits.occupied;
+    document.getElementById('ia-gov-consumed').textContent = credits.consumed;
+    
+    const userRole = OS_AUTH.user?.role;
+    if (userRole === 'ADMIN') {
+        const btnManual = document.getElementById('btn-manual-credit');
+        if (btnManual) btnManual.style.display = 'block';
+    }
+
+    const tableBody = document.getElementById('ia-gov-table-body');
+    const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+    const clientAssets = mockAssets.filter(a => a.project_id === currentProject && a.metadata?.ai_generated);
+    
+    if (clientAssets.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:50px; color:#444;">Nenhuma geração de IA encontrada neste escopo.</td></tr>';
+    } else {
+        tableBody.innerHTML = '';
+        clientAssets.forEach(a => {
+            const tr = document.createElement('tr');
+            let impact = 'Nenhum';
+            const stdStatus = mapToStandardStatus(a.status);
+            if (['aprovado_interno', 'em_revisao_fluxai', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(a.status) || ['REVIEW', 'READY_TO_POST'].includes(stdStatus)) impact = 'Ocupado';
+            if (stdStatus === 'POSTED' || a.status === 'publicado') impact = 'Consumido';
+            
+            tr.innerHTML = `
+                <td style="font-family:'JetBrains Mono', monospace; font-size:0.75rem;">${a.id.split('_').pop().substring(0,8)}</td>
+                <td><span style="background:rgba(255,255,255,0.1); padding:3px 8px; border-radius:4px; font-size:0.7rem;">${a.status}</span></td>
+                <td>${a.metadata?.origin_contract || 'Contrato Base'}</td>
+                <td style="color:${impact==='Ocupado'?'var(--os-warning)':impact==='Consumido'?'var(--os-primary)':'#888'}">${impact}</td>
+                <td style="font-size:0.75rem;">${new Date(a.created_at).toLocaleDateString('pt-BR')}</td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+};
+
+window.manualCreditAdjustment = () => {
+    if (!currentProject) return;
+    const currentAdjustments = JSON.parse(localStorage.getItem('fluxai_ia_manual_adjustments') || '{}');
+    const currentVal = parseInt(currentAdjustments[currentProject] || 0, 10);
+    const newVal = prompt(`Ajuste manual de créditos para ${currentProject}.\nDigite o novo valor de créditos adicionais manuais:`, currentVal);
+    if (newVal !== null && !isNaN(parseInt(newVal, 10))) {
+        currentAdjustments[currentProject] = parseInt(newVal, 10);
+        localStorage.setItem('fluxai_ia_manual_adjustments', JSON.stringify(currentAdjustments));
+        
+        OS_LOGS_ENGINE.userAction(
+            'IA_CREDIT_MANUAL_ADJUSTMENT',
+            'content-engine',
+            { action: 'ajuste_credito', novo_valor: parseInt(newVal, 10) },
+            OS_AUTH.user?.role || 'ADMIN',
+            currentProject,
+            !OS_CONFIG.flags.sendRealWebhooks
+        );
+        
+        updateIAGovDashboard();
+        alert('Ajuste aplicado com sucesso.');
+    }
+};
 
 async function loadContent() {
     const workflowDeadline = document.getElementById('workflow-deadline');
@@ -277,6 +398,8 @@ async function loadContent() {
         
         renderCalendar('calendar-strategic-body', window.loadedContents, 'STRATEGIC');
         renderCalendar('calendar-operational-body', window.loadedContents, 'OPERATIONAL');
+        
+        if(window.updateIAGovDashboard) await window.updateIAGovDashboard();
     } catch (e) {
         const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
         let projectAssets = mockAssets;
@@ -290,6 +413,8 @@ async function loadContent() {
         
         renderCalendar('calendar-strategic-body', projectAssets, 'STRATEGIC');
         renderCalendar('calendar-operational-body', projectAssets, 'OPERATIONAL');
+        
+        if(window.updateIAGovDashboard) await window.updateIAGovDashboard();
     }
 }
 
@@ -1026,6 +1151,22 @@ window.saveAssetEdit = async () => {
                 );
             }
 
+            // IA Governance Logs
+            if (currentAssetData.metadata?.ai_generated) {
+                if (targetLogical === 'internal_review') {
+                    OS_LOGS_ENGINE.userAction('IA_GENERATION_REVIEW_STARTED', 'content-engine', { asset_id: editingAssetId }, userRole, currentAssetData.project_id || currentProject, !isWebhookReal);
+                } else if (targetLogical === 'planning_approved' || nextStatus === 'aprovado_interno') {
+                    OS_LOGS_ENGINE.userAction('IA_GENERATION_APPROVED_INTERNAL', 'content-engine', { asset_id: editingAssetId }, userRole, currentAssetData.project_id || currentProject, !isWebhookReal);
+                } else if (targetLogical === 'client_review_planning' || targetLogical === 'client_review_content' || targetLogical === 'client_revision_planning') {
+                    OS_LOGS_ENGINE.userAction('IA_GENERATION_SENT_CLIENT', 'content-engine', { asset_id: editingAssetId }, userRole, currentAssetData.project_id || currentProject, !isWebhookReal);
+                } else if (targetLogical === 'rejected' || nextStatus === 'rejeitado') {
+                    OS_LOGS_ENGINE.userAction('IA_GENERATION_REJECTED', 'content-engine', { asset_id: editingAssetId }, userRole, currentAssetData.project_id || currentProject, !isWebhookReal);
+                    if (!['aprovado_interno', 'planning_approved', 'enviado_cliente', 'posted', 'ready_to_post'].includes(currentLogical)) {
+                        OS_LOGS_ENGINE.userAction('IA_CREDIT_RELEASED', 'content-engine', { asset_id: editingAssetId, reason: 'rejeitado_antes_de_aprovacao_interna' }, userRole, currentAssetData.project_id || currentProject, !isWebhookReal);
+                    }
+                }
+            }
+
             OS_LOGS_ENGINE.userAction(
                 'STATUS_CHANGED',
                 'content-engine',
@@ -1218,25 +1359,13 @@ window.forceReady = async (id) => {
         }
 
         // Validar Limite Operacional Contratado
-        const configs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
-        const clientConf = configs[currentProject] || { iaLimit: 20 };
-        const clientLimit = clientConf.iaLimit || 0;
-
-        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-        const clientAssets = mockAssets.filter(a => a && a.project_id === currentProject);
-        let countApproved = 0;
-        let countPublished = 0;
-        clientAssets.forEach(asset => {
-            const gia = mapAssetStatusToGia(asset.status);
-            if (gia === 'aprovado' || gia === 'aguardando_publicacao') countApproved++;
-            else if (gia === 'publicado') countPublished++;
-        });
-
-        if (countApproved + countPublished >= clientLimit) {
-            alert(`Erro de Governança: Limite operacional contratado atingido (${countApproved + countPublished}/${clientLimit}). Não é possível aprovar novos conteúdos IA.`);
+        const limits = await window.calculateIACredits(currentProject);
+        
+        if (limits.available <= 0) {
+            alert(`Erro de Governança: Limite operacional contratado atingido. Não é possível aprovar novos conteúdos IA.`);
             OS_LOGS_ENGINE.security(
                 'SECURITY_WARNING',
-                { action: 'limite_ia_excedido', client_id: currentProject, limite: clientLimit, ocupacao: countApproved + countPublished },
+                { action: 'limite_ia_excedido', client_id: currentProject, limite: limits.total, ocupacao: limits.occupied + limits.consumed },
                 'warning'
             );
             return;
@@ -1262,9 +1391,9 @@ window.forceReady = async (id) => {
             title: currentAsset.title,
             platform: currentAsset.platform,
             status_ia: 'aguardando_publicacao',
-            action: 'IA_GENERATION_APPROVED',
-            limite_anterior: clientLimit,
-            limite_novo: clientLimit,
+            action: 'IA_GENERATION_APPROVED_INTERNAL',
+            limite_anterior: limits.available,
+            limite_novo: limits.available,
             timestamp: new Date().toISOString()
         };
 
@@ -1357,14 +1486,16 @@ window.forceReady = async (id) => {
         }
         
         // Registrar logs de sucesso
-        OS_LOGS_ENGINE.userAction(
-            'IA_GENERATION_APPROVED',
-            'content-engine',
-            { asset_id: id, action: 'force_ready' },
-            userRole,
-            currentProject,
-            !OS_CONFIG.flags.sendRealWebhooks
-        );
+        if (currentAsset.metadata?.ai_generated) {
+            OS_LOGS_ENGINE.userAction(
+                'IA_GENERATION_APPROVED_INTERNAL',
+                'content-engine',
+                { asset_id: id, action: 'force_ready' },
+                userRole,
+                currentProject,
+                !OS_CONFIG.flags.sendRealWebhooks
+            );
+        }
 
         OS_LOGS_ENGINE.userAction(
             'LIMIT_OCCUPIED',
@@ -1612,18 +1743,27 @@ async function runAiPlanner() {
     try {
         sLog(`[IA_PLANNER] Executando planejamento de IA para o cliente ${selectedId}, serviço: ${serviceKey}`);
         
+        const limits = await window.calculateIACredits(selectedId);
+        if (limits.available <= 0) {
+            alert('Acesso negado: Limite de Créditos IA esgotado para este cliente.');
+            OS_LOGS_ENGINE.security(
+                'SECURITY_WARNING',
+                { action: 'geracao_bloqueada_limite_esgotado', client_id: selectedId, role: userRole },
+                'critical'
+            );
+            return;
+        }
+
         const generated = await AIPlanner.generatePlan(selectedId, serviceKey, 1);
         if (!generated || generated.length === 0) {
             throw new Error('Nenhuma pauta pôde ser gerada para o escopo selecionado.');
         }
 
         const newAsset = generated[0];
+        newAsset.metadata = newAsset.metadata || {};
+        newAsset.metadata.ai_generated = true; // Flag for credits computation
         
         // Webhook de controle operacional de IA
-        const configs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
-        const clientConf = configs[selectedId] || { iaLimit: 20 };
-        const clientLimit = clientConf.iaLimit || 0;
-
         const payload = {
             client_id: selectedId,
             asset_id: newAsset.id || 'mock_id',
@@ -1631,8 +1771,8 @@ async function runAiPlanner() {
             platform: newAsset.platform,
             status_ia: 'rascunho',
             action: 'IA_GENERATION_CREATED',
-            limite_anterior: clientLimit,
-            limite_novo: clientLimit,
+            limite_anterior: limits.available,
+            limite_novo: limits.available, // Rascunho doesn't consume yet
             timestamp: new Date().toISOString()
         };
 
@@ -1851,9 +1991,7 @@ document.getElementById('btn-confirm-pub')?.addEventListener('click', async () =
     btnConfirm.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> ENVIANDO WEBHOOK...';
 
     try {
-        const configs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
-        const clientConf = configs[currentProject] || { iaLimit: 20 };
-        const clientLimit = clientConf.iaLimit || 0;
+        const limits = await window.calculateIACredits(currentProject);
 
         // Disparar webhook
         const payload = {
@@ -1863,8 +2001,8 @@ document.getElementById('btn-confirm-pub')?.addEventListener('click', async () =
             platform: asset.platform,
             status_ia: 'publicado',
             action: 'IA_GENERATION_PUBLISHED',
-            limite_anterior: clientLimit,
-            limite_novo: clientLimit,
+            limite_anterior: limits.available,
+            limite_novo: limits.available > 0 ? limits.available - 1 : 0,
             timestamp: new Date().toISOString()
         };
 
@@ -1966,6 +2104,17 @@ document.getElementById('btn-confirm-pub')?.addEventListener('click', async () =
             currentProject,
             !OS_CONFIG.flags.sendRealWebhooks
         );
+
+        if (asset.metadata?.ai_generated) {
+            OS_LOGS_ENGINE.userAction(
+                'IA_CREDIT_CONSUMED',
+                'content-engine',
+                { asset_id: id, action: 'consume_credit', reason: 'publicacao_definitiva' },
+                userRole,
+                currentProject,
+                !OS_CONFIG.flags.sendRealWebhooks
+            );
+        }
 
         OS_LOGS_ENGINE.userAction(
             'GOVERNANCE_ACTION',
