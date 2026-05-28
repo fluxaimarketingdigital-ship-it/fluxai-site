@@ -66,8 +66,9 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 - **Estados de erro:** Queda da conexão com o banco de dados.
 - **Validação de permissão:** Cliente A não pode forçar a URL para ver dados do Cliente B.
 - **Risco funcional:** Quebra de confidencialidade (Cross-Tenant Data Leak).
-- **Ajustes necessários:** [Em aberto]
-- **Prioridade:** [Em aberto]
+- **Ajustes necessários:** IDOR Front-End (Vazamento Cross-Tenant) corrigido via patch de segurança cruzando URL e JWT na função init(). Falta apenas flag visual de Fallback.
+- **Prioridade:** Backlog UX
+- **Status da Validação:** 🟢 Homologado (P0 mitigado; P2 UX visual confuso documentado no Backlog)
 
 ### 4. Onboarding
 - **Objetivo operacional:** Cadastramento unificado e ativação do funil inicial de um novo cliente.

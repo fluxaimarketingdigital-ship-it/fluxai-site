@@ -554,7 +554,7 @@
         let currentMonth = new Date().getMonth();
 
         const params = new URLSearchParams(window.location.search);
-        const projectId = params.get('project_id') || params.get('project') || localStorage.getItem('fluxai_current_project_id') || 'p_c1';
+        let projectId = params.get('project_id') || params.get('project') || localStorage.getItem('fluxai_current_project_id') || 'p_c1';
 
         function isValidSupabaseUrl(url) {
             try {
@@ -576,11 +576,34 @@
         }
 
         async function init() {
-            // Controle de Exibição do Botão de Voltar (esconde se for CLIENT real)
             const session = OS_AUTH.user || {};
+            
+            // CROSS-TENANT SECURITY (IDOR PATCH)
             if (session.role === 'CLIENT') {
                 const backBtn = document.querySelector('.btn-back-portal');
                 if (backBtn) backBtn.style.display = 'none';
+                
+                const officialId = session.project_id;
+                // Se a URL difere do ID oficial, consideramos tentativa de quebra de escopo
+                if (officialId && projectId !== officialId) {
+                    if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                        OS_LOGS_ENGINE.security('IDOR_ATTEMPT_BLOCKED', { 
+                            requested: projectId, 
+                            official: officialId 
+                        }, 'high');
+                    }
+                    console.error('[SECURITY] Blocked Cross-Tenant access. Forcing official session ID.');
+                    projectId = officialId;
+                    
+                    // Opcionalmente limpar a URL sem reload
+                    const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + "?project_id=" + encodeURIComponent(officialId);
+                    window.history.replaceState({path: newUrl}, '', newUrl);
+                }
+            } else if (['ADMIN', 'OPERATOR'].includes(session.role)) {
+                // Proxy vision: Audita a visualização do painel do cliente
+                if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                    OS_LOGS_ENGINE.userAction('PROXY_VIEW_CLIENT_PORTAL', 'client-portal', { viewed_project: projectId }, session.role, session.project_id);
+                }
             }
 
             if (!projectId) return document.getElementById('client-name').innerText = 'Acesso Negado: ID do Projeto Ausente';
