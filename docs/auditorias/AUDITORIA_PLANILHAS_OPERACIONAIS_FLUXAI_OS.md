@@ -73,9 +73,39 @@ Exigem que limite operacional, origem, consumo e status da geração sejam separ
 *   `GPT_GERACOES_LOG`
 *   Métricas cruzadas em `INSTAGRAM_DIARIO`, `GA4_DIARIO`, `CLARITY_DIARIO`.
 
-## 9. Abas de Instagram/Meta
-Altamente ramificadas, atualmente vazias ou em excesso. (C)
-*   `INSTAGRAM_CONTEUDO_MANUAL`, `INSTAGRAM_CONTEUDO_RAW`, `INSTAGRAM_POSTS_RAW`, `INSTAGRAM_STORIES_RAW`, `INSTAGRAM_MANUAL_DIARIO`, `INSTAGRAM_PERFIL_DIARIO`
+## 9. Abas de Instagram/Meta (Convivência Manual vs API)
+> [!IMPORTANT]
+> **REGRA CRÍTICA:** Nem todos os clientes terão Instagram conectado via API. O ecossistema **deve obrigatoriamente aceitar** a convivência de clientes `modo_coleta=api` e `modo_coleta=manual` sem quebrar o Make, o OS ou os Relatórios.
+
+**Regras de Ouro Operacionais:**
+1. Clientes com coleta manual não devem ter seus serviços desativados no Make apenas para evitar duplicações. A duplicação deve ser evitada pelos filtros dos cenários Make consultando o campo `modo_coleta`.
+2. Se `modo_coleta=api`, as automações roteiam os dados para as abas RAW/API.
+3. Se `modo_coleta=manual`, o Make deve ignorar a busca automatizada e o operador preencherá as abas MANUAIS.
+4. Se está aguardando permissão de API, o status do token fica como `aguardando_autorizacao` e o Make pula a coleta automaticamente, caindo para o fallback manual se necessário.
+5. Se o `relatorio_incluir=sim`, o sistema de relatórios buscará os dados, independentemente se vieram de abas manuais ou da API. O OS consolida ambos.
+
+**Classificação e Mapeamento Oficial das Abas de Instagram:**
+
+*   **Abas API / RAW (Alimentadas exclusivamente pelo Make):**
+    *   `INSTAGRAM_CONTEUDO_RAW`
+    *   `INSTAGRAM_POSTS_RAW`
+    *   `INSTAGRAM_STORIES_RAW`
+    *   `INSTAGRAM_PERFIL_DIARIO`
+
+*   **Abas Manuais (Alimentadas por Operadores):**
+    *   `INSTAGRAM_MANUAL_DIARIO`
+    *   `INSTAGRAM_CONTEUDO_MANUAL`
+
+*   **Abas Consolidadas (Juntam os dois mundos para Relatório):**
+    *   `INSTAGRAM_DIARIO` (Deveria agir como ponte de consolidação final)
+
+*   **Abas Candidatas a Arquivamento / Fusão Futura:**
+    *   `INSTAGRAM_AUDIENCIA`, `INSTAGRAM_CRESCIMENTO`, `INSTAGRAM_INSIGHTS_CONTEUDO`. (Podem ser facilmente absorvidas pelas abas diárias consolidadas ou de Perfil, evitando a proliferação excessiva de abas).
+
+**Casos de Uso Atuais:**
+- `FLUXAI_LABS_001`: Uso de API onde há autorização.
+- `MARIA_APARECIDA_002`: Instagram totalmente Manual (Início).
+- `EXECUTA_GROUP_003`: Instagram Manual, aguardando autorização da Meta para virar API.
 
 ## 10. Abas de GA4/GSC/Clarity
 Atualmente estruturadas e vazias. Prontas para automação, mas necessitam revisão de finalidade.
