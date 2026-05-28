@@ -38,8 +38,9 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 - **Estados de erro:** Credenciais inválidas, falha de rede.
 - **Validação de permissão:** Tentativa de burlar redirecionamento (forçar `/os/command-center` logado como CLIENT).
 - **Risco funcional:** Lockout de usuários legítimos ou vazamento de contexto.
-- **Ajustes necessários:** [Em aberto]
-- **Prioridade:** [Em aberto]
+- **Ajustes necessários:** Substituir `alert()` nativo por Modal/Toast UI.
+- **Prioridade:** Backlog (UX)
+- **Status da Validação:** 🟢 Homologado (Aprovado com ressalva UX em backlog)
 
 ### 2. Command Center
 - **Objetivo operacional:** Visão 360° gerencial do negócio (Admin/Operator).
