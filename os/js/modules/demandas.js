@@ -55,13 +55,13 @@ async function loadDemands() {
             }
 
             html += `<tr>
-                <td class="cell-mono">${d.date}</td>
-                <td class="cell-mono">${d.id}</td>
-                <td class="cell-primary">${d.clientId}</td>
-                <td>${d.title}</td>
+                <td class="cell-mono">${window.escapeHTML(d.date)}</td>
+                <td class="cell-mono">${window.escapeHTML(d.id)}</td>
+                <td class="cell-primary">${window.escapeHTML(d.clientId)}</td>
+                <td>${window.escapeHTML(d.title)}</td>
                 <td>${prioBadge}</td>
                 <td>${statusBadge}</td>
-                <td>${d.deadline}</td>
+                <td>${window.escapeHTML(d.deadline)}</td>
             </tr>`;
         });
 

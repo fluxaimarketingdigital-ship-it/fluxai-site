@@ -45,11 +45,11 @@ async function loadLeads() {
             }
 
             html += `<tr>
-                <td class="cell-primary">${l.name}</td>
-                <td>${l.company}</td>
-                <td style="color: var(--os-text-muted);">${l.contact}</td>
-                <td><span style="font-size: 0.65rem; border: 1px solid var(--os-border); padding: 2px 6px; border-radius: 4px;">${l.serviceOfInterest}</span></td>
-                <td>${l.origin}</td>
+                <td class="cell-primary">${window.escapeHTML(l.name)}</td>
+                <td>${window.escapeHTML(l.company)}</td>
+                <td style="color: var(--os-text-muted);">${window.escapeHTML(l.contact)}</td>
+                <td><span style="font-size: 0.65rem; border: 1px solid var(--os-border); padding: 2px 6px; border-radius: 4px;">${window.escapeHTML(l.serviceOfInterest)}</span></td>
+                <td>${window.escapeHTML(l.origin)}</td>
                 <td>${statusBadge}</td>
             </tr>`;
         });
