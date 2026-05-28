@@ -72,16 +72,16 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 
 ### 4. Onboarding
 - **Objetivo operacional:** Cadastramento unificado e ativação do funil inicial de um novo cliente.
-- **Perfil de usuário permitido:** ADMIN, OPERATOR.
-- **Fluxo esperado:** Preenchimento de dados → Geração de `client_id` → Disparo via Webhook → Confirmação.
-- **Dados utilizados:** Formulário de ativação, metadados empresariais.
-- **Integrações envolvidas:** Webhook Make (`make-proxy`).
-- **Estados vazios:** Formulário resetado para nova entrada.
-- **Estados de erro:** Falha no envio do Webhook, dados incompletos.
-- **Validação de permissão:** Acesso negado para CLIENT.
-- **Risco funcional:** Falha silenciosa no Make impedindo a criação do ecossistema do cliente.
-- **Ajustes necessários:** [Em aberto]
-- **Prioridade:** [Em aberto]
+- **Perfil de usuário permitido:** ADMIN (comercial e operacional).
+- **Fluxo esperado:** Coleta de dados (Empresa, URLs, Escopo, Dados do cartão/faturamento).
+- **Dados utilizados:** Escopo do serviço, integrações requisitadas.
+- **Integrações envolvidas:** Disparo webhook Make (Ativação Cliente).
+- **Estados de erro:** Falha no webhook Make ou Supabase (Fallback offline tratado e bloqueio visual ativo).
+- **Validação de permissão:** Acesso bloqueado para CLIENT e OPERATOR regular.
+- **Risco funcional:** Envio duplo criando cadastros replicados (corrigido com desativação do botão) ou falsos-positivos (corrigido com trava offline).
+- **Ajustes necessários:** O falso-positivo de rede/banco foi convertido e mapeado; logs separados de Sucesso Oficial, Falha Parcial e Falha Total inseridos na controller.
+- **Prioridade:** Resolvido (P1 mitigado).
+- **Status da Validação:** 🟢 Homologado
 
 ### 5. Content Engine
 - **Objetivo operacional:** Esteira de produção de conteúdo (planejamento, aprovação e postagem).

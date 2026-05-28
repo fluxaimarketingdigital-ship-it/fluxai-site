@@ -251,40 +251,6 @@ async function handleOnboarding(e) {
         ? raw.client_instagram_handle.replace('@', '').trim().toLowerCase() + "@fluxai.com" 
         : raw.responsible_name.toLowerCase().replace(/[^a-z0-9]/g, '') + "@fluxai.com";
 
-    // 1. Mostrar o Overlay de Deploy Cinematográfico
-    const overlay = document.getElementById('deploy-overlay');
-    const deployBar = document.getElementById('deploy-bar');
-    const deployLogs = document.getElementById('deploy-logs');
-    
-    if (overlay) {
-        overlay.style.display = 'flex';
-    }
-
-    const logMessages = [
-        { progress: 10, text: `> [SISTEMA] Inicializando provisionamento de infraestrutura FluxAI OS™...` },
-        { progress: 25, text: `> [DB ENGINE] Conectando ao cluster de banco de dados e aplicando políticas RLS...` },
-        { progress: 40, text: `> [WORKSPACE] Workspace '${raw.company_name}' criado com sucesso. Tenant ID: tenant_${projectId}` },
-        { progress: 55, text: `> [GOVERNANÇA] Conta de Portal '${email}' gerada com senha padrão 'fluxai@2026'.` },
-        { progress: 70, text: `> [SLA ENGINE] SLAs operacionais calibrados para ${raw.sla_minutes} min sob responsabilidade de ${raw.approval_responsible}.` },
-        { progress: 85, text: `> [IA MEMORY] Consolidando DNA estratégico. Tom: '${raw.voice_tone}' | Objetivos: '${raw.objective}'...` },
-        { progress: 95, text: `> [MESA EDITORIAL] Mesa ativada! Injetando pautas iniciais baseadas no ICP de ${raw.segment}...` },
-        { progress: 100, text: `> [SISTEMA] Deploy concluído com 100% de sucesso! Redirecionando...` }
-    ];
-
-    const runLogs = async () => {
-        for (let i = 0; i < logMessages.length; i++) {
-            await new Promise(res => setTimeout(res, 500));
-            if (deployBar) deployBar.style.width = `${logMessages[i].progress}%`;
-            if (deployLogs) {
-                deployLogs.innerHTML += `<br/>${logMessages[i].text}`;
-                deployLogs.scrollTop = deployLogs.scrollHeight;
-            }
-        }
-    };
-
-    // Rodar os logs visualmente em paralelo
-    const logPromise = runLogs();
-
     // 2. Construir Dados estruturados
     const digital_infrastructure = {
         web: {
@@ -391,11 +357,13 @@ async function handleOnboarding(e) {
         }
     };
 
+    let dbSuccess = false;
+    let makeSuccess = false;
+    let totalFailure = false;
+
     // 3. Executar o webhook e provisionamento real
     try {
         const session = window.FLUXAI_RUNTIME_CONTEXT || {};
-        
-        // Obter status inicial a partir do STATUS_SYSTEM
         const statusConfig = StatusEngine.resolve('clientes', 'onboarding');
         projectData.status = statusConfig.value;
 
@@ -408,7 +376,7 @@ async function handleOnboarding(e) {
                 cliente_id: projectId,
                 nome_interno: raw.company_name,
                 nome_comercial: raw.company_name,
-                email: raw.responsible_name.toLowerCase().replace(/[^a-z0-9]/g, '') + "@fluxai.com",
+                email: email,
                 telefone: raw.whatsapp_decisor,
                 website: raw.client_website || '',
                 instagram_profile: raw.client_instagram_handle || '',
@@ -460,14 +428,11 @@ async function handleOnboarding(e) {
             }
         };
 
-        // Disparar log de auditoria
-        if (typeof OS_LOGS_ENGINE !== 'undefined') {
-            OS_LOGS_ENGINE.userAction('ONBOARDING_CREATED', webhookPayload, !OS_CONFIG.flags.sendRealWebhooks);
-        }
-
         // Disparar Webhook
         const webhookResult = await OS_CONFIG.webhooks.send('CLIENT_ONBOARDING', webhookPayload);
-        if (!webhookResult.success) {
+        if (webhookResult.success) {
+            makeSuccess = true;
+        } else {
             console.warn('[ONBOARDING] Webhook não enviado ou falhou:', webhookResult.error);
         }
 
@@ -499,6 +464,8 @@ async function handleOnboarding(e) {
         }
 
         if (project && project.id) {
+            dbSuccess = true;
+            
             // Inserir Contrato no Supabase
             const extraValue = Number(raw.finance_extra_services_value) || 0;
             let finalDeliverables = `FEE MENSAL: Módulos contratados (${Array.from(formData.getAll('modules')).join(', ')})`;
@@ -570,27 +537,97 @@ async function handleOnboarding(e) {
                 project.id
             );
 
-            // Logs legado de compatibilidade
-            await supabase.from('audit_logs').insert([
-                { action: 'ATIVACAO_WORKSPACE', module: 'ONBOARDING', user_role: 'ADMIN', metadata: { company_name: raw.company_name } },
-                { action: 'ATIVACAO_CONTRATO', module: 'FINANCAS', user_role: 'ADMIN', metadata: { contract_value: raw.monthly_fee } },
-                { action: 'MESA_EDITORIAL_PROVIDA', module: 'CONTENT_ENGINE', user_role: 'IA_ENGINE', metadata: { qty: pautas.length } }
-            ]);
+            // Logs de Segurança e Auditoria
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                if (makeSuccess) {
+                    OS_LOGS_ENGINE.userAction('ONBOARDING_OFFICIAL_SUCCESS', webhookPayload, false);
+                } else {
+                    OS_LOGS_ENGINE.userAction('ONBOARDING_MAKE_DISPATCH_FAILED', webhookPayload, false);
+                }
+            }
         }
 
     } catch (err) {
         console.warn('[ONBOARDING] Falha de comunicação ou Supabase offline. Rodando persistência local mock.', err);
+        totalFailure = !dbSuccess;
+        if (typeof OS_LOGS_ENGINE !== 'undefined') {
+            OS_LOGS_ENGINE.userAction('ONBOARDING_TOTAL_FAILURE', { error: err.message }, false);
+        }
     } finally {
         // Garantir gravação robusta em localStorage (offline fallback primário)
         registerLocalMockProjectAndUser(projectId, projectData, raw, email);
     }
 
-    // Aguardar a conclusão da animação de deploy para redirecionar de forma fantástica
-    await logPromise;
+    // 4. Lidar com Interface Visual e Feedback de Status
+    const alertContainer = document.querySelector('#step-7 .form-section');
 
-    setTimeout(() => {
-        window.location.href = `cliente-detalhe.html?client_id=${projectId}`;
-    }, 500);
+    if (dbSuccess && makeSuccess) {
+        // SUCCESSO OFICIAL ABSOLUTO
+        const overlay = document.getElementById('deploy-overlay');
+        const deployBar = document.getElementById('deploy-bar');
+        const deployLogs = document.getElementById('deploy-logs');
+        
+        if (overlay) overlay.style.display = 'flex';
+
+        const logMessages = [
+            { progress: 10, text: `> [SISTEMA] Inicializando provisionamento de infraestrutura FluxAI OS™...` },
+            { progress: 25, text: `> [DB ENGINE] Conectando ao cluster de banco de dados e aplicando políticas RLS...` },
+            { progress: 40, text: `> [WORKSPACE] Workspace '${raw.company_name}' criado com sucesso. Tenant ID: tenant_${projectId}` },
+            { progress: 55, text: `> [GOVERNANÇA] Conta de Portal '${email}' gerada.` },
+            { progress: 70, text: `> [SLA ENGINE] SLAs operacionais calibrados para ${raw.sla_minutes} min.` },
+            { progress: 85, text: `> [IA MEMORY] Consolidando DNA estratégico. Tom: '${raw.voice_tone}'...` },
+            { progress: 95, text: `> [MESA EDITORIAL] Mesa ativada! Injetando pautas iniciais...` },
+            { progress: 100, text: `> [SISTEMA] Deploy oficial concluído com 100% de sucesso no Make e Banco!` }
+        ];
+
+        const runLogs = async () => {
+            for (let i = 0; i < logMessages.length; i++) {
+                await new Promise(res => setTimeout(res, 400));
+                if (deployBar) deployBar.style.width = `${logMessages[i].progress}%`;
+                if (deployLogs) {
+                    deployLogs.innerHTML += `<br/>${logMessages[i].text}`;
+                    deployLogs.scrollTop = deployLogs.scrollHeight;
+                }
+            }
+        };
+
+        await runLogs();
+        setTimeout(() => {
+            window.location.href = `cliente-detalhe.html?client_id=${projectId}`;
+        }, 500);
+
+    } else if (dbSuccess && !makeSuccess) {
+        // PARCIAL: BANCO OK, MAKE ERROR
+        btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> SALVO NO BANCO COM ALERTA';
+        btn.style.background = '#f59e0b';
+        btn.disabled = false;
+        
+        const alertHtml = `
+            <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; padding: 20px; border-radius: 8px; margin-top: 20px; color: #fbd38d;">
+                <strong>⚠️ ATENÇÃO OPERACIONAL</strong><br/>
+                Cliente salvo no banco, mas automação Make não confirmou execução. Revisar fila operacional.
+            </div>
+            <button type="button" onclick="window.location.href='cliente-detalhe.html?client_id=${projectId}'" style="margin-top:15px; padding:10px 20px; background:#f59e0b; color:#000; font-weight:800; border-radius:6px; cursor:pointer; border:none; transition:0.2s;">Prosseguir ao Perfil</button>
+        `;
+        alertContainer.insertAdjacentHTML('beforeend', alertHtml);
+
+    } else {
+        // FALHA TOTAL / FALLBACK
+        if (typeof OS_LOGS_ENGINE !== 'undefined') {
+            OS_LOGS_ENGINE.userAction('ONBOARDING_LOCAL_FALLBACK_DRAFT', projectData, false);
+        }
+        btn.innerHTML = '<i class="fa-solid fa-wifi"></i> SALVO COMO RASCUNHO OFFLINE';
+        btn.style.background = '#ef4444';
+        btn.disabled = false;
+        
+        const alertHtml = `
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 8px; margin-top: 20px; color: #fca5a5;">
+                <strong>🚨 MODO OFFLINE — Cliente salvo apenas como rascunho local. Não foi oficializado no banco nem enviado ao Make.</strong><br/>
+                O cliente não tem ID persistente na nuvem e o webhook Make não ativou a jornada. Certifique-se de ter rede e refaça a tentativa quando o Supabase estiver online.
+            </div>
+        `;
+        alertContainer.insertAdjacentHTML('beforeend', alertHtml);
+    }
 }
 
 function generatePautasTemplates(projId, raw) {
