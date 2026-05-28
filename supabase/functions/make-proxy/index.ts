@@ -32,22 +32,18 @@ Deno.serve(async (req) => {
   const requestId = crypto.randomUUID();
 
   try {
-    // 1. CORS Preflight
     if (req.method === "OPTIONS") {
       return new Response("ok", { headers: corsHeaders });
     }
 
-    // 2. Method guard
     if (req.method !== "POST") {
       return jsonResponse({ ok: false, error: "Method not allowed", requestId }, 405);
     }
 
-    // 3. Proxy-Key validation
     const proxyKeySecret = Deno.env.get("FLUXAI_PROXY_ACCESS_KEY");
     const proxyKeyHeader = req.headers.get("x-fluxai-proxy-key");
 
     if (!proxyKeySecret) {
-      // Secret não configurado no Supabase — erro interno seguro
       console.log("make-proxy:missing-proxy-key-secret", { requestId });
       return jsonResponse({ ok: false, error: "Missing proxy key configuration", requestId }, 500);
     }
@@ -57,7 +53,6 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, error: "Unauthorized", requestId }, 401);
     }
 
-    // 4. Parse body
     let body;
     try {
       body = await req.json();
@@ -65,15 +60,11 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, error: "Invalid JSON body", requestId }, 400);
     }
 
-    const { route, payload } = body ?? {};
+    const route = body?.route;
+    const payload = body?.payload;
 
-    console.log("make-proxy:start", {
-      requestId,
-      route,
-      hasPayload: Boolean(payload),
-    });
+    console.log("make-proxy:start", { requestId, route, hasPayload: Boolean(payload) });
 
-    // 5. Route validation
     if (!route || typeof route !== "string") {
       return jsonResponse({ ok: false, error: "Missing route", requestId }, 400);
     }
@@ -85,20 +76,13 @@ Deno.serve(async (req) => {
       return jsonResponse({ ok: false, error: "Invalid route", route, requestId }, 400);
     }
 
-    // 6. Read webhook URL from env
     const webhookUrl = Deno.env.get(secretName);
 
-    if (!webhookUrl) {
-      console.log("make-proxy:missing-secret", { requestId, route });
-      return jsonResponse({ ok: false, error: "Missing webhook secret", route, requestId }, 500);
+    if (!webhookUrl || !webhookUrl.startsWith("https://")) {
+      console.log("make-proxy:invalid-secret", { requestId, route });
+      return jsonResponse({ ok: false, error: "Invalid webhook configuration", route, requestId }, 500);
     }
 
-    if (!webhookUrl.startsWith("https://")) {
-      console.log("make-proxy:invalid-secret-url", { requestId, route });
-      return jsonResponse({ ok: false, error: "Invalid webhook URL", route, requestId }, 500);
-    }
-
-    // 7. Forward to Make with timeout
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 8000);
 
@@ -121,7 +105,7 @@ Deno.serve(async (req) => {
       console.log("make-proxy:make-fetch-error", {
         requestId,
         route,
-        error: error instanceof Error ? error.message : String(error),
+        error: error instanceof Error ? error.message : "Unknown error",
       });
       return jsonResponse({ ok: false, error: "Make webhook request failed", route, requestId }, 502);
     }
@@ -151,7 +135,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.log("make-proxy:unhandled-error", {
       requestId,
-      error: error instanceof Error ? error.message : String(error),
+      error: error instanceof Error ? error.message : "Unknown error",
     });
     return jsonResponse({ ok: false, error: "Unhandled proxy error", requestId }, 500);
   }
