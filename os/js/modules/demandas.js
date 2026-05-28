@@ -3,6 +3,7 @@ import { SheetsService } from '../../services/sheets-service.js';
 import { getSupabase } from '../../services/supabase-client.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { OS_CONFIG } from '../../config/os-config.js';
+import { populateProjectFilter } from '../utils/ui-helpers.js';
 
 let currentProject = null;
 window.loadedDemands = [];
@@ -15,18 +16,11 @@ async function initPage() {
     await OS_UI.renderTopbar();
 
     currentProject = localStorage.getItem('fluxai_current_project_id');
-    await loadProjects();
-
-    const filter = document.getElementById('project-filter');
-    if (filter) {
-        if (currentProject) filter.value = currentProject;
-        filter.onchange = async (e) => {
-            currentProject = e.target.value;
-            localStorage.setItem('fluxai_current_project_id', currentProject);
-            await OS_UI.renderTopbar();
-            loadDemands();
-        };
-    }
+    await populateProjectFilter('project-filter', async (newProj) => { 
+        currentProject = newProj; 
+        await OS_UI.renderTopbar(); 
+        loadDemands(); 
+    }, currentProject);
 
     const btnNew = document.getElementById('btn-new-demand');
     if (btnNew) {
@@ -48,34 +42,6 @@ async function initPage() {
     await loadDemands();
 }
 
-async function loadProjects() {
-    try {
-        const cached = localStorage.getItem('fluxai_supabase_projects');
-        let projects = cached ? JSON.parse(cached) : [];
-        if (!projects || projects.length === 0) {
-            const supabase = getSupabase();
-            const { data } = await supabase.from('projects').select('*').eq('status', 'ATIVO');
-            projects = data || [];
-        }
-
-        const select = document.getElementById('project-filter');
-        if (select) {
-            select.textContent = '';
-            const opt = document.createElement('option');
-            opt.value = "";
-            opt.textContent = "Selecione um Cliente...";
-            select.appendChild(opt);
-            projects.forEach(p => {
-                const opt = document.createElement('option');
-                opt.value = p.id;
-                opt.innerText = p.company_name || p.name;
-                select.appendChild(opt);
-            });
-        }
-    } catch (e) {
-        console.warn('Erro ao carregar projetos:', e);
-    }
-}
 
 async function loadDemands() {
     const container = document.getElementById('demands-table-container');

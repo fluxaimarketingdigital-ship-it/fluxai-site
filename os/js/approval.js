@@ -85,6 +85,31 @@ async function handleWebhookFailure(app, response, transitionResult, actionName)
     }
 }
 
+async function executeStateTransition(app, targetStatus, feedback, actionName) {
+    const transitionResult = await StatusEngine.transition('aprovacoes', app.id, app.status, targetStatus, { role: 'CLIENT' });
+    if (!transitionResult.success) {
+        alert(`Erro de Governança: Transição inválida.\nMotivo: ${transitionResult.error}`);
+        return { success: false };
+    }
+    const isReal = OS_CONFIG.flags.sendRealWebhooks || (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(transitionResult.webhook));
+    if (transitionResult.webhook) {
+        const payload = {
+            approval_id: app.id,
+            project_id: app.project_id,
+            type: app.type,
+            status: targetStatus,
+            feedback: feedback,
+            timestamp: new Date().toISOString()
+        };
+        const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
+        if (!response.success && isReal) {
+            await handleWebhookFailure(app, response, transitionResult, actionName);
+            return { success: false };
+        }
+    }
+    return { success: true, webhook: transitionResult.webhook, isReal };
+}
+
 function renderApproval(app) {
     document.getElementById('loading-state').style.display = 'none';
     document.getElementById('app-container').style.display = 'block';
@@ -116,38 +141,10 @@ function bindEvents(app) {
     document.getElementById('btn-approve-all').onclick = async () => {
         if (!confirm('Deseja aprovar este material?')) return;
         
-        const transitionResult = await StatusEngine.transition(
-            'aprovacoes',
-            app.id,
-            app.status,
-            'aprovado',
-            { role: 'CLIENT' }
-        );
-        
-        if (!transitionResult.success) {
-            alert(`Erro de Governança: Transição inválida.\nMotivo: ${transitionResult.error}`);
-            return;
-        }
-
-        const isReal = OS_CONFIG.flags.sendRealWebhooks || 
-                       (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(transitionResult.webhook));
-
-        // Disparar webhook real ANTES de qualquer persistência no banco
-        if (transitionResult.webhook) {
-            const payload = {
-                approval_id: app.id,
-                project_id: app.project_id,
-                type: app.type,
-                status: 'aprovado',
-                feedback: null,
-                timestamp: new Date().toISOString()
-            };
-            const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
-            if (!response.success && isReal) {
-                await handleWebhookFailure(app, response, transitionResult, 'aprovar_entrega');
-                return;
-            }
-        }
+        const exec = await executeStateTransition(app, 'aprovado', null, 'aprovar_entrega');
+        if (!exec.success) return;
+        const isReal = exec.isReal;
+        const transitionResult = { webhook: exec.webhook };
 
         try {
             await supabase.from('external_approvals').update({ status: 'APROVADO' }).eq('id', app.id);
@@ -201,38 +198,10 @@ function bindEvents(app) {
             return;
         }
 
-        const transitionResult = await StatusEngine.transition(
-            'aprovacoes',
-            app.id,
-            app.status,
-            'alteracao',
-            { role: 'CLIENT' }
-        );
-        
-        if (!transitionResult.success) {
-            alert(`Erro de Governança: Transição inválida.\nMotivo: ${transitionResult.error}`);
-            return;
-        }
-
-        const isReal = OS_CONFIG.flags.sendRealWebhooks || 
-                       (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(transitionResult.webhook));
-
-        // Disparar webhook real ANTES de qualquer persistência no banco
-        if (transitionResult.webhook) {
-            const payload = {
-                approval_id: app.id,
-                project_id: app.project_id,
-                type: app.type,
-                status: 'alteracao',
-                feedback: feedback,
-                timestamp: new Date().toISOString()
-            };
-            const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
-            if (!response.success && isReal) {
-                await handleWebhookFailure(app, response, transitionResult, 'solicitar_alteracao');
-                return;
-            }
-        }
+        const exec = await executeStateTransition(app, 'alteracao', feedback, 'solicitar_alteracao');
+        if (!exec.success) return;
+        const isReal = exec.isReal;
+        const transitionResult = { webhook: exec.webhook };
 
         try {
             await supabase.from('external_approvals').update({ 
@@ -273,38 +242,10 @@ function bindEvents(app) {
     document.getElementById('btn-reject-all').onclick = async () => {
         if (!confirm('Deseja realmente reprovar este material?')) return;
         
-        const transitionResult = await StatusEngine.transition(
-            'aprovacoes',
-            app.id,
-            app.status,
-            'rejeitado',
-            { role: 'CLIENT' }
-        );
-        
-        if (!transitionResult.success) {
-            alert(`Erro de Governança: Transição inválida.\nMotivo: ${transitionResult.error}`);
-            return;
-        }
-
-        const isReal = OS_CONFIG.flags.sendRealWebhooks || 
-                       (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(transitionResult.webhook));
-
-        // Disparar webhook real ANTES de qualquer persistência no banco
-        if (transitionResult.webhook) {
-            const payload = {
-                approval_id: app.id,
-                project_id: app.project_id,
-                type: app.type,
-                status: 'rejeitado',
-                feedback: null,
-                timestamp: new Date().toISOString()
-            };
-            const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
-            if (!response.success && isReal) {
-                await handleWebhookFailure(app, response, transitionResult, 'rejeitar_entrega');
-                return;
-            }
-        }
+        const exec = await executeStateTransition(app, 'rejeitado', null, 'rejeitar_entrega');
+        if (!exec.success) return;
+        const isReal = exec.isReal;
+        const transitionResult = { webhook: exec.webhook };
 
         try {
             await supabase.from('external_approvals').update({ status: 'REPROVADO' }).eq('id', app.id);
