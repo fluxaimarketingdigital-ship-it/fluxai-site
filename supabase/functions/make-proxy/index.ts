@@ -49,7 +49,7 @@ Deno.serve(async (req) => {
     if (!proxyKeySecret) {
       // Secret não configurado no Supabase — erro interno seguro
       console.log("make-proxy:missing-proxy-key-secret", { requestId });
-      return jsonResponse({ ok: false, error: "Proxy not configured", requestId }, 500);
+      return jsonResponse({ ok: false, error: "Missing proxy key configuration", requestId }, 500);
     }
 
     if (!proxyKeyHeader || proxyKeyHeader !== proxyKeySecret) {
