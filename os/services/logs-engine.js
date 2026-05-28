@@ -121,13 +121,13 @@ const _saveLog = (key, entry) => {
 
         // Salvar na categoria específica
         let specificLogs = [];
-        try { specificLogs = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { specificLogs = []; }
+        try { specificLogs = JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { console.warn(e); specificLogs = []; }
         specificLogs.unshift(safeEntry);
         localStorage.setItem(key, safeStringify(specificLogs.slice(0, OPERATION_LOGS_CONFIG.maxEntries)));
 
         // Salvar na timeline consolidada de todos os logs
         let allLogs = [];
-        try { allLogs = JSON.parse(localStorage.getItem(OPERATION_LOGS_CONFIG.storageKeys.ALL) || '[]'); } catch(e) { allLogs = []; }
+        try { allLogs = JSON.parse(localStorage.getItem(OPERATION_LOGS_CONFIG.storageKeys.ALL) || '[]'); } catch(e) { console.warn(e); allLogs = []; }
         allLogs.unshift(safeEntry);
         localStorage.setItem(OPERATION_LOGS_CONFIG.storageKeys.ALL, safeStringify(allLogs.slice(0, OPERATION_LOGS_CONFIG.maxEntries)));
 

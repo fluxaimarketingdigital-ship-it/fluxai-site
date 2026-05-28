@@ -1,6 +1,6 @@
 import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
 import { getSupabase } from '/os/services/supabase-client.js';
-import { OS_LOGS_ENGINE } from '/os/js/modules/os-logs.js';
+import { OS_LOGS_ENGINE } from '/os/services/logs-engine.js';
 import { OS_CONFIG } from '/os/config/os-config.js';
 
 window.OS_LOGS_ENGINE = OS_LOGS_ENGINE;
