@@ -1,7 +1,7 @@
 aba,nivel_governanca,tipo_aba,status_operacional,fonte_verdade,make_pode_ler,os_pode_ler,relatorio_pode_ler,modo_coleta,contem_dado_sensivel,tipo_dado_sensivel,risco,acao_recomendada,prioridade,observacao
 CLIENTES_CONFIG,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,sim,nao_aplicavel,sim,meta_access_token,critico,Remover token real,P0,Core system
 SERVICOS_CLIENTES,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,sim,nao_aplicavel,nao,,baixo,Manter,P3,Define modo de coleta e relatorio
-ROTAS_AUTOMACOES,A_FONTE_DE_VERDADE,controle_make,ativa,sim,sim,sim,nao,nao_aplicavel,sim,token_necessario,alto,Alterar para booleano,P0,Apenas autoriza rota
+ROTAS_AUTOMACOES,A_FONTE_DE_VERDADE,controle_make,ativa,sim,sim,sim,nao,nao_aplicavel,sim,token_necessario,baixo,Referenciado via token_ref,P3,Chaves reais neutralizadas para token_ref.
 MAKE_WORKFLOWS,A_FONTE_DE_VERDADE,controle_make,ativa,sim,sim,sim,nao,nao_aplicavel,sim,url_webhook,critico,Ocultar webhook,P0,Risco de exploit
 CLIENTES_ESTRATEGIA,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,sim,nao_aplicavel,nao,,baixo,Manter,P3,
 CONTRATOS_CLIENTES,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,nao,sim,nao,nao_aplicavel,nao,,baixo,Manter,P3,
@@ -17,7 +17,7 @@ CONFIG,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,nao,nao_aplicavel,nao,
 CATALOGO_SERVICOS_FLUXAI,A_FONTE_DE_VERDADE,log,ativa,sim,sim,sim,nao,nao_aplicavel,nao,,baixo,Manter append only,P2,
 PLANEJAMENTO_CONTEUDO,B_OPERACIONAL,controle_operacional,ativa,nao,sim,sim,sim,nao_aplicavel,nao,,baixo,Validar filtro antes de Make,P1,
 CALENDARIO_POSTAGENS,B_OPERACIONAL,controle_operacional,ativa,nao,sim,sim,sim,nao_aplicavel,nao,,baixo,Validar filtro antes de Make,P1,
-STATUS_MONITOR_DIARIO,B_OPERACIONAL,governanca_ia,ativa,nao,sim,sim,nao,nao_aplicavel,sim,token_status,alto,Proteger,P0,
+STATUS_MONITOR_DIARIO,B_OPERACIONAL,governanca_ia,ativa,nao,sim,sim,nao,nao_aplicavel,sim,token_status,baixo,Higienizada,P3,Traces e logs tecnicos brutos removidos.
 MELHORES_HORARIOS_POSTAGEM,B_OPERACIONAL,controle_operacional,ativa,nao,nao,sim,nao,nao_aplicavel,nao,,baixo,Manter,P2,
 CONTRATOS_METRICAS,B_OPERACIONAL,controle_operacional,ativa,nao,nao,sim,nao,nao_aplicavel,nao,,baixo,Manter,P2,
 STATUS_INTEGRACOES,B_OPERACIONAL,controle_operacional,ativa,nao,nao,sim,nao,nao_aplicavel,nao,,baixo,Manter,P2,
@@ -46,7 +46,7 @@ BACKUP_LIMPEZA_[TELEFONE_REMOVIDO]_033858,F_LEGADO,legado,arquivo,nao,nao,nao,na
 INVENTARIO_ABAS,F_LEGADO,apoio,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
 LISTAS_VALIDACAO,F_LEGADO,apoio,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
 README_ECOSSISTEMA,F_LEGADO,documentacao,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
-ROTAS_MAKE_FUTURAS,F_LEGADO,controle_make,arquivo,nao,nao,nao,nao,nao_aplicavel,sim,token_necessario,alto,Neutralizar,P0,
+ROTAS_MAKE_FUTURAS,F_LEGADO,controle_make,futura,nao,nao,nao,nao,nao_aplicavel,sim,token_necessario,baixo,Neutralizada e isolada,P3,Rota futura. Risco neutralizado.
 LEADS,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
 ALERTAS,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
 ALERTAS_SITE,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
@@ -54,4 +54,4 @@ RESUMO_SEMANAL,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,
 RESUMO_SITE,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
 INSIGHTS_CONTEUDO,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
 UTMS,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
-GPT_GERACOES_LOG,B_OPERACIONAL,log,ativa,nao,sim,sim,nao,nao_aplicavel,sim,tokens_estimados,alto,Append Only,P0,
+GPT_GERACOES_LOG,B_OPERACIONAL,log,ativa,nao,sim,sim,nao,nao_aplicavel,sim,tokens_estimados,baixo,Append-only e redigida,P3,Logs sensiveis redigidos e salvos no Drive.
