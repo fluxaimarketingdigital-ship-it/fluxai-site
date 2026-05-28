@@ -136,23 +136,57 @@ async function loadDemands() {
             else if (d.status === 'em_andamento') statusBadge = `<span class="os-badge os-badge-info">Em Andamento</span>`;
 
             const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td class="cell-mono safe-date"></td>
-                <td class="cell-mono safe-id"></td>
-                <td class="safe-title"></td>
-                <td>${prioBadge}</td>
-                <td>${statusBadge}</td>
-                <td class="safe-deadline"></td>
-                <td style="text-align:right;">
-                    <button class="btn-advance" title="Avançar Etapa" style="background:transparent; border:none; color:var(--os-success); cursor:pointer; margin-right:8px;"><i class="fa-solid fa-check"></i></button>
-                    <button class="btn-archive" title="Arquivar Demanda" style="background:transparent; border:none; color:var(--os-danger); cursor:pointer;"><i class="fa-solid fa-box-archive"></i></button>
-                </td>
-            `;
+            const td1 = document.createElement('td');
+            td1.className = "cell-mono safe-date";
+            td1.textContent = d.date || new Date().toISOString().split('T')[0];
 
-            tr.querySelector('.safe-date').textContent = d.date || new Date().toISOString().split('T')[0];
-            tr.querySelector('.safe-id').textContent = d.id;
-            tr.querySelector('.safe-title').textContent = d.title;
-            tr.querySelector('.safe-deadline').textContent = d.deadline || 'A definir';
+            const td2 = document.createElement('td');
+            td2.className = "cell-mono safe-id";
+            td2.textContent = d.id;
+
+            const td3 = document.createElement('td');
+            td3.className = "safe-title";
+            td3.textContent = d.title;
+
+            const td4 = document.createElement('td');
+            td4.innerHTML = prioBadge; // prioBadge is statically controlled safe HTML above
+
+            const td5 = document.createElement('td');
+            td5.innerHTML = statusBadge; // statusBadge is statically controlled safe HTML above
+
+            const td6 = document.createElement('td');
+            td6.className = "safe-deadline";
+            td6.textContent = d.deadline || 'A definir';
+
+            const td7 = document.createElement('td');
+            td7.style.textAlign = "right";
+            
+            const btnAdv = document.createElement('button');
+            btnAdv.className = "btn-advance";
+            btnAdv.title = "Avançar Etapa";
+            btnAdv.style.cssText = "background:transparent; border:none; color:var(--os-success); cursor:pointer; margin-right:8px;";
+            const iAdv = document.createElement('i');
+            iAdv.className = "fa-solid fa-check";
+            btnAdv.appendChild(iAdv);
+
+            const btnArch = document.createElement('button');
+            btnArch.className = "btn-archive";
+            btnArch.title = "Arquivar Demanda";
+            btnArch.style.cssText = "background:transparent; border:none; color:var(--os-danger); cursor:pointer;";
+            const iArch = document.createElement('i');
+            iArch.className = "fa-solid fa-box-archive";
+            btnArch.appendChild(iArch);
+
+            td7.appendChild(btnAdv);
+            td7.appendChild(btnArch);
+
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+            tr.appendChild(td5);
+            tr.appendChild(td6);
+            tr.appendChild(td7);
 
             if (d.status === 'concluido' || d.status === 'entregue') {
                 tr.querySelector('.btn-advance').style.display = 'none';

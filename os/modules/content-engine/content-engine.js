@@ -319,13 +319,32 @@ window.updateIAGovDashboard = async () => {
             if (['aprovado_interno', 'em_revisao_fluxai', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(a.status) || ['REVIEW', 'READY_TO_POST'].includes(stdStatus)) impact = 'Ocupado';
             if (stdStatus === 'POSTED' || a.status === 'publicado') impact = 'Consumido';
             
-            tr.innerHTML = `
-                <td style="font-family:'JetBrains Mono', monospace; font-size:0.75rem;">${a.id.split('_').pop().substring(0,8)}</td>
-                <td><span style="background:rgba(255,255,255,0.1); padding:3px 8px; border-radius:4px; font-size:0.7rem;">${a.status}</span></td>
-                <td>${a.metadata?.origin_contract || 'Contrato Base'}</td>
-                <td style="color:${impact==='Ocupado'?'var(--os-warning)':impact==='Consumido'?'var(--os-primary)':'#888'}">${impact}</td>
-                <td style="font-size:0.75rem;">${new Date(a.created_at).toLocaleDateString('pt-BR')}</td>
-            `;
+            const td1 = document.createElement('td');
+            td1.style.cssText = "font-family:'JetBrains Mono', monospace; font-size:0.75rem;";
+            td1.textContent = a.id.split('_').pop().substring(0,8);
+            
+            const td2 = document.createElement('td');
+            const spanStatus = document.createElement('span');
+            spanStatus.style.cssText = "background:rgba(255,255,255,0.1); padding:3px 8px; border-radius:4px; font-size:0.7rem;";
+            spanStatus.textContent = a.status;
+            td2.appendChild(spanStatus);
+            
+            const td3 = document.createElement('td');
+            td3.textContent = a.metadata?.origin_contract || 'Contrato Base';
+            
+            const td4 = document.createElement('td');
+            td4.style.color = impact==='Ocupado' ? 'var(--os-warning)' : (impact==='Consumido' ? 'var(--os-primary)' : '#888');
+            td4.textContent = impact;
+            
+            const td5 = document.createElement('td');
+            td5.style.fontSize = "0.75rem";
+            td5.textContent = new Date(a.created_at).toLocaleDateString('pt-BR');
+            
+            tr.appendChild(td1);
+            tr.appendChild(td2);
+            tr.appendChild(td3);
+            tr.appendChild(td4);
+            tr.appendChild(td5);
             tableBody.appendChild(tr);
         });
     }

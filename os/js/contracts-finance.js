@@ -467,7 +467,7 @@ function renderContracts(contracts) {
         actionDiv.style.justifyContent = 'flex-end';
 
         const btnPortal = document.createElement('a');
-        btnPortal.href = '/os/client-portal.html?project_id=' + c.project_id;
+        btnPortal.setAttribute('href', '/os/client-portal.html?project_id=' + encodeURIComponent(c.project_id));
         btnPortal.className = 'btn-mini';
         btnPortal.style.cssText = 'display:inline-flex; align-items:center; justify-content:center; text-decoration:none;';
         btnPortal.title = 'Ver Portal Cliente';
@@ -811,34 +811,106 @@ window.generateContractDoc = (contractId) => {
 
     const contentDiv = document.getElementById('receipt-content');
     
-    let extrasHtml = '';
-    if (contract.extras && contract.extras.length > 0) {
-        extrasHtml = `<h4 style="margin: 15px 0 5px 0; color: var(--os-primary);">Serviços Extras / Avulsos Lançados:</h4>
-                      <ul style="padding-left: 20px; color: var(--os-text-muted);">`;
+        const extrasWrapper = document.createElement('div');
+        const extrasHeader = document.createElement('h4');
+        extrasHeader.style.cssText = "margin: 15px 0 5px 0; color: var(--os-primary);";
+        extrasHeader.textContent = "Serviços Extras / Avulsos Lançados:";
+        const extrasUl = document.createElement('ul');
+        extrasUl.style.cssText = "padding-left: 20px; color: var(--os-text-muted);";
+        
         contract.extras.forEach(ext => {
-            extrasHtml += `<li><strong>${ext.type}</strong> - Valor: ${formatCurrency(ext.value)} (Status: ${ext.status.toUpperCase()})</li>`;
+            const li = document.createElement('li');
+            const strongExtType = document.createElement('strong');
+            strongExtType.textContent = ext.type;
+            const textNode = document.createTextNode(` - Valor: ${formatCurrency(ext.value)} (Status: ${ext.status.toUpperCase()})`);
+            li.appendChild(strongExtType);
+            li.appendChild(textNode);
+            extrasUl.appendChild(li);
         });
-        extrasHtml += `</ul>`;
+        extrasWrapper.appendChild(extrasHeader);
+        extrasWrapper.appendChild(extrasUl);
+        extrasHtmlNode = extrasWrapper; // We'll append this down below
     }
 
-    contentDiv.innerHTML = `
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-            <div>
-                <p><strong>Para o Cliente:</strong><br>${contract.client_name}<br><span style="color:var(--os-text-muted);">${contract.company_name}</span></p>
-            </div>
-            <div style="text-align: right;">
-                <p><strong>Contrato Ref:</strong> #${contract.id.toUpperCase()}<br><strong>Status:</strong> ${contract.status}</p>
-            </div>
-        </div>
-        <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px; border: 1px solid var(--os-border); margin-bottom: 20px;">
-            <p style="margin: 0;"><strong>Escopo Recorrente Acordado:</strong><br>${contract.deliverables.replace(/\\n/g, '<br>')}</p>
-        </div>
-        <div style="display: flex; justify-content: space-between; font-size: 1.1rem; font-family: var(--os-font-mono); font-weight: 700; border-top: 1px solid var(--os-border); padding-top: 15px;">
-            <span>Valor Mensal Base:</span>
-            <span>${formatCurrency(contract.contract_value)}</span>
-        </div>
-        ${extrasHtml}
-    `;
+    contentDiv.innerHTML = ''; // clear it
+    
+    const headerDiv = document.createElement('div');
+    headerDiv.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;";
+    
+    const clientDiv = document.createElement('div');
+    const pClient = document.createElement('p');
+    const strongClient = document.createElement('strong');
+    strongClient.textContent = "Para o Cliente:";
+    const br1 = document.createElement('br');
+    const clientNameNode = document.createTextNode(contract.client_name);
+    const br2 = document.createElement('br');
+    const spanCompany = document.createElement('span');
+    spanCompany.style.color = "var(--os-text-muted)";
+    spanCompany.textContent = contract.company_name;
+    pClient.appendChild(strongClient);
+    pClient.appendChild(br1);
+    pClient.appendChild(clientNameNode);
+    pClient.appendChild(br2);
+    pClient.appendChild(spanCompany);
+    clientDiv.appendChild(pClient);
+    
+    const infoDiv = document.createElement('div');
+    infoDiv.style.textAlign = "right";
+    const pInfo = document.createElement('p');
+    const strongRef = document.createElement('strong');
+    strongRef.textContent = "Contrato Ref:";
+    const refNode = document.createTextNode(" #" + contract.id.toUpperCase());
+    const br3 = document.createElement('br');
+    const strongStatus = document.createElement('strong');
+    strongStatus.textContent = "Status:";
+    const statusNode = document.createTextNode(" " + contract.status);
+    pInfo.appendChild(strongRef);
+    pInfo.appendChild(refNode);
+    pInfo.appendChild(br3);
+    pInfo.appendChild(strongStatus);
+    pInfo.appendChild(statusNode);
+    infoDiv.appendChild(pInfo);
+    
+    headerDiv.appendChild(clientDiv);
+    headerDiv.appendChild(infoDiv);
+    
+    const scopeDiv = document.createElement('div');
+    scopeDiv.style.cssText = "background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px; border: 1px solid var(--os-border); margin-bottom: 20px;";
+    const pScope = document.createElement('p');
+    pScope.style.margin = "0";
+    const strongScope = document.createElement('strong');
+    strongScope.textContent = "Escopo Recorrente Acordado:";
+    const br4 = document.createElement('br');
+    pScope.appendChild(strongScope);
+    pScope.appendChild(br4);
+    
+    // Add lines safely
+    const deliverablesLines = contract.deliverables.split('\\n');
+    deliverablesLines.forEach((line, index) => {
+        pScope.appendChild(document.createTextNode(line));
+        if (index < deliverablesLines.length - 1) {
+            pScope.appendChild(document.createElement('br'));
+        }
+    });
+    
+    scopeDiv.appendChild(pScope);
+    
+    const valueDiv = document.createElement('div');
+    valueDiv.style.cssText = "display: flex; justify-content: space-between; font-size: 1.1rem; font-family: var(--os-font-mono); font-weight: 700; border-top: 1px solid var(--os-border); padding-top: 15px;";
+    const spanValText = document.createElement('span');
+    spanValText.textContent = "Valor Mensal Base:";
+    const spanVal = document.createElement('span');
+    spanVal.textContent = formatCurrency(contract.contract_value);
+    valueDiv.appendChild(spanValText);
+    valueDiv.appendChild(spanVal);
+    
+    contentDiv.appendChild(headerDiv);
+    contentDiv.appendChild(scopeDiv);
+    contentDiv.appendChild(valueDiv);
+    
+    if (typeof extrasHtmlNode !== 'undefined' && extrasHtmlNode) {
+        contentDiv.appendChild(extrasHtmlNode);
+    }
 
     document.getElementById('receipt-date').innerText = new Date().toLocaleString('pt-BR');
     document.getElementById('receipt-hash').innerText = btoa(contractId + Date.now()).substring(0, 16).toUpperCase();
