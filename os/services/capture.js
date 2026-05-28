@@ -1,5 +1,6 @@
 import { OS_CONFIG } from '../config/os-config.js';
 import { OS_LOGS_ENGINE } from './logs-engine.js';
+import { getUrlParam } from './sanitizer.js';
 
 export const LeadCapture = {
     init: () => {
@@ -44,7 +45,7 @@ export const LeadCapture = {
                 status: 'NOVO',
                 temperature: 'MORNO',
                 health_score: 50,
-                utm_source: new URLSearchParams(window.location.search).get('utm_source') || 'orgânico'
+                utm_source: getUrlParam('utm_source', 'orgânico', { allowPattern: /^[a-zA-Z0-9_\-\s]{0,100}$/ })
             };
 
             // Payload exclusivo para o Make.com
@@ -58,7 +59,7 @@ export const LeadCapture = {
                 empresa: formData.get('company') || '',
                 servico_interesse: "leads_site",
                 canal_origem: "site",
-                campanha: new URLSearchParams(window.location.search).get('utm_campaign') || '',
+                campanha: getUrlParam('utm_campaign', '', { allowPattern: /^[a-zA-Z0-9_\-\s]{0,100}$/ }),
                 pagina_origem: window.location.href,
                 status_lead: "novo",
                 responsavel: "FluxAI",

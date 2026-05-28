@@ -1,6 +1,17 @@
 import { INTEGRATIONS } from '../config/integrations.js';
 import { CONTACT_INFO } from '../config/constants.js';
 
+// Utilitário inline de sanitização para o site público (sem ESM externo)
+const UTM_PATTERN = /^[a-zA-Z0-9_\-\s]{0,100}$/;
+function safeUtmParam(key, fallback = '') {
+    const raw = new URLSearchParams(window.location.search).get(key);
+    if (!raw) return fallback;
+    const clean = String(raw).slice(0, 100);
+    // Rejeitar protocolos perigosos
+    if (/^(javascript|data|vbscript):/i.test(clean.trim())) return fallback;
+    return UTM_PATTERN.test(clean) ? clean : fallback;
+}
+
 document.addEventListener('DOMContentLoaded', () => {
 
     // 1. BODY LOADED FADE-IN
@@ -213,9 +224,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Captura de Inteligência de Tráfego (UTMs)
             const urlParams = new URLSearchParams(window.location.search);
-            const utmSource = urlParams.get('utm_source') || 'Direto';
-            const utmMedium = urlParams.get('utm_medium') || 'Orgânico';
-            const utmCampaign = urlParams.get('utm_campaign') || 'N/A';
+            const utmSource = safeUtmParam('utm_source', 'Direto');
+            const utmMedium = safeUtmParam('utm_medium', 'Orgânico');
+            const utmCampaign = safeUtmParam('utm_campaign', 'N/A');
 
             const payload = {
                 data: new Date().toISOString(),

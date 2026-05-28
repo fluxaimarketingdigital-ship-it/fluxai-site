@@ -463,12 +463,20 @@ function _applyRBAC(user, requiredRole, requiredPermission) {
     // Bloqueio de URL direta para CLIENT
     if (user.role === 'CLIENT') {
         const currentPath = window.location.pathname.toLowerCase();
-        // Permite client-portal, access-denied, login
-        const isAllowed = currentPath.includes('client-portal') || currentPath.includes('access-denied') || currentPath.includes('login');
-        
+        // CLIENT só pode acessar: client-portal, approval (aprovar entregas), access-denied, login
+        const isAllowed = [
+            'client-portal',
+            'approval',
+            'contract-view',
+            'access-denied',
+            'login'
+        ].some(allowed => currentPath.includes(allowed));
+
         if (!isAllowed) {
             console.warn('[RBAC] CLIENT bloqueado de rota interna:', currentPath);
-            window.location.href = getRoute('client-portal');
+            window.location.replace(
+                window.location.pathname.endsWith('.html') ? 'client-portal.html' : 'client-portal'
+            );
             return null;
         }
     }
@@ -545,6 +553,31 @@ export const OS_AUTH = {
         window.location.href = hasExt ? 'login.html' : 'login';
     }
 };
+
+// ── Listener de estado de sessão (SIGNED_OUT) ──
+// Invalida o contexto em RAM imediatamente quando o Supabase detecta
+// logout (expiração de token, revoção de sessão ou logout em outra aba).
+(function _registerAuthStateGuard() {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
+    supabase.auth.onAuthStateChange((event, _session) => {
+        if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !_session) {
+            console.warn('[AUTH_GUARD] Sessão encerrada remotamente. Limpando contexto.');
+            window.FLUXAI_RUNTIME_CONTEXT = null;
+            localStorage.removeItem('fluxai_current_project_id');
+
+            // Redirecionar apenas se estiver em rota protegida
+            const path = window.location.pathname.toLowerCase();
+            const isPublic = ['/os/login', '/os/access-denied', 'login.html', 'access-denied.html']
+                .some(p => path.includes(p));
+            if (!isPublic) {
+                const hasExt = window.location.pathname.endsWith('.html');
+                window.location.replace(hasExt ? 'login.html' : 'login');
+            }
+        }
+    });
+}());
 
 /**
  * Ponte Manual Assistida do WhatsApp
