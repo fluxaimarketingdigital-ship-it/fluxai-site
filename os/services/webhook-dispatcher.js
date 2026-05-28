@@ -16,8 +16,11 @@
 
 import { SUPABASE_CONFIG } from '../config/os-config.js';
 
-// ─── Endpoint da Edge Function (sem secrets, sem Make URLs) ─────────────────
-const PROXY_ENDPOINT = `${SUPABASE_CONFIG.url}/functions/v1/make-proxy`;
+// O Endpoint da Edge Function será gerado dinamicamente para evitar
+// problemas de inicialização (dependência circular com os-config.js).
+function getProxyEndpoint() {
+    return `${SUPABASE_CONFIG.url}/functions/v1/make-proxy`;
+}
 
 // ─── Proxy-Key pública (não é secret — apenas identifica o frontend) ────────
 // O verdadeiro segredo vive somente no Supabase (FLUXAI_PROXY_ACCESS_KEY).
@@ -45,7 +48,8 @@ export async function dispatchWebhook(route, payload, token = null) {
 
     let response;
     try {
-        response = await fetch(PROXY_ENDPOINT, {
+        const endpoint = getProxyEndpoint();
+        response = await fetch(endpoint, {
             method: 'POST',
             headers,
             body: JSON.stringify({ route, payload }),
