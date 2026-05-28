@@ -1,0 +1,24 @@
+﻿ZAP pelo Relatório de Varredura Checkmarx
+Gerado com O logo da ZAPZAP em qui. 28 mai. 2026, às 01:44:33
+Versão ZAP: 2.17.0
+
+[... Relatório Consolidado ...]
+Alvo: https://www.fluxaidigital.com.br
+- High: 0
+- Medium: 4
+- Low: 3
+- Informational: 4
+- Total: 11
+
+Alvo: https://www.fluxaidigital.com.br/os/login.html
+- High: 0
+- Medium: 3
+- Low: 0
+- Informational: 2
+- Total: 5
+
+Mediums residuais:
+- CSP script-src unsafe-inline
+- CSP style-src unsafe-inline
+- Sub Resource Integrity Attribute Missing
+- Configuração Incorreta Entre Domínios no site público

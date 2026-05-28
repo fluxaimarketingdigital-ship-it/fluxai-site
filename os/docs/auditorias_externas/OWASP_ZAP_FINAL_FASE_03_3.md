@@ -54,8 +54,22 @@ Testes sintéticos pós-hardening confirmam total integridade no FluxAI OS™:
 - ✅ *Integração Make/Sheets:* Passando limpo via Proxy Restrito com Token.
 
 ## Conclusão Final
-Após a bateria intensa de análise, correção e documentação (Fases 03.1, 03.2, 03.3A, B e C), o ecossistema *FluxAI OS™* e a infraestrutura comercial *FluxAI Labs* conquistam neste ciclo o status **Secure Baseline**. 
 
-**Status Oficial**: High 0, P0 0, Mediums residuais tecnicamente justificados e aceitos temporariamente, com backlog futuro para nonce/hash CSP e refinamento SRI/CORS.
+**Ciclo OWASP 03.1 a 03.3C: encerrável com ressalva técnica.**
 
-A plataforma está homologada sob parâmetros adequados de Defesa Perimetral (DAST) e Higiene de Payload.
+Após a bateria intensa de análise, correção e documentação, o ecossistema *FluxAI OS™* e a infraestrutura comercial *FluxAI Labs* conquistam neste ciclo o status de **Secure Baseline**. 
+
+**Status Oficial**: High 0, P0 0, riscos residuais tecnicamente justificados e aceitos temporariamente.
+
+> **Atenção:** O status "Medium" não foi reduzido a zero e não declaramos ausência total de vulnerabilidades ou certificação absoluta. Os Mediums identificados decorrem estritamente da necessidade arquitetônica atual de permitir scripts/estilos in-line de terceiros e outras configurações inerentes ao ambiente (Vercel/Google/Meta).
+
+### Backlog Futuro de Hardening
+1. Remover `unsafe-inline` via nonce/hash CSP.
+2. Refatorar scripts inline legados.
+3. Avaliar substituição ou local hosting de recursos externos sem SRI.
+4. Reavaliar CORS do site público e headers estáticos Vercel.
+5. Revisar labels de formulários para acessibilidade.
+6. Corrigir warning visual de `.os-topbar` ausente em rotas específicas.
+7. Remover fallback local do Client Portal quando Supabase definitivo estiver pronto.
+
+*(Evidência oficial em anexo: ZAP_FINAL_FLUXAI_03_3C.txt)*
