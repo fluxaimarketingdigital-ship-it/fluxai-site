@@ -55,3 +55,5 @@ RESUMO_SITE,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arq
 INSIGHTS_CONTEUDO,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
 UTMS,F_LEGADO,legado,arquivo,nao,nao,nao,nao,nao_aplicavel,nao,,baixo,Arquivar,P2,
 GPT_GERACOES_LOG,B_OPERACIONAL,log,ativa,nao,sim,sim,nao,nao_aplicavel,sim,tokens_estimados,baixo,Append-only e redigida,P3,Logs sensiveis redigidos e salvos no Drive.
+MAPA_GOVERNANCA_ABAS,H_DOCUMENTACAO,documentacao,ativa,sim,nao,sim,nao,nao_aplicavel,nao,,baixo,Manter atualizada,P3,Indice mestre de governanca das abas da planilha.
+FLUXAI_ACADEMY,H_DOCUMENTACAO,documentacao,ativa,sim,nao,sim,nao,nao_aplicavel,nao,,baixo,Manter atrativos e roteiros,P3,Espelho tecnico de roteiros de treinamento do manual.
