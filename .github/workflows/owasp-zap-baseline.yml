@@ -28,7 +28,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Run ZAP Baseline Scan
-        uses: zaproxy/action-baseline@v0.15.0
+        uses: zaproxy/action-baseline@6c5a007541891231cd9e0ddec25d4f25c59c9874 # v0.15.0
         with:
           target: ${{ matrix.target }}
           allow_issue_writing: false
