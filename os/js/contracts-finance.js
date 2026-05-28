@@ -604,6 +604,7 @@ function renderOperationalAlerts(contracts, payments) {
         return;
     }
 
+    alerts.forEach(a => {
         const div = document.createElement('div'); 
         div.className = `alert-item ${a.type}`; 
         

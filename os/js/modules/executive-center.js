@@ -70,8 +70,6 @@ async function loadExecutiveData() {
         
         const validContractIds = mockContracts.map(c => c.id);
         const mockPayments = isGlobalView ? mockPaymentsRaw : mockPaymentsRaw.filter(p => validContractIds.includes(p.contract_id));
-        const clientConfigs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
-
         // Leads fallback
         let localLeadsRaw = JSON.parse(localStorage.getItem('fluxai_mock_leads') || '[]');
         if (localLeadsRaw.length === 0) {

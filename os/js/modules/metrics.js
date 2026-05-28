@@ -52,11 +52,12 @@ async function loadMetrics() {
         emptyState.style.display = 'none';
     }
 
-        const rawMetrics = await SheetsService.fetchMetrics();
-        if (!rawMetrics || Object.keys(rawMetrics).length === 0) {
-            container.innerHTML = '<div style="opacity: 0.5;">Nenhuma métrica encontrada.</div>';
-            return;
-        }
+        try {
+            const rawMetrics = await SheetsService.fetchMetrics();
+            if (!rawMetrics || Object.keys(rawMetrics).length === 0) {
+                container.innerHTML = '<div style="opacity: 0.5;">Nenhuma métrica encontrada.</div>';
+                return;
+            }
 
         // Filtra cada array se não for visão global
         const metrics = {
