@@ -100,15 +100,16 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 ### 6. CRM / Leads / Demandas
 - **Objetivo operacional:** Controle do pipeline comercial e acompanhamento de tickets/demandas.
 - **Perfil de usuário permitido:** ADMIN, OPERATOR.
-- **Fluxo esperado:** Gestão Kanban/lista de Leads, alteração de status, fechamento de ticket.
-- **Dados utilizados:** Pipeline comercial.
-- **Integrações envolvidas:** Supabase DB.
-- **Estados vazios:** Pipeline zerado.
-- **Estados de erro:** Falha na atualização de status.
+- **Fluxo esperado:** Recebimento de lead/demanda → Tratamento/Triagem → Evolução de status.
+- **Dados utilizados:** Nome, origem, serviço, prioridade, prazos.
+- **Integrações envolvidas:** Webhook Make (CRM_UPDATE).
+- **Estados vazios:** Sem demanda aguardando. (Isolado por tenant obrigatório).
+- **Estados de erro:** Falha no webhook avisa de rascunho local e emite log de falha (Fail-safe).
 - **Validação de permissão:** Acesso negado para CLIENT.
-- **Risco funcional:** Contatos perdidos, gargalos comerciais invisíveis.
-- **Ajustes necessários:** [Em aberto]
-- **Prioridade:** [Em aberto]
+- **Risco funcional:** Proteção estrita contra vazamento tenant-tenant e bloqueio de cliques duplos implantado.
+- **Ajustes necessários:** Resolvido via Recuperação Técnica.
+- **Prioridade:** Resolvido.
+- **Status da Validação:** 🟢 Homologado (Pós-Recuperação Técnica)
 
 ### 7. Logs / Auditoria
 - **Objetivo operacional:** Rastreio de eventos do sistema, disparos de webhooks e acessos.
