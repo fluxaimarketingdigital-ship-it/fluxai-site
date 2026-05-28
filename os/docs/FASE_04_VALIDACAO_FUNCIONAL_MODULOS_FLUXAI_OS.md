@@ -90,11 +90,12 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 - **Dados utilizados:** Peças de conteúdo, status.
 - **Integrações envolvidas:** Google Sheets, Webhook Make.
 - **Estados vazios:** Nenhuma pauta aguardando aprovação.
-- **Estados de erro:** Erro de sincronia com a planilha.
-- **Validação de permissão:** Acesso negado para CLIENT.
-- **Risco funcional:** Perda de trabalho ou duplicação de postagens.
-- **Ajustes necessários:** [Em aberto]
-- **Prioridade:** [Em aberto]
+- **Estados de erro:** Rollback ativo impedindo falso-positivos se o webhook Make falhar. Fallback para LocalStorage se Supabase falhar.
+- **Validação de permissão:** Acesso negado rigidamente para CLIENT nas controllers vitais.
+- **Risco funcional:** Múltiplas travas impedem transições sem validação e protegem o limite de IA do cliente.
+- **Ajustes necessários:** Nenhum. Módulo 100% blindado por Rollback Automático.
+- **Prioridade:** Resolvido.
+- **Status da Validação:** 🟢 Homologado
 
 ### 6. CRM / Leads / Demandas
 - **Objetivo operacional:** Controle do pipeline comercial e acompanhamento de tickets/demandas.
