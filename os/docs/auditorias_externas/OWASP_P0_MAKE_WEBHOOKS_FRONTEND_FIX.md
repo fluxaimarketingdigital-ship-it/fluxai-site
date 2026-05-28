@@ -100,13 +100,15 @@ não constituem vazamento de endpoint operacional.
 
 ---
 
-## 6. Critério de Aceite — Status
+## 6. Critério de Aceite — Status Final
 
-- [x] LEAD_CAPTURE testado e confirmado `ok: true` via proxy (makeStatus: 200, Make recebeu)
-- [x] Nenhuma URL real de Make permanece no frontend
-- [x] os-config.js não expõe webhooks reais
-- [x] Auth / RBAC / login / client-portal / CSS global intactos
-- [x] OWASP P0 de webhook exposto: **CORRIGIDO**
+- [x] LEAD_CAPTURE sem header `X-FluxAI-Proxy-Key`: **401 Unauthorized** (teste bloqueado com sucesso)
+- [x] LEAD_CAPTURE com header `X-FluxAI-Proxy-Key` válido: **ok: true, makeStatus: 200** (teste aprovado)
+- [x] Nenhuma URL real de Make permanece no frontend (`grep hook.us` == 0 resultados)
+- [x] `os-config.js` contém apenas aliases lógicos, roteando requisições ao `webhook-dispatcher.js`
+- [x] `webhook-dispatcher.js` aciona exclusivamente a Edge Function injetando a chave pública
+- [x] Auth / RBAC / login / client-portal / CSS global mantidos 100% intactos
+- [x] **P0 OWASP Webhooks Make: CORRIGIDO E FECHADO**
 
 ---
 
