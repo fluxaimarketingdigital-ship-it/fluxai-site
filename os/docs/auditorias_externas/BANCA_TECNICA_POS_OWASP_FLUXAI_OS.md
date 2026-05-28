@@ -25,7 +25,7 @@ Emitir um parecer técnico, arquitetural e comercial consolidado sobre o estado 
 ## ⚖️ Avaliações por Área
 
 ### 1. Segurança e OWASP 🛡️
-- **Diagnóstico:** O sistema atingiu um nível invejável de blindagem para uma plataforma no estágio atual. A proteção perimetral via Edge Functions, aliada ao controle de headers e CSP estrito, neutralizou a principal ameaça de exploração de chaves e webhooks. O SonarCloud confirma a sanidade do código.
+- **Diagnóstico:** O sistema atingiu um nível avançado de blindagem para uso interno controlado. A proteção perimetral via Edge Functions, aliada ao controle de headers e CSP estrito, neutralizou a principal ameaça de exploração de chaves e webhooks. O SonarCloud confirma a sanidade do código.
 - **Riscos Remanescentes:** Persistência do `unsafe-inline` na política CSP e uso de CDN (Google Fonts) sem checagem de integridade (SRI). 
 - **Pontos Aprovados:** Proxy de Webhooks, Restrições de CORS no `vercel.json`, Quality Gate do SonarCloud, RBAC.
 - **Restrições de Alteração:** Rigoroso bloqueio de edições nas regras de CSP, headers da Vercel e lógica do `make-proxy`.
@@ -53,7 +53,7 @@ Emitir um parecer técnico, arquitetural e comercial consolidado sobre o estado 
 - **Recomendações:** Atacar urgentemente o backlog visual de UX nas próximas fases operacionais, garantindo fluidez e preenchendo os "buracos" deixados por componentes placeholder.
 
 ### 5. Estratégia Comercial FluxAI 💼
-- **Diagnóstico:** O "Selo Verde" no Quality Gate e os testes limpos do OWASP fornecem um ativo de PR e de credibilidade monumental. O sistema pode ser apresentado a clientes institucionais/high-ticket sem ressalvas críticas de segurança de dados.
+- **Diagnóstico:** O "Selo Verde" no Quality Gate e os testes limpos do OWASP fornecem um ativo relevante de credibilidade técnica e institucional. O sistema pode ser apresentado a clientes institucionais/high-ticket sem ressalvas críticas de segurança de dados.
 - **Riscos Remanescentes:** A percepção de um portal do cliente com "fallback local" pode reduzir o valor percebido caso não evolua rápido.
 - **Pontos Aprovados:** Zero exposição P0 de chaves e de dados dos clientes; proteção contra a "clonagem" do fluxo de captura.
 - **Restrições de Alteração:** Nenhuma mudança na esteira principal de funil de vendas sem aprovação do comitê comercial.
