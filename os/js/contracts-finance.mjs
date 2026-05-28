@@ -2,7 +2,6 @@ import { OS_UI, OS_AUTH } from '/os/js/os-core.js';
 import { getSupabase } from '/os/services/supabase-client.js';
 import { OS_LOGS_ENGINE } from '/os/services/logs-engine.js';
 import { OS_CONFIG } from '/os/config/os-config.js';
-import { SERVICES_CATALOG } from '/os/js/config/services-catalog.js';
 
 window.OS_LOGS_ENGINE = OS_LOGS_ENGINE;
 window.OS_CONFIG = OS_CONFIG;
@@ -33,7 +32,58 @@ async function initFinance() {
             const val = selectExtra.value;
             const extraValField = document.getElementById('edit-extra-value');
             const extraDescField = document.getElementById('edit-extra-desc');
-
+            
+            const SERVICES_CATALOG = {
+                "[FluxAI] Gravação / Captação Audiovisual": {
+                    value: 400,
+                    desc: "Captação presencial (até 4h de gravação) com equipamento profissional de áudio e vídeo, direção de cena para gravação de Reels e captação de materiais institucionais brutas."
+                },
+                "[FluxAI] Produção de Reels Extra (Unidade)": {
+                    value: 100,
+                    desc: "Roteirização técnica de 1 Reels extra (incluindo gancho forte, copy fluida e CTA clara), edição dinâmica premium com cortes precisos, legendas animadas sincronizadas e inserção de efeitos sonoros."
+                },
+                "[FluxAI] Produção de Carrosséis Extra (Unidade)": {
+                    value: 80,
+                    desc: "Pesquisa de pauta, roteiro em slides (até 8 slides) focado em storytelling, design visual premium corporativo sob a identidade da marca, criação de legenda de alta retenção e capa atraente."
+                },
+                "[FluxAI] Apresentação Comercial / Pitch Deck": {
+                    value: 500,
+                    desc: "Estruturação de narrativa de vendas (Pitch), design de apresentação corporativa premium (até 12 slides) no Canva ou PDF, diagramação limpa, focada em conversão para empresas e parceiros locais."
+                },
+                "[FluxAI] Branding & Identidade Visual Express": {
+                    value: 1200,
+                    desc: "Criação de logotipo principal, submark, paleta de cores institucional estratégica, tipografias recomendadas, manual básico de aplicação da marca e templates editáveis para posts e stories."
+                },
+                "[FluxAI] Gestão de Anúncios Meta Ads": {
+                    value: 600,
+                    desc: "Criação de conta de anúncios/gerenciador de negócios, configuração de pixel de rastreamento, pesquisa de público-alvo qualificado regional, criação de 2 campanhas de anúncios (Tráfego/Mensagens) e relatório quinzenal."
+                },
+                "[FluxAI Labs] Automação de Processos (Make / n8n)": {
+                    value: 800,
+                    desc: "Desenvolvimento de fluxos automatizados integrando WhatsApp, Planilhas, CRM e Email. Inclui tratamento de erros, webhook instantâneo, otimização de execução de tarefas e até 3 integrações ativas."
+                },
+                "[FluxAI Labs] Landing Page (LP) de Alta Conversão": {
+                    value: 1500,
+                    desc: "Criação de Landing Page com design premium responsivo, copy com técnicas de copywriting/venda, integração com WhatsApp ou formulários, pixel do Meta/Google instalado, SEO básico e hospedagem otimizada."
+                },
+                "[FluxAI Labs] Site Institucional Completo": {
+                    value: 2500,
+                    desc: "Desenvolvimento de site institucional estruturado em seções (Home, Sobre, Serviços, Depoimentos, Contato), design exclusivo, blog interno básico, otimização de velocidade, SEO On-Page avançado e integradores de contato."
+                },
+                "[FluxAI Labs] Arquitetura de CRM & Pipeline de Vendas": {
+                    value: 900,
+                    desc: "Estruturação completa de pipeline de funil de vendas (Prospecção, Qualificação, Apresentação, Fechamento) no CRM, automação de etapas para envio de propostas, tags e treinamento de equipe operacional."
+                },
+                "[FluxAI Labs] Chatbot de IA & Agente de Triagem": {
+                    value: 1200,
+                    desc: "Treinamento de agente inteligente de Inteligência Artificial para qualificar e realizar a triagem inicial de leads no WhatsApp ou Instagram Direct, integrado a banco de respostas do profissional."
+                },
+                "[FluxAI Labs] Dashboard de Analytics Personalizado": {
+                    value: 1000,
+                    desc: "Modelagem de dados operacionais e financeiros, integração com fontes de dados (Meta Ads/Google Sheets), gráficos iterativos corporativos no Looker Studio ou FluxAI OS Engine."
+                }
+            };
+            
             if (val && SERVICES_CATALOG[val]) {
                 extraValField.value = SERVICES_CATALOG[val].value;
                 extraDescField.value = SERVICES_CATALOG[val].desc;
@@ -663,7 +713,7 @@ window.saveContractEdit = async () => {
         let extraServicePayload = null;
         if (extraType && extraType !== "") {
             extraServicePayload = {
-                extra_id: 'ext_' + crypto.getRandomValues(new Uint32Array(1))[0].toString(36),
+                extra_id: 'ext_' + Math.random().toString(36).substr(2, 9),
                 type: extraType,
                 value: parseFloat(document.getElementById('edit-extra-value').value || 0),
                 approved_value: parseFloat(document.getElementById('edit-extra-approved-value').value || 0),
@@ -765,8 +815,6 @@ window.generateContractDoc = (contractId) => {
 
     const contentDiv = document.getElementById('receipt-content');
     
-    let extrasHtmlNode = null;
-    if (contract.extras && contract.extras.length > 0) {
         const extrasWrapper = document.createElement('div');
         const extrasHeader = document.createElement('h4');
         extrasHeader.style.cssText = "margin: 15px 0 5px 0; color: var(--os-primary);";

@@ -110,7 +110,6 @@ async function loadDemands() {
         table.appendChild(tbody);
         wrapper.appendChild(table);
         container.appendChild(wrapper);
-        const tbody = document.getElementById('demands-tbody');
 
         demands.forEach(d => {
             const spanPrio = document.createElement('span');
