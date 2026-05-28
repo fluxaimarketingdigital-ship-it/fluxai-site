@@ -1,8 +1,8 @@
 aba,nivel_governanca,tipo_aba,status_operacional,fonte_verdade,make_pode_ler,os_pode_ler,relatorio_pode_ler,modo_coleta,contem_dado_sensivel,tipo_dado_sensivel,risco,acao_recomendada,prioridade,observacao
-CLIENTES_CONFIG,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,sim,nao_aplicavel,sim,meta_access_token,critico,Remover token real,P0,Core system
+CLIENTES_CONFIG,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,sim,nao_aplicavel,sim,meta_access_token,baixo,Manter referencia logica,P3,Token real neutralizado. Mantida referencia logica.
 SERVICOS_CLIENTES,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,sim,nao_aplicavel,nao,,baixo,Manter,P3,Define modo de coleta e relatorio
 ROTAS_AUTOMACOES,A_FONTE_DE_VERDADE,controle_make,ativa,sim,sim,sim,nao,nao_aplicavel,sim,token_necessario,baixo,Referenciado via token_ref,P3,Chaves reais neutralizadas para token_ref.
-MAKE_WORKFLOWS,A_FONTE_DE_VERDADE,controle_make,ativa,sim,sim,sim,nao,nao_aplicavel,sim,url_webhook,critico,Ocultar webhook,P0,Risco de exploit
+MAKE_WORKFLOWS,A_FONTE_DE_VERDADE,controle_make,ativa,sim,sim,sim,nao,nao_aplicavel,sim,url_webhook,baixo,Usar make-proxy,P3,Sem URL real exposta. Operacao via referencia logica/make-proxy.
 CLIENTES_ESTRATEGIA,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,sim,nao_aplicavel,nao,,baixo,Manter,P3,
 CONTRATOS_CLIENTES,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,nao,sim,nao,nao_aplicavel,nao,,baixo,Manter,P3,
 DNA_CLIENTE_GPT,A_FONTE_DE_VERDADE,cadastro_base,ativa,sim,sim,sim,nao,nao_aplicavel,nao,,baixo,Manter,P3,
