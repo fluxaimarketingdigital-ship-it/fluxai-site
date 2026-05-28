@@ -34,7 +34,19 @@ export const LeadCapture = {
 
             // Coletar dados
             const formData = new FormData(form);
+            
+            // Gerar ID no formato LEAD-YYYYMMDD-HHMMSS
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            const leadIdStr = `LEAD-${year}${month}${day}-${hours}${minutes}${seconds}`;
+
             const leadData = {
+                id: leadIdStr,
                 name: formData.get('name') || '',
                 email: formData.get('email') || '',
                 phone: formData.get('phone') || '',
@@ -50,6 +62,7 @@ export const LeadCapture = {
 
             // Payload exclusivo para o Make.com
             const payloadMake = {
+                lead_id: leadIdStr,
                 cliente_id: "FLUXAI_LABS_001",
                 cliente_nome: "FluxAI Labs",
                 origem_site: "site_fluxai",

@@ -504,6 +504,12 @@ function renderClientLogs() {
 function setupEventListeners() {
     // IA - Bloquear / Desbloquear IA
     document.getElementById('btn-toggle-ia').addEventListener('click', () => {
+        const role = currentUser ? currentUser.role : 'CLIENT';
+        if (role === 'CLIENT') {
+            alert('Ação restrita: Apenas administradores e operadores podem gerenciar acesso à IA.');
+            return;
+        }
+
         iaBlocked = !iaBlocked;
         
         // Salvar localmente
@@ -525,6 +531,12 @@ function setupEventListeners() {
 
     // IA - Liberar limite operacional manual
     document.getElementById('btn-adjust-limit').addEventListener('click', () => {
+        const role = currentUser ? currentUser.role : 'CLIENT';
+        if (role === 'CLIENT') {
+            alert('Ação restrita: Apenas administradores e operadores podem ajustar limites de IA.');
+            return;
+        }
+
         document.getElementById('input-new-limit').value = currentClientData.iaMetrics.limit;
         document.getElementById('limit-modal').style.display = 'flex';
     });
@@ -563,6 +575,12 @@ function setupEventListeners() {
 
     // PRODUÇÃO - Pausar / Reativar automações
     document.getElementById('btn-toggle-automations').addEventListener('click', () => {
+        const role = currentUser ? currentUser.role : 'CLIENT';
+        if (role === 'CLIENT') {
+            alert('Ação restrita: Apenas administradores e operadores podem gerenciar automações.');
+            return;
+        }
+
         automationsPaused = !automationsPaused;
         
         // Salvar localmente
@@ -586,11 +604,17 @@ function setupEventListeners() {
 
     // PRODUÇÃO - Aprovar relatório mensal
     document.getElementById('btn-approve-report').addEventListener('click', () => {
+        const role = currentUser ? currentUser.role : 'CLIENT';
+        if (role === 'CLIENT') {
+            alert('Ação restrita: Você não possui autorização para aprovar relatórios via cockpit interno.');
+            return;
+        }
+
         OS_LOGS_ENGINE.userAction(
             'DELIVERY_APPROVED',
             'cliente-detalhe',
             { document_type: 'REPORT', month: 'Corrente', details: 'Aprovado pelo operador' },
-            currentUser ? currentUser.role : 'CLIENT',
+            role,
             activeClientId,
             !OS_CONFIG.flags.sendRealWebhooks
         );
@@ -600,11 +624,17 @@ function setupEventListeners() {
 
     // PRODUÇÃO - Devolver relatório mensal para revisão
     document.getElementById('btn-return-report').addEventListener('click', () => {
+        const role = currentUser ? currentUser.role : 'CLIENT';
+        if (role === 'CLIENT') {
+            alert('Ação restrita: Apenas equipe interna pode devolver relatórios no cockpit.');
+            return;
+        }
+
         OS_LOGS_ENGINE.userAction(
             'STATUS_CHANGED',
             'cliente-detalhe',
             { document_type: 'REPORT', transition: 'devolver_para_revisao' },
-            currentUser ? currentUser.role : 'CLIENT',
+            role,
             activeClientId,
             !OS_CONFIG.flags.sendRealWebhooks
         );

@@ -570,12 +570,20 @@ window.mutateClient = (clientId, property, value) => {
         const actionText = value === 'ativo' ? 'ativado' : (value === 'pausado' ? 'pausado' : 'arquivado');
         alert(`Cliente ${clientName} foi ${actionText} com sucesso!`);
     } else if (property === 'ia') {
+        if (role === 'CLIENT') {
+            alert('Ação restrita: Apenas administradores e operadores podem alterar status de IA.');
+            return;
+        }
         logPayload.old_value = configs[clientId].iaBlocked;
         configs[clientId].iaBlocked = value;
         logType = 'SECURITY_PERMISSIONS_CHANGED';
         
         alert(value ? `IA suspensa para ${clientName}.` : `IA reativada para ${clientName}.`);
     } else if (property === 'auto') {
+        if (role === 'CLIENT') {
+            alert('Ação restrita: Apenas administradores e operadores podem alterar automações.');
+            return;
+        }
         logPayload.old_value = configs[clientId].automationsPaused;
         configs[clientId].automationsPaused = value;
         
@@ -615,6 +623,12 @@ window.mutateClient = (clientId, property, value) => {
 };
 
 window.mutateClientLimit = (clientId) => {
+    const role = currentUser ? currentUser.role : 'CLIENT';
+    if (role === 'CLIENT') {
+        alert('Ação restrita: Apenas administradores e operadores podem ajustar limites de IA.');
+        return;
+    }
+
     const configs = getClientConfigs();
     if (!configs[clientId]) {
         configs[clientId] = { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Outros' };
