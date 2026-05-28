@@ -113,16 +113,17 @@ Abaixo está a matriz de validação que será executada sequencialmente. Nenhum
 
 ### 7. Logs / Auditoria
 - **Objetivo operacional:** Rastreio de eventos do sistema, disparos de webhooks e acessos.
-- **Perfil de usuário permitido:** ADMIN, (OPERATOR restrito).
-- **Fluxo esperado:** Listagem paginada de eventos cronológicos (Engine `os-logs`).
-- **Dados utilizados:** Registro de eventos.
-- **Integrações envolvidas:** `os-logs-engine`.
-- **Estados vazios:** Sistema recém-iniciado (sem logs recentes).
-- **Estados de erro:** Falha ao recuperar logs do banco/memória.
-- **Validação de permissão:** Acesso negado para CLIENT.
-- **Risco funcional:** Perda de rastreabilidade durante um incidente (Non-repudiation failure).
-- **Ajustes necessários:** [Em aberto]
-- **Prioridade:** [Em aberto]
+- **Perfil de usuário permitido:** ADMIN. (Restrito via Patch de Governança).
+- **Fluxo esperado:** Captura de eventos do local storage ou DB e exibição cronológica.
+- **Dados utilizados:** Timestamp, UserID, Tenant, Ação, Payload.
+- **Integrações envolvidas:** Event Bus local (`OS_LOGS_ENGINE`).
+- **Estados vazios:** Mocks injetados automaticamente na ausência de logs reais.
+- **Estados de erro:** Parsing seguro contra payloads corrompidos.
+- **Validação de permissão:** Acesso severamente negado para OPERATOR e CLIENT.
+- **Risco funcional:** Vazamento de webhook keys e tokens em raw payloads.
+- **Ajustes necessários:** Resolvido (Nível de acesso subido para ADMIN, Redaction visual de secrets ativada).
+- **Prioridade:** Resolvido (P1 mitigado).
+- **Status da Validação:** 🟢 Homologado (Pós-Patch de Acesso)
 
 ### 8. Serviços Extras
 - **Objetivo operacional:** Fluxo de up-sell e contratação de demandas fora do escopo padrão.

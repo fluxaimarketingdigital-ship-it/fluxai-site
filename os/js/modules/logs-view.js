@@ -113,8 +113,8 @@ const INITIAL_TELEMETRY_MOCKS = [
 ];
 
 async function initPage() {
-    // Validar se o usuário é ADMIN ou OPERATOR
-    const user = await OS_AUTH.check('OPERATOR');
+    // Validar se o usuário é ADMIN (Operadores e Clientes não podem ver a telemetria global)
+    const user = await OS_AUTH.check('ADMIN');
     if (!user) return;
 
     OS_UI.renderSidebar('logs', user.role);
@@ -385,8 +385,19 @@ function openModal(log) {
     const title = document.getElementById('modal-log-title');
     const content = document.getElementById('modal-json-content');
 
+    // Sanitizar dados sensíveis antes de exibir no modal
+    let sanitizedLog = JSON.parse(JSON.stringify(log));
+    if (sanitizedLog.payload) {
+        if (sanitizedLog.payload.webhook_key) sanitizedLog.payload.webhook_key = '***REDACTED***';
+        if (sanitizedLog.payload.target_url && sanitizedLog.payload.target_url.includes('make-proxy')) {
+            sanitizedLog.payload.target_url = '***REDACTED_PROXY_URL***';
+        }
+        if (sanitizedLog.payload.token) sanitizedLog.payload.token = '***REDACTED***';
+        if (sanitizedLog.payload.password) sanitizedLog.payload.password = '***REDACTED***';
+    }
+
     title.innerText = `Evento: ${log.action_type} (${log.simulated ? 'Simulado' : 'Real'})`;
-    content.innerText = JSON.stringify(log, null, 4);
+    content.innerText = JSON.stringify(sanitizedLog, null, 4);
     modal.style.display = 'flex';
 }
 
