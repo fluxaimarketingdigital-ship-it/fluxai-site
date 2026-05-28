@@ -100,15 +100,17 @@ não constituem vazamento de endpoint operacional.
 
 ---
 
-## 6. Critério de Aceite — Status Final
+## 6. Critério de Aceite — Status Final (Validado em Produção)
 
-- [x] LEAD_CAPTURE sem header `X-FluxAI-Proxy-Key`: **401 Unauthorized** (teste bloqueado com sucesso)
-- [x] LEAD_CAPTURE com header `X-FluxAI-Proxy-Key` válido: **ok: true, makeStatus: 200** (teste aprovado)
-- [x] Nenhuma URL real de Make permanece no frontend (`grep hook.us` == 0 resultados)
-- [x] `os-config.js` contém apenas aliases lógicos, roteando requisições ao `webhook-dispatcher.js`
-- [x] `webhook-dispatcher.js` aciona exclusivamente a Edge Function injetando a chave pública
-- [x] Auth / RBAC / login / client-portal / CSS global mantidos 100% intactos
-- [x] **P0 OWASP Webhooks Make: CORRIGIDO E FECHADO**
+- [x] LEAD_CAPTURE testado de ponta a ponta: `ok: true`, `makeStatus: 200`
+- [x] Integração Make e Planilha Google Sheets receberam os dados com sucesso
+- [x] TESTE A: Sem header `X-FluxAI-Proxy-Key` bloqueado com **401 Unauthorized**
+- [x] TESTE B: Com header `X-FluxAI-Proxy-Key` validado e autorizado
+- [x] Nenhuma URL real de Make ou WEBHOOK_CONFIG permanece no frontend (Varredura `grep` retornou 0)
+- [x] `os-config.js` contém apenas aliases lógicos, delegando a rede para `webhook-dispatcher.js`
+- [x] `webhook-dispatcher.js` aciona exclusivamente a Edge Function injetando a chave pública (fluxai-proxy-public-2026)
+- [x] Lógica de falhas (timeout 8s, 400 bad request, 500 secret ausente) selada na Edge Function
+- [x] **P0 OWASP Webhooks Make: 100% CORRIGIDO E FECHADO**
 
 ---
 
