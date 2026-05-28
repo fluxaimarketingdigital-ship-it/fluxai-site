@@ -7,11 +7,17 @@
 ## 1. Resumo Executivo
 Após a mitigação profunda (Fases 03.1 a 03.3A), a arquitetura do ecossistema atingiu conformidade com os mais altos níveis de exigência em testes dinâmicos de aplicação web (DAST). O ambiente encontra-se estabilizado, mantendo a operabilidade integral das integrações e ferramentas de marketing.
 
-### Resultado Consolidado (FluxAI)
+### Resultado Consolidado (Site Público)
 - **High (Alta):** 0
-- **Medium (Média):** 6 (Persistentes — Em análise e aceite técnico pendente na Fase 03.3C)
-- **Low (Baixa):** 0 (no domínio FluxAI)
+- **Medium (Média):** 4
+- **Low (Baixa):** 3
 - **Informational (Informativo):** 4
+
+### Resultado Consolidado (/os/login.html)
+- **High (Alta):** 0
+- **Medium (Média):** 3
+- **Low (Baixa):** 0
+- **Informational (Informativo):** 2
 
 > **Nota sobre Domínios Externos:** Alertas originados no domínio `firefox-settings-attachments.cdn.mozilla.net` estão fora do escopo FluxAI.
 
@@ -49,5 +55,7 @@ Testes sintéticos pós-hardening confirmam total integridade no FluxAI OS™:
 
 ## Conclusão Final
 Após a bateria intensa de análise, correção e documentação (Fases 03.1, 03.2, 03.3A, B e C), o ecossistema *FluxAI OS™* e a infraestrutura comercial *FluxAI Labs* conquistam neste ciclo o status **Secure Baseline**. 
-Não restam vulnerabilidades Críticas/Altas (High 0, P0 0). 
-Todos os Mediums e Lows foram mitigados em código ou devidamente justificados tecnicamente perante arquitetura de terceiros incontornável. A plataforma está homologada sob parâmetros adequados de Defesa Perimetral (DAST) e Higiene de Payload.
+
+**Status Oficial**: High 0, P0 0, Mediums residuais tecnicamente justificados e aceitos temporariamente, com backlog futuro para nonce/hash CSP e refinamento SRI/CORS.
+
+A plataforma está homologada sob parâmetros adequados de Defesa Perimetral (DAST) e Higiene de Payload.
