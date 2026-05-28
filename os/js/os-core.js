@@ -70,6 +70,7 @@ export const OS_UI = {
             { id: 'metricas',         label: 'Métricas Inbound',      icon: 'fa-chart-pie',           group: 'Métricas & Relatórios', roles: ['ADMIN', 'OPERATOR'], contexts: ['MASTER','LABS'] },
             
             { id: 'client-portal',    label: 'Portal do Cliente',     icon: 'fa-briefcase',           group: 'Interface de Valor',    roles: ['ADMIN', 'CLIENT'],   contexts: ['MASTER','CLIENT'] },
+            { id: 'fluxai-academy',   label: 'FluxAI Academy',        icon: 'fa-graduation-cap',      group: 'Treinamento & Suporte', roles: ['ADMIN', 'OPERATOR', 'CLIENT'], contexts: ['MASTER', 'LABS', 'CLIENT'] },
             { id: 'contracts-finance',label: 'Contratos & Financeiro',icon: 'fa-file-invoice-dollar', group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
             { id: 'governance',       label: 'Governança',            icon: 'fa-user-shield',         group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },
             { id: 'governance-users', label: 'Gestão de Usuários',    icon: 'fa-users-cog',           group: 'Governança',            roles: ['ADMIN'],             contexts: ['MASTER'] },

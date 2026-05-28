@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FluxAI OS™ | Academy (Manual Operacional)</title>
+    
+    <!-- Design System Global -->
+    <link rel="stylesheet" href="./css/os-theme.css">
+    <link rel="stylesheet" href="./css/os-layout.css">
+    <link rel="stylesheet" href="./css/os-components.css">
+    
+    <!-- Fontes & Ícones -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        .academy-layout {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .academy-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .video-player-container {
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 */
+            height: 0;
+            overflow: hidden;
+            border-radius: 6px;
+            background: #000;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .video-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--os-text);
+            margin: 0;
+        }
+
+        .video-desc {
+            color: var(--os-text-muted);
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .playlist-container {
+            background: var(--os-surface);
+            border: 1px solid var(--os-border);
+            border-radius: 8px;
+            padding: 20px;
+            max-height: calc(100vh - 150px);
+            overflow-y: auto;
+        }
+
+        .playlist-header {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--os-primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--os-border);
+            padding-bottom: 10px;
+        }
+
+        .playlist-item {
+            display: flex;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            margin-bottom: 8px;
+        }
+
+        .playlist-item:hover {
+            background: rgba(255, 255, 255, 0.03);
+            border-color: var(--os-border);
+        }
+
+        .playlist-item.active {
+            background: rgba(167, 139, 250, 0.1);
+            border-color: var(--os-primary);
+        }
+
+        .playlist-item-thumb {
+            width: 100px;
+            height: 56px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--os-primary);
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .playlist-item-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .playlist-item-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--os-text);
+            margin-bottom: 4px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .playlist-item-meta {
+            font-size: 0.75rem;
+            color: var(--os-text-muted);
+        }
+        
+        .badge-role {
+            font-size: 0.65rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--os-text-muted);
+            margin-right: 5px;
+            text-transform: uppercase;
+        }
+    </style>
+</head>
+<body>
+
+    <aside class="os-sidebar"></aside>
+    <main class="os-main">
+        <header class="os-topbar"></header>
+        
+        <div class="os-content">
+            <div class="os-page-header">
+                <div>
+                    <h1>FluxAI Academy</h1>
+                    <p>Manual Operacional Oficial em Vídeo do FluxAI OS™.</p>
+                </div>
+            </div>
+
+            <div class="academy-layout">
+                <!-- Player de Vídeo Principal -->
+                <div class="video-player-container">
+                    <div class="video-wrapper" id="academy-video-wrapper">
+                        <!-- O iframe será injetado aqui -->
+                        <div style="width:100%; height:100%; display:flex; align-items:center; justify-content:center; background:#111; color:var(--os-text-muted);">
+                            <i class="fa-solid fa-spinner fa-spin" style="font-size: 2rem;"></i>
+                        </div>
+                    </div>
+                    <div id="academy-video-info">
+                        <h2 class="video-title" id="academy-video-title">Carregando Módulo...</h2>
+                        <div style="margin: 10px 0;">
+                            <span id="academy-video-roles"></span>
+                        </div>
+                        <p class="video-desc" id="academy-video-desc">Aguarde, carregando informações do treinamento...</p>
+                    </div>
+                </div>
+
+                <!-- Playlist -->
+                <div class="playlist-container">
+                    <div class="playlist-header">
+                        <i class="fa-solid fa-list-check"></i> Trilha de Aprendizado
+                    </div>
+                    <div id="academy-playlist">
+                        <!-- Os itens da playlist serão injetados aqui via JS -->
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Supabase & Core System -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="module" src="./js/os-core.js"></script>
+    <script type="module" src="./js/modules/fluxai-academy.js"></script>
+</body>
+</html>

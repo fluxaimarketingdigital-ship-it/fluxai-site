@@ -1,0 +1,139 @@
+import { OS_AUTH, OS_UI } from '../os-core.js';
+import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
+
+/**
+ * Banco de Dados de Vídeos (Placeholders para o manual operacional)
+ * Substitua o 'embedUrl' pelo link real do vídeo quando estiver gravado (YouTube Embed ou Vimeo).
+ */
+const ACADEMY_VIDEOS = [
+    {
+        id: 'vid_01_intro',
+        title: 'Visão Geral do FluxAI OS™',
+        desc: 'Neste vídeo, você aprenderá a navegar pelas principais telas do sistema, entender os contextos (Master, Labs e Cliente) e configurar seu perfil básico.',
+        roles: ['ADMIN', 'OPERATOR', 'CLIENT'],
+        embedUrl: '', // Deixe vazio para usar o placeholder simulado
+        duration: '04:15'
+    },
+    {
+        id: 'vid_02_clientes',
+        title: 'Portal do Cliente: Aprovações e Entregas',
+        desc: 'Tutorial focado nos clientes finais: como acessar o Client Portal, revisar conteúdos gerados pelo Motor, solicitar ajustes e aprovar relatórios mensais.',
+        roles: ['ADMIN', 'OPERATOR', 'CLIENT'],
+        embedUrl: '',
+        duration: '05:30'
+    },
+    {
+        id: 'vid_03_operacao',
+        title: 'Command Center & Demandas',
+        desc: 'Para operadores e gestores internos: como processar demandas, criar checklists avançados, mudar os status de kanban e gerenciar tarefas pendentes.',
+        roles: ['ADMIN', 'OPERATOR'],
+        embedUrl: '',
+        duration: '08:45'
+    },
+    {
+        id: 'vid_04_financas',
+        title: 'Contratos e Serviços Extras',
+        desc: 'Exclusivo para ADMIN: Como criar contratos recorrentes baseados em valor, lançar serviços avulsos da tabela e emitir recibos instantâneos via OS.',
+        roles: ['ADMIN'],
+        embedUrl: '',
+        duration: '06:20'
+    }
+];
+
+let currentUser = null;
+let currentVideoId = null;
+
+async function initAcademy() {
+    // Requer no mínimo acesso CLIENT, mas o conteúdo varia por role.
+    currentUser = await OS_AUTH.check(null);
+    if (!currentUser) return;
+
+    OS_UI.renderSidebar('fluxai-academy', currentUser.role);
+    await OS_UI.renderTopbar();
+
+    renderPlaylist();
+    
+    // Auto-selecionar o primeiro vídeo disponível para o usuário
+    const firstAvailable = getAvailableVideos()[0];
+    if (firstAvailable) {
+        loadVideo(firstAvailable.id);
+    }
+    
+    OS_LOGS_ENGINE.userAction('ACADEMY_ACCESSED', 'fluxai-academy', { action: 'Acessou a área de treinamento' }, currentUser.role, null, false);
+}
+
+function getAvailableVideos() {
+    return ACADEMY_VIDEOS.filter(vid => vid.roles.includes(currentUser.role));
+}
+
+function renderPlaylist() {
+    const playlistEl = document.getElementById('academy-playlist');
+    const videos = getAvailableVideos();
+    
+    if (videos.length === 0) {
+        playlistEl.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--os-text-muted);">Nenhum vídeo disponível para o seu nível de acesso.</div>';
+        return;
+    }
+
+    playlistEl.innerHTML = videos.map((vid, index) => {
+        const isActive = vid.id === currentVideoId ? 'active' : '';
+        const roleBadges = vid.roles.map(r => `<span class="badge-role">${r}</span>`).join('');
+        
+        return `
+            <div class="playlist-item ${isActive}" onclick="window.loadAcademyVideo('${vid.id}')">
+                <div class="playlist-item-thumb">
+                    <i class="fa-solid fa-play"></i>
+                </div>
+                <div class="playlist-item-content">
+                    <div class="playlist-item-title">${index + 1}. ${vid.title}</div>
+                    <div class="playlist-item-meta">
+                        ${roleBadges} • ${vid.duration}
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+window.loadAcademyVideo = (id) => {
+    const video = ACADEMY_VIDEOS.find(v => v.id === id);
+    if (!video) return;
+
+    // Verificar se o usuário tem permissão
+    if (!video.roles.includes(currentUser.role)) {
+        alert('Você não tem permissão para visualizar este módulo.');
+        return;
+    }
+
+    currentVideoId = id;
+    
+    // Atualizar UI da Playlist
+    renderPlaylist();
+
+    // Atualizar Player
+    const wrapper = document.getElementById('academy-video-wrapper');
+    if (video.embedUrl) {
+        wrapper.innerHTML = `<iframe src="${video.embedUrl}" allow="autoplay; fullscreen; encrypted-media; picture-in-picture" allowfullscreen></iframe>`;
+    } else {
+        // Placeholder visual para quando não houver vídeo gravado
+        wrapper.innerHTML = `
+            <div style="width:100%; height:100%; position:absolute; top:0; left:0; background: linear-gradient(45deg, #1a1a2e, #16213e); display:flex; flex-direction:column; align-items:center; justify-content:center; color: #fff; text-align: center; padding: 20px;">
+                <i class="fa-solid fa-video-slash" style="font-size: 3rem; color: var(--os-primary); margin-bottom: 15px; opacity: 0.8;"></i>
+                <h3 style="margin:0 0 10px 0; font-family: var(--os-font-mono);">GRAVAÇÃO PENDENTE</h3>
+                <p style="color: var(--os-text-muted); font-size: 0.9rem; max-width: 80%;">
+                    Aguardando a gravação final e upload (Fase 05).<br>O script (roteiro) já está pronto!
+                </p>
+            </div>
+        `;
+    }
+
+    // Atualizar Informações
+    document.getElementById('academy-video-title').textContent = video.title;
+    document.getElementById('academy-video-roles').innerHTML = video.roles.map(r => `<span class="badge-role" style="background: rgba(167, 139, 250, 0.2); color: var(--os-primary);">${r}</span>`).join('');
+    document.getElementById('academy-video-desc').textContent = video.desc;
+    
+    OS_LOGS_ENGINE.userAction('ACADEMY_VIDEO_PLAYED', 'fluxai-academy', { video_id: id, video_title: video.title }, currentUser.role, null, false);
+};
+
+// Start
+document.addEventListener('DOMContentLoaded', initAcademy);
