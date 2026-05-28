@@ -104,7 +104,7 @@ const INITIAL_TELEMETRY_MOCKS = [
         client_id: 'global',
         action_type: 'WEBHOOK_ERROR',
         source_page: 'MAKE_SCENARIO_02',
-        payload: { webhook_key: "LEAD_CAPTURE", error: "CORS policies or invalid target URL configuration", target_url: "https://hook.us2.make.com/gmu9xakjqfocdd8nk4sn5lxcc7pmbte2", status_code: 502 },
+        payload: { webhook_key: "LEAD_CAPTURE", error: "CORS policies or invalid target URL configuration", target_url: "[proxy:make-proxy]", status_code: 502 },
         status: 'error',
         severity: 'warning',
         environment: 'PRODUCTION',

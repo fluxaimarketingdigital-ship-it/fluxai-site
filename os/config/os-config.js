@@ -103,71 +103,78 @@ export const FEATURE_FLAGS = {
  * REGRA: Nenhum webhook pode estar hardcoded em módulo ou página.
  * Toda chamada deve referenciar WEBHOOK_CONFIG.<chave>.
  *
- * ATENÇÃO: URLs de webhook não devem ser expostas em
- * código-fonte público. Em produção, usar variáveis de
- * ambiente via backend ou Supabase Edge Functions.
+ * SEGURANÇA (P0 OWASP — Resolvido em 27/05/2026):
+ * As URLs reais do Make foram removidas deste arquivo público.
+ * Os disparos reais são roteados via Supabase Edge Function make-proxy.
+ * As URLs reais vivem exclusivamente nos Secrets do Supabase Dashboard.
+ *
+ * Todas as chaves abaixo são aliases lógicos (não URLs).
+ * O disparo real usa: os/services/webhook-dispatcher.js
  */
+import { dispatchWebhook } from '../services/webhook-dispatcher.js';
+
 export const WEBHOOK_CONFIG = {
-    // 01_FLUXAI_PORTAL_DEMANDAS (Cliente envia demanda pelo portal)
-    DEMAND_SUBMISSION: 'https://hook.us2.make.com/bnm7xedyxhxdlvh417gone7gy5m4e8me',
+    // 01_FLUXAI_PORTAL_DEMANDAS
+    DEMAND_SUBMISSION: 'DEMAND_SUBMISSION',
 
-    // 02_FLUXAI_LEADS_SITE (Captura de lead do site institucional)
-    LEAD_CAPTURE: 'https://hook.us2.make.com/gmu9xakjqfocdd8nk4sn5lxcc7pmbte2',
+    // 02_FLUXAI_LEADS_SITE
+    LEAD_CAPTURE: 'LEAD_CAPTURE',
 
-    // 09_FLUXAI_NOVO_CLIENTE_ONBOARDING (Processa onboarding de novo cliente)
-    CLIENT_ONBOARDING: 'https://hook.us2.make.com/mybtyyiob2msvh5sgo1115vx9pxroym9',
+    // 09_FLUXAI_NOVO_CLIENTE_ONBOARDING
+    CLIENT_ONBOARDING: 'CLIENT_ONBOARDING',
 
-    // 10_FLUXAI_SERVICO_EXTRA_REQUEST (Serviço extra solicitado pelo cliente no portal)
-    SERVICE_EXTRA_REQUEST: 'https://hook.us2.make.com/rplnhe37vqvzcjh6gu92ltpvr8rirean',
+    // 10_FLUXAI_SERVICO_EXTRA_REQUEST
+    SERVICE_EXTRA_REQUEST: 'SERVICE_EXTRA_REQUEST',
 
-    // 11_FLUXAI_IA_CREDITOS_CONTROLE (Controle de créditos e consumo de IA)
-    IA_CREDITOS_CONTROLE: 'https://hook.us2.make.com/667mka2gvio5g6fpe1mgi39j5rmxeoo4',
-    AI_OPERATIONAL_CONTROL: 'https://hook.us2.make.com/667mka2gvio5g6fpe1mgi39j5rmxeoo4',
+    // 11_FLUXAI_IA_CREDITOS_CONTROLE
+    IA_CREDITOS_CONTROLE: 'IA_CREDITOS_CONTROLE',
+    AI_OPERATIONAL_CONTROL: 'AI_OPERATIONAL_CONTROL',
 
-    // 12_FLUXAI_SERVICO_EXTRA_APROVACAO (Aprovação de orçamento de serviço extra)
-    SERVICE_EXTRA_APPROVAL: 'https://hook.us2.make.com/tpmta55my8fjptkue3oll3y2e3aykrr6',
+    // 12_FLUXAI_SERVICO_EXTRA_APROVACAO
+    SERVICE_EXTRA_APPROVAL: 'SERVICE_EXTRA_APPROVAL',
 
-    // 13_FLUXAI_IA_GUARDRAIL (Auditoria de qualidade e segurança do prompt de IA)
-    IA_GUARDRAIL: 'https://hook.us2.make.com/v19wgjtxye8uqpfkcmauag4s7wjdz767',
+    // 13_FLUXAI_IA_GUARDRAIL
+    IA_GUARDRAIL: 'IA_GUARDRAIL',
 
-    // 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC (Sincronização de arquivos do Google Drive)
+    // 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC
     CLIENTES_ARQUIVOS_SYNC: '',
 
-    // 15_FLUXAI_PLANEJAMENTO_CONTEUDO (Aprovação e ajustes de pautas/planejamento)
-    PLANEJAMENTO_CONTEUDO: 'https://hook.us2.make.com/ggmqkgpb7ea13dw5i1jprrnyox24u5ba',
+    // 15_FLUXAI_PLANEJAMENTO_CONTEUDO
+    PLANEJAMENTO_CONTEUDO: 'PLANEJAMENTO_CONTEUDO',
 
-    // 16_FLUXAI_CALENDARIO_POSTAGENS (Aprovação final e publicação de posts)
-    CALENDARIO_POSTAGENS: 'https://hook.us2.make.com/hxbcsiiti62ha5erdxbp24tats04vti5',
+    // 16_FLUXAI_CALENDARIO_POSTAGENS
+    CALENDARIO_POSTAGENS: 'CALENDARIO_POSTAGENS',
 
-    // 17_FLUXAI_GPT_GERACOES_LOG (Log de geração e uso do GPT)
-    GPT_GERACOES_LOG: 'https://hook.us2.make.com/g5l7uhmgir0uhs5v4d9xdfk6jgha5smy',
+    // 17_FLUXAI_GPT_GERACOES_LOG
+    GPT_GERACOES_LOG: 'GPT_GERACOES_LOG',
 
-    // 18_FLUXAI_LEADS_CLIENTES (Leads gerados/atualizados dentro da carteira do cliente)
+    // 18_FLUXAI_LEADS_CLIENTES
     LEADS_CLIENTES: '',
 
     // --- ALIASES DE COMPATIBILIDADE ---
-    SERVICE_EXTRA_INTERNAL: '',  // Redireciona para SERVICE_EXTRA_APPROVAL
-    DEMAND_STATUS_UPDATE: '',    // Atualizações de status de demanda
-    REPORT_STATUS_UPDATE: '',    // Relatório mensal
-    DELIVERY_APPROVAL: '',       // Redireciona para PLANEJAMENTO_CONTEUDO ou CALENDARIO_POSTAGENS
+    SERVICE_EXTRA_INTERNAL: '',
+    DEMAND_STATUS_UPDATE: '',
+    REPORT_STATUS_UPDATE: '',
+    DELIVERY_APPROVAL: '',
     METRICS_SYNC_INBOUND: '',
     LEADS_SYNC_INBOUND: '',
 
     /**
-     * Utilitário interno — não exportar como endpoint
-     * Verifica se o webhook está configurado antes de chamar
+     * Utilitário interno — verifica se a rota está ativa para disparo real.
+     * Agora aceita aliases lógicos (string não-vazia) além de https://.
      */
     _isConfigured: (key) => {
-        const url = WEBHOOK_CONFIG[key];
-        return typeof url === 'string' && url.startsWith('https://');
+        const val = WEBHOOK_CONFIG[key];
+        return typeof val === 'string' && val.length > 0;
     },
 
     /**
-     * POST genérico para o Make.
+     * POST genérico via Supabase Edge Function make-proxy.
+     * A assinatura é idêntica à anterior — nenhum chamador precisa mudar.
      * Retorna { success, status, error }.
      */
     send: async (webhookKey, payload) => {
-        // Redirecionamento inteligente de aliases para cenários reais
+        // Redirecionamento inteligente de aliases para rotas reais
         let targetKey = webhookKey;
         if (webhookKey === 'DELIVERY_APPROVAL') {
             targetKey = (payload.type === 'PLANNING' || payload.logical_transition?.includes('planning'))
@@ -179,27 +186,25 @@ export const WEBHOOK_CONFIG = {
             targetKey = 'AI_OPERATIONAL_CONTROL';
         }
 
-        const isReal = (FEATURE_FLAGS.sendRealWebhooks || 
+        const isReal = (FEATURE_FLAGS.sendRealWebhooks ||
                        (Array.isArray(FEATURE_FLAGS.enabledRealWebhooks) && FEATURE_FLAGS.enabledRealWebhooks.includes(targetKey))) &&
                        WEBHOOK_CONFIG._isConfigured(targetKey);
         const isSimulated = !isReal;
-        
+
         if (typeof console !== 'undefined') {
             console.info(
-                `%c[WEBHOOK:${isSimulated ? 'SIMULADO' : 'REAL'}] Acionando ${targetKey} (origem: ${webhookKey})...`,
+                `%c[WEBHOOK:${isSimulated ? 'SIMULADO' : 'PROXY'}] Acionando ${targetKey} (origem: ${webhookKey})...`,
                 'color: #8e9e68; font-weight: bold;'
             );
         }
 
         if (isSimulated) {
-            // Registrar envio simulado no OS_LOGS_ENGINE
             if (typeof OS_LOGS_ENGINE !== 'undefined') {
                 OS_LOGS_ENGINE.webhook(targetKey, payload, true, 200, null, true);
             }
             return { success: true, status: 200, simulated: true };
         }
 
-        const url = WEBHOOK_CONFIG[targetKey];
         if (!WEBHOOK_CONFIG._isConfigured(targetKey)) {
             console.warn(`[WEBHOOK] ${targetKey} não configurado. Payload ignorado.`, payload);
             if (typeof OS_LOGS_ENGINE !== 'undefined') {
@@ -207,19 +212,21 @@ export const WEBHOOK_CONFIG = {
             }
             return { success: false, status: 0, error: 'WEBHOOK_NOT_CONFIGURED' };
         }
+
         try {
-            const res = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json; charset=utf-8' },
-                body: JSON.stringify(payload),
-            });
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                OS_LOGS_ENGINE.webhook(targetKey, payload, true, res.status, null, false);
+            // ── Disparo real via proxy seguro (sem URLs Make no frontend) ──
+            const result = await dispatchWebhook(targetKey, payload);
+
+            if (!result.ok) {
+                throw new Error(result.error || `PROXY_HTTP_${result.status}`);
             }
-            return { success: true, status: res.status };
+
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.webhook(targetKey, payload, true, result.status, null, false);
+            }
+            return { success: true, status: result.status };
         } catch (err) {
-            console.error(`[WEBHOOK] Erro ao enviar para ${targetKey}:`, err.message);
+            console.error(`[WEBHOOK] Erro ao enviar para ${targetKey} via proxy:`, err.message);
             if (typeof OS_LOGS_ENGINE !== 'undefined') {
                 OS_LOGS_ENGINE.webhook(targetKey, payload, false, 0, err.message, false);
             }

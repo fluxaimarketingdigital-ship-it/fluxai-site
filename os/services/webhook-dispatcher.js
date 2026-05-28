@@ -1,0 +1,73 @@
+/**
+ * ╔══════════════════════════════════════════════════════════════════════╗
+ * ║  FLUXAI OS™ — WEBHOOK DISPATCHER                                     ║
+ * ║  Arquivo: os/services/webhook-dispatcher.js                          ║
+ * ║                                                                      ║
+ * ║  Wrapper centralizado de disparo de webhooks via Supabase Edge       ║
+ * ║  Function make-proxy. Nenhum módulo deve fazer fetch() direto        ║
+ * ║  ao Make. Todas as chamadas passam obrigatoriamente por aqui.        ║
+ * ║                                                                      ║
+ * ║  REGRA ABSOLUTA: Nunca inserir URLs reais do Make neste arquivo.     ║
+ * ║  Nunca inserir service_role key aqui.                                ║
+ * ╚══════════════════════════════════════════════════════════════════════╝
+ */
+
+'use strict';
+
+import { SUPABASE_CONFIG } from '../config/os-config.js';
+
+// ─── Endpoint da Edge Function (sem secrets, sem Make URLs) ─────────────────
+const PROXY_ENDPOINT = `${SUPABASE_CONFIG.url}/functions/v1/make-proxy`;
+
+// ─── Proxy-Key pública (não é secret — apenas identifica o frontend) ────────
+// O verdadeiro segredo vive somente no Supabase (FLUXAI_PROXY_ACCESS_KEY).
+// Esta chave pública é um fingerprint de origem controlada; CORS na Edge
+// Function restringe chamadas a domínios não-autorizados.
+const PROXY_ACCESS_KEY = 'fluxai-proxy-public-2026';
+
+/**
+ * Dispara um webhook via Supabase Edge Function make-proxy.
+ *
+ * @param {string} route     - Rota lógica (ex: 'LEAD_CAPTURE', 'DEMAND_SUBMISSION')
+ * @param {object} payload   - Dados a serem encaminhados ao Make
+ * @param {string} [token]   - JWT do usuário autenticado (opcional; ausente em rotas públicas)
+ * @returns {Promise<{ok: boolean, status: number, data?: object, error?: string}>}
+ */
+export async function dispatchWebhook(route, payload, token = null) {
+    const headers = {
+        'Content-Type': 'application/json',
+        'x-fluxai-proxy-key': PROXY_ACCESS_KEY,
+    };
+
+    if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    let response;
+    try {
+        response = await fetch(PROXY_ENDPOINT, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ route, payload }),
+        });
+    } catch (networkError) {
+        console.warn(`[DISPATCHER] Falha de rede ao chamar make-proxy para ${route}:`, networkError?.message);
+        return { ok: false, status: 0, error: 'NETWORK_ERROR' };
+    }
+
+    let data = {};
+    try {
+        data = await response.json();
+    } catch {
+        data = { raw: true };
+    }
+
+    if (!response.ok) {
+        console.warn(`[DISPATCHER] make-proxy retornou ${response.status} para ${route}`, data);
+        return { ok: false, status: response.status, data, error: data?.error || `HTTP_${response.status}` };
+    }
+
+    return { ok: true, status: response.status, data };
+}
+
+export default { dispatchWebhook };
