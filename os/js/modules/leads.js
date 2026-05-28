@@ -3,7 +3,7 @@ import { SheetsService } from '../../services/sheets-service.js';
 import { getSupabase } from '../../services/supabase-client.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { OS_CONFIG } from '../../config/os-config.js';
-import { populateProjectFilter } from '../utils/ui-helpers.js';
+import { populateProjectFilter, processEntityAction } from '../utils/ui-helpers.js';
 
 let currentProject = null;
 window.loadedLeads = [];
@@ -227,131 +227,35 @@ async function submitNewLead() {
 window.advanceLeadStatus = async (id) => {
     const lead = window.loadedLeads.find(l => l.id === id);
     if (!lead) return;
-
     if (lead.status === 'negociacao') {
         alert('Lead já está em Negociação. (Próxima etapa: Fechamento via Contratos)');
         return;
     }
-
-    if (!confirm(`Avançar o lead "${lead.name}" para Negociação?`)) return;
-
-    const userRole = OS_AUTH.user?.role || 'OPERATOR';
-    const oldStatus = lead.status;
-    const newStatus = 'negociacao';
-
-    try {
-        // Enviar Webhook fail-safe
-        const payload = {
-            action: 'UPDATE_LEAD_STATUS',
-            lead_id: id,
-            project_id: currentProject,
-            old_status: oldStatus,
-            new_status: newStatus
-        };
-        
-        const response = await OS_CONFIG.webhooks.send('CRM_UPDATE', payload);
-        if (!response.success) {
-            alert('Erro de conexão com o Webhook (Make). Transição abortada. Mantendo status anterior.');
-            OS_LOGS_ENGINE.userAction(
-                'CRM_UPDATE_FAILED',
-                'leads',
-                { action: 'advance_status', lead_id: id, error: response.error },
-                userRole,
-                currentProject,
-                true
-            );
-            return;
-        }
-
-        // Apply local (mock db)
-        const localLeads = JSON.parse(localStorage.getItem('fluxai_mock_leads_ext') || '[]');
-        const idx = localLeads.findIndex(l => l.id === id);
-        if (idx >= 0) {
-            localLeads[idx].status = newStatus;
-            localStorage.setItem('fluxai_mock_leads_ext', JSON.stringify(localLeads));
-        } else {
-            // Se o lead veio do sheets original, copio pra ext pra persistir mudança
-            lead.status = newStatus;
-            localLeads.push(lead);
-            localStorage.setItem('fluxai_mock_leads_ext', JSON.stringify(localLeads));
-        }
-
-        OS_LOGS_ENGINE.userAction(
-            'CRM_LEAD_STATUS_UPDATED',
-            'leads',
-            { lead_id: id, from: oldStatus, to: newStatus },
-            userRole,
-            currentProject,
-            false
-        );
-
-        loadLeads();
-
-    } catch (e) {
-        alert('Erro ao avançar lead: ' + e.message);
-    }
+    
+    await processEntityAction('advance', 'lead', lead, currentProject, 
+        `Avançar o lead "${lead.name}" para Negociação?`,
+        { action: 'UPDATE_LEAD_STATUS', lead_id: id, project_id: currentProject, old_status: lead.status, new_status: 'negociacao' },
+        'fluxai_mock_leads_ext',
+        { newStatus: 'negociacao' },
+        { failType: 'CRM_UPDATE_FAILED', context: 'leads', failPayload: (err) => ({ action: 'advance_status', lead_id: id, error: err }),
+          successType: 'CRM_LEAD_STATUS_UPDATED', successPayload: { lead_id: id, from: lead.status, to: 'negociacao' } },
+        loadLeads
+    );
 };
 
 window.archiveLead = async (id) => {
     const lead = window.loadedLeads.find(l => l.id === id);
     if (!lead) return;
-
-    if (!confirm(`Tem certeza que deseja ARQUIVAR o lead "${lead.name}"? Ele será ocultado da esteira ativa.`)) return;
-
-    const userRole = OS_AUTH.user?.role || 'OPERATOR';
-
-    try {
-        // Enviar Webhook
-        const payload = {
-            action: 'ARCHIVE_LEAD',
-            lead_id: id,
-            project_id: currentProject
-        };
-        
-        const response = await OS_CONFIG.webhooks.send('CRM_UPDATE', payload);
-        if (!response.success) {
-            alert('Erro de conexão com o Webhook. O arquivamento foi abortado para evitar perda de dados.');
-            OS_LOGS_ENGINE.userAction(
-                'CRM_UPDATE_FAILED',
-                'leads',
-                { action: 'archive', lead_id: id, error: response.error },
-                userRole,
-                currentProject,
-                true
-            );
-            return;
-        }
-
-        // Soft Delete (mock db)
-        const localLeads = JSON.parse(localStorage.getItem('fluxai_mock_leads_ext') || '[]');
-        const idx = localLeads.findIndex(l => l.id === id);
-        if (idx >= 0) {
-            localLeads[idx].status = 'arquivado';
-            localLeads[idx].archived_at = new Date().toISOString();
-            localLeads[idx].archived_by = userRole;
-            localStorage.setItem('fluxai_mock_leads_ext', JSON.stringify(localLeads));
-        } else {
-            lead.status = 'arquivado';
-            lead.archived_at = new Date().toISOString();
-            lead.archived_by = userRole;
-            localLeads.push(lead);
-            localStorage.setItem('fluxai_mock_leads_ext', JSON.stringify(localLeads));
-        }
-
-        OS_LOGS_ENGINE.userAction(
-            'CRM_LEAD_ARCHIVED',
-            'leads',
-            { lead_id: id, company: lead.company },
-            userRole,
-            currentProject,
-            false
-        );
-
-        loadLeads();
-
-    } catch (e) {
-        alert('Erro ao arquivar lead: ' + e.message);
-    }
+    
+    await processEntityAction('archive', 'lead', lead, currentProject, 
+        `Tem certeza que deseja ARQUIVAR o lead "${lead.name}"? Ele será ocultado da esteira ativa.`,
+        { action: 'ARCHIVE_LEAD', lead_id: id, project_id: currentProject },
+        'fluxai_mock_leads_ext',
+        { newStatus: 'arquivado' },
+        { failType: 'CRM_UPDATE_FAILED', context: 'leads', failPayload: (err) => ({ action: 'archive', lead_id: id, error: err }),
+          successType: 'CRM_LEAD_ARCHIVED', successPayload: { lead_id: id, company: lead.company } },
+        loadLeads
+    );
 };
 
 initPage();

@@ -3,7 +3,7 @@ import { SheetsService } from '../../services/sheets-service.js';
 import { getSupabase } from '../../services/supabase-client.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { OS_CONFIG } from '../../config/os-config.js';
-import { populateProjectFilter } from '../utils/ui-helpers.js';
+import { populateProjectFilter, processEntityAction } from '../utils/ui-helpers.js';
 
 let currentProject = null;
 window.loadedDemands = [];
@@ -283,121 +283,35 @@ async function submitNewDemand() {
 window.advanceDemandStatus = async (id) => {
     const demand = window.loadedDemands.find(d => d.id === id);
     if (!demand) return;
-
-    if (!confirm(`Concluir a demanda "${demand.title}"?`)) return;
-
-    const userRole = OS_AUTH.user?.role || 'OPERATOR';
-    const oldStatus = demand.status;
-    const newStatus = 'concluido';
-
-    try {
-        const payload = {
-            action: 'UPDATE_DEMAND_STATUS',
-            demand_id: id,
-            project_id: currentProject,
-            old_status: oldStatus,
-            new_status: newStatus
-        };
-        
-        const response = await OS_CONFIG.webhooks.send('CRM_UPDATE', payload);
-        if (!response.success) {
-            alert('Erro de conexão com o Webhook. Transição abortada para evitar inconsistência.');
-            OS_LOGS_ENGINE.userAction(
-                'DEMAND_UPDATE_FAILED',
-                'demandas',
-                { action: 'advance_status', demand_id: id, error: response.error },
-                userRole,
-                currentProject,
-                true
-            );
-            return;
-        }
-
-        const localDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands_ext') || '[]');
-        const idx = localDemands.findIndex(d => d.id === id);
-        if (idx >= 0) {
-            localDemands[idx].status = newStatus;
-            localStorage.setItem('fluxai_mock_demands_ext', JSON.stringify(localDemands));
-        } else {
-            demand.status = newStatus;
-            localDemands.push(demand);
-            localStorage.setItem('fluxai_mock_demands_ext', JSON.stringify(localDemands));
-        }
-
-        OS_LOGS_ENGINE.userAction(
-            'DEMAND_STATUS_UPDATED',
-            'demandas',
-            { demand_id: id, from: oldStatus, to: newStatus },
-            userRole,
-            currentProject,
-            false
-        );
-
-        loadDemands();
-
-    } catch (e) {
-        alert('Erro ao avançar demanda: ' + e.message);
-    }
+    const seq = ['pendente', 'em_andamento', 'revisao', 'concluido'];
+    const cIdx = seq.indexOf(demand.status);
+    if (cIdx === -1 || cIdx === seq.length - 1) return;
+    const newStatus = seq[cIdx + 1];
+    
+    await processEntityAction('advance', 'demanda', demand, currentProject, 
+        `Avançar a demanda "${demand.title}" de [${demand.status}] para [${newStatus}]?`,
+        { action: 'UPDATE_DEMAND_STATUS', demand_id: id, project_id: currentProject, old_status: demand.status, new_status: newStatus },
+        'fluxai_mock_demands_ext',
+        { newStatus: newStatus },
+        { failType: 'PORTAL_DEMANDAS_UPDATE_FAILED', context: 'demandas', failPayload: (err) => ({ action: 'advance_status', demand_id: id, error: err }),
+          successType: 'PORTAL_DEMANDAS_STATUS_UPDATED', successPayload: { demand_id: id, from: demand.status, to: newStatus } },
+        loadDemands
+    );
 };
 
 window.archiveDemand = async (id) => {
     const demand = window.loadedDemands.find(d => d.id === id);
     if (!demand) return;
-
-    if (!confirm(`Tem certeza que deseja ARQUIVAR a demanda "${demand.title}"?`)) return;
-
-    const userRole = OS_AUTH.user?.role || 'OPERATOR';
-
-    try {
-        const payload = {
-            action: 'ARCHIVE_DEMAND',
-            demand_id: id,
-            project_id: currentProject
-        };
-        
-        const response = await OS_CONFIG.webhooks.send('CRM_UPDATE', payload);
-        if (!response.success) {
-            alert('Erro de conexão com o Webhook. Arquivamento abortado.');
-            OS_LOGS_ENGINE.userAction(
-                'DEMAND_UPDATE_FAILED',
-                'demandas',
-                { action: 'archive', demand_id: id, error: response.error },
-                userRole,
-                currentProject,
-                true
-            );
-            return;
-        }
-
-        const localDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands_ext') || '[]');
-        const idx = localDemands.findIndex(d => d.id === id);
-        if (idx >= 0) {
-            localDemands[idx].status = 'arquivado';
-            localDemands[idx].archived_at = new Date().toISOString();
-            localDemands[idx].archived_by = userRole;
-            localStorage.setItem('fluxai_mock_demands_ext', JSON.stringify(localDemands));
-        } else {
-            demand.status = 'arquivado';
-            demand.archived_at = new Date().toISOString();
-            demand.archived_by = userRole;
-            localDemands.push(demand);
-            localStorage.setItem('fluxai_mock_demands_ext', JSON.stringify(localDemands));
-        }
-
-        OS_LOGS_ENGINE.userAction(
-            'DEMAND_ARCHIVED',
-            'demandas',
-            { demand_id: id, title: demand.title },
-            userRole,
-            currentProject,
-            false
-        );
-
-        loadDemands();
-
-    } catch (e) {
-        alert('Erro ao arquivar demanda: ' + e.message);
-    }
+    
+    await processEntityAction('archive', 'demanda', demand, currentProject, 
+        `Tem certeza que deseja ARQUIVAR a demanda "${demand.title}"?`,
+        { action: 'ARCHIVE_DEMAND', demand_id: id, project_id: currentProject },
+        'fluxai_mock_demands_ext',
+        { newStatus: 'arquivado' },
+        { failType: 'PORTAL_DEMANDAS_UPDATE_FAILED', context: 'demandas', failPayload: (err) => ({ action: 'archive', demand_id: id, error: err }),
+          successType: 'PORTAL_DEMANDAS_ARCHIVED', successPayload: { demand_id: id, title: demand.title } },
+        loadDemands
+    );
 };
 
 initPage();
