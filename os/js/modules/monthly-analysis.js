@@ -11,21 +11,40 @@ async function initPage() {
     OS_UI.renderSidebar('relatorio-mensal', user.role);
     await OS_UI.renderTopbar();
 
+    window.addEventListener('fluxai_project_changed', () => {
+        loadReports();
+    });
+
     await loadReports();
 }
 
 async function loadReports() {
     const container = document.getElementById('reports-grid');
+    const emptyState = document.getElementById('empty-state-reports');
+    const curProj = window.FLUXAI_RUNTIME_CONTEXT?.project_id;
+
+    if (!curProj) {
+        container.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    } else {
+        container.style.display = 'flex';
+        emptyState.style.display = 'none';
+    }
 
     try {
-        let reports = JSON.parse(localStorage.getItem('fluxai_mock_reports') || '[]');
-        if (reports.length === 0) {
-            reports = await SheetsService.fetchMonthlyAnalysis();
-            localStorage.setItem('fluxai_mock_reports', JSON.stringify(reports));
+        let reportsRaw = JSON.parse(localStorage.getItem('fluxai_mock_reports') || '[]');
+        if (reportsRaw.length === 0) {
+            reportsRaw = await SheetsService.fetchMonthlyAnalysis();
+            // Disparar log de sync na criação
+            OS_LOGS_ENGINE.userAction('REPORT_DATA_SYNCED', 'monthly-analysis', { count: reportsRaw.length }, 'SYSTEM', curProj, false);
+            localStorage.setItem('fluxai_mock_reports', JSON.stringify(reportsRaw));
         }
 
+        const reports = reportsRaw.filter(r => r.clientId === curProj || r.project_id === curProj);
+
         if (reports.length === 0) {
-            container.innerHTML = '<div style="opacity: 0.5;">Nenhum relatório encontrado.</div>';
+            container.innerHTML = '<div style="opacity: 0.5; width: 100%; text-align: center;">Nenhum relatório encontrado para este cliente. <button class="os-btn os-btn-primary" onclick="window.createDraft()">GERAR RASCUNHO</button></div>';
             return;
         }
 
@@ -75,20 +94,27 @@ async function loadReports() {
                     </div>
 
                     <div class="report-content">
-                        <h4>Diagnóstico Executivo</h4>
-                        <p>${r.executiveDiagnostic}</p>
+                        <h4>O que Aconteceu?</h4>
+                        <p>${r.whatHappened || 'Resumo executivo do mês não preenchido...'}</p>
                         
-                        <h4>Decisão Próximo Mês</h4>
+                        <h4>Por que Aconteceu? (Diagnóstico Executivo)</h4>
+                        <p>${r.executiveDiagnostic}</p>
+
+                        <h4>Impacto & Riscos</h4>
+                        <p>${r.risks || 'Análise de risco não preenchida...'}</p>
+                        
+                        <h4>Oportunidades & Decisão Próximo Mês</h4>
                         <p>${r.nextMonthDecision}</p>
                         
-                        <h4>Prioridades</h4>
+                        <h4>Próximos Passos</h4>
                         <p>${r.priorities}</p>
                     </div>
                     
-                    <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; text-align: right; display: flex; justify-content: flex-end; align-items: center;">
+                    <div style="margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px; text-align: right; display: flex; justify-content: flex-end; align-items: center; flex-wrap: wrap; gap: 8px;">
                         <span style="font-size: 0.65rem; color: var(--os-text-muted); margin-right: auto;">Ações de Estado:</span>
                         ${buttonsHtml}
-                        <button style="background: rgba(255,255,255,0.05); border: 1px solid var(--os-border); color: #fff; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.65rem; text-transform: uppercase; margin-left: 8px;">Editar Rascunho</button>
+                        <button style="background: rgba(255,255,255,0.05); border: 1px solid var(--os-border); color: #fff; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.65rem; text-transform: uppercase;">Editar Rascunho</button>
+                        ${(r.status === 'aprovado_internamente' || r.status === 'liberado_cliente' || r.status === 'enviado_cliente') ? `<button onclick="window.printReport('${r.id || r.clientId}')" style="background: var(--os-primary); border: none; color: #000; padding: 6px 12px; border-radius: 4px; font-weight: 600; cursor: pointer; font-size: 0.65rem; text-transform: uppercase;"><i class="fa-solid fa-print"></i> Imprimir/Exportar</button>` : ''}
                     </div>
                 </div>
             </div>`;
@@ -97,9 +123,35 @@ async function loadReports() {
         container.innerHTML = html;
     } catch (e) {
         console.error(e);
-        container.innerHTML = '<div style="color: var(--os-danger);">Erro ao carregar relatórios.</div>';
+        OS_LOGS_ENGINE.userAction('REPORT_DATA_FAILED', 'monthly-analysis', { error: e.message }, 'SYSTEM', curProj || 'unknown', true);
+        container.innerHTML = '<div style="color: var(--os-danger); width: 100%; text-align: center; padding: 20px;">Falha de API/Conexão: Dados Pendentes / Fonte Indisponível.</div>';
     }
 }
+
+window.createDraft = async () => {
+    const curProj = window.FLUXAI_RUNTIME_CONTEXT?.project_id;
+    if(!curProj) return;
+    
+    let reportsRaw = JSON.parse(localStorage.getItem('fluxai_mock_reports') || '[]');
+    reportsRaw.push({
+        id: 'REP_' + Math.floor(Math.random()*10000),
+        clientId: curProj,
+        month: new Date().toLocaleString('pt-BR', { month: 'long', year: 'numeric' }),
+        status: 'rascunho_fluxai',
+        reach: 0, followers: 0, contentPublished: 0,
+        executiveDiagnostic: 'Aguardando diagnóstico',
+        nextMonthDecision: 'Aguardando decisão',
+        priorities: 'Aguardando prioridades'
+    });
+    localStorage.setItem('fluxai_mock_reports', JSON.stringify(reportsRaw));
+    
+    OS_LOGS_ENGINE.userAction('REPORT_DRAFT_CREATED', 'monthly-analysis', {}, window.FLUXAI_RUNTIME_CONTEXT?.role || 'OPERATOR', curProj, false);
+    await loadReports();
+};
+
+window.printReport = async (reportId) => {
+    alert("Exportação em desenvolvimento (Visualização Simples / Print HTML). A impressão pelo browser pode ser acionada pressionando CTRL+P após isolar o componente.");
+};
 
 window.transitionReport = async (reportId, currentStatus, targetStatus) => {
     try {
@@ -193,9 +245,9 @@ window.transitionReport = async (reportId, currentStatus, targetStatus) => {
 
         // Registrar logs de transição com base no novo status
         let logEvent = 'REPORT_STATUS_UPDATED';
-        if (targetStatus === 'em_revisao') logEvent = 'REPORT_REVIEW_STARTED';
-        else if (targetStatus === 'aprovado_internamente') logEvent = 'REPORT_APPROVED';
-        else if (targetStatus === 'enviado_ao_cliente') logEvent = 'REPORT_RELEASED';
+        if (targetStatus === 'em_revisao_estrategica') logEvent = 'REPORT_REVIEW_STARTED';
+        else if (targetStatus === 'aprovado_interno') logEvent = 'REPORT_APPROVED_INTERNAL';
+        else if (targetStatus === 'enviado_cliente') logEvent = 'REPORT_SENT_CLIENT';
 
         OS_LOGS_ENGINE.userAction(
             logEvent,

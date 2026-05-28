@@ -4,6 +4,8 @@ import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 
 let currentUser = null;
 
+let isGlobalView = false;
+
 async function initPage() {
     // Restrição absoluta ao perfil ADMIN
     const user = await OS_AUTH.check('ADMIN');
@@ -13,30 +15,79 @@ async function initPage() {
     OS_UI.renderSidebar('executive-center', user.role);
     await OS_UI.renderTopbar();
 
+    const btnGlobal = document.getElementById('btn-global-view');
+    const globalBanner = document.getElementById('global-banner');
+    if (btnGlobal) {
+        btnGlobal.style.display = 'block';
+        btnGlobal.onclick = () => {
+            isGlobalView = !isGlobalView;
+            if (isGlobalView) {
+                btnGlobal.textContent = 'VOLTAR À VISÃO POR CLIENTE';
+                if(globalBanner) globalBanner.style.display = 'block';
+            } else {
+                btnGlobal.textContent = 'VER VISÃO GLOBAL INTERNA (ADMIN)';
+                if(globalBanner) globalBanner.style.display = 'none';
+            }
+            loadExecutiveData();
+        };
+    }
+
+    window.addEventListener('fluxai_project_changed', () => {
+        if (!isGlobalView) loadExecutiveData();
+    });
+
     await loadExecutiveData();
 }
 
 async function loadExecutiveData() {
     try {
+        const curProj = window.FLUXAI_RUNTIME_CONTEXT?.project_id;
+        const emptyState = document.getElementById('empty-state-exec');
+        const grids = document.querySelectorAll('.os-widget-grid');
+        
+        if (!isGlobalView && !curProj) {
+            emptyState.style.display = 'block';
+            grids.forEach(g => g.style.display = 'none');
+            return;
+        } else {
+            emptyState.style.display = 'none';
+            grids.forEach(g => g.style.display = '');
+        }
+
         // 1. Carregar dados do localStorage e fallbacks
-        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-        const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
-        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-        const mockDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands') || '[]');
+        const mockContractsRaw = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+        const mockPaymentsRaw = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
+        const mockProjectsRaw = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+        const mockAssetsRaw = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+        const mockDemandsRaw = JSON.parse(localStorage.getItem('fluxai_mock_demands') || '[]');
+        const clientConfigs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
+
+        // Filtragem Base
+        const mockContracts = isGlobalView ? mockContractsRaw : mockContractsRaw.filter(c => c.project_id === curProj || c.client_id === curProj);
+        const mockProjects = isGlobalView ? mockProjectsRaw : mockProjectsRaw.filter(p => p.id === curProj);
+        const mockAssets = isGlobalView ? mockAssetsRaw : mockAssetsRaw.filter(a => a.project_id === curProj);
+        const mockDemands = isGlobalView ? mockDemandsRaw : mockDemandsRaw.filter(d => d.project_id === curProj);
+        
+        const validContractIds = mockContracts.map(c => c.id);
+        const mockPayments = isGlobalView ? mockPaymentsRaw : mockPaymentsRaw.filter(p => validContractIds.includes(p.contract_id));
         const clientConfigs = JSON.parse(localStorage.getItem('fluxai_client_configs') || '{}');
 
         // Leads fallback
-        let localLeads = JSON.parse(localStorage.getItem('fluxai_mock_leads') || '[]');
-        if (localLeads.length === 0) {
-            localLeads = [
+        let localLeadsRaw = JSON.parse(localStorage.getItem('fluxai_mock_leads') || '[]');
+        if (localLeadsRaw.length === 0) {
+            localLeadsRaw = [
                 { id_lead: 'LD_5001', nome_lead: 'Roberto Dutra', empresa: 'Dutra Logística', contato: '11 99122-3344', servico_interesse: 'Gestão de Mídia Social', origem: 'LinkedIn', status: 'proposta_enviada', responsavel: 'Comercial' },
                 { id_lead: 'LD_5002', nome_lead: 'Maria Oliveira', empresa: 'Clínica Saúde', contato: '11 98888-7777', servico_interesse: 'Tráfego Pago + CRM', origem: 'Instagram', status: 'em_negociacao', responsavel: 'Comercial' },
                 { id_lead: 'LD_5003', nome_lead: 'Carlos Andrade', empresa: 'Andrade Law', contato: '21 97777-6666', servico_interesse: 'Assessoria de Conteúdo', origem: 'Indicação', status: 'novo', responsavel: 'Diretoria' },
                 { id_lead: 'LD_5004', nome_lead: 'Juliana Costa', empresa: 'Costa Estética', contato: '82 99933-2211', servico_interesse: 'Onboarding Estratégico', origem: 'Site', status: 'fechado', responsavel: 'Comercial' }
             ];
-            localStorage.setItem('fluxai_mock_leads', JSON.stringify(localLeads));
+            localStorage.setItem('fluxai_mock_leads', JSON.stringify(localLeadsRaw));
         }
+
+        // Simplificação: se não é Global, exibimos zero leads se for um dashboard individual que não cruza empresa/lead ID corretamente
+        // Mas se a empresa bater com o curProj name, podemos filtrar. Para o MVP, se isGlobalView, mostrar todos. Se for cliente, mostrar vazia a grid se não for CRM.
+        const activeProjName = mockProjects[0]?.company_name || '';
+        const localLeads = isGlobalView ? localLeadsRaw : localLeadsRaw.filter(l => l.empresa.toLowerCase().includes(activeProjName.toLowerCase()) && activeProjName !== '');
 
         // 2. Cálculos Financeiros
         const activeContracts = mockContracts.filter(c => c.status === 'ATIVO');

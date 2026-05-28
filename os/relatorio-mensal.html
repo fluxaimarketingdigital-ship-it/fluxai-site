@@ -32,11 +32,17 @@
             <main class="os-viewport">
                 <div class="os-page-title">
                     <h1>Relatórios Mensais</h1>
-                    <p>Rascunhos consolidados pelo Make aguardando revisão interna.</p>
+                    <p>Rascunhos consolidados aguardando revisão interna estratégica.</p>
                 </div>
                 
+                <div id="empty-state-reports" style="display: none; text-align: center; padding: 50px; background: rgba(255,255,255,0.02); border: 1px dashed var(--os-border); margin-top: 20px; border-radius: 8px;">
+                    <i class="fa-solid fa-chart-pie" style="font-size: 2rem; color: var(--os-text-muted); margin-bottom: 15px;"></i>
+                    <h3 style="color: #fff; margin-bottom: 10px;">Nenhum Projeto Selecionado</h3>
+                    <p style="color: var(--os-text-muted); font-size: 0.9rem;">Selecione um cliente/projeto no menu superior para gerar ou revisar o relatório deste ciclo.</p>
+                </div>
+
                 <div class="os-widget-grid" id="reports-grid">
-                    <div style="opacity: 0.5; padding: 20px;">Sincronizando com Google Sheets via Make...</div>
+                    <div style="opacity: 0.5; padding: 20px;">Sincronizando com OS DB...</div>
                 </div>
             </main>
         </div>

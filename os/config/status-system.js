@@ -253,46 +253,68 @@ export const STATUS_SYSTEM = {
 
     // 5. Relatórios
     relatorios: {
-        rascunho: {
-            value: 'rascunho',
-            label: 'Rascunho',
+        rascunho_fluxai: {
+            value: 'rascunho_fluxai',
+            label: 'Rascunho Interno',
             badge: 'neutral',
             color: '#6b7280',
-            description: 'Relatório mensal preliminar gerado.',
-            allowedTransitions: ['em_revisao'],
+            description: 'Relatório mensal preliminar gerado internamente.',
+            allowedTransitions: ['em_revisao_estrategica'],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
             webhook: 'REPORT_STATUS_UPDATE',
-            action: 'REPORT_STATUS_UPDATED'
+            action: 'REPORT_DRAFT_CREATED'
         },
-        em_revisao: {
-            value: 'em_revisao',
-            label: 'Em Revisão',
+        em_revisao_estrategica: {
+            value: 'em_revisao_estrategica',
+            label: 'Em Revisão Estratégica',
             badge: 'info',
             color: '#3b82f6',
             description: 'Operador editando e revisando dados.',
-            allowedTransitions: ['aprovado_internamente'],
+            allowedTransitions: ['aprovado_interno'],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
             webhook: 'REPORT_STATUS_UPDATE',
-            action: 'REPORT_STATUS_UPDATED'
+            action: 'REPORT_REVIEW_STARTED'
         },
-        aprovado_internamente: {
-            value: 'aprovado_internamente',
-            label: 'Aprovado Internamente',
+        aprovado_interno: {
+            value: 'aprovado_interno',
+            label: 'Aprovado Interno',
             badge: 'warning',
             color: '#f59e0b',
+            description: 'Aprovado internamente pela diretoria.',
+            allowedTransitions: ['liberado_cliente'],
+            authorizedRoles: ['ADMIN', 'OPERATOR'],
+            webhook: 'REPORT_STATUS_UPDATE',
+            action: 'REPORT_APPROVED_INTERNAL'
+        },
+        liberado_cliente: {
+            value: 'liberado_cliente',
+            label: 'Liberado p/ Envio',
+            badge: 'primary',
+            color: '#8b5cf6',
             description: 'Pronto para ser enviado ao cliente.',
-            allowedTransitions: ['enviado_ao_cliente', 'em_revisao'],
+            allowedTransitions: ['enviado_cliente'],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
             webhook: 'REPORT_STATUS_UPDATE',
             action: 'REPORT_STATUS_UPDATED'
         },
-        enviado_ao_cliente: {
-            value: 'enviado_ao_cliente',
+        enviado_cliente: {
+            value: 'enviado_cliente',
             label: 'Enviado ao Cliente',
             badge: 'success',
             color: '#10b981',
             description: 'Disponibilizado para visualização do cliente.',
-            allowedTransitions: ['em_revisao'],
+            allowedTransitions: ['arquivado'],
+            authorizedRoles: ['ADMIN', 'OPERATOR'],
+            webhook: 'REPORT_STATUS_UPDATE',
+            action: 'REPORT_SENT_CLIENT'
+        },
+        arquivado: {
+            value: 'arquivado',
+            label: 'Arquivado',
+            badge: 'neutral',
+            color: '#4b5563',
+            description: 'Relatório arquivado.',
+            allowedTransitions: [],
             authorizedRoles: ['ADMIN', 'OPERATOR'],
             webhook: 'REPORT_STATUS_UPDATE',
             action: 'REPORT_STATUS_UPDATED'

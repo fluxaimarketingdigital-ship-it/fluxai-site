@@ -1,27 +1,79 @@
 import { OS_UI, OS_AUTH } from '../os-core.js';
 import { SheetsService } from '../../services/sheets-service.js';
 
+let isGlobalView = false;
+let currentUser = null;
+
 async function initPage() {
     const user = await OS_AUTH.check('OPERATOR');
     if (!user) return;
+    currentUser = user;
 
     OS_UI.renderSidebar('metricas', user.role);
     await OS_UI.renderTopbar();
+
+    const btnGlobal = document.getElementById('btn-global-view');
+    const globalBanner = document.getElementById('global-banner');
+    
+    // Apenas ADMIN pode ver a visão global de métricas brutas
+    if (user.role === 'ADMIN' && btnGlobal) {
+        btnGlobal.style.display = 'block';
+        btnGlobal.onclick = () => {
+            isGlobalView = !isGlobalView;
+            if (isGlobalView) {
+                btnGlobal.textContent = 'VOLTAR À VISÃO POR CLIENTE';
+                if(globalBanner) globalBanner.style.display = 'block';
+            } else {
+                btnGlobal.textContent = 'VER VISÃO GLOBAL INTERNA (ADMIN)';
+                if(globalBanner) globalBanner.style.display = 'none';
+            }
+            loadMetrics();
+        };
+    }
+
+    window.addEventListener('fluxai_project_changed', () => {
+        if (!isGlobalView) loadMetrics();
+    });
 
     await loadMetrics();
 }
 
 async function loadMetrics() {
     const container = document.getElementById('metrics-grid');
+    const emptyState = document.getElementById('empty-state-metrics');
+    const curProj = window.FLUXAI_RUNTIME_CONTEXT?.project_id;
 
-    try {
-        const metrics = await SheetsService.fetchMetrics();
-        if (!metrics || Object.keys(metrics).length === 0) {
+    if (!isGlobalView && !curProj) {
+        container.style.display = 'none';
+        emptyState.style.display = 'block';
+        return;
+    } else {
+        container.style.display = 'grid';
+        emptyState.style.display = 'none';
+    }
+
+        const rawMetrics = await SheetsService.fetchMetrics();
+        if (!rawMetrics || Object.keys(rawMetrics).length === 0) {
             container.innerHTML = '<div style="opacity: 0.5;">Nenhuma métrica encontrada.</div>';
             return;
         }
 
+        // Filtra cada array se não for visão global
+        const metrics = {
+            instagram: isGlobalView ? rawMetrics.instagram : (rawMetrics.instagram || []).filter(m => m.cliente_id === curProj),
+            metaAds: isGlobalView ? rawMetrics.metaAds : (rawMetrics.metaAds || []).filter(m => m.cliente_id === curProj),
+            ga4: isGlobalView ? rawMetrics.ga4 : (rawMetrics.ga4 || []).filter(m => m.cliente_id === curProj),
+            searchConsole: isGlobalView ? rawMetrics.searchConsole : (rawMetrics.searchConsole || []).filter(m => m.cliente_id === curProj)
+        };
+
         let html = '';
+
+        // Se após o filtro, todos os arrays estiverem vazios
+        const isEmpty = !metrics.instagram?.length && !metrics.metaAds?.length && !metrics.ga4?.length && !metrics.searchConsole?.length;
+        if (isEmpty) {
+            container.innerHTML = '<div style="opacity: 0.5;">Nenhuma métrica encontrada para este projeto.</div>';
+            return;
+        }
 
         // Instagram
         if (metrics.instagram) {
