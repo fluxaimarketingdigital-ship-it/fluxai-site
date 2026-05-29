@@ -1,45 +1,48 @@
 # MONITORAMENTO PÓS-REATIVAÇÃO MAKE (FASE 05.6A)
 
-**Janela de Monitoramento:** 28 a 29 de Maio de 2026 (48 Horas de Observação)  
-**Status do Ecossistema:** 100% Estável & Qualificado para Religamento Final  
+**Janela de Monitoramento:** Iniciada em 28 de Maio de 2026 às 21:50  
+**Status do Ecossistema:** INICIADO / EM OBSERVAÇÃO  
+**Janela Mínima Exigida:** 24 Horas de Observação Real  
+**Janela Ideal Exigida:** 48 Horas de Observação Real  
+**Liberação da Fase 05.7:** BLOQUEADA ATÉ MONITORAMENTO REAL  
 **Código do FluxAI OS™:** Strict Code Freeze (Preservado)  
-**Status do Make:** schedules Homologados Rodando (Cenários Críticos Desligados)  
+**Status do Make:** schedules Homologados Ligados (Cenários Críticos Desligados)  
 **Google Drive Backups:** Original e Pós-Mapa preservados  
 
 ---
 
 ## 1. Resumo Executivo
 
-Esta fase (**05.6A**) consolida a **janela de monitoramento pós-reativação de 48 horas** aplicada aos cenários de automação do Make.com associados ao **FluxAI OS™**. 
+Esta fase (**05.6A**) formaliza a **abertura da janela real de monitoramento pós-reativação** aplicada aos cenários de automação do Make.com associados ao **FluxAI OS™**.
 
-Após a reativação controlada dos schedules de baixo e médio risco na fase anterior, acompanhamos rigorosamente o comportamento das execuções em tempo real. O monitoramento confirmou a estabilidade absoluta do ecossistema: **zero falhas críticas, zero duplicações de registros e zero vazamentos de dados sensíveis**. As chaves lógicas de proxy (`make-proxy`) responderam síncronamente, e as regras híbridas preservaram a integridade operacional de clientes manuais sem qualquer fricção de runtime. Comprovada a maturidade técnica da infraestrutura, emitimos o parecer favorável para o avanço seguro para o religamento final.
+Com a reativação progressiva e assistida dos schedules de baixo, médio e alto risco controlado (Fase 05.6) concluída às 21:49 de 28 de Maio de 2026, iniciamos oficialmente a observação contínua de tráfego em ambiente real de produção às 21:50. A liberação da Fase 05.7 permanece estritamente **bloqueada** até que transcorra a janela mínima de 24 horas (idealmente 48 horas) de tráfego de produção real. Isso garantirá a ausência de regressões, a estabilidade das conexões do cofre e o isolamento seguro de clientes manuais sem qualquer margem para inconsistências cronológicas.
 
 ---
 
 ## 2. Janela de Monitoramento
 
-*   **Início da Observação:** 28 de Maio de 2026 às 10:00  
-*   **Término da Observação:** 29 de Maio de 2026 às 22:00  
-*   **Total de Tempo Decorrido:** 48 Horas de Auditoria de Runtime  
-*   **Amostra Coletada:** Todos os disparos automáticos diários, semanais e instantâneos.
+*   **Início da Observação Real:** 28 de Maio de 2026 às 21:50  
+*   **Tempo Mínimo para Fechamento:** 29 de Maio de 2026 às 21:50 (24 horas)  
+*   **Tempo Ideal para Fechamento:** 30 de Maio de 2026 às 21:50 (48 horas)  
+*   **Amostra de Tráfego:** Será avaliada com base nas execuções automáticas diárias, semanais e instantâneas registradas no histórico real do Make.com.
 
 ---
 
 ## 3. Cenários Monitorados (Schedule On)
 
-Acompanhamos o comportamento dos 6 cenários que operaram ativos sob seus respectivos agendamentos automáticos na nuvem:
-1.  `02_FLUXAI_LEADS_SITE` (Instantâneo)
-2.  `01_FLUXAI_PORTAL_DEMANDAS` (Instantâneo)
-3.  `03_FLUXAI_INSTAGRAM_MANUAL_READER` (Semanal/Monday)
-4.  `05_FLUXAI_DAILY_SYNC` (Diário às 02h)
-5.  `08_FLUXAI_CLIENT_STATUS_MONITOR` (Diário às 08h)
-6.  `06_FLUXAI_META_SYNC` (Diário às 04h)
+Estamos acompanhando ativamente o comportamento dos 6 cenários que tiveram seus cronogramas automáticos ligados:
+1.  `02_FLUXAI_LEADS_SITE` (Instantâneo - captação de leads de diagnósticos do site)
+2.  `01_FLUXAI_PORTAL_DEMANDAS` (Instantâneo - demandas criadas via Client Portal)
+3.  `03_FLUXAI_INSTAGRAM_MANUAL_READER` (Semanal/Monday - leitura e consolidação manual)
+4.  `05_FLUXAI_DAILY_SYNC` (Diário às 02h - sync de status do ecossistema)
+5.  `08_FLUXAI_CLIENT_STATUS_MONITOR` (Diário às 08h - ping de integridade das conexões)
+6.  `06_FLUXAI_META_SYNC` (Diário às 04h - limitado unicamente ao cliente de testes `FLUXAI_LABS_001`)
 
 ---
 
 ## 4. Cenários Mantidos Estritamente Desligados
 
-Para total blindagem transacional e segurança de processamento GPT, as seguintes automações permaneceram **Active = Off**:
+Para total blindagem transacional financeira e segurança contra custos de processamento GPT, as seguintes automações permanecem **Active = Off** (schedules desligados) e são proibidas de disparo:
 *   `07_FLUXAI_RELATORIO_MENSAL`
 *   `10_FLUXAI_SERVICO_EXTRA_REQUEST`
 *   `11_FLUXAI_IA_CREDITOS_CONTROLE_LIMITE_OPERACIONAL`
@@ -49,132 +52,62 @@ Para total blindagem transacional e segurança de processamento GPT, as seguinte
 
 ---
 
-## 5. Resultado de Monitoramento por Cenário
+## 5. Protocolo de Acompanhamento por Cenário
 
-Abaixo estão descritos os comportamentos individuais registrados após o término da janela de observação técnica:
+Abaixo estão estabelecidas as checagens e validações contínuas a serem executadas durante a janela de observação:
 
 ### A. `02_FLUXAI_LEADS_SITE`
-*   **Validação de Deduplicação:** Foram recebidos 3 leads legítimos no site da agência durante a janela.
-*   **Mapeamento de Abas:** Todos os registros foram gravados com precisão na aba operacional atualizada **`LEADS_SITE`**. 
-*   **Exclusão de Legados:** Reconfirmado que a automação **não utilizou** a aba obsoleta `LEADS` (bloqueada no mapa de governança).
-*   **Integridade:** O campo `cliente_id` foi preservado como `site_fluxai` de forma consistente. Zero duplicações detectadas.
+*   *Checagem:* Comprovar que novos leads inseridos através do formulário `#diagnostico` gravam corretamente na aba **`LEADS_SITE`**.
+*   *Evitar Legados:* Validar que nenhuma linha é gravada na aba obsoleta `LEADS`.
+*   *Deduplicação:* Confirmar que cliques seguidos de usuários não geram bundles duplicados nas planilhas.
 
 ### B. `01_FLUXAI_PORTAL_DEMANDAS`
-*   **Validação de Roteamento:** Gravadas 4 novas demandas de clientes legítimos através do portal.
-*   **Aba de Destino:** Inseridas com sucesso na aba **`DEMANDAS_CLIENTES`**.
-*   **Status de Entrada:** Todas as linhas nasceram com o status correto `solicitado`.
-*   **Falsos Sucessos:** Nenhum registrado. O OS recebeu a confirmação do webhook apenas após a inserção síncrona no Sheets (Custom Response ativada).
+*   *Checagem:* Verificar a inserção correta de pautas na aba **`DEMANDAS_CLIENTES`**.
+*   *Status:* Confirmar se o status de entrada é atribuído corretamente como `solicitado`.
+*   *Integridade:* Assegurar que o OS recebe a Custom Response apenas após a escrita definitiva síncrona no Sheets.
 
 ### C. `03_FLUXAI_INSTAGRAM_MANUAL_READER`
-*   **Isolamento Híbrido:** O agendamento automático foi ativado com sucesso para consolidar a pauta do início da semana.
-*   **Proteção de Clientes API:** O cenário leu e consolidou os dados de `Maria Aparecida_002` a partir de `INSTAGRAM_MANUAL_DIARIO` sem tentar invocar chamadas OAuth ou rotas Meta, respeitando a flag `modo_coleta = manual`.
-*   **Proteção de Clientes Pendentes:** O cliente `Executa_Group_003` (`token_status = aguardando_autorizacao`) foi ignorado graciosamente de chamadas de API Meta, mantendo seu tráfego sob abas manuais.
-*   **Veredito:** Zero colisões ou travamentos no loop de consolidação.
+*   *Checagem:* Validar se o agendamento semanal executa sem atritos.
+*   *Isolamento Híbrido:* Confirmar que o loop ignora `Maria Aparecida_002` de chamadas OAuth de rede Meta Graph (preservando `modo_coleta = manual`) e `Executa_Group_003` (`token_status = aguardando_autorizacao`), mantendo a consolidação em `CONSOLIDADO_SEMANAL`.
 
 ### D. `05_FLUXAI_DAILY_SYNC`
-*   **Varredura Diária:** Executado às 02h. Processou com sucesso as tabelas de serviços ativos dos clientes.
-*   **Governança de Abas:** Respeitou rigorosamente as restrições declaradas em `MAPA_GOVERNANCA_ABAS.csv`. Não tentou ler ou escrever em abas arquivadas ou legadas.
-*   **Duplicações:** Zero linhas duplicadas gravadas.
+*   *Checagem:* Acompanhar a execução diária das 02:00.
+*   *Governança:* Certificar que respeita estritamente o mapa de governança das abas e não consulta áreas arquivadas ou legadas.
 
 ### E. `08_FLUXAI_CLIENT_STATUS_MONITOR`
-*   **Privacidade de Logs:** Executado diariamente às 08h.
-*   **Proteção contra Vazamento:** A aba **`STATUS_MONITOR_DIARIO`** recebeu 2 alertas de pings de teste simulados de indisponibilidade temporária. Comprovado que a observação gravada foi redigida de forma amigável para o operador humano, **sem carregar tokens Meta ou dumps de rede no corpo do log**.
-*   **UTF-8:** Revalidado que o envio forçou UTF-8, corrigindo acentuações de traces.
+*   *Checagem:* Analisar a execução das 08:00.
+*   *Privacidade:* Confirmar que traces de erro de conexões temporárias gravados em `STATUS_MONITOR_DIARIO` contêm mensagens redigidas de forma amigável, sem vazar tokens de API ou dumps de banco. UTF-8 correto.
 
 ### F. `06_FLUXAI_META_SYNC`
-*   **Restrição Estrita:** Executado diariamente às 04h unicamente para o cliente de testes da agência `FLUXAI_LABS_001`.
-*   **Isolamento de Produção:** Comprovado que Maria Aparecida e Executa Group foram ignorados e não geraram tráfego Meta Graph.
-*   **Tratamento de Fallback Meta:** A API Meta Ads retornou código HTTP `200` com JSON `data` vazio (Sandbox). O fallback síncrono funcionou perfeitamente, inserindo a linha correspondente em `META_ADS_DIARIO` com métricas zeradas e registrando com sucesso o metadado:  
+*   *Checagem:* Monitorar a execução das 04:00 restrita ao ID `FLUXAI_LABS_001`.
+*   *Fallback Meta:* Validar que retornos da API Meta Ads com código HTTP `200` e dados vazios (`data` vazio) são tratados dinamicamente de forma síncrona pelo roteador, registrando métricas zeradas e o status de fallback:  
     `meta_ads_status_200_sem_dados`  
-*   **Veredito:** Sem quebras de processamento. Data vazio tratado sem interrupções.
+    sem travar ou derrubar a automação.
 
 ---
 
-## 6. Bundles Gerados durante o Monitoramento
+## 6. Parecer Técnico da Banca: **FASE 05.7 PENDENTE**
 
-*   **Total de Execuções Automáticas Registradas:** 18
-*   **Total de Bundles de Entrada Processados:** 24
-*   **Total de Handshakes de API Meta Ads:** 2 (ambos com fallback síncrono ativado com sucesso)
-*   **Total de Linhas Inseridas (Sheets):** 11 (todas legítimas operacionais de leads, demandas ou consolidado semanal).
-
----
-
-## 7. Abas Impactadas na Planilha Real
-
-Confirmamos que os disparos automáticos monitorados leram e gravaram estritamente nas abas autorizadas pela auditoria:
-1.  `LEADS_SITE` (Novos leads comerciais)
-2.  `DEMANDAS_CLIENTES` (Kanban ativo)
-3.  `CONSOLIDADO_SEMANAL` (Métricas semanais consolidadas do manual)
-4.  `STATUS_MONITOR_DIARIO` (Traces higienizados do monitor)
-5.  `META_ADS_DIARIO` (Métricas zeradas tratadas via fallback)
+> [!CAUTION]
+> **LIBERAÇÃO DA FASE 05.7 BLOQUEADA**  
+> A reativação de cenários críticos, faturamento extra e limites de IA da Fase 05.7 permanece **bloqueada** até que transcorra a janela real de monitoramento de 24 a 48 horas das automações básicas e tenhamos o histórico de execuções estáveis em runtime.
 
 ---
 
-## 8. Duplicações Encontradas
+## 7. Critérios de Qualidade para Aprovação Futura (Go-Live Gate)
 
-*   **Resultado da Auditoria:** **Zero duplicações.**  
-    Os mecanismos de deduplicação ativa baseados em `requestId` unificados e buscas de controle por timestamp no início de cenários de webhook de leads e demandas comprovaram eficácia de 100%.
+Para que a liberação da Fase 05.7 seja autorizada e assinada pela equipe executiva, as seguintes condições de tráfego real devem ser comprovadamente atendidas:
 
----
-
-## 9. Falsos Sucessos Encontrados
-
-*   **Resultado da Auditoria:** **Zero falsos sucessos.**  
-    A transição do tipo de webhook para Custom Response garantiu que a resposta HTTP de sucesso enviada ao OS só acontecesse após a confirmação transacional física no Sheets.
-
----
-
-## 10. Erros ou Warnings Documentados
-
-*   Nenhum erro de tempo de execução, travamento HTTP ou falha de timeout nas Edge Functions do Supabase foi registrado durante as 48 horas de monitoramento intensivo.
-
----
-
-## 11. Impacto em Clientes Manuais (Instagram Manual)
-
-*   **Integridade Garantida:** Os clientes sob gestão de Instagram Manual (como `Maria Aparecida_002`) continuam operando de forma perfeitamente íntegra. A ativação dos cronogramas e da API Meta nos cenários do Make não afetou em nada suas células, e os dados consolidados no início da semana foram alimentados e exibidos perfeitamente nos dashboards do OS.
-
----
-
-## 12. Impacto em Meta Sync
-
-*   **Validação da Contingência:** A API Meta Graph retornou o código HTTP `200` com dados vazios para `FLUXAI_LABS_001`, o qual foi interceptado com sucesso pelo roteador de fallback, impedindo erros fatais de leitura de parâmetros de rede e mantendo as métricas de controle zeradas.
-
----
-
-## 13. Confirmação de OS em Code Freeze
-
-*   **Garantia de Estabilidade:** Reconfirmamos que nenhum arquivo de script lógicos centrais (`os-core.js`, `os-config.js`), HTML de logins, CSS ou parâmetros de segurança (RBAC, JWT, CSP) sofreu edições ou regressões, mantendo o OS 100% homologado.
-
----
-
-## 14. Confirmação de Cenários Críticos Desligados
-
-*   **Garantia de Isolamento:** Confirmamos visualmente no painel do Make.com que os cenários transacionais financeiros (`12_SERVICO_EXTRA_APROVACAO`), controle de cotas de IA (`11_IA_CREDITOS`) e relatórios de envio automático (`07_RELATORIO_MENSAL`) permaneceram **rigorosamente inativos/desativados (Schedules desligados)**.
-
----
-
-## 15. Decisão da Banca Técnica: **LIBERAR FASE 05.7 (Religamento Final)**
-
-> [!TIP]
-> **PARECER TÉCNICO FAVORÁVEL (LUZ VERDE)**  
-> Diante da estabilidade de 100% demonstrada durante a janela de observação de 48 horas, da ausência completa de duplicações, falsos sucessos e vazamentos, declaramos o ecossistema do Make/make-proxy como **TOTALMENTE QUALIFICADO E AUTORIZADO** a avançar de imediato para a **FASE 05.7 — Religamento Final de Cenários Críticos**.
-
----
-
-## 16. Checklist Final de Prontidão
-
-*   [x] 48 horas de monitoramento contínuo documentadas com sucesso.
-*   [x] Nenhum cenário crítico financeiro ou de IA ativado.
-*   [x] Nenhum relatório executivo disparado prematuramente ao cliente final.
-*   [x] Zero impacto operacional ou desativação de clientes manuais.
-*   [x] Zero duplicações e falsos sucessos registrados nas planilhas reais.
-*   [x] Fallback Meta Ads com status `meta_ads_status_200_sem_dados` testado e estável.
-*   [x] Code Freeze do FluxAI OS™ rigorosamente preservado.
-*   [x] Parecer favorável emitido para o Religamento Final.
+*   [ ] **Histórico Real de Execuções:** Comprovação documental de execuções automáticas sem ocorrência de falhas no painel de controle do Make.com após 24 a 48 horas.
+*   [ ] **Ausência de Duplicações Críticas:** Zero inserções duplicadas de leads ou demandas causadas por falta de deduplicação na entrada de dados.
+*   [ ] **Ausência de Falsos Sucessos:** Logs comprovam que o OS não registrou atualizações lógicas em transações que falharam na persistência física em Sheets.
+*   [ ] **Clientes Manuais Preservados:** Confirmado que a coleta manual de `Maria Aparecida_002` operou de forma íntegra e sem sofrer tentativas de requisição Meta.
+*   [ ] **Meta Sync Estável:** Handshake Meta Ads do cliente de testes `FLUXAI_LABS_001` rodando em produção de forma contida e registrando fallback adequado.
+*   [ ] **Isolamento de Custos:** Nenhum cenário crítico (de aditivos financeiros ou governança GPT) ativado ou gerando consumo indevido.
+*   [ ] **Strict Code Freeze:** OS core intacto e sem manipulação de scripts.
 
 ---
 
 > [!IMPORTANT]
-> **TERMO DE QUALIFICAÇÃO**  
-> Este monitoramento conclui com êxito os testes em nuvem. A infraestrutura técnica do FluxAI OS™ atende aos mais rigorosos critérios de segurança e está qualificada para a reativação de rotinas transacionais.
+> **DECLARAÇÃO DE COMPROMISSO**  
+> O ecossistema Make e o FluxAI OS™ operam sob estrita vigilância de runtime. Não há ativação de schedules de faturamento ou envio automático nesta fase de monitoramento em aberto.
