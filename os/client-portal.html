@@ -730,7 +730,11 @@
             const logAction = isExtra ? 'EXTRA_SERVICE_REQUESTED' : 'DEMAND_SUBMITTED';
             const category = isExtra ? 'servicos_extras' : 'demandas';
             const targetStatus = isExtra ? 'solicitado' : 'aberta';
-            const generatedId = 'dem_' + Math.random().toString(36).substr(2, 9);
+            const generatedId = 'dem_' + (
+              window.crypto && typeof window.crypto.randomUUID === 'function'
+                ? window.crypto.randomUUID()
+                : `${Date.now()}_${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`
+            );
             
             try {
                 // Validar transição inicial via StatusEngine

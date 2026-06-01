@@ -46,6 +46,26 @@ function jsonResponse(body: unknown, status = 200, corsHeaders: Record<string, s
   });
 }
 
+function isValidEmailBasic(email: unknown): boolean {
+  if (typeof email !== 'string') return false;
+
+  const value = email.trim();
+
+  if (value.length < 3 || value.length > 254) return false;
+  if (value.includes(' ')) return false;
+
+  const parts = value.split('@');
+  if (parts.length !== 2) return false;
+
+  const [localPart, domain] = parts;
+
+  if (!localPart || !domain) return false;
+  if (domain.startsWith('.') || domain.endsWith('.')) return false;
+  if (!domain.includes('.')) return false;
+
+  return true;
+}
+
 Deno.serve(async (req) => {
   const requestId = crypto.randomUUID();
   const reqOrigin = req.headers.get("Origin") || req.headers.get("origin");
@@ -128,8 +148,7 @@ Deno.serve(async (req) => {
       }
 
       // Valida formato de e-mail básico no backend
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(String(email).trim())) {
+      if (!isValidEmailBasic(email)) {
         console.log("make-proxy:invalid-email-format", { requestId, email, origin: reqOrigin });
         return jsonResponse({ ok: false, error: "Invalid email format", requestId }, 400, corsHeaders);
       }
