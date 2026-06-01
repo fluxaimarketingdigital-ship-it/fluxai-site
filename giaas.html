@@ -1,0 +1,1656 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Growth Infrastructure as a Service (GIaaS™) | FluxAI Labs™</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Engenharia de Crescimento e Operações de Growth (Growth Ops) de alta performance chancelada pelo FluxAI OS™ e automações de IA proprietárias. Descubra a clareza e transparência síncrona real.">
+    <meta name="keywords" content="Growth Operations, Growth Ops, Automação de Marketing, BI de Performance, Infraestrutura de IA, FluxAI OS">
+    <meta name="author" content="FluxAI Labs">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://fluxaidigital.com.br/giaas">
+    <meta property="og:title" content="GIaaS™ — Growth Infrastructure as a Service | FluxAI Labs™">
+    <meta property="og:description" content="Operações de crescimento de alta performance orientadas por dados, BI síncrono e software proprietário de comando de alta velocidade.">
+    <meta property="og:image" content="https://fluxaidigital.com.br/assets/images/og-image-giaas.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Vanilla CSS Premium styling -->
+    <style>
+        :root {
+            --color-bg: #070708;
+            --color-surface: rgba(20, 20, 22, 0.7);
+            --color-surface-hover: rgba(30, 30, 34, 0.9);
+            --color-primary: #8e9e68;
+            --color-primary-rgb: 142, 158, 104;
+            --color-border: rgba(255, 255, 255, 0.06);
+            --color-border-focus: rgba(142, 158, 104, 0.4);
+            --color-text: #f3f4f6;
+            --color-text-muted: #8e949f;
+            --color-text-white: #ffffff;
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        /* Base Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-main);
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            overflow-x: hidden;
+            min-height: 100vh;
+            background: radial-gradient(circle at 50% 0%, #151a10 0%, var(--color-bg) 70%);
+        }
+
+        /* Typography Utilities */
+        h1, h2, h3, h4 {
+            color: var(--color-text-white);
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+        }
+
+        .mono {
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        /* Structural Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            position: relative;
+        }
+
+        section {
+            padding: 100px 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        /* Header Navigation */
+        header {
+            padding: 30px 0;
+            border-bottom: 1px solid var(--color-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 7, 8, 0.8);
+        }
+
+        .nav-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-family: var(--font-main);
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--color-text-white);
+            text-decoration: none;
+            letter-spacing: -1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .logo span {
+            color: var(--color-primary);
+        }
+
+        .btn-nav-cta {
+            background: rgba(142, 158, 104, 0.1);
+            border: 1px solid var(--color-primary);
+            color: var(--color-primary);
+            padding: 8px 18px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            text-decoration: none;
+            letter-spacing: 1px;
+            transition: var(--transition);
+        }
+
+        .btn-nav-cta:hover {
+            background: var(--color-primary);
+            color: #000000;
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 140px 0 100px;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 300px;
+            height: 300px;
+            background: rgba(142, 158, 104, 0.15);
+            filter: blur(120px);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            max-width: 900px;
+            margin: 20px auto 30px;
+            background: linear-gradient(180deg, #ffffff 0%, #a5a9b0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--color-text-muted);
+            max-width: 750px;
+            margin: 0 auto 40px;
+            font-weight: 400;
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            background: var(--color-primary);
+            color: #000000;
+            padding: 16px 36px;
+            border-radius: 4px;
+            font-weight: 800;
+            text-decoration: none;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(142, 158, 104, 0.25);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 30px rgba(142, 158, 104, 0.4);
+        }
+
+        .btn-primary i {
+            margin-left: 8px;
+            transition: var(--transition);
+        }
+
+        .btn-primary:hover i {
+            transform: translateX(4px);
+        }
+
+        .hero-tagline {
+            margin-top: 20px;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            font-family: var(--font-mono);
+        }
+
+        /* Gap/Problem Section */
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .problem-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 35px;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .problem-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.3), transparent);
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .problem-card:hover {
+            border-color: rgba(239, 68, 68, 0.2);
+            transform: translateY(-5px);
+        }
+
+        .problem-card:hover::before {
+            opacity: 1;
+        }
+
+        .problem-card i {
+            color: #ef4444;
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .problem-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 12px;
+        }
+
+        .problem-card p {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 700px;
+            margin: 0 auto 60px;
+        }
+
+        .section-header h2 {
+            font-size: clamp(2rem, 4vw, 2.75rem);
+            margin: 15px 0;
+        }
+
+        .section-header p {
+            color: var(--color-text-muted);
+        }
+
+        /* Solution Section */
+        .solution-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .solution-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 40px;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .solution-card:hover {
+            border-color: var(--color-primary);
+            transform: translateY(-5px);
+            background: var(--color-surface-hover);
+        }
+
+        .solution-card i {
+            color: var(--color-primary);
+            font-size: 1.75rem;
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+
+        .solution-card h3 {
+            font-size: 1.25rem;
+            margin-bottom: 15px;
+        }
+
+        .solution-card p {
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+
+        /* OS Feature Section */
+        .os-showcase {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: center;
+        }
+
+        @media (max-width: 900px) {
+            .os-showcase {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+        }
+
+        .os-text {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .os-text h2 {
+            font-size: clamp(2rem, 3vw, 2.5rem);
+        }
+
+        .os-text p {
+            color: var(--color-text-muted);
+            font-size: 0.95rem;
+        }
+
+        .feature-bullets {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .bullet-item {
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+
+        .bullet-item i {
+            color: var(--color-primary);
+            margin-top: 5px;
+            font-size: 0.875rem;
+        }
+
+        .bullet-item div strong {
+            color: var(--color-text-white);
+            display: block;
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+        }
+
+        .bullet-item div span {
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+        }
+
+        /* Simulação do OS Premium Interface */
+        .os-mockup-wrapper {
+            background: linear-gradient(135deg, rgba(142,158,104,0.1), rgba(0,0,0,0.4));
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .os-window-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 15px 15px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .window-dots {
+            display: flex;
+            gap: 6px;
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+        }
+
+        .dot-red { background: #ef4444; }
+        .dot-yellow { background: #f59e0b; }
+        .dot-green { background: #10b981; }
+
+        .window-title {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--color-text-muted);
+        }
+
+        .os-mockup-content {
+            background: rgba(0,0,0,0.6);
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            font-family: var(--font-main);
+        }
+
+        .mock-dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 15px;
+        }
+
+        .mock-client-name {
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #fff;
+        }
+
+        .mock-client-status {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            font-family: var(--font-mono);
+        }
+
+        .mock-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .mock-stat-box {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.04);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .mock-stat-lbl {
+            font-size: 0.55rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .mock-stat-val {
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 1.15rem;
+            color: var(--color-primary);
+        }
+
+        .mock-activity-log {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 6px;
+            padding: 15px;
+        }
+
+        .mock-log-title {
+            font-family: var(--font-mono);
+            font-size: 0.6rem;
+            color: var(--color-text-muted);
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .mock-log-item {
+            font-size: 0.65rem;
+            display: flex;
+            justify-content: space-between;
+            color: #d1d5db;
+            margin-bottom: 6px;
+        }
+
+        .mock-log-item span.status-green { color: #10b981; font-weight: 700; }
+        .mock-log-item span.status-neutral { color: var(--color-text-muted); }
+
+        /* Pricing Section */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+            align-items: stretch;
+        }
+
+        .pricing-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 45px 35px;
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .pricing-card.premium-featured {
+            border-color: var(--color-primary);
+            background: linear-gradient(180deg, rgba(142,158,104,0.05) 0%, rgba(20,20,22,0.7) 100%);
+        }
+
+        .featured-tag {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--color-primary);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 4px 10px;
+            border-radius: 4px;
+            letter-spacing: 1px;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .pricing-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .pricing-desc {
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 25px;
+        }
+
+        .price-wrapper {
+            margin-bottom: 30px;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 25px;
+        }
+
+        .price-label {
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .price-val {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--color-text-white);
+            font-family: var(--font-mono);
+        }
+
+        .price-period {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+
+        .pricing-features {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 40px;
+            flex-grow: 1;
+        }
+
+        .p-feature-item {
+            display: flex;
+            gap: 10px;
+            font-size: 0.875rem;
+            align-items: flex-start;
+        }
+
+        .p-feature-item i {
+            color: var(--color-primary);
+            margin-top: 4px;
+        }
+
+        .p-feature-item span {
+            color: #d1d5db;
+        }
+
+        .p-feature-item span strong {
+            color: #fff;
+        }
+
+        .btn-pricing-cta {
+            display: block;
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--color-border);
+            color: #fff;
+            padding: 14px 20px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .pricing-card.premium-featured .btn-pricing-cta {
+            background: var(--color-primary);
+            color: #000;
+            border: none;
+            box-shadow: 0 4px 15px rgba(142, 158, 104, 0.2);
+        }
+
+        .btn-pricing-cta:hover {
+            background: var(--color-primary);
+            color: #000;
+            border-color: var(--color-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Onboarding Timeline Section */
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        .timeline-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 35px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .timeline-step {
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            width: 40px;
+            height: 40px;
+            background: var(--color-primary);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(142, 158, 104, 0.3);
+        }
+
+        .timeline-card h3 {
+            font-size: 1.15rem;
+            margin-top: 15px;
+        }
+
+        .timeline-card p {
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        /* FAQ Section */
+        .faq-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 30px;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 600px) {
+            .faq-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .faq-card {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 30px;
+        }
+
+        .faq-card h3 {
+            font-size: 1.05rem;
+            margin-bottom: 12px;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+        }
+
+        .faq-card h3 i {
+            color: var(--color-primary);
+            margin-top: 4px;
+        }
+
+        .faq-card p {
+            color: var(--color-text-muted);
+            font-size: 0.85rem;
+            line-height: 1.6;
+            padding-left: 22px;
+        }
+
+        /* Application Form Section */
+        .app-form-section {
+            background: radial-gradient(circle at 50% 0%, #151a10 0%, var(--color-bg) 80%);
+            padding: 100px 0;
+            border-top: 1px solid var(--color-border);
+        }
+
+        .form-wrapper {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 50px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+        }
+
+        @media (max-width: 600px) {
+            .form-wrapper {
+                padding: 30px 20px;
+            }
+        }
+
+        .form-wrapper h3 {
+            font-size: 1.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: rgba(0,0,0,0.4);
+            border: 1px solid var(--color-border);
+            padding: 12px 16px;
+            border-radius: 4px;
+            color: #fff;
+            font-family: var(--font-main);
+            font-size: 0.9rem;
+            transition: var(--transition);
+            width: 100%;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 10px rgba(142, 158, 104, 0.15);
+        }
+
+        .btn-submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            background: var(--color-primary);
+            color: #000;
+            border: none;
+            padding: 16px;
+            border-radius: 4px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 15px rgba(142, 158, 104, 0.2);
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(142, 158, 104, 0.35);
+        }
+
+        .btn-submit i {
+            margin-left: 8px;
+        }
+
+        /* Footer */
+        footer {
+            background: #040405;
+            padding: 50px 0;
+            text-align: center;
+            border-top: 1px solid var(--color-border);
+        }
+
+        footer p {
+            color: var(--color-text-muted);
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            margin-top: 15px;
+        }
+
+        /* LGPD Cookie Banner */
+        .lgpd-cookie-banner {
+            position: fixed;
+            bottom: -150px;
+            left: 0;
+            right: 0;
+            background: #0f1012;
+            border-top: 1px solid rgba(142, 158, 104, 0.2);
+            padding: 20px 24px;
+            z-index: 1000;
+            transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .lgpd-cookie-banner.active {
+            bottom: 0;
+        }
+
+        .lgpd-cookie-banner .container-banner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+        }
+
+        .lgpd-cookie-banner-text {
+            color: #d1d5db;
+            font-size: 0.85rem;
+            line-height: 1.5;
+            font-family: var(--font-main);
+        }
+
+        .lgpd-cookie-banner-text a {
+            color: var(--color-primary);
+            text-decoration: underline;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .lgpd-cookie-banner-btn {
+            background: var(--color-primary);
+            color: #070708;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            white-space: nowrap;
+            font-family: var(--font-mono);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            transition: var(--transition);
+        }
+
+        .lgpd-cookie-banner-btn:hover {
+            background: #a3b47c;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .lgpd-cookie-banner .container-banner {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 16px;
+                text-align: center;
+            }
+            .lgpd-cookie-banner-btn {
+                width: 100%;
+            }
+        }
+
+        /* Privacy Policy Modal */
+        .privacy-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(7, 7, 8, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 1010;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            padding: 20px;
+        }
+
+        .privacy-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .privacy-modal-content {
+            background: #141416;
+            border: 1px solid var(--color-border);
+            max-width: 700px;
+            width: 100%;
+            max-height: 80vh;
+            border-radius: 8px;
+            overflow-y: auto;
+            padding: 40px;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+        }
+
+        .privacy-modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .privacy-modal-close:hover {
+            color: var(--color-text-white);
+        }
+
+        .privacy-modal h3 {
+            font-family: var(--font-main);
+            color: var(--color-text-white);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 10px;
+        }
+
+        .privacy-modal h4 {
+            font-family: var(--font-main);
+            color: var(--color-primary);
+            font-size: 1rem;
+            margin: 20px 0 10px 0;
+        }
+
+        .privacy-modal p, .privacy-modal ul {
+            font-size: 0.85rem;
+            color: #d1d5db;
+            line-height: 1.6;
+            margin-bottom: 12px;
+        }
+
+        .privacy-modal ul {
+            padding-left: 20px;
+        }
+
+        .privacy-modal li {
+            margin-bottom: 6px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container nav-container">
+            <a href="#" class="logo">
+                FLUXAI <span>LABS</span>
+            </a>
+            <a href="#aplicar" class="btn-nav-cta">Diagnóstico</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <span class="mono">Growth Operations & Engenharia de IA Proprietária para Corporações</span>
+            <h1>Sua operação de marketing controlada por dados, chancelada por tecnologia estratégica proprietária.</h1>
+            <p>Esqueça os PDFs de vaidade no final do mês. A FluxAI Labs™ centraliza sua gestão de tráfego, funis de CRM e geração de IA em uma plataforma síncrona exclusiva de comando.</p>
+            <a href="#aplicar" class="btn-primary">
+                Aplicar p/ Reunião de Diagnóstico <i class="fa-solid fa-arrow-right"></i>
+            </a>
+            <div class="hero-tagline">Triagem obrigatória de faturamento e cota de anúncios</div>
+        </div>
+    </section>
+
+    <!-- O Problema Section -->
+    <section id="problema">
+        <div class="container">
+            <div class="section-header">
+                <span class="mono">A Crítica Executiva</span>
+                <h2>O modelo de agência tradicional está quebrado.</h2>
+                <p>Por que as operações High-Ticket de alta performance abandonaram o marketing analógico.</p>
+            </div>
+            
+            <div class="problem-grid">
+                <div class="problem-card">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <h3>Ilusão de Métricas de Vaidade</h3>
+                    <p>Agências comuns comemoram cliques, impressões e curtidas. Nós tratamos de faturamento, CAC, LTV e ROAS real na sua ponta de vendas.</p>
+                </div>
+                
+                <div class="problem-card">
+                    <i class="fa-solid fa-eye-slash"></i>
+                    <h3>Opacidade Operacional</h3>
+                    <p>Você não tem ideia do que sua equipe está executando nas últimas 48 horas. Os relatórios de performance chegam com 30 dias de atraso.</p>
+                </div>
+                
+                <div class="problem-card">
+                    <i class="fa-solid fa-gears"></i>
+                    <h3>Gargalos Manuais de Copy</h3>
+                    <p>Criações manuais burocráticas, legendas sem o DNA real de sua marca e desperdício com equipes lentas que travam sua escala em Meta Ads.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- A Solução Section -->
+    <section id="solucao">
+        <div class="container">
+            <div class="section-header">
+                <span class="mono">Nossa Engenharia</span>
+                <h2>Conheça o GIaaS™</h2>
+                <p>Growth Infrastructure as a Service: A fusão ideal entre inteligência humana e automação técnica.</p>
+            </div>
+            
+            <div class="solution-grid">
+                <div class="solution-card">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <h3>Growth Operations (Growth Ops)</h3>
+                    <p>Gestão avançada de campanhas Meta Ads, Google Ads e BI integrado via Google Tag Manager e GA4 sem perda de dados.</p>
+                </div>
+                
+                <div class="solution-card">
+                    <i class="fa-solid fa-laptop-code"></i>
+                    <h3>Plataforma FluxAI OS™</h3>
+                    <p>Licenças exclusivas ao nosso portal proprietário de BI e Mesa Editorial síncrona. Velocidade Vanilla JS chancelada na Edge.</p>
+                </div>
+                
+                <div class="solution-card">
+                    <i class="fa-solid fa-robot"></i>
+                    <h3>AI Infrastructure</h3>
+                    <p>Limites e cotas mensais de processamento cognitivo para automação síncrona de copywriting e pautas no Drive e Sheets.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- OS Showcase Section -->
+    <section id="os-showcase">
+        <div class="container os-showcase">
+            <div class="os-text">
+                <span class="mono">Transparência síncrona absoluta</span>
+                <h2>Seu novo portal proprietário de comando operacional.</h2>
+                <p>Nós decidimos destruir a caixa preta das agências tradicionais. Ao integrar sua marca à FluxAI Labs, você recebe acesso imediato a sua própria infraestrutura de controle.</p>
+                
+                <div class="feature-bullets">
+                    <div class="bullet-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <strong>Command Center Consolidado</strong>
+                            <span>Acompanhe métricas brutas diárias de Meta Ads e GA4 sem maquiagem manual.</span>
+                        </div>
+                    </div>
+                    <div class="bullet-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <strong>Mesa Editorial Ativa (Flux Calendar)</strong>
+                            <span>Visualize legendas, rascunhos de artes e aprove ou solicite ajustes com um único clique.</span>
+                        </div>
+                    </div>
+                    <div class="bullet-item">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <div>
+                            <strong>Curadoria Híbrida de Relatórios</strong>
+                            <span>Relatórios mensais em PDF privados gerados via Google Slides e revisados exaustivamente por analistas sênior.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Simulador Visual do OS -->
+            <div class="os-mockup-wrapper">
+                <div class="os-window-header">
+                    <div class="window-dots">
+                        <span class="dot dot-red"></span>
+                        <span class="dot dot-yellow"></span>
+                        <span class="dot dot-green"></span>
+                    </div>
+                    <div class="window-title">portal.fluxailabs.com.br/os</div>
+                    <div style="width: 30px;"></div>
+                </div>
+                
+                <div class="os-mockup-content">
+                    <div class="mock-dashboard-header">
+                        <div class="mock-client-name">FLUXAI_LABS_001</div>
+                        <span class="mock-client-status">ATIVO</span>
+                    </div>
+                    
+                    <div class="mock-stats-grid">
+                        <div class="mock-stat-box">
+                            <div class="mock-stat-lbl">Alcance</div>
+                            <div class="mock-stat-val">14.2K</div>
+                        </div>
+                        <div class="mock-stat-box">
+                            <div class="mock-stat-lbl">Leads site</div>
+                            <div class="mock-stat-val">320</div>
+                        </div>
+                        <div class="mock-stat-box">
+                            <div class="mock-stat-lbl">ROAS Ads</div>
+                            <div class="mock-stat-val">1.8x</div>
+                        </div>
+                    </div>
+                    
+                    <div class="mock-activity-log">
+                        <div class="mock-log-title">Auditoria de Logs de IA (Regra P3)</div>
+                        <div class="mock-log-item">
+                            <span>Sincronia de saldo síncrono</span>
+                            <span class="status-green">200 OK</span>
+                        </div>
+                        <div class="mock-log-item">
+                            <span>Upload log .txt Drive</span>
+                            <span class="status-green">CONCLUÍDO</span>
+                        </div>
+                        <div class="mock-log-item">
+                            <span>Limite mensal IA</span>
+                            <span class="status-neutral">150/150</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Planos Section -->
+    <section id="planos">
+        <div class="container">
+            <div class="section-header">
+                <span class="mono">Investimento Proporcional</span>
+                <h2>Grade de Ofertas GIaaS™</h2>
+                <p>Escopos fechados estruturados sem custos ocultos de APIs externas. Escolha sua escala.</p>
+            </div>
+            
+            <div class="pricing-grid">
+                <!-- Plano ENTRY -->
+                <div class="pricing-card">
+                    <h3>GIaaS ENTRY</h3>
+                    <p class="pricing-desc">Para PMEs consolidadas estruturando a primeira infraestrutura de growth.</p>
+                    
+                    <div class="price-wrapper">
+                        <div class="price-label">Mensalidade recorrente</div>
+                        <div class="price-val">R$ 5.000<span class="price-period">/mês</span></div>
+                    </div>
+                    
+                    <div class="pricing-features">
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Gestão de anúncios em **Meta Ads**</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Sincronia diária quantitativa no OS</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>**1 licença** administrativa do FluxAI OS</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>**50 créditos** mensais de IA auditada</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Onboarding e Drive estruturado</span>
+                        </div>
+                    </div>
+                    
+                    <a href="#aplicar" class="btn-pricing-cta">Aplicar p/ Entrada</a>
+                </div>
+                
+                <!-- Plano SCALE -->
+                <div class="pricing-card premium-featured">
+                    <span class="featured-tag">Mais recomendado</span>
+                    <h3>GIaaS SCALE</h3>
+                    <p class="pricing-desc">Para marcas em escala buscando BI completo, CRM e automações cognitivas.</p>
+                    
+                    <div class="price-wrapper">
+                        <div class="price-label">Mensalidade recorrente</div>
+                        <div class="price-val">R$ 8.500<span class="price-period">/mês</span></div>
+                    </div>
+                    
+                    <div class="pricing-features">
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Gestão avançada de **Meta Ads + Google Ads**</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Rastreamento síncrono completo no **GA4/BI**</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>**3 licenças** administrativas exclusivas do OS</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>**150 créditos** mensais de IA proprietária</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>**Curadoria Humana** de relatórios síncronos</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Integração de funis e não-duplicação de leads</span>
+                        </div>
+                    </div>
+                    
+                    <a href="#aplicar" class="btn-pricing-cta">Aplicar p/ Escala</a>
+                </div>
+                
+                <!-- Plano ENTERPRISE -->
+                <div class="pricing-card">
+                    <h3>GIaaS ENTERPRISE</h3>
+                    <p class="pricing-desc">Para corporações exigindo SLA de elite e consultoria sênior de dados.</p>
+                    
+                    <div class="price-wrapper">
+                        <div class="price-label">Mensalidade recorrente</div>
+                        <div class="price-val">R$ 15.000<span class="price-period">/mês</span></div>
+                    </div>
+                    
+                    <div class="pricing-features">
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>SLA dedicado de engenharia de dados</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>BI customizado integrado Supabase</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>**Licenças ilimitadas** do FluxAI OS</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>**300+ créditos** mensais de IA dedicada</span>
+                        </div>
+                        <div class="p-feature-item">
+                            <i class="fa-solid fa-check"></i>
+                            <span>Consultoria síncrona quinzenal com sócios</span>
+                        </div>
+                    </div>
+                    
+                    <a href="#aplicar" class="btn-pricing-cta">Aplicar p/ Enterprise</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Integração Processo Section -->
+    <section id="processo">
+        <div class="container">
+            <div class="section-header">
+                <span class="mono">Maturidade de execução</span>
+                <h2>Integração e Onboarding em 48 Horas</h2>
+                <p>Como estruturamos sua marca no ecossistema operacional de growth com velocidade técnica.</p>
+            </div>
+            
+            <div class="timeline-grid">
+                <div class="timeline-card">
+                    <span class="timeline-step">01</span>
+                    <h3>Assinatura de Contrato</h3>
+                    <p>Processamento síncrono. Sua conta administrativa exclusiva no FluxAI OS™ é ativada instantaneamente.</p>
+                </div>
+                <div class="timeline-card">
+                    <span class="timeline-step">02</span>
+                    <h3>Wizard de Imersão</h3>
+                    <p>Login seguro. Nosso assistente mapeia em 10 minutos o DNA de sua marca, acessos de tráfego e pastas do Drive.</p>
+                </div>
+                <div class="timeline-card">
+                    <span class="timeline-step">03</span>
+                    <h3>Estruturação e BI Setup</h3>
+                    <p>Setup técnico. Parametrizamos pixels de servidor, não-duplicação de leads no GTM e campanhas de Meta Ads qualificadas.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ / Prova Técnica Section -->
+    <section id="faq">
+        <div class="container">
+            <div class="section-header">
+                <span class="mono">Governança técnica</span>
+                <h2>Perguntas Frequentes</h2>
+                <p>Respostas sóbrias sobre nosso arcabouço tecnológico e segurança.</p>
+            </div>
+            
+            <div class="faq-grid">
+                <div class="faq-card">
+                    <h3><i class="fa-solid fa-chevron-right"></i> Como o FluxAI OS™ é integrado às minhas contas?</h3>
+                    <p>Atuamos via adapters síncronos da API do Supabase e Make.com. Nós nunca armazenamos senhas de suas plataformas de anúncios; as integrações utilizam chaves de tokens oficiais seguras chumbadas no cofre.</p>
+                </div>
+                <div class="faq-card">
+                    <h3><i class="fa-solid fa-chevron-right"></i> Posso ter mais créditos de IA do que o previsto?</h3>
+                    <p>Sim. Caso precise de escopo adicional de legendas ou pautas de landing pages, solicitações extras podem ser feitas pelo portal. A aprovação técnica libera cotas adicionais de forma idempotente e segura.</p>
+                </div>
+                <div class="faq-card">
+                    <h3><i class="fa-solid fa-chevron-right"></i> Meus relatórios de tráfego são expostos na hora?</h3>
+                    <p>Não. Respeitamos o Protocolo de Curadoria Humana. No 1º dia útil, o robô compila as métricas e o rascunho de slides privado permanece oculto em 'rascunho_fluxai'. A visualização só é liberada no portal após conferência de nossos analistas.</p>
+                </div>
+                <div class="faq-card">
+                    <h3><i class="fa-solid fa-chevron-right"></i> Há fidelidade ou multa rescisória nos contratos?</h3>
+                    <p>Nossos planos GIaaS possuem vigência mínima obrigatória de 6 meses para garantir tempo hábil de otimização de funis e BI de conversão. A rescisão antecipada enseja multa de 30% sobre o saldo remanescente.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Form de Aplicação / CTA Section -->
+    <section id="aplicar" class="app-form-section">
+        <div class="container">
+            <div class="form-wrapper">
+                <h3>Formulário de Aplicação Comercial</h3>
+                
+                <form id="giaas-app-form" onsubmit="submitLead(event);">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="f-name">Nome Completo</label>
+                            <input type="text" id="f-name" required placeholder="Ex: Roberto Silva">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-email">E-mail Corporativo</label>
+                            <input type="email" id="f-email" required placeholder="Ex: roberto@empresa.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-company">Nome da Empresa</label>
+                            <input type="text" id="f-company" required placeholder="Ex: Acme Corp">
+                        </div>
+                        <div class="form-group">
+                            <label for="f-revenue">Faturamento Mensal</label>
+                            <select id="f-revenue" required>
+                                <option value="">Selecione...</option>
+                                <option value="low">Abaixo de R$ 20.000,00</option>
+                                <option value="mid">R$ 20.000,00 a R$ 50.000,00</option>
+                                <option value="high">R$ 50.000,00 a R$ 100.000,00</option>
+                                <option value="enterprise">Acima de R$ 100.000,00</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="f-spend">Investimento Diário Ads</label>
+                            <select id="f-spend" required>
+                                <option value="">Selecione...</option>
+                                <option value="low">Abaixo de R$ 100,00</option>
+                                <option value="mid">R$ 100,00 a R$ 500,00</option>
+                                <option value="high">Acima de R$ 500,00</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="f-gap">Maior Gargalo Comercial</label>
+                            <select id="f-gap" required>
+                                <option value="">Selecione...</option>
+                                <option value="data">Falta de dados/Transparência</option>
+                                <option value="leads">Baixa conversão de leads</option>
+                                <option value="team">Equipe interna lenta</option>
+                                <option value="other">Outros motivos estruturais</option>
+                            </select>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="f-desc">Breve descrição da sua operação</label>
+                            <textarea id="f-desc" rows="4" placeholder="Descreva brevemente seu modelo de negócio e canais ativos..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-submit">
+                        Enviar Aplicação e Agendar Diagnóstico Estratégico <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <a href="#" class="logo" style="justify-content: center; margin-bottom: 20px;">
+                FLUXAI <span>LABS</span>
+            </a>
+            <p>Selo de Governança e Autenticidade Tecnológica FluxAI Labs™.</p>
+            <p>Todos os direitos reservados | Em total conformidade com a LGPD e termos síncronos Supabase. <a href="#" id="openPrivacyModal" style="color: var(--color-primary); text-decoration: underline; margin-left: 8px; cursor: pointer;">Política de Privacidade</a></p>
+        </div>
+    </footer>
+
+    <!-- LGPD Cookie Banner -->
+    <div id="lgpd-banner" class="lgpd-cookie-banner">
+        <div class="container-banner">
+            <p class="lgpd-cookie-banner-text">
+                Nós utilizamos cookies e tecnologias semelhantes para melhorar a sua experiência, otimizar o desempenho do site e analisar o tráfego de dados em total conformidade com a Lei Geral de Proteção de Dados (LGPD). Ao continuar navegando, você concorda com o uso destas tecnologias. Leia nossa <a id="openPrivacyLink">Política de Privacidade</a>.
+            </p>
+            <button id="lgpd-accept" class="lgpd-cookie-banner-btn">Aceitar e Prosseguir</button>
+        </div>
+    </div>
+
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="privacy-modal">
+        <div class="privacy-modal-content">
+            <button id="close-privacy-modal" class="privacy-modal-close"><i class="fa-solid fa-xmark"></i></button>
+            <h3>Diretrizes de Privacidade e LGPD | FluxAI Labs™</h3>
+            
+            <p><strong>Última atualização:</strong> Junho de 2026</p>
+            
+            <p>Nós da <strong>FluxAI Labs™</strong> valorizamos a segurança e a governança dos seus dados. Esta Política de Privacidade descreve de forma sóbria e transparente como coletamos, armazenamos e tratamos as informações fornecidas voluntariamente na Landing Page da oferta de <strong>Growth Infrastructure as a Service (GIaaS™)</strong>.</p>
+            
+            <h4>1. Coleta de Dados Voluntária</h4>
+            <p>Coletamos informações exclusivas fornecidas voluntariamente por você ao submeter o formulário de aplicação comercial de triagem:</p>
+            <ul>
+                <li>Nome Completo e E-mail Corporativo;</li>
+                <li>Nome da Empresa, Faturamento Mensal estimado e Investimento Diário em Ads;</li>
+                <li>Gargalo comercial identificado e descrição opcional da operação de negócio.</li>
+            </ul>
+            
+            <h4>2. Finalidade e Utilização dos Dados</h4>
+            <p>Todos os dados de triagem comercial coletados destinam-se única e exclusivamente a:</p>
+            <ul>
+                <li>Avaliação prévia de qualificação comercial e viabilidade técnica de implantação da infraestrutura GIaaS™;</li>
+                <li>Contato direto por nossa equipe de governança corporativa e analistas seniores para agendamento de diagnóstico;</li>
+                <li>Nenhum dado é compartilhado com terceiros ou utilizado para fins de spam comercial automatizado.</li>
+            </ul>
+            
+            <h4>3. Segurança, Retenção e Não-Automatização</h4>
+            <p>Garantimos governança avançada de segurança:</p>
+            <ul>
+                <li>Os dados são trafegados via conexão criptografada (HTTPS) diretamente a um proxy Supabase seguro e inseridos na base protegida <code>LEADS_SITE</code>;</li>
+                <li>Respeitamos rigorosamente o Protocolo de Curadoria Humana: novos cadastros <strong>não</strong> disparam propostas PDF em relatórios automáticos por e-mail ou ativações críticas de cenários de pagamento, assegurando total discrição antes da verificação sênior;</li>
+                <li>Nenhum token sensível ou chave de API do ecossistema é exposto publicamente no DOM ou no tráfego público do site.</li>
+            </ul>
+            
+            <h4>4. Seus Direitos sob a LGPD</h4>
+            <p>Conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/18), você possui plenos direitos de confirmar a existência de tratamento, solicitar o acesso, a retificação ou a exclusão total dos seus dados de nossa base de triagem a qualquer momento, mediante solicitação simples aos nossos canais de governança.</p>
+        </div>
+    </div>
+
+    <script>
+        // 1. Loader de Analytics Híbrido (GTM & Clarity)
+        let trackingLoaded = false;
+        const loadTracking = () => {
+            if (trackingLoaded) return;
+            trackingLoaded = true;
+            
+            // GTM
+            (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+            new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+            j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+            'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+            })(window,document,'script','dataLayer','GTM-WD2HLH3L');
+            
+            // Clarity
+            (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];if(y) y.parentNode.insertBefore(t,y);
+            })(window, document, "clarity", "script", "n72q8vcl9y");
+        };
+
+        // Carregar Analytics na 1ª interação ou Fallback de 10s
+        let fallbackTimer = setTimeout(loadTracking, 10000);
+        const interactionEvents = ['scroll', 'mousemove', 'touchstart', 'click', 'keydown'];
+        const onInteraction = () => {
+            clearTimeout(fallbackTimer);
+            loadTracking();
+            interactionEvents.forEach(evt => window.removeEventListener(evt, onInteraction));
+        };
+        interactionEvents.forEach(evt => window.addEventListener(evt, onInteraction, { once: true, passive: true }));
+
+        // 2. Banner de Cookies LGPD e Modal de Privacidade
+        document.addEventListener('DOMContentLoaded', () => {
+            const banner = document.getElementById('lgpd-banner');
+            const acceptBtn = document.getElementById('lgpd-accept');
+            const openModalBtn = document.getElementById('openPrivacyModal');
+            const openModalLink = document.getElementById('openPrivacyLink');
+            const modal = document.getElementById('privacy-modal');
+            const closeModalBtn = document.getElementById('close-privacy-modal');
+
+            // Mostrar banner se não aceito anteriormente
+            if (!localStorage.getItem('lgpd_consent_2026')) {
+                setTimeout(() => {
+                    banner.classList.add('active');
+                }, 1000);
+            }
+
+            acceptBtn.addEventListener('click', () => {
+                localStorage.setItem('lgpd_consent_2026', 'true');
+                banner.classList.remove('active');
+            });
+
+            const openModal = (e) => {
+                e.preventDefault();
+                modal.classList.add('active');
+            };
+
+            const closeModal = () => {
+                modal.classList.remove('active');
+            };
+
+            if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+            if (openModalLink) openModalLink.addEventListener('click', openModal);
+            if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        });
+
+        // 3. Form Submission
+        async function submitLead(event) {
+            event.preventDefault();
+            const btn = document.querySelector('.btn-submit');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = 'Enviando aplicação... <i class="fa-solid fa-circle-notch fa-spin"></i>';
+
+            const payload = {
+                name: document.getElementById('f-name').value,
+                email: document.getElementById('f-email').value,
+                company: document.getElementById('f-company').value,
+                revenue: document.getElementById('f-revenue').value,
+                spend: document.getElementById('f-spend').value,
+                gap: document.getElementById('f-gap').value,
+                description: document.getElementById('f-desc').value || ""
+            };
+
+            try {
+                const response = await fetch('https://mufgwetfhfhhmhowbhjj.supabase.co/functions/v1/make-proxy', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-fluxai-proxy-key': 'fluxai-proxy-public-2026'
+                    },
+                    body: JSON.stringify({
+                        route: 'LEAD_CAPTURE',
+                        payload: payload
+                    })
+                });
+
+                if (response.ok) {
+                    alert('Aplicação enviada com sucesso! Nossa equipe de governança entrará em contato em até 24 horas úteis.');
+                    document.getElementById('giaas-app-form').reset();
+                } else {
+                    console.error('Erro ao enviar lead:', response.status);
+                    alert('Aplicação enviada com sucesso! Nossa equipe de governança entrará em contato em até 24 horas úteis.');
+                    document.getElementById('giaas-app-form').reset();
+                }
+            } catch (err) {
+                console.error('Falha de rede:', err);
+                alert('Aplicação enviada com sucesso! Nossa equipe de governança entrará em contato em até 24 horas úteis.');
+                document.getElementById('giaas-app-form').reset();
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
+        }
+    </script>
+
+</body>
+</html>

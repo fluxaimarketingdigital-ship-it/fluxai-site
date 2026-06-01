@@ -37,6 +37,12 @@
       "permanent": true
     }
   ],
+  "rewrites": [
+    {
+      "source": "/giaas",
+      "destination": "/giaas.html"
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

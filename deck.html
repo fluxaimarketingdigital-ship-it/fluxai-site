@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apresentação Executiva GIaaS™ | FluxAI Labs™</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Vanilla CSS Slide System styling -->
+    <style>
+        :root {
+            --color-bg: #070708;
+            --color-surface: rgba(20, 20, 22, 0.8);
+            --color-primary: #8e9e68;
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-text: #f3f4f6;
+            --color-text-muted: #8e949f;
+            --color-text-white: #ffffff;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        /* Reset and Base styling */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-main);
+            background: radial-gradient(circle at 50% 0%, #151a10 0%, var(--color-bg) 75%);
+        }
+
+        /* Slide Container */
+        .slide-deck {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Individual Slide Window */
+        .slide {
+            position: absolute;
+            width: 90%;
+            max-width: 1100px;
+            height: 80%;
+            max-height: 650px;
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 60px;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            opacity: 0;
+            visibility: hidden;
+            transform: scale(0.96) translateY(10px);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+        }
+
+        /* Active Slide Animation */
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+            transform: scale(1) translateY(0);
+            z-index: 10;
+        }
+
+        /* Typography */
+        h2 {
+            font-size: 2.25rem;
+            font-weight: 900;
+            letter-spacing: -0.03em;
+            color: var(--color-text-white);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        h2 i {
+            color: var(--color-primary);
+            font-size: 1.75rem;
+        }
+
+        p {
+            color: var(--color-text-muted);
+            font-size: 1rem;
+            line-height: 1.6;
+        }
+
+        .mono-tag {
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--color-primary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        /* UI Elements and Grid Layouts */
+        .slide-content {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-grid-2 {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 40px;
+            width: 100%;
+            align-items: center;
+        }
+
+        .slide-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* Slide Footer information */
+        .slide-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            padding-top: 25px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+        }
+
+        .slide-footer span.footer-logo {
+            color: var(--color-text-white);
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .slide-footer span.footer-logo span {
+            color: var(--color-primary);
+        }
+
+        /* Slide Navigation Controls */
+        .nav-controls {
+            position: absolute;
+            bottom: 4%;
+            display: flex;
+            gap: 20px;
+            z-index: 20;
+        }
+
+        .nav-arrow {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: #fff;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .nav-arrow:hover {
+            background: var(--color-primary);
+            color: #000;
+            border-color: var(--color-primary);
+            transform: scale(1.1);
+        }
+
+        .progress-dots {
+            position: absolute;
+            right: 5%;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            z-index: 20;
+        }
+
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.15);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .progress-dot.active {
+            background: var(--color-primary);
+            transform: scale(1.4);
+            box-shadow: 0 0 10px rgba(142, 158, 104, 0.4);
+        }
+
+        /* Slide 1 Custom - Capa */
+        .slide-capa {
+            text-align: center;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .slide-capa h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            background: linear-gradient(180deg, #ffffff 0%, #9ca3af 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .slide-capa p {
+            font-size: 1.15rem;
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* Card Elements */
+        .card-bullet {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 24px;
+            transition: var(--transition);
+        }
+
+        .card-bullet:hover {
+            border-color: var(--color-primary);
+            background: rgba(255,255,255,0.03);
+        }
+
+        .card-bullet i {
+            font-size: 1.25rem;
+            color: var(--color-primary);
+            margin-bottom: 12px;
+            display: inline-block;
+        }
+
+        .card-bullet.danger i {
+            color: #ef4444;
+        }
+
+        .card-bullet h4 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .card-bullet p {
+            font-size: 0.8rem;
+            line-height: 1.6;
+        }
+
+        /* Mockup del OS minimal */
+        .mockup-os-lite {
+            background: rgba(0,0,0,0.6);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 18px;
+            font-family: var(--font-main);
+        }
+
+        .mockup-header-lite {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        .mockup-bullets {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .mockup-b-item {
+            font-size: 0.7rem;
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 10px;
+            background: rgba(255,255,255,0.01);
+            border-radius: 4px;
+            border-left: 2px solid var(--color-primary);
+        }
+
+        .mockup-b-item span.status {
+            font-family: var(--font-mono);
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        /* Slide 6 Custom - Pricing Table */
+        .pricing-deck-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            width: 100%;
+        }
+
+        .pricing-deck-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            transition: var(--transition);
+        }
+
+        .pricing-deck-card.featured {
+            border-color: var(--color-primary);
+            background: linear-gradient(180deg, rgba(142,158,104,0.03) 0%, rgba(20,20,22,0.8) 100%);
+        }
+
+        .pricing-deck-card h4 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .pricing-deck-card .price {
+            font-family: var(--font-mono);
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--color-primary);
+        }
+
+        .pricing-deck-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+        }
+
+        .pricing-deck-card ul li i {
+            color: var(--color-primary);
+            margin-right: 6px;
+        }
+
+        /* Timeline Process standard styles */
+        .timel-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        .timel-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            padding: 30px 24px;
+            position: relative;
+        }
+
+        .timel-step {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            width: 32px;
+            height: 32px;
+            background: var(--color-primary);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-weight: 800;
+            font-size: 0.9rem;
+        }
+
+        .timel-card h4 {
+            margin-top: 10px;
+            font-size: 1rem;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .timel-card p {
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="slide-deck">
+        
+        <!-- Slide 1: Abertura (Capa) -->
+        <div class="slide slide-capa active" id="slide-0">
+            <div>
+                <span class="mono-tag">Growth Infrastructure as a Service</span>
+                <h1>Apresentação Executiva GIaaS™</h1>
+                <p>A transição estrutural da sua marca para uma operação de marketing baseada em dados, BI síncrono e automações de IA proprietárias.</p>
+            </div>
+            <div class="slide-footer" style="width: 100%;">
+                <span class="footer-logo">FLUXAI <span>LABS</span></span>
+                <span>Slide 01 / 07</span>
+            </div>
+        </div>
+
+        <!-- Slide 2: O Diagnóstico Invisível (Problemas) -->
+        <div class="slide" id="slide-1">
+            <span class="mono-tag">A Crítica Executiva</span>
+            <h2><i class="fa-solid fa-search"></i> O Diagnóstico Invisível das Operações</h2>
+            
+            <div class="slide-content">
+                <div class="slide-grid-3">
+                    <div class="card-bullet danger">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        <h4>Opacidade de Dados</h4>
+                        <p>Foco excessivo em métricas de vaidade (curtidas, cliques) enquanto o CAC real em Meta Ads explode sem rastreamento.</p>
+                    </div>
+                    <div class="card-bullet danger">
+                        <i class="fa-solid fa-eye-slash"></i>
+                        <h4>Falta de Transparência</h4>
+                        <p>O que o time de marketing executou nas últimas 48 horas? Ausência de portal de controle e atrasos de relatórios.</p>
+                    </div>
+                    <div class="card-bullet danger">
+                        <i class="fa-solid fa-clock"></i>
+                        <h4>Gargalos de Equipe</h4>
+                        <p>Criações manuais burocráticas, legendas sem o DNA real e lentidão de equipe que travam a escalabilidade.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <span class="footer-logo">FLUXAI <span>LABS</span></span>
+                <span>Slide 02 / 07</span>
+            </div>
+        </div>
+
+        <!-- Slide 3: O Reposicionamento (Growth Ops) -->
+        <div class="slide" id="slide-2">
+            <span class="mono-tag">Metodologia de Elite</span>
+            <h2><i class="fa-solid fa-chart-line"></i> A Metodologia Growth Operations</h2>
+            
+            <div class="slide-content">
+                <div class="slide-grid-3">
+                    <div class="card-bullet">
+                        <i class="fa-solid fa-gears"></i>
+                        <h4>Engenharia de Dados</h4>
+                        <p>Configuração e parametrização avançada de GTM e funis de CRM, garantindo consistência e não-duplicação de leads.</p>
+                    </div>
+                    <div class="card-bullet">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                        <h4>BI de Performance</h4>
+                        <p>Gestão e otimização avançada de Meta Ads e Google Ads orientados estritamente por conversões qualificadas e ROI real.</p>
+                    </div>
+                    <div class="card-bullet">
+                        <i class="fa-solid fa-shield-halved"></i>
+                        <h4>Maturidade Operacional</h4>
+                        <p>A agência executa, o software proprietário prova a conformidade e os relatórios chancelam a inteligência estratégica.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <span class="footer-logo">FLUXAI <span>LABS</span></span>
+                <span>Slide 03 / 07</span>
+            </div>
+        </div>
+
+        <!-- Slide 4: A Prova Técnica (FluxAI OS) -->
+        <div class="slide" id="slide-3">
+            <span class="mono-tag">Diferenciação Tecnológica</span>
+            <h2><i class="fa-solid fa-laptop-code"></i> A Central Proprietária de Comando</h2>
+            
+            <div class="slide-content">
+                <div class="slide-grid-2">
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <p>O **FluxAI OS™** é nossa plataforma proprietária de comando de dados de alta velocidade que elimina a caixa preta tradicional, oferecendo controle estrito de estados e governança operacional em tempo real:</p>
+                        <div class="mockup-b-item" style="border-color: var(--color-primary); background: transparent; padding-left: 0;">
+                            <span>Command Center: Métricas consolidadas em tempo real integradas a barramentos de dados síncronos e automação.</span>
+                        </div>
+                        <div class="mockup-b-item" style="border-color: var(--color-primary); background: transparent; padding-left: 0;">
+                            <span>Flux Calendar: Mesa editorial integrada para aprovação de criativos e pautas com um clique.</span>
+                        </div>
+                        <div class="mockup-b-item" style="border-color: var(--color-primary); background: transparent; padding-left: 0;">
+                            <span>Curadoria de Relatórios: Relatórios de desempenho gerados e atualizados em tempo real de forma privada.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mockup-os-lite">
+                        <div class="mockup-header-lite">
+                            <div style="font-weight: 800; font-size: 0.75rem; color: #fff;">FLUXAI_OS_LIVE</div>
+                            <span style="font-size: 0.55rem; color: #10b981; font-family: var(--font-mono); font-weight: 700;">CONECTADO</span>
+                        </div>
+                        <div class="mockup-bullets">
+                            <div class="mockup-b-item">
+                                <span>Métricas diárias GA4</span>
+                                <span class="status">SYNCED</span>
+                            </div>
+                            <div class="mockup-b-item">
+                                <span>Relatório Maio/2026</span>
+                                <span class="status">DRAFT</span>
+                            </div>
+                            <div class="mockup-b-item">
+                                <span>Logs de IA (Cofre Privado)</span>
+                                <span class="status">ACTIVE</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <span class="footer-logo">FLUXAI <span>LABS</span></span>
+                <span>Slide 04 / 07</span>
+            </div>
+        </div>
+
+        <!-- Slide 5: IA na Prática (Infraestrutura) -->
+        <div class="slide" id="slide-4">
+            <span class="mono-tag">Governança e Eficiência</span>
+            <h2><i class="fa-solid fa-robot"></i> Inteligência Artificial Proprietária</h2>
+            
+            <div class="slide-content">
+                <div class="slide-grid-3">
+                    <div class="card-bullet">
+                        <i class="fa-solid fa-coins"></i>
+                        <h4>Créditos Auditados</h4>
+                        <p>Limites mensais de processamento inteligente e transparente de inteligência artificial vinculados ao contrato.</p>
+                    </div>
+                    <div class="card-bullet">
+                        <i class="fa-solid fa-box-archive"></i>
+                        <h4>Governança de Armazenamento Seguro</h4>
+                        <p>Prompts brutos armazenados de forma privada em nosso cofre de arquivos, mantendo os débitos auditados em nosso livro-razão de governança de forma leve e rápida.</p>
+                    </div>
+                    <div class="card-bullet">
+                        <i class="fa-solid fa-shield-check"></i>
+                        <h4>Prevenção de Custos Duplicados</h4>
+                        <p>Garantia de faturamento único contra dupla cobrança de serviços de inteligência artificial em solicitações avulsas.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <span class="footer-logo">FLUXAI <span>LABS</span></span>
+                <span>Slide 05 / 07</span>
+            </div>
+        </div>
+
+        <!-- Slide 6: A Grade de Ofertas GIaaS (Planos) -->
+        <div class="slide" id="slide-5">
+            <span class="mono-tag">Estruturação Híbrida</span>
+            <h2><i class="fa-solid fa-tags"></i> Grade de Ofertas Recorrentes GIaaS™</h2>
+            
+            <div class="slide-content">
+                <div class="pricing-deck-grid">
+                    <div class="pricing-deck-card">
+                        <h4>GIaaS ENTRY</h4>
+                        <div class="price">R$ 5.000<span style="font-size: 0.7rem; color: var(--color-text-muted);">/mês</span></div>
+                        <ul>
+                            <li><i class="fa-solid fa-check"></i> Anúncios Meta Ads</li>
+                            <li><i class="fa-solid fa-check"></i> 1 Licença do OS</li>
+                            <li><i class="fa-solid fa-check"></i> 50 Créditos IA</li>
+                        </ul>
+                    </div>
+                    <div class="pricing-deck-card featured">
+                        <h4>GIaaS SCALE</h4>
+                        <div class="price">R$ 8.500<span style="font-size: 0.7rem; color: var(--color-text-muted);">/mês</span></div>
+                        <ul>
+                            <li><i class="fa-solid fa-check"></i> Meta + Google Ads</li>
+                            <li><i class="fa-solid fa-check"></i> 3 Licenças do OS</li>
+                            <li><i class="fa-solid fa-check"></i> 150 Créditos IA</li>
+                            <li><i class="fa-solid fa-check"></i> Curadoria de Relatório</li>
+                        </ul>
+                    </div>
+                    <div class="pricing-deck-card">
+                        <h4>GIaaS ENTERPRISE</h4>
+                        <div class="price">R$ 15.000<span style="font-size: 0.7rem; color: var(--color-text-muted);">/mês</span></div>
+                        <ul>
+                            <li><i class="fa-solid fa-check"></i> SLA Dados Dedicado</li>
+                            <li><i class="fa-solid fa-check"></i> Licenças Ilimitadas OS</li>
+                            <li><i class="fa-solid fa-check"></i> 300+ Créditos IA</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <span class="footer-logo">FLUXAI <span>LABS</span></span>
+                <span>Slide 06 / 07</span>
+            </div>
+        </div>
+
+        <!-- Slide 7: Próximos Passos (Onboarding) -->
+        <div class="slide" id="slide-6">
+            <span class="mono-tag">Alinhamento de Largada</span>
+            <h2><i class="fa-solid fa-route"></i> Integração e Onboarding em 48 Horas</h2>
+            
+            <div class="slide-content">
+                <div class="timel-grid">
+                    <div class="timel-card">
+                        <span class="timel-step">01</span>
+                        <h4>Assinatura e Setup</h4>
+                        <p>Acesso imediato. Sua conta exclusiva no FluxAI OS™ é gerada e ativada instantaneamente.</p>
+                    </div>
+                    <div class="timel-card">
+                        <span class="timel-step">02</span>
+                        <h4>Wizard de Imersão</h4>
+                        <p>Nosso assistente mapeia em 10 minutos o DNA de sua marca, acessos de tráfego e estruturas privadas do Drive.</p>
+                    </div>
+                    <div class="timel-card">
+                        <span class="timel-step">03</span>
+                        <h4>Estruturação e BI</h4>
+                        <p>Setup técnico. Parametrizamos pixels de servidor, não-duplicação de leads e campanhas de alta conversão.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="slide-footer">
+                <span class="footer-logo">FLUXAI <span>LABS</span></span>
+                <span>Slide 07 / 07</span>
+            </div>
+        </div>
+
+        <!-- Navigation Arrows -->
+        <div class="nav-controls">
+            <button class="nav-arrow" id="prev-btn"><i class="fa-solid fa-arrow-left"></i></button>
+            <button class="nav-arrow" id="next-btn"><i class="fa-solid fa-arrow-right"></i></button>
+        </div>
+
+        <!-- Progress Dots -->
+        <div class="progress-dots" id="dots-container">
+            <!-- Renderizado dinamicamente via JS -->
+        </div>
+
+    </div>
+
+    <!-- Slide Engine Logic -->
+    <script>
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const dotsContainer = document.getElementById('dots-container');
+        
+        let currentSlide = 0;
+
+        // Render Dots
+        slides.forEach((slide, index) => {
+            const dot = document.createElement('div');
+            dot.className = `progress-dot ${index === 0 ? 'active' : ''}`;
+            dot.addEventListener('click', () => goToSlide(index));
+            dotsContainer.appendChild(dot);
+        });
+
+        const dots = document.querySelectorAll('.progress-dot');
+
+        function updateSlideClasses() {
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.add('active');
+                } else {
+                    slide.classList.remove('active');
+                }
+            });
+            
+            dots.forEach((dot, index) => {
+                if (index === currentSlide) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
+
+        function goToSlide(index) {
+            currentSlide = index;
+            updateSlideClasses();
+        }
+
+        function nextSlide() {
+            currentSlide = (currentSlide + 1) % slides.length;
+            updateSlideClasses();
+        }
+
+        function prevSlide() {
+            currentSlide = (currentSlide - 1 + slides.length) % slides.length;
+            updateSlideClasses();
+        }
+
+        nextBtn.addEventListener('click', nextSlide);
+        prevBtn.addEventListener('click', prevSlide);
+
+        // Keyboard Controls
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                prevSlide();
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposta Comercial GIaaS™ SCALE | FluxAI Labs™</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --color-bg: #070708;
+            --color-surface: #0e0e11;
+            --color-surface-card: #141418;
+            --color-primary: #8e9e68;
+            --color-primary-dark: #6e7e4e;
+            --color-primary-light: #a4b480;
+            --color-border: rgba(255, 255, 255, 0.08);
+            --color-text: #e5e7eb;
+            --color-text-muted: #9ca3af;
+            --color-text-white: #ffffff;
+            --font-title: 'Outfit', sans-serif;
+            --font-main: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset and Base */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            background-color: var(--color-bg);
+        }
+
+        body {
+            background-color: var(--color-bg);
+            color: var(--color-text);
+            font-family: var(--font-main);
+            line-height: 1.6;
+            padding: 60px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: radial-gradient(circle at 50% 0%, #151a10 0%, var(--color-bg) 60%);
+            background-attachment: fixed;
+        }
+
+        /* Proposal Container */
+        .proposal-paper {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 900px;
+            padding: 60px;
+            box-shadow: 0 40px 80px rgba(0, 0, 0, 0.6);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .proposal-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary-dark), var(--color-primary), var(--color-primary-light));
+        }
+
+        /* Header block */
+        .proposal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--color-border);
+            padding-bottom: 40px;
+            margin-bottom: 40px;
+        }
+
+        .logo-area {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .logo-text {
+            font-family: var(--font-title);
+            font-size: 1.75rem;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+            color: var(--color-text-white);
+        }
+
+        .logo-text span {
+            color: var(--color-primary);
+        }
+
+        .logo-tagline {
+            font-family: var(--font-mono);
+            font-size: 0.65rem;
+            color: var(--color-primary);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .proposal-meta {
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            color: var(--color-text-muted);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .proposal-id {
+            color: var(--color-primary);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        /* Titles styling */
+        h1 {
+            font-family: var(--font-title);
+            font-size: 2.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            color: var(--color-text-white);
+            margin-bottom: 15px;
+            letter-spacing: -0.03em;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            color: var(--color-text-muted);
+            margin-bottom: 40px;
+            max-width: 700px;
+            font-weight: 300;
+        }
+
+        h2 {
+            font-family: var(--font-title);
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--color-text-white);
+            margin-top: 45px;
+            margin-bottom: 20px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        h2 i {
+            color: var(--color-primary);
+            font-size: 1.1rem;
+        }
+
+        h3 {
+            font-family: var(--font-title);
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--color-text-white);
+            margin-top: 25px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        p {
+            font-size: 0.925rem;
+            color: var(--color-text-muted);
+            line-height: 1.7;
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        strong {
+            color: var(--color-text-white);
+            font-weight: 600;
+        }
+
+        /* Parties grid */
+        .parties-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+            background: var(--color-surface-card);
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            padding: 25px;
+        }
+
+        .party-card h4 {
+            font-family: var(--font-title);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+        }
+
+        .party-card ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            font-size: 0.825rem;
+            color: var(--color-text-muted);
+        }
+
+        .party-card ul li strong {
+            font-weight: 500;
+        }
+
+        /* Service Cards and List style */
+        .service-block {
+            margin-bottom: 25px;
+        }
+
+        .bullet-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .bullet-list li {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            padding-left: 25px;
+            position: relative;
+            line-height: 1.6;
+        }
+
+        .bullet-list li::before {
+            content: "\f058";
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            color: var(--color-primary);
+            position: absolute;
+            left: 0;
+            top: 2px;
+            font-size: 0.85rem;
+        }
+
+        /* Pricing Table */
+        .pricing-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            font-size: 0.9rem;
+        }
+
+        .pricing-table th, .pricing-table td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .pricing-table th {
+            background-color: rgba(255, 255, 255, 0.02);
+            color: var(--color-text-white);
+            font-family: var(--font-title);
+            font-weight: 600;
+        }
+
+        .pricing-table td {
+            color: var(--color-text-muted);
+        }
+
+        .pricing-table tr:hover td {
+            color: var(--color-text-white);
+            background-color: rgba(255, 255, 255, 0.01);
+        }
+
+        .price-highlight {
+            font-family: var(--font-mono);
+            color: var(--color-primary) !important;
+            font-weight: 700;
+            font-size: 1.05rem;
+        }
+
+        /* Info Alert Boxes */
+        .alert-box {
+            background: rgba(142, 158, 104, 0.05);
+            border-left: 3px solid var(--color-primary);
+            border-radius: 4px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .alert-box h4 {
+            font-family: var(--font-title);
+            color: var(--color-text-white);
+            font-size: 0.95rem;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .alert-box h4 i {
+            color: var(--color-primary);
+        }
+
+        .alert-box p {
+            margin-bottom: 0;
+            font-size: 0.85rem;
+            text-align: left;
+        }
+
+        /* Steps Layout */
+        .steps-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .step-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .step-num {
+            font-family: var(--font-mono);
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .step-card h4 {
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            color: var(--color-text-white);
+            margin-bottom: 8px;
+        }
+
+        .step-card p {
+            font-size: 0.775rem;
+            line-height: 1.6;
+            margin-bottom: 0;
+        }
+
+        /* Signatures Area */
+        .signatures-area {
+            margin-top: 60px;
+            border-top: 1px solid var(--color-border);
+            padding-top: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .signature-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .signature-line {
+            width: 100%;
+            max-width: 280px;
+            height: 1px;
+            background: var(--color-text-muted);
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .signature-block p {
+            text-align: center;
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        .signature-block .name {
+            color: var(--color-text-white);
+            font-weight: 600;
+        }
+
+        .signature-block .role {
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--color-primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Export PDF / Print Button */
+        .action-bar {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .btn-print {
+            background-color: var(--color-primary);
+            color: #070708;
+            border: none;
+            border-radius: 50px;
+            padding: 14px 28px;
+            font-family: var(--font-title);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(142, 158, 104, 0.4);
+            transition: var(--transition);
+        }
+
+        .btn-print:hover {
+            background-color: var(--color-primary-light);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(142, 158, 104, 0.5);
+        }
+
+        /* Printing adjustments */
+        @media print {
+            body {
+                background: #fff !important;
+                color: #111 !important;
+                padding: 0 !important;
+            }
+            .proposal-paper {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+                background: #fff !important;
+            }
+            .proposal-paper::before {
+                display: none;
+            }
+            h1, h2, h3, h4, strong {
+                color: #000 !important;
+            }
+            p, td, li, .step-card p {
+                color: #333 !important;
+            }
+            .parties-grid, .step-card {
+                background: #f9f9f9 !important;
+                border: 1px solid #ddd !important;
+            }
+            .action-bar {
+                display: none !important;
+            }
+            .pricing-table th {
+                background: #eee !important;
+                color: #000 !important;
+                border-bottom: 2px solid #ccc !important;
+            }
+            .price-highlight {
+                color: #000 !important;
+            }
+            .alert-box {
+                background: #f5f5f5 !important;
+                border-left: 3px solid #666 !important;
+            }
+            .step-num {
+                color: #000 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="proposal-paper">
+        
+        <!-- Header -->
+        <div class="proposal-header">
+            <div class="logo-area">
+                <div class="logo-text">FLUXAI <span>LABS</span></div>
+                <div class="logo-tagline">Growth Operations & BI Labs</div>
+            </div>
+            <div class="proposal-meta">
+                <span class="proposal-id">PROP_2026_004</span>
+                <span>Emissão: 31 de Maio de 2026</span>
+                <span>Validade: 7 dias corridos</span>
+            </div>
+        </div>
+
+        <!-- Title -->
+        <h1>Proposta Comercial Prestadora de Serviços</h1>
+        <div class="subtitle">Integração e implantação de Growth Infrastructure as a Service (GIaaS™) — Plano SCALE</div>
+
+        <!-- Parties Block -->
+        <div class="parties-grid">
+            <div class="party-card">
+                <h4>Proponente</h4>
+                <ul>
+                    <li><strong>Prestadora:</strong> FluxAI Labs™</li>
+                    <li><strong>CNPJ:</strong> [REDIGIDO]</li>
+                    <li><strong>Contato:</strong> comercial@fluxailabs.com.br</li>
+                    <li><strong>Local:</strong> São Paulo, SP</li>
+                </ul>
+            </div>
+            <div class="party-card">
+                <h4>Contratante</h4>
+                <ul>
+                    <li><strong>Empresa / Razão:</strong> [Razão Social do Cliente]</li>
+                    <li><strong>CNPJ:</strong> [REDIGIDO]</li>
+                    <li><strong>Representante:</strong> [Nome do Diretor / C-Level]</li>
+                    <li><strong>E-mail:</strong> [E-mail Corporativo]</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- 1. Diagnóstico -->
+        <h2><i class="fa-solid fa-circle-info"></i> 1. Diagnóstico Operacional e Escopo Inicial</h2>
+        <p>A presente proposta visa estruturar uma infraestrutura integrada de dados e tração para eliminar a opacidade métrica, unificar funis de captação e automatizar processos criativos com responsabilidade. Ao invés de atuar como uma agência terceirizada tradicional, a FluxAI Labs™ integra software proprietário e engenharia operacional diretamente ao negócio do cliente, otimizando orçamentos de Meta/Google Ads.</p>
+
+        <!-- 2. Escopo do Plano -->
+        <h2><i class="fa-solid fa-list-check"></i> 2. Escopo do Plano GIaaS™ SCALE</h2>
+        <p>O plano <strong>GIaaS™ SCALE</strong> consolida uma operação contínua e robusta dividida em três frentes de tráfego, plataforma e inteligência artificial:</p>
+
+        <div class="service-block">
+            <h3><i class="fa-solid fa-chart-line"></i> Pilar 1: Performance & Growth Operations</h3>
+            <ul class="bullet-list">
+                <li><strong>Gestão Estratégica de Campanhas Paid Media:</strong> Planejamento, estruturação, otimização diária e relatórios de anúncios Meta Business (Instagram/Facebook Ads) e Google Ads.</li>
+                <li><strong>Rastreamento e Engenharia de GA4:</strong> Estruturação de Tag Manager (GTM) e metas de conversão de pixel de servidor sem maquiagem manual de cliques.</li>
+                <li><strong>Mapeamento de Funil CRM:</strong> Monitoramento e normalização no fluxo de leads para evitar a duplicação de dados, com concorrência limpa de transações.</li>
+            </ul>
+        </div>
+
+        <div class="service-block">
+            <h3><i class="fa-solid fa-terminal"></i> Pilar 2: Central Proprietária de Comando — FluxAI OS™</h3>
+            <ul class="bullet-list">
+                <li><strong>Command Center Integrado:</strong> Acesso administrativo para 3 licenças corporativas ao painel de comando de dados, mostrando status diários reais e relatórios.</li>
+                <li><strong>Flux Calendar:</strong> Mesa editorial administrativa centralizada para visualização e aprovação conceitual e de criativos com apenas um clique.</li>
+                <li><strong>Cofre Privado de Arquivos:</strong> Upload, curadoria híbrida e organização de relatórios mensais e documentos comerciais protegidos por chaves privadas em nuvem.</li>
+            </ul>
+        </div>
+
+        <div class="service-block">
+            <h3><i class="fa-solid fa-robot"></i> Pilar 3: Automação e Inteligência de Processamento</h3>
+            <ul class="bullet-list">
+                <li><strong>Processamento Inteligente Contínuo:</strong> Limite mensal de 150 créditos de inteligência artificial exclusivos para automação criativa de pautas e copywriting com base no DNA da marca.</li>
+                <li><strong>Governança de Armazenamento Seguro:</strong> Prompts brutos compactados de forma privada em nosso cofre de arquivos, mantendo os débitos de processamento devidamente auditados no livro-razão de governança, de forma leve e rápida.</li>
+            </ul>
+        </div>
+
+        <!-- 3. SLA e Governança -->
+        <h2><i class="fa-solid fa-shield-halved"></i> 3. Protocolos de SLA e Segurança Corporativa</h2>
+        <p>A prestação dos serviços regulamentados rege-se pelos seguintes critérios de qualidade, governança de dados e blindagem operacional:</p>
+        
+        <div class="alert-box">
+            <h4><i class="fa-solid fa-lock"></i> Protocolo de Rascunho & Curadoria Híbrida</h4>
+            <p>O relatório mensal gerado automaticamente pelas integrações adquire inicialmente o status de <strong><code>rascunho_fluxai</code></strong>, permanecendo confidencial e oculto no painel. A liberação de visualização corporativa ocorre exclusivamente após a curadoria e validação manual pelo ADMIN estratégico no livro-razão.</p>
+        </div>
+
+        <ul class="bullet-list">
+            <li><strong>Prevenção de Custos Duplicados:</strong> Todas as solicitações de serviços opcionais ou orçamentos adicionais utilizam um barramento com proteção de duplicidade, prevenindo cobranças repetidas.</li>
+            <li><strong>Estorno de Créditos de IA:</strong> Eventuais estornos ou reajustes de créditos de IA por geração inconsistente, descarte operacional ou revisão interna poderão ser processados em até 24 horas úteis, mediante validação da equipe FluxAI Labs.</li>
+        </ul>
+
+        <!-- 4. Investimento -->
+        <h2><i class="fa-solid fa-wallet"></i> 4. Do Investimento e Condições de Faturamento</h2>
+        <p>Para a ativação, setup e prestação de serviços continuados da engenharia operacional, definem-se os seguintes valores comerciais:</p>
+
+        <table class="pricing-table">
+            <thead>
+                <tr>
+                    <th>Rubrica Comercial</th>
+                    <th>Escopo Técnico / Entregáveis</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Taxa Única de Onboarding</strong></td>
+                    <td>Integração técnica inicial, Wizard de Imersão, criação de contas no FluxAI OS™ e estruturação do cofre de arquivos privado.</td>
+                    <td class="price-highlight">R$ 4.250,00</td>
+                </tr>
+                <tr>
+                    <td><strong>Mensalidade (GIaaS SCALE)</strong></td>
+                    <td>Gestão contínua de Ads, Analytics GA4, mesa editorial no OS, 3 licenças e 150 créditos mensais de IA.</td>
+                    <td class="price-highlight">R$ 8.500,00 / mês</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="alert-box" style="background: rgba(142, 158, 104, 0.05); border-left-color: var(--color-primary);">
+            <h4><i class="fa-solid fa-circle-exclamation"></i> Importante: Investimento em Mídia Paga</h4>
+            <p>A mensalidade e o setup não incluem verba de mídia paga. O investimento em anúncios deverá ser realizado diretamente pelo cliente, em conta própria, por cartão corporativo ou meio de pagamento aprovado nas plataformas Meta, Google ou equivalentes.</p>
+        </div>
+
+        <div class="alert-box" style="background: rgba(255, 255, 255, 0.01); border-left-color: rgba(255,255,255,0.15);">
+            <h4><i class="fa-solid fa-calendar-days"></i> Prazo de Vigência e Condições</h4>
+            <p>A vigência recomendada do projeto é de <strong>6 (seis) meses</strong> de recorrência mínima obrigatória para garantir a estabilização de funis de dados. O faturamento da mensalidade recorrente ocorre a cada 30 dias contados da ativação inicial. Pagamentos via boleto bancário ou faturamento síncrono estruturado.</p>
+        </div>
+
+        <!-- 5. Próximos Passos -->
+        <h2><i class="fa-solid fa-route"></i> 5. Integração em 3 Passos (48 Horas)</h2>
+        <div class="steps-container">
+            <div class="step-card">
+                <span class="step-num">01</span>
+                <h4>Imersão de DNA</h4>
+                <p>Mapeamento rápido em 10 minutos das pautas conceituais, guia de tom de voz da marca e acessos de tráfego.</p>
+            </div>
+            <div class="step-card">
+                <span class="step-num">02</span>
+                <h4>Setup Técnico</h4>
+                <p>Quando aplicável, o setup poderá incluir parametrização avançada de rastreamento, incluindo Pixel, eventos prioritários, UTMs e API de Conversões / CAPI do Meta Business, conforme disponibilidade técnica e permissões concedidas pelo cliente.</p>
+            </div>
+            <div class="step-card">
+                <span class="step-num">03</span>
+                <h4>Ativação do OS</h4>
+                <p>Ativação imediata das contas administrativas no FluxAI OS™ para visualização em tempo real.</p>
+            </div>
+        </div>
+
+        <!-- Signatures -->
+        <div class="signatures-area">
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <p class="name">FluxAI Labs™</p>
+                <p class="role">Representante Técnico</p>
+            </div>
+            <div class="signature-block">
+                <div class="signature-line"></div>
+                <p class="name">[Razão Social do Cliente]</p>
+                <p class="role">Representante Legal</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Floating Print/PDF Button -->
+    <div class="action-bar">
+        <button class="btn-print" onclick="window.print()">
+            <i class="fa-solid fa-file-pdf"></i> Exportar Proposta (PDF)
+        </button>
+    </div>
+
+</body>
+</html>

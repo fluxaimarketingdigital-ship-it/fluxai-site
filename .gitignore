@@ -41,3 +41,17 @@ Thumbs.db
 out/
 dist/
 build/
+.vercel
+
+# Exclusões do Saneamento de Binários (Fase 06.4 - SonarCloud)
+os/docs/treinamento/videos/temp/
+*.mp4
+*.mov
+*.avi
+*.mkv
+*.zip
+*.pdf
+*.psd
+*.ai
+# Exceção para a proposta PDF comercial final
+!PROPOSTA_COMERCIAL_GIAAS_SCALE_REVISAVEL.pdf

@@ -8,7 +8,7 @@ Este documento serve como a "Fonte da Verdade" para a infraestrutura técnica e 
 
 *   **Meta Pixel ID:** `1235053088839431` (Ativo e validado).
 *   **Google Analytics 4 (GA4):** `G-KGJRE4BJYQ` (Configurado com `debug_mode` para validação).
-*   **Microsoft Clarity:** ID `wonrxc0xrb` (Ativo para Heatmaps e Sessões).
+*   **Microsoft Clarity:** ID `n72q8vcl9y` (Rotacionado por segurança - P0).
 *   **Meta CAPI (API de Conversão):** Ativo e Integrado via Webhook (Garante 100% de recepção de leads, contornando AdBlocks). Chave de acesso armazenada de forma segura.
 *   **Eventos Mapeados:**
     *   `generate_lead`: Disparado no envio do formulário de diagnóstico.
