@@ -37,10 +37,10 @@ Para publicar de forma controlada a nova Landing Page comercial, estabelecemos o
 O operador técnico deverá validar e checar cada um dos itens abaixo antes de autorizar a submissão de publicação:
 
 ### 2.1. Otimização de SEO e Rastreamento (GA4, GTM e Clarity)
-- [x] **Título Executivo (`<title>`):** Configurado exatamente como `"Growth Infrastructure as a Service (GIaaS™) | FluxAI Labs™"`.
+- [x] **Título Executivo (`<title>`):** Configurado exatamente como `"Sistema de Crescimento FluxAI™ | FluxAI Labs™"`.
 - [x] **Meta Description:** Contendo copy Premium chancelada: `"Engenharia de Crescimento e Operações de Growth (Growth Ops) de alta performance chancelada pelo FluxAI OS™ e automações de IA proprietárias. Descubra a clareza e transparência síncrona real."`
 - [x] **Inserção de Meta Tags Open Graph (Recomendado):**
-  * `<meta property="og:title" content="GIaaS™ — Growth Infrastructure as a Service | FluxAI Labs™">`
+  * `<meta property="og:title" content="Sistema de Crescimento FluxAI™ | FluxAI Labs™">`
   * `<meta property="og:description" content="Operações de crescimento de alta performance orientadas por dados, BI síncrono e software proprietário de comando de alta velocidade.">`
   * `<meta property="og:image" content="https://fluxaidigital.com.br/assets/images/og-image-giaas.png">`
   * `<meta property="og:type" content="website">`
