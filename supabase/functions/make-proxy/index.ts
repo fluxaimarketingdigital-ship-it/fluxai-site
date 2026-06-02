@@ -9,7 +9,7 @@ function isOriginAllowed(origin: string | null): boolean {
   if (!origin) return false;
   if (ALLOWED_ORIGINS.includes(origin)) return true;
   // Permite domínios de preview/staging da Vercel (ex: *.vercel.app)
-  if (origin.endsWith(".vercel.app") || /^https:\/\/fluxai-site-.*\.vercel\.app$/.test(origin)) return true;
+  if (origin.endsWith(".vercel.app") || (origin.startsWith("https://fluxai-site-") && origin.endsWith(".vercel.app"))) return true;
   return false;
 }
 
