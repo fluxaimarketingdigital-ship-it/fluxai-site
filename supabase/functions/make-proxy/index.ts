@@ -153,15 +153,33 @@ Deno.serve(async (req) => {
         return jsonResponse({ ok: false, error: "Invalid email format", requestId }, 400, corsHeaders);
       }
 
-      // Sanitiza payload para conter apenas os campos definidos no schema do lead (prevenção de injeção)
+      // Constrói o identificador do lead de forma segura
+      const leadId = `LEAD-${crypto.randomUUID()}`;
+
+      // Monta a observação concatenando as informações comerciais
+      const faturamentoText = String(revenue).trim().substring(0, 30);
+      const midiaText = String(spend).trim().substring(0, 30);
+      const gargaloText = String(gap).trim().substring(0, 50);
+      const descricaoText = String(sanitizedPayload.description || "").trim().substring(0, 1000);
+      const observacaoText = `Faturamento: ${faturamentoText} | Mídia: ${midiaText} | Gargalo: ${gargaloText} | ${descricaoText}`;
+
+      // Transforma o payload no formato achatado exigido pelo cenário 02 do Make
       sanitizedPayload = {
-        name: String(name).trim().substring(0, 100),
+        lead_id: leadId,
+        cliente_id: "FLUXAI_LABS_001",
+        cliente_nome: "FluxAI Labs",
+        origem_site: "landing_sistema_crescimento",
+        nome_lead: String(name).trim().substring(0, 100),
         email: String(email).trim().substring(0, 100),
-        company: String(company).trim().substring(0, 100),
-        revenue: String(revenue).trim().substring(0, 30),
-        spend: String(spend).trim().substring(0, 30),
-        gap: String(gap).trim().substring(0, 50),
-        description: String(sanitizedPayload.description || "").trim().substring(0, 1000)
+        telefone: String(sanitizedPayload.phone || sanitizedPayload.telefone || "").trim().substring(0, 30),
+        empresa: String(company).trim().substring(0, 100),
+        servico_interesse: "Sistema de Crescimento FluxAI",
+        canal_origem: "site",
+        campanha: "landing_sistema_crescimento",
+        pagina_origem: String(sanitizedPayload.page_url || "/giaas").trim().substring(0, 100),
+        status_lead: "novo",
+        responsavel: "FluxAI",
+        observacao: observacaoText
       };
     }
 
