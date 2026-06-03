@@ -73,8 +73,8 @@ export const initDashboard = () => {
             const mainContent = doc.querySelector('main .container');
 
             if (mainContent) {
-                const title = mainContent.querySelector('h1')?.innerText || '';
-                const modLabel = mainContent.querySelector('.section-top-label')?.innerText || '';
+                const titleHTML = mainContent.querySelector('h1')?.innerHTML || '';
+                const modLabel = mainContent.querySelector('.section-top-label')?.textContent?.trim() || '';
                 const editorialClone = mainContent.querySelector('.editorial-content');
                 const bodyNodes = editorialClone ? editorialClone.cloneNode(true) : document.createElement('div');
                 // Remove 'reveal' so the cloned content is immediately visible (not opacity:0)
@@ -91,7 +91,7 @@ export const initDashboard = () => {
                 badge.className = 'data-badge';
                 badge.textContent = modLabel;
                 const h3 = document.createElement('h3');
-                h3.textContent = title;
+                h3.innerHTML = titleHTML;
                 header.appendChild(badge);
                 header.appendChild(h3);
                 

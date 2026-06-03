@@ -2527,7 +2527,7 @@ a[href*="typebot.io"],
 .nav-item:hover { background: rgba(0,0,0,0.02); color: var(--text-main); }
 .nav-item.active { background: var(--bg-white); color: var(--primary); border-right: 3px solid var(--primary); }
 .nav-item:focus { outline: 2px solid var(--primary); outline-offset: -2px; z-index: 10; }
-.dashboard-display { padding: 40px 60px 60px; position: relative; background: var(--bg-white); display: flex; flex-direction: column; justify-content: flex-start; }
+.dashboard-display { padding: 40px 60px 60px; position: relative; background: var(--bg-white); display: flex; flex-direction: column; justify-content: flex-start; overflow-y: auto; max-height: 72vh; scroll-behavior: smooth; }
 .display-content { opacity: 0; transform: translateY(10px); transition: opacity 0.4s ease, transform 0.4s ease; display: none; }
 .display-content.active { display: block; opacity: 1; transform: translateY(0); }
 .display-header { margin-bottom: 30px; display: flex; flex-direction: column; gap: 8px; }
