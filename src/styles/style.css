@@ -2689,3 +2689,5 @@ a[href*="typebot.io"],
 .matrix-item li i { color: var(--primary); margin-right: 10px; }
 
 @media (max-width: 1024px) { .pipeline-visual { justify-content: flex-start; } .matrix-grid { grid-template-columns: 1fr; } }
+
+.thesis-box p, .thesis-box li, .thesis-box strong { color: rgba(255,255,255,0.95) !important; }
