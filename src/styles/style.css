@@ -87,7 +87,7 @@
   box-sizing: border-box;
 }
 
-html {
+html { scroll-behavior: smooth;
   scroll-behavior: smooth;
   scroll-padding-top: 80px; /* Compensa o menu fixo */
 }
@@ -1334,7 +1334,7 @@ a[href*="elfsight.com"],
 }
 
 /* CTA FINAL / FORMULÃƒÂRIO */
-.cta {
+.cta { scroll-margin-top: 100px; 
   padding-bottom: 0;
 }
 .cta-banner {
