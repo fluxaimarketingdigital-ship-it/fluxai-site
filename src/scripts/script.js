@@ -111,14 +111,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 6. MOBILE MENU
-    const menuToggle = document.getElementById('menuToggle');
+    const menuToggle = document.getElementById('mobile-toggle') || document.getElementById('menuToggle');
     const menu = document.getElementById('menu');
     if (menuToggle && menu) {
         menuToggle.addEventListener('click', () => {
             menu.classList.toggle('active');
             const icon = menuToggle.querySelector('i');
-            icon.classList.toggle('fa-bars');
-            icon.classList.toggle('fa-xmark');
+            if (icon) {
+                icon.classList.toggle('fa-bars');
+                icon.classList.toggle('fa-xmark');
+            }
         });
 
         // Close menu on link click (Mobile UX)
@@ -145,8 +147,8 @@ document.addEventListener('DOMContentLoaded', () => {
         content: { title: "FluxAI Content Engine™", desc: "Engenharia de conteúdo focada em ativos de retenção.", features: ["Conteúdo de Alta Densidade", "Scripts Estratégicos", "Gestão de Ativos Digitais"] },
         crm: { title: "FluxAI CRM Intelligence™", desc: "Infraestrutura de aquisição e escala de receita.", features: ["Tráfego Pago Especializado", "Funis de Alta Conversão", "Inteligência de Dados"] },
         automation: { title: "FluxAI Automation Hub™", desc: "Núcleo tecnológico de automação e IA aplicada.", features: ["Agentes Comerciais de IA", "Arquitetura de CRM", "Eficiência Operacional"] },
-        analytics: { title: "FluxAI Analytics Intelligence™", desc: "Arquitetura de inteligência de dados e LTV.", features: ["Rastreamento Avançado", "Dashboard de Performance", "Otimização de Conversão"] },
-        govos: { title: "FluxAI GovOS™", desc: "Plataforma proprietária de governança operacional.", features: ["Gestão de Ativos", "Protocolos de Segurança", "Escala Sistêmica"] }
+        analytics: { title: "FluxAI Analytics Intelligence™", desc: "A leitura estratégica dos dados para transformar métricas soltas em decisões de crescimento.", features: ["Modelagem LTV", "Atribuição Fina", "Dashboards Consolidados"] },
+        governanca: { title: "FluxAI Governança Operacional™", desc: "A camada que protege consistência, escopo, aprovação, entregas e qualidade da operação.", features: ["Controle de Escopo", "Fluxos de Aprovação", "Proteção de Ativos"] }
     };
 
     document.querySelectorAll('.service-card, .os-item, .nav-item').forEach(card => {
@@ -164,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 else if(searchStr.includes('crm') || searchStr.includes('intelligence')) d = servicesData.crm;
                 else if(searchStr.includes('automation') || searchStr.includes('hub')) d = servicesData.automation;
                 else if(searchStr.includes('analytics')) d = servicesData.analytics;
-                else if(searchStr.includes('govos')) d = servicesData.govos;
+                else if(searchStr.includes('govos') || searchStr.includes('governança') || searchStr.includes('governanca') || searchStr.includes('governance')) d = servicesData.governanca;
             }
 
             if (d && modal && modalBody) {
@@ -293,32 +295,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // MOBILE MENU TOGGLE
-    const mobileToggle = document.getElementById('mobile-toggle');
-    const navLinks = document.querySelector('.nav-links');
-    
-    if (mobileToggle && navLinks) {
-        mobileToggle.addEventListener('click', () => {
-            navLinks.classList.toggle('active');
-            const icon = mobileToggle.querySelector('i');
-            if (icon) {
-                icon.classList.toggle('fa-bars');
-                icon.classList.toggle('fa-xmark');
-            }
-        });
-
-        // Close menu when clicking a link
-        navLinks.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                navLinks.classList.remove('active');
-                const icon = mobileToggle.querySelector('i');
-                if (icon) {
-                    icon.classList.add('fa-bars');
-                    icon.classList.remove('fa-xmark');
-                }
-            });
-        });
-    }
 
 });
 

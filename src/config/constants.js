@@ -1,9 +1,9 @@
 export const CONTACT_INFO = {
     whatsapp: "5571981114694",
     whatsappLink: "https://wa.me/5571981114694",
-    instagram: "https://www.instagram.com/fluxai.mark/",
-    linkedin: "https://www.linkedin.com/company/fluxaidigital",
-    facebook: "https://www.facebook.com/fluxaidigital",
+    instagram: "https://www.instagram.com/fluxai.labs/",
+    linkedin: "",
+    facebook: "",
     email: "fluxaimarketingdigital@gmail.com",
     location: "Salvador, BA // Global"
 };

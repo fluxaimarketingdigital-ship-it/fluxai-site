@@ -2,44 +2,68 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://fluxaidigital.com.br/</loc>
-    <lastmod>2026-05-11</lastmod>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://fluxaidigital.com.br/pages/command-center.html</loc>
-    <lastmod>2026-05-11</lastmod>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://fluxaidigital.com.br/pages/content-engine.html</loc>
-    <lastmod>2026-05-11</lastmod>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://fluxaidigital.com.br/pages/crm-intelligence.html</loc>
-    <lastmod>2026-05-11</lastmod>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
     <loc>https://fluxaidigital.com.br/pages/automation-hub.html</loc>
-    <lastmod>2026-05-11</lastmod>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fluxaidigital.com.br/pages/analytics.html</loc>
-    <lastmod>2026-05-11</lastmod>
+    <loc>https://fluxaidigital.com.br/pages/analytics-intelligence.html</loc>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://fluxaidigital.com.br/pages/govos.html</loc>
-    <lastmod>2026-05-11</lastmod>
+    <loc>https://fluxaidigital.com.br/pages/governanca.html</loc>
+    <lastmod>2026-06-03</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fluxaidigital.com.br/pages/fluxai-os.html</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://fluxaidigital.com.br/pages/diagnosticos.html</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fluxaidigital.com.br/pages/mercados.html</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://fluxaidigital.com.br/pages/processo.html</loc>
+    <lastmod>2026-06-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
 </urlset>

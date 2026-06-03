@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>FluxAI Labs | FluxAI OS™ Infraestrutura Proprietária</title>
-    <meta name="description" content="Infraestrutura operacional e camada de inteligência para gestão de ativos de alto valor." />
+    <meta name="description" content="A infraestrutura operacional e camada de inteligência corporativa para gestão de ativos digitais de alto valor." />
     <link rel="stylesheet" href="/src/styles/style.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -21,6 +21,9 @@
         <img src="/assets/images/branding/logo-primary.webp" alt="FluxAI Labs" class="logo-img" />
       </a>
       <div class="nav-right">
+        <button id="themeToggle" class="nav-icon" aria-label="Alterar Tema" style="background: none; border: none; color: #fff; cursor: pointer; font-size: 1.2rem; margin-right: 15px;">
+          <i class="fa-solid fa-moon"></i>
+        </button>
         <a href="../index.html" class="btn btn-diagnostic" style="background: rgba(255,255,255,0.1); color: #fff; border: none;">Voltar ao Site</a>
       </div>
     </div>
@@ -31,80 +34,91 @@
       
       <!-- OS GATE HEADER -->
       <section class="reveal" style="text-align: center; max-width: 800px; margin: 0 auto 80px;">
-        <span class="section-top-label" style="display: block; margin-bottom: 20px; font-weight: 700; letter-spacing: 2px; color: var(--primary);">[SISTEMA PROPRIETÁRIO]</span>
+        <span class="section-top-label" style="display: block; margin-bottom: 20px; font-weight: 700; letter-spacing: 2px; color: var(--primary);">[INFRAESTRUTURA OPERACIONAL PROPRIETÁRIA]</span>
         <h1 style="font-size: clamp(2.5rem, 8vw, 4rem); line-height: 1.1; margin-bottom: 30px; color: var(--secondary); font-weight: 800; letter-spacing: -0.03em;">
           FluxAI <span style="color: var(--primary);">OS™</span>
         </h1>
-        <p style="font-size: 1.25rem; line-height: 1.6; color: #475569; font-weight: 500;">
-          A infraestrutura operacional que sustenta marcas soberanas. Inteligência, controle e escala em um único ambiente restrito.
+        <p style="font-size: 1.25rem; line-height: 1.6; color: var(--text-muted); font-weight: 500; max-width: 700px; margin: 0 auto;">
+          A base interna operacional e de inteligência corporativa que sustenta a execução, a aprovação sistemática e a governança de ativos dos projetos sob a nossa gestão.
         </p>
-        
-        <div style="margin-top: 50px;">
-          <a href="/os/login.html" class="btn btn-primary btn-large" style="background: var(--bg-dark); border: none;">Acessar Ambiente Operacional <i class="fa-solid fa-lock"></i></a>
-        </div>
       </section>
 
       <!-- OS FEATURES / ARCHITECTURE -->
-      <section class="reveal" style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; margin-bottom: 120px;">
+      <section class="reveal" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 60px; align-items: center; margin-bottom: 120px;">
         <div>
-          <h2 style="font-size: 2rem; color: var(--secondary); margin-bottom: 25px;">Arquitetura de Inteligência</h2>
-          <p style="color: #64748b; line-height: 1.8; margin-bottom: 30px;">
-            Diferente de dashboards genéricos, a **FluxAI OS™** é uma camada de inteligência proprietária projetada para gerir o ciclo de vida completo de ativos digitais de alto valor.
+          <h2 style="font-size: 2rem; color: var(--secondary); margin-bottom: 25px;">Arquitetura Proprietária</h2>
+          <p style="color: var(--text-muted); line-height: 1.8; margin-bottom: 30px;">
+            Diferente de ferramentas de gestão genéricas ou planilhas desconexas, o <strong>FluxAI OS™</strong> centraliza todo o ciclo operacional e a inteligência da nossa consultoria num ambiente fechado de controle fino. É a engine de suporte que garante previsibilidade, conformidade e velocidade na entrega de ativos.
           </p>
           <ul style="list-style: none; padding: 0;">
             <li style="margin-bottom: 20px; display: flex; gap: 15px;">
-              <i class="fa-solid fa-gauge-high" style="color: var(--primary); margin-top: 5px;"></i>
+              <i class="fa-solid fa-layer-group" style="color: var(--primary); margin-top: 5px;"></i>
               <div>
-                <strong>Monitoramento em Tempo Real</strong>
-                <p style="font-size: 0.9rem; color: #64748b;">Visualização instantânea de saúde do CRM e fluxo comercial.</p>
+                <strong>Centralização de Metas & KPIs</strong>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Visualização do progresso dos projetos e atribuição de responsabilidades operacionais.</p>
               </div>
             </li>
             <li style="margin-bottom: 20px; display: flex; gap: 15px;">
-              <i class="fa-solid fa-pen-nib" style="color: var(--primary); margin-top: 5px;"></i>
+              <i class="fa-solid fa-signature" style="color: var(--primary); margin-top: 5px;"></i>
               <div>
-                <strong>Pipeline Editorial Vivo</strong>
-                <p style="font-size: 0.9rem; color: #64748b;">Gestão operacional de conteúdo focado em autoridade técnica.</p>
+                <strong>Central de Aprovação de Ativos</strong>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Fluxo automatizado que permite ao cliente revisar e homologar entregas com segurança digital.</p>
               </div>
             </li>
             <li style="margin-bottom: 20px; display: flex; gap: 15px;">
-              <i class="fa-solid fa-shield-halved" style="color: var(--primary); margin-top: 5px;"></i>
+              <i class="fa-solid fa-lock" style="color: var(--primary); margin-top: 5px;"></i>
               <div>
-                <strong>Governança e Segurança</strong>
-                <p style="font-size: 0.9rem; color: #64748b;">Protocolos institucionais de proteção de ativos e reputação.</p>
+                <strong>Protocolo de Segurança Operacional</strong>
+                <p style="font-size: 0.9rem; color: var(--text-muted);">Acesso restrito e criptografado para garantir a proteção de informações institucionais.</p>
               </div>
             </li>
           </ul>
         </div>
-        <div style="background: #fff; padding: 40px; border-radius: 8px; border: 1px solid var(--border); box-shadow: var(--shadow-layered);">
-          <!-- Placeholder para screenshot/mockup da OS -->
-          <div style="background: var(--bg-dark); border-radius: 4px; padding: 20px; border: 1px solid rgba(255,255,255,0.05);">
-             <div style="display: flex; gap: 8px; margin-bottom: 15px;">
+        <div style="background: var(--bg-white); padding: 40px; border-radius: 4px; border: 1px solid var(--border); box-shadow: var(--shadow-layered);">
+          <div style="background: var(--bg-dark); border-radius: 4px; padding: 25px; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
+             <div style="display: flex; gap: 8px; margin-bottom: 20px;">
                <div style="width: 8px; height: 8px; border-radius: 50%; background: #ff4d4d;"></div>
                <div style="width: 8px; height: 8px; border-radius: 50%; background: #ffcc00;"></div>
                <div style="width: 8px; height: 8px; border-radius: 50%; background: #00cc66;"></div>
              </div>
-             <div style="height: 200px; display: flex; align-items: center; justify-content: center; color: var(--primary); font-family: monospace; font-size: 0.8rem; text-align: center;">
-               [ AMBIENTE RESTRITO ]<br>ACESSO EXCLUSIVO PARA CLIENTES E OPERADORES
+             <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--primary); font-family: monospace; font-size: 0.85rem; text-align: center; gap: 15px;">
+               <div>
+                 [ AMBIENTE PRIVADO E SEGURO ]<br>
+                 <span style="color: #64748b; font-size: 0.75rem;">Acesso exclusivo para clientes e operadores da FluxAI</span>
+               </div>
+               <a href="/os/login.html" class="btn btn-diagnostic" style="background: var(--primary); color: #fff; border: none; padding: 8px 16px; font-size: 0.8rem; font-weight: 600;">
+                 Portal do Cliente <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
+               </a>
              </div>
           </div>
-          <p style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: #94a3b8; font-style: italic;">Interface Operacional v1.0.4 - FluxAI Labs</p>
+          <p style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); font-style: italic;">Interface Operacional v1.0.4 - FluxAI Labs</p>
         </div>
       </section>
 
       <!-- FINAL CTA -->
-      <section class="reveal" style="text-align: center; padding: 100px 40px; background: var(--bg-dark); color: #fff; border-radius: 8px;">
-        <h2 style="font-size: 2.2rem; margin-bottom: 20px;">Leve sua Operação para o Próximo Nível.</h2>
-        <p style="color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto 40px;">
-          O FluxAI OS™ é entregue como parte da nossa consultoria de infraestrutura estratégica.
-        </p>
-        <a href="../index.html#diagnostico" class="btn btn-primary btn-large">Garantir Diagnóstico Estratégico <i class="fa-solid fa-arrow-right"></i></a>
+      <section class="reveal" style="text-align: center; padding: 80px 40px; background: var(--bg-dark); color: #fff; border-radius: 4px; position: relative; overflow: hidden;">
+        <div style="position: absolute; top: 0; right: 0; opacity: 0.05; pointer-events: none;">
+          <i class="fa-solid fa-network-wired" style="font-size: 20rem; color: #fff;"></i>
+        </div>
+        <div style="position: relative; z-index: 2;">
+          <h2 style="font-size: 2.2rem; margin-bottom: 20px; color: #fff;">Leve sua Operação para o Próximo Nível</h2>
+          <p style="color: #94a3b8; font-size: 1.1rem; max-width: 600px; margin: 0 auto 40px;">
+            O FluxAI OS™ é entregue e customizado exclusivamente como parte da implantação da nossa arquitetura estratégica de crescimento.
+          </p>
+          <a href="../index.html#diagnostico" class="btn btn-primary btn-large" style="background: var(--primary); border: none; color: #fff;">
+            Garantir Diagnóstico <i class="fa-solid fa-arrow-right"></i>
+          </a>
+        </div>
       </section>
 
     </div>
   </main>
 
   <footer class="footer" style="padding: 60px 0; border-top: 1px solid var(--border); text-align: center;">
-    <p style="color: #64748b; font-size: 0.9rem;">© 2026 FluxAI Labs. Sistema Operacional Proprietário.</p>
+    <div class="container">
+      <img src="/assets/images/branding/logo-secondary.webp" alt="FluxAI Labs" style="width: 120px; margin-bottom: 20px; opacity: 0.5; filter: brightness(0) invert(1);" />
+      <p style="color: var(--text-muted); font-size: 0.9rem;">© 2026 FluxAI Labs. Sistema Operacional Proprietário.</p>
+    </div>
   </footer>
 
   <script type="module" src="/src/scripts/script.js"></script>

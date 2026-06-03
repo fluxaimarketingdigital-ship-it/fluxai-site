@@ -28,12 +28,32 @@
     },
     {
       "source": "/pages/sistemas-de-retencao",
-      "destination": "/pages/analytics",
+      "destination": "/pages/analytics-intelligence",
       "permanent": true
     },
     {
       "source": "/pages/plataformas-proprietarias",
-      "destination": "/pages/govos",
+      "destination": "/pages/governanca",
+      "permanent": true
+    },
+    {
+      "source": "/pages/analytics.html",
+      "destination": "/pages/analytics-intelligence.html",
+      "permanent": true
+    },
+    {
+      "source": "/pages/analytics",
+      "destination": "/pages/analytics-intelligence",
+      "permanent": true
+    },
+    {
+      "source": "/pages/govos.html",
+      "destination": "/pages/governanca.html",
+      "permanent": true
+    },
+    {
+      "source": "/pages/govos",
+      "destination": "/pages/governanca",
       "permanent": true
     }
   ],
