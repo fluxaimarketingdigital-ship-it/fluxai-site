@@ -29,19 +29,21 @@ Cole no editor e clique em **"Run"** (ou `Ctrl+Enter`).
 
 Após rodar, vá em **Table Editor** e confirme que as seguintes tabelas existem:
 
-| # | Tabela | Criada em |
-|---|--------|-----------|
-| 1 | `projects` | v1.0 |
-| 2 | `contracts` | v1.0 |
-| 3 | `governance_users` | v1.0 |
-| 4 | `content_assets` | v1.0 |
-| 5 | `audit_logs` | v1.0 |
-| 6 | `payments_ledger` | v3.0 |
-| 7 | `extra_services_contracts` | v3.0 |
-| 8 | `operational_events` | v3.0 |
-| 9 | `ai_usage_logs` | **v4.0** ← nova |
-| 10 | `client_knowledge_cache` | **v4.0** ← nova |
-| 11 | `knowledge_documents` | **v4.0** ← nova |
+| # | Tabela | Criada em | Descrição / Função no Ecossistema |
+|---|--------|-----------|-----------------------------------|
+| 1 | `projects` | v1.0 | Workspace e metadados de cada marca/cliente |
+| 2 | `contracts` | v1.0 | Contratos de recorrência e governança financeira |
+| 3 | `governance_users` | v1.0 | Usuários do OS e perfis de permissão (RBAC) |
+| 4 | `content_assets` | v1.0 | Planejamento, pautas e criativos do motor de conteúdo |
+| 5 | `audit_logs` | v1.0 | Logs de auditoria do sistema e ações de operadores |
+| 6 | `crm_leads` | v3.0 | Captação e inteligência comercial de leads |
+| 7 | `payments_ledger` | v3.0 | Razão financeiro, faturamentos, PIX e comprovantes |
+| 8 | `extra_services_contracts` | v3.0 | Contratos de serviços extras e add-ons (avulsos) |
+| 9 | `operational_events` | v3.0 | Barramento de eventos operacionais e timeline de valor |
+| 10 | `ai_usage_logs` | **v4.0** ← nova | Auditoria de uso e controle de custos de chamadas de IA |
+| 11 | `client_knowledge_cache` | **v4.0** ← nova | Contexto consolidado pré-compilado de marcas para a IA |
+| 12 | `knowledge_documents` | **v4.0** ← nova | Documentação de briefing e playbooks para RAG semântico |
+| 13 | `external_approvals` | **v4.0** ← nova | Solicitações de aprovação externa via token de alta entropia |
 
 ---
 
@@ -118,9 +120,10 @@ FluxAI OS™ v4.0.0
 ├── WORKSPACE INTERNO (NOVO)
 │   └── fluxai-labs.html    ← Workspace FluxAI Labs (INTERNAL_WORKSPACE)
 │
-└── DATABASE (11 tabelas)
+└── DATABASE (13 tabelas | RLS Mitigado 'authenticated')
     ├── projects            ← workspace_type + is_billing_exempt (NOVO)
     ├── ai_usage_logs       ← (NOVO)
     ├── client_knowledge_cache ← (NOVO)
-    └── knowledge_documents ← (NOVO)
+    ├── knowledge_documents ← (NOVO)
+    └── external_approvals  ← (NOVO)
 ```

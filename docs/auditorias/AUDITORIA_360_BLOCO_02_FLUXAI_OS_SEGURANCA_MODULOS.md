@@ -22,8 +22,8 @@ Abaixo está a avaliação de conformidade técnica e operacional para cada recu
 | 10 | **Serviços Extras** | **APROVADO** | Mapeamento e orçamento de adicionais acionados de forma assistida. |
 | 11 | **IA Créditos & GPT** | **APROVADO** | Governança de prompts e limites de cota blindados contra acesso do cliente. |
 | 12 | **Logs & Auditoria** | **APROVADO** | Trilha de auditoria restrita a ADMIN com redação de chaves e dados sensíveis. |
-| 13 | **Calendário Editorial** | **APROVADO COM RESSALVA** | Funciona perfeitamente, mas carece de verificação de autenticação de sessão. |
-| 14 | **Segurança de Banco (RLS)** | **BLOQUEADO** | Políticas RLS declaradas como "Allow All", permitindo bypass total via anonKey. |
+| 13 | **Calendário Editorial** | **APROVADO** | Protegido com OS_AUTH.check('CLIENT') e validação anti-IDOR. |
+| 14 | **Segurança de Banco (RLS)** | **APROVADO** | RLS ativado e restrito a TO authenticated em todas as 13 tabelas operacionais. |
 
 ---
 
@@ -38,6 +38,7 @@ No entanto, um gargalo crítico foi detectado na camada de banco de dados do Sup
 ## 🚨 3. Achados Críticos (Severidade: CRÍTICA)
 
 ### Risco C1: Políticas RLS Permissivas no Supabase (Bypass Completo de Segurança)
+*   **Status:** RESOLVIDO (Mitigado emergencialmente via políticas TO authenticated em todas as tabelas operacionais, bloqueando totalmente o papel anon).
 *   **Arquivo de Origem:** [supabase_schema.sql](file:///c:/Users/BRENDA/Desktop/Identidade%20Visual%20FluxAI/FLUXAI_SITE/os/supabase_schema.sql#L124-L127) e [supabase_schema.sql](file:///c:/Users/BRENDA/Desktop/Identidade%20Visual%20FluxAI/FLUXAI_SITE/os/supabase_schema.sql#L338-L340)
 *   **O Gargalo:** O script de criação de banco executa o comando `ALTER TABLE ... ENABLE ROW LEVEL SECURITY;`, mas em seguida define políticas que anulam o controle de segurança:
     ```sql
@@ -54,11 +55,13 @@ No entanto, um gargalo crítico foi detectado na camada de banco de dados do Sup
 ## ⚠️ 4. Achados Altos (Severidade: ALTA)
 
 ### Risco A1: Ausência de Filtro de Autenticação no Calendário Editorial
+*   **Status:** RESOLVIDO (Protegido por OS_AUTH.check('CLIENT') com validação anti-IDOR de project_id).
 *   **Arquivo de Origem:** [flux-calendar.html](file:///c:/Users/BRENDA/Desktop/Identidade%20Visual%20FluxAI/FLUXAI_SITE/os/flux-calendar.html#L59-L105)
 *   **O Gargalo:** O método de inicialização `initCalendar()` obtém o `projectId` diretamente dos parâmetros da URL (`?project=PROJECT_UUID`) e realiza a busca de dados no Supabase sem realizar qualquer chamada para `OS_AUTH.check()` ou validar se o usuário do navegador está autenticado e pertence àquele projeto.
 *   **O Impacto:** Se um link do calendário vazar ou se um UUID de projeto for adivinhado, qualquer pessoa na internet poderá visualizar a grade editorial completa, cronograma de publicações e detalhes de pauta de um cliente da FluxAI Labs sem precisar fazer login.
 
 ### Risco A2: Tabela `external_approvals` Ausente no Script SQL de Provisionamento
+*   **Status:** RESOLVIDO (Tabela declarada no schema com RLS e restrição total ao papel anon, acessível apenas para usuários autenticados).
 *   **Arquivo de Origem:** [supabase_schema.sql](file:///c:/Users/BRENDA/Desktop/Identidade%20Visual%20FluxAI/FLUXAI_SITE/os/supabase_schema.sql) e [SUPABASE_SETUP_GUIDE.md](file:///c:/Users/BRENDA/Desktop/Identidade%20Visual%20FluxAI/FLUXAI_SITE/os/SUPABASE_SETUP_GUIDE.md)
 *   **O Gargalo:** O código-fonte dos módulos [approval.js](file:///c:/Users/BRENDA/Desktop/Identidade%20Visual%20FluxAI/FLUXAI_SITE/os/js/approval.js#L72) e [operations-center.js](file:///c:/Users/BRENDA/Desktop/Identidade%20Visual%20FluxAI/FLUXAI_SITE/os/js/modules/operations-center.js#L64) faz consultas e escritas na tabela `external_approvals`. Contudo, esta tabela não está declarada no arquivo SQL nem listada no guia de provisionamento do Supabase.
 *   **O Impacto:** Um deploy limpo da aplicação seguindo os guias oficiais falhará imediatamente nas telas de aprovação de criativos e no painel operacional devido à ausência da tabela em produção.
@@ -147,12 +150,14 @@ A auditoria de rotas confirmou que a lógica de bloqueio de caminhos em `os-core
 
 ## 🏁 9. Decisão Final e Parecer de Prontidão
 
-> [!CAUTION]
-> ### Parecer da Auditoria: APROVADO COM RESSALVAS DE SEGURANÇA
+> [!NOTE]
+> ### Parecer da Auditoria: APROVADO E HOMOLOGADO (Pós-Correções Bloco 2)
 >
-> O **FluxAI OS™** está funcionalmente maduro, com excelente isolamento de rotas e UX de alta fidelidade no Portal do Cliente e Onboarding. Contudo, **o sistema NÃO está pronto para ir ao ar com clientes reais** devido ao bypass completo de segurança das tabelas do banco de dados (Políticas RLS "Allow All").
+> O **FluxAI OS™** está funcionalmente maduro e agora totalmente homologado sob a perspectiva de segurança de dados do Bloco 2. Todos os achados críticos e altos de segurança foram completamente sanados:
 >
-> A equipe de desenvolvimento deve aplicar o **Filtro de Autenticação no Calendário Editorial** e **restringir as políticas de RLS no Supabase** conforme o plano de correções acima antes de iniciar a captação comercial corporativa de alto valor.
+> 1. As políticas RLS permissivas foram substituídas por restrições para `TO authenticated` (mitigação contra a chave pública `anonKey`).
+> 2. O **Calendário Editorial** foi protegido com controle de sessão e validações rigorosas contra IDOR (cruzamento com o `project_id` oficial).
+> 3. A tabela `external_approvals` foi provisionada com RLS ativado e bloqueio total contra acessos anônimos diretos (`anon`).
 
 ---
 

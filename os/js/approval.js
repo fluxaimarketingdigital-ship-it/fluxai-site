@@ -2,6 +2,7 @@ import { getSupabase } from '../services/supabase-client.js';
 import { StatusEngine } from '../config/status-system.js';
 import { OS_LOGS_ENGINE } from '../services/logs-engine.js';
 import { OS_CONFIG } from '../config/os-config.js';
+import { OS_AUTH } from './os-core.js';
 
 async function handleWebhookFailure(app, response, transitionResult, actionName) {
     console.error('[DELIVERY_APPROVAL] Falha no webhook real. Abortando persistência.', response.error);
@@ -55,7 +56,9 @@ async function handleWebhookFailure(app, response, transitionResult, actionName)
     );
 
     alert(`Falha Crítica de Conexão com o Webhook de Integração:\n\n${response.error || 'O servidor de integração retornou erro.'}\n\nOperação abortada e revertida com sucesso (Rollback). Nenhum dado foi gravado.`);
-}async function initApproval() {
+}
+
+async function initApproval() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
 
@@ -68,6 +71,14 @@ async function handleWebhookFailure(app, response, transitionResult, actionName)
     if (!supabase) return;
 
     try {
+        // RLS / MITIGAÇÃO DE SEGURANÇA BLOCO 2
+        // Bloquear consulta direta de visitante anônimo à tabela external_approvals
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+            showError('Acesso Anônimo Bloqueado: Por motivos de conformidade com a LGPD e regras rígidas de RLS, o acesso direto de visitantes não logados a esta tabela foi desativado. A aprovação por token externo está suspensa e aguarda a implantação da Edge Function controladora. Por favor, autentique-se no painel do FluxAI OS™ para realizar a aprovação.');
+            return;
+        }
+
         // 1. Buscar item de aprovação pelo token
         const { data: app, error } = await supabase
             .from('external_approvals')

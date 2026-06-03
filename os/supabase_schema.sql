@@ -119,12 +119,16 @@ DROP POLICY IF EXISTS "Allow All on projects" ON projects;
 DROP POLICY IF EXISTS "Allow All on contracts" ON contracts;
 DROP POLICY IF EXISTS "Allow All on content_assets" ON content_assets;
 DROP POLICY IF EXISTS "Allow All on audit_logs" ON audit_logs;
+DROP POLICY IF EXISTS "Allow authenticated on projects" ON projects;
+DROP POLICY IF EXISTS "Allow authenticated on contracts" ON contracts;
+DROP POLICY IF EXISTS "Allow authenticated on content_assets" ON content_assets;
+DROP POLICY IF EXISTS "Allow authenticated on audit_logs" ON audit_logs;
 
--- Recria políticas públicas de acesso amplo para simulação e onboarding imediato
-CREATE POLICY "Allow All on projects" ON projects FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All on contracts" ON contracts FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All on content_assets" ON content_assets FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All on audit_logs" ON audit_logs FOR ALL USING (true) WITH CHECK (true);
+-- Políticas de acesso para usuários logados (mitigação emergencial)
+CREATE POLICY "Allow authenticated on projects" ON projects FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on contracts" ON contracts FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on content_assets" ON content_assets FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on audit_logs" ON audit_logs FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- =====================================================================================
 -- PARTE 4: TABELAS DE CRM E GOVERNANÇA (FASE 3)
@@ -168,9 +172,11 @@ ALTER TABLE governance_users ENABLE ROW LEVEL SECURITY;
 
 DROP POLICY IF EXISTS "Allow All on crm_leads" ON crm_leads;
 DROP POLICY IF EXISTS "Allow All on governance_users" ON governance_users;
+DROP POLICY IF EXISTS "Allow authenticated on crm_leads" ON crm_leads;
+DROP POLICY IF EXISTS "Allow authenticated on governance_users" ON governance_users;
 
-CREATE POLICY "Allow All on crm_leads" ON crm_leads FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All on governance_users" ON governance_users FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on crm_leads" ON crm_leads FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on governance_users" ON governance_users FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- =====================================================================================
 -- PARTE 5: INTERLIGAÇÕES OPERACIONAIS - FINANCIAL + EXTRAS + EVENTOS
@@ -235,19 +241,40 @@ CREATE TABLE IF NOT EXISTS operational_events (
     metadata JSONB DEFAULT '{}'::jsonb -- Payload técnico correlacionado
 );
 
+-- 9a. APROVAÇÕES EXTERNAS (APROVAÇÕES VIA TOKEN DE ALTA ENTROPIA)
+-- Liga: projects -> external_approvals
+-- Acionado por: Content Engine / Admin Center
+CREATE TABLE IF NOT EXISTS external_approvals (
+    id UUID DEFAULT extensions.uuid_generate_v4() PRIMARY KEY,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+    token TEXT UNIQUE NOT NULL,
+    status TEXT DEFAULT 'PENDENTE',
+    type TEXT NOT NULL,
+    content_data JSONB DEFAULT '{}'::jsonb,
+    feedback JSONB DEFAULT '{}'::jsonb
+);
+
 -- Ativar RLS nas novas tabelas
 ALTER TABLE payments_ledger ENABLE ROW LEVEL SECURITY;
 ALTER TABLE extra_services_contracts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE operational_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE external_approvals ENABLE ROW LEVEL SECURITY;
 
--- Políticas de acesso amplo (ajuste para produção com auth.uid())
+-- Políticas de acesso para usuários logados (mitigação emergencial)
 DROP POLICY IF EXISTS "Allow All on payments_ledger" ON payments_ledger;
 DROP POLICY IF EXISTS "Allow All on extra_services_contracts" ON extra_services_contracts;
 DROP POLICY IF EXISTS "Allow All on operational_events" ON operational_events;
+DROP POLICY IF EXISTS "Allow All on external_approvals" ON external_approvals;
+DROP POLICY IF EXISTS "Allow authenticated on payments_ledger" ON payments_ledger;
+DROP POLICY IF EXISTS "Allow authenticated on extra_services_contracts" ON extra_services_contracts;
+DROP POLICY IF EXISTS "Allow authenticated on operational_events" ON operational_events;
+DROP POLICY IF EXISTS "Allow authenticated on external_approvals" ON external_approvals;
 
-CREATE POLICY "Allow All on payments_ledger" ON payments_ledger FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All on extra_services_contracts" ON extra_services_contracts FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All on operational_events" ON operational_events FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on payments_ledger" ON payments_ledger FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on extra_services_contracts" ON extra_services_contracts FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on operational_events" ON operational_events FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on external_approvals" ON external_approvals FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- Migração segura: adiciona coluna em governance_users se já existia sem ela
 ALTER TABLE governance_users ADD COLUMN IF NOT EXISTS scoped_project_id UUID REFERENCES projects(id) ON DELETE SET NULL;
@@ -261,6 +288,9 @@ CREATE INDEX IF NOT EXISTS idx_extras_project ON extra_services_contracts(projec
 CREATE INDEX IF NOT EXISTS idx_events_project ON operational_events(project_id);
 CREATE INDEX IF NOT EXISTS idx_events_type ON operational_events(event_type);
 CREATE INDEX IF NOT EXISTS idx_assets_project_status ON content_assets(project_id, status);
+CREATE INDEX IF NOT EXISTS idx_ext_app_project ON external_approvals(project_id);
+CREATE INDEX IF NOT EXISTS idx_ext_app_token ON external_approvals(token);
+CREATE INDEX IF NOT EXISTS idx_ext_app_status ON external_approvals(status);
 
 -- =====================================================================================
 -- PARTE 6: KNOWLEDGE CORE™ — TABELAS DE INTELIGÊNCIA CONTEXTUAL
@@ -334,10 +364,13 @@ ALTER TABLE knowledge_documents ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Allow All on ai_usage_logs" ON ai_usage_logs;
 DROP POLICY IF EXISTS "Allow All on client_knowledge_cache" ON client_knowledge_cache;
 DROP POLICY IF EXISTS "Allow All on knowledge_documents" ON knowledge_documents;
+DROP POLICY IF EXISTS "Allow authenticated on ai_usage_logs" ON ai_usage_logs;
+DROP POLICY IF EXISTS "Allow authenticated on client_knowledge_cache" ON client_knowledge_cache;
+DROP POLICY IF EXISTS "Allow authenticated on knowledge_documents" ON knowledge_documents;
 
-CREATE POLICY "Allow All on ai_usage_logs" ON ai_usage_logs FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All on client_knowledge_cache" ON client_knowledge_cache FOR ALL USING (true) WITH CHECK (true);
-CREATE POLICY "Allow All on knowledge_documents" ON knowledge_documents FOR ALL USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on ai_usage_logs" ON ai_usage_logs FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on client_knowledge_cache" ON client_knowledge_cache FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on knowledge_documents" ON knowledge_documents FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- ─── Índices de Performance ─────────────────────────────────────
 
@@ -359,10 +392,10 @@ ALTER TABLE extra_services_contracts
     ADD COLUMN IF NOT EXISTS contract_id UUID REFERENCES contracts(id) ON DELETE SET NULL;
 
 -- =====================================================================================
--- FIM DO SCHEMA v4.0.0
+-- FIM DO SCHEMA v4.0.0 (Ajuste de Segurança Bloco 2)
 -- =====================================================================================
--- Tabelas: projects, contracts, governance_users, content_assets, audit_logs,
+-- Tabelas: projects, contracts, content_assets, audit_logs, crm_leads, governance_users,
 --          payments_ledger, extra_services_contracts, operational_events,
---          ai_usage_logs, client_knowledge_cache, knowledge_documents
--- Total: 11 tabelas | RLS ativado em todas
+--          ai_usage_logs, client_knowledge_cache, knowledge_documents, external_approvals
+-- Total: 13 tabelas | RLS ativado em todas (Restrito a authenticated | anon bloqueado)
 -- =====================================================================================
