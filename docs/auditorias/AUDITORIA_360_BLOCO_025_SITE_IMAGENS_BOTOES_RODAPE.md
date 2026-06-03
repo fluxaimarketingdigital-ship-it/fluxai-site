@@ -105,3 +105,11 @@ Avaliação dos destinos da barra inferior das páginas públicas.
 ---
 
 *Relatório de auditoria de presença pública compilado, corrigido e homologado pela Equipe de DevOps e Governança de Elite da FluxAI Labs.*
+
+
+## FECHAMENTO FINAL 2.5C
+- Ajustes globais de scroll-margin-top aplicados.
+- Botões CTA validados.
+- Limpeza de referências comerciais GovOS concluída.
+- Redes sociais limpas (Facebook/LinkedIn removidos, Instagram mantido).
+

@@ -82,3 +82,11 @@ node "C:\Users\BRENDA\.gemini\antigravity\brain\efd6cd1a-679f-4501-bf5b-0c58ab02
 ---
 
 *Correções aplicadas em conformidade estrita com as diretrizes do Bloco 2.5C e prontas para homologação final por teste físico manual.*
+
+
+## FECHAMENTO FINAL 2.5C
+- Ajustes globais de scroll-margin-top aplicados.
+- Botões CTA validados.
+- Limpeza de referências comerciais GovOS concluída.
+- Redes sociais limpas (Facebook/LinkedIn removidos, Instagram mantido).
+
