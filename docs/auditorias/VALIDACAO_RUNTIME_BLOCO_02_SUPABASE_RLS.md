@@ -1,104 +1,178 @@
-# Validação Runtime e Saneamento RLS — Bloco 2
+# Validação Runtime e Saneamento RLS — Bloco 2 (Atualizado)
 
-Este documento registra o diagnóstico, o script de saneamento final e o processo de homologação das políticas de Row Level Security (RLS) no Supabase de produção.
+Este documento registra o diagnóstico final, o script de saneamento final e o processo de homologação das políticas de Row Level Security (RLS) no Supabase de produção.
 
 ---
 
 ## 🔍 1. Diagnóstico de Políticas Residuais
 
-Após a execução da primeira etapa de migração, uma varredura nas políticas de banco de dados revelou que algumas tabelas operacionais e acessos legados ainda possuíam regras com o papel `public` ou `anon` (definidas como `roles = {public}` com cláusulas `USING (true)`). 
+Nas varreduras do banco de dados, identificamos a presença de políticas públicas legadas ou remanescentes associadas ao papel `{public}` (ou `{anon}`) em várias tabelas operacionais e de perfis.
 
-As seguintes tabelas e políticas foram identificadas como vulneráveis e remanescentes:
-- `ai_usage_logs` / `Allow All on ai_usage_logs`
-- `analytics_snapshots` / `Allow All on analytics_snapshots`
-- `approvals` / `Approvals public read`, `Permitir tudo provisoriamente`, `Políticas de aprovação por cargo`
-- `audit_logs` / `Allow All on audit_logs`
-- `client_knowledge_cache` / `Allow All on client_knowledge_cache`
-- `content_assets` / `Allow All on content_assets`, `Permitir tudo provisoriamente`, `Public Update Content`, `Public View Content`
-- `contracts` / `Allow All on contracts`, `Permitir tudo provisoriamente`
-- `crm_leads` / `Allow All on crm_leads`
-- `external_approvals` / `Allow External Access via Token`
-- `extra_services_contracts` / `Allow All on extra_services_contracts`
-- `governance_users` / `Allow All on governance_users`
-- `knowledge_documents` / `Allow All on knowledge_documents`
+As tabelas e políticas a serem saneadas são:
+- **`profiles`**: `Profiles are viewable by everyone`, `Users can update own profile`, `Allow All on profiles`
+- **`leads` / `crm_leads`**: `Leads insertable by staff`, `Leads public read`, `Allow All on crm_leads`
+- **`approvals`**: `Approvals public read`, `Staff can create approvals`, `Permitir tudo provisoriamente`
+- **`content_assets`**: `Allow All on content_assets`, `Permitir tudo provisoriamente`, `Public View Content`, `Public Update Content`
+- **`projects`**: `Allow All on projects`
+- **`contracts`**: `Allow All on contracts`, `Permitir tudo provisoriamente`
+- **`payments` / `payments_ledger`**: `Allow All on payments`, `Allow All on payments_ledger`
+- **`governance_users`**: `Allow All on governance_users`
+- **`extra_services_contracts`**: `Allow All on extra_services_contracts`
+- **`operational_events`**: `Allow All on operational_events`
+- **`ai_usage_logs`**: `Allow All on ai_usage_logs`
+- **`client_knowledge_cache`**: `Allow All on client_knowledge_cache`
+- **`knowledge_documents`**: `Allow All on knowledge_documents`
+- **`audit_logs`**: `Allow All on audit_logs`
+- **`external_approvals`**: `Allow External Access via Token`, `Allow All on external_approvals`
 
 ---
 
-## 🛠️ 2. Script SQL de Saneamento Final
+## 🛠️ 2. Script SQL de Saneamento Definitivo
 
-O script a seguir realiza o expurgo de todas as políticas públicas listadas acima, ativa RLS e assegura que todas as tabelas operacionais estejam protegidas por políticas restritas a `TO authenticated`.
+Execute este script no **SQL Editor** do Supabase para revogar todas as políticas públicas e anôminas e forçar o RLS restrito a `TO authenticated` em todas as tabelas operacionais:
 
 ```sql
 -- =====================================================================================
--- FLUXAI OS™ - SCRIPT DE SANEAMENTO FINAL RLS (BLOCO 2)
+-- FLUXAI OS™ - SCRIPT DE SANEAMENTO DEFINITIVO RLS (BLOCO 2)
 -- APLICAÇÃO: Manual via Supabase SQL Editor
--- CARACTERÍSTICA: Não destrutivo (não apaga dados reais de produção)
+-- CARACTERÍSTICA: Não destrutivo (não apaga dados reais nem dropa tabelas)
 -- =====================================================================================
 
 -- -------------------------------------------------------------------------------------
--- SEÇÃO 1: EXPURGO DAS POLÍTICAS PÚBLICAS / ANÔNIMAS REMANESCENTES
+-- SEÇÃO 1: EXPURGO DAS POLÍTICAS PÚBLICAS / ANÔNIMAS RESTANTES
 -- -------------------------------------------------------------------------------------
 
--- ai_usage_logs
-DROP POLICY IF EXISTS "Allow All on ai_usage_logs" ON public.ai_usage_logs;
+-- 1. Tabela public.profiles
+DROP POLICY IF EXISTS "Profiles are viewable by everyone" ON public.profiles;
+DROP POLICY IF EXISTS "Users can update own profile" ON public.profiles;
+DROP POLICY IF EXISTS "Allow All on profiles" ON public.profiles;
+DROP POLICY IF EXISTS "Allow authenticated on profiles" ON public.profiles;
 
--- analytics_snapshots
-DROP POLICY IF EXISTS "Allow All on analytics_snapshots" ON public.analytics_snapshots;
+-- 2. Tabela public.leads
+DROP POLICY IF EXISTS "Leads insertable by staff" ON public.leads;
+DROP POLICY IF EXISTS "Leads public read" ON public.leads;
+DROP POLICY IF EXISTS "Allow All on leads" ON public.leads;
+DROP POLICY IF EXISTS "Allow authenticated on leads" ON public.leads;
 
--- approvals
+-- 3. Tabela public.crm_leads
+DROP POLICY IF EXISTS "Leads insertable by staff" ON public.crm_leads;
+DROP POLICY IF EXISTS "Leads public read" ON public.crm_leads;
+DROP POLICY IF EXISTS "Allow All on crm_leads" ON public.crm_leads;
+DROP POLICY IF EXISTS "Allow authenticated on crm_leads" ON public.crm_leads;
+
+-- 4. Tabela public.approvals
 DROP POLICY IF EXISTS "Approvals public read" ON public.approvals;
+DROP POLICY IF EXISTS "Staff can create approvals" ON public.approvals;
 DROP POLICY IF EXISTS "Permitir tudo provisoriamente" ON public.approvals;
-DROP POLICY IF EXISTS "Políticas de aprovação por cargo" ON public.approvals;
+DROP POLICY IF EXISTS "Allow All on approvals" ON public.approvals;
+DROP POLICY IF EXISTS "Allow authenticated on approvals" ON public.approvals;
 
--- audit_logs
-DROP POLICY IF EXISTS "Allow All on audit_logs" ON public.audit_logs;
-
--- client_knowledge_cache
-DROP POLICY IF EXISTS "Allow All on client_knowledge_cache" ON public.client_knowledge_cache;
-
--- content_assets
+-- 5. Tabela public.content_assets
 DROP POLICY IF EXISTS "Allow All on content_assets" ON public.content_assets;
 DROP POLICY IF EXISTS "Permitir tudo provisoriamente" ON public.content_assets;
-DROP POLICY IF EXISTS "Public Update Content" ON public.content_assets;
 DROP POLICY IF EXISTS "Public View Content" ON public.content_assets;
+DROP POLICY IF EXISTS "Public Update Content" ON public.content_assets;
+DROP POLICY IF EXISTS "Allow authenticated on content_assets" ON public.content_assets;
 
--- contracts
+-- 6. Tabela public.projects
+DROP POLICY IF EXISTS "Allow All on projects" ON public.projects;
+DROP POLICY IF EXISTS "Allow authenticated on projects" ON public.projects;
+
+-- 7. Tabela public.contracts
 DROP POLICY IF EXISTS "Allow All on contracts" ON public.contracts;
 DROP POLICY IF EXISTS "Permitir tudo provisoriamente" ON public.contracts;
+DROP POLICY IF EXISTS "Allow authenticated on contracts" ON public.contracts;
 
--- crm_leads
-DROP POLICY IF EXISTS "Allow All on crm_leads" ON public.crm_leads;
+-- 8. Tabela public.payments
+DROP POLICY IF EXISTS "Allow All on payments" ON public.payments;
+DROP POLICY IF EXISTS "Allow authenticated on payments" ON public.payments;
 
--- external_approvals
-DROP POLICY IF EXISTS "Allow External Access via Token" ON public.external_approvals;
+-- 9. Tabela public.payments_ledger
+DROP POLICY IF EXISTS "Allow All on payments_ledger" ON public.payments_ledger;
+DROP POLICY IF EXISTS "Allow authenticated on payments_ledger" ON public.payments_ledger;
 
--- extra_services_contracts
-DROP POLICY IF EXISTS "Allow All on extra_services_contracts" ON public.extra_services_contracts;
-
--- governance_users
+-- 10. Tabela public.governance_users
 DROP POLICY IF EXISTS "Allow All on governance_users" ON public.governance_users;
+DROP POLICY IF EXISTS "Allow authenticated on governance_users" ON public.governance_users;
 
--- knowledge_documents
+-- 11. Tabela public.extra_services_contracts
+DROP POLICY IF EXISTS "Allow All on extra_services_contracts" ON public.extra_services_contracts;
+DROP POLICY IF EXISTS "Allow authenticated on extra_services_contracts" ON public.extra_services_contracts;
+
+-- 12. Tabela public.operational_events
+DROP POLICY IF EXISTS "Allow All on operational_events" ON public.operational_events;
+DROP POLICY IF EXISTS "Allow authenticated on operational_events" ON public.operational_events;
+
+-- 13. Tabela public.ai_usage_logs
+DROP POLICY IF EXISTS "Allow All on ai_usage_logs" ON public.ai_usage_logs;
+DROP POLICY IF EXISTS "Allow authenticated on ai_usage_logs" ON public.ai_usage_logs;
+
+-- 14. Tabela public.client_knowledge_cache
+DROP POLICY IF EXISTS "Allow All on client_knowledge_cache" ON public.client_knowledge_cache;
+DROP POLICY IF EXISTS "Allow authenticated on client_knowledge_cache" ON public.client_knowledge_cache;
+
+-- 15. Tabela public.knowledge_documents
 DROP POLICY IF EXISTS "Allow All on knowledge_documents" ON public.knowledge_documents;
+DROP POLICY IF EXISTS "Allow authenticated on knowledge_documents" ON public.knowledge_documents;
 
+-- 16. Tabela public.audit_logs
+DROP POLICY IF EXISTS "Allow All on audit_logs" ON public.audit_logs;
+DROP POLICY IF EXISTS "Allow authenticated on audit_logs" ON public.audit_logs;
 
--- -------------------------------------------------------------------------------------
--- SEÇÃO 2: GARANTIA DE RLS ATIVO EM TODAS AS TABELAS OPERACIONAIS COMPLEMENTARES
--- -------------------------------------------------------------------------------------
-ALTER TABLE public.approvals ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.analytics_snapshots ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.external_approvals ENABLE ROW LEVEL SECURITY;
-
--- -------------------------------------------------------------------------------------
--- SEÇÃO 3: CRIAÇÃO/REFORÇO DAS POLÍTICAS DE ACESSO AUTENTICADO (TO authenticated)
--- -------------------------------------------------------------------------------------
-DROP POLICY IF EXISTS "Allow authenticated on approvals" ON public.approvals;
-DROP POLICY IF EXISTS "Allow authenticated on analytics_snapshots" ON public.analytics_snapshots;
+-- 17. Tabela public.external_approvals
+DROP POLICY IF EXISTS "Allow External Access via Token" ON public.external_approvals;
+DROP POLICY IF EXISTS "Allow All on external_approvals" ON public.external_approvals;
 DROP POLICY IF EXISTS "Allow authenticated on external_approvals" ON public.external_approvals;
 
+-- 18. Tabela public.analytics_snapshots (se aplicável)
+DROP POLICY IF EXISTS "Allow All on analytics_snapshots" ON public.analytics_snapshots;
+DROP POLICY IF EXISTS "Allow authenticated on analytics_snapshots" ON public.analytics_snapshots;
+
+
+-- -------------------------------------------------------------------------------------
+-- SEÇÃO 2: ATIVAÇÃO GLOBAL DE ROW LEVEL SECURITY (RLS)
+-- -------------------------------------------------------------------------------------
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.crm_leads ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.approvals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.content_assets ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.projects ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.contracts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payments ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payments_ledger ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.governance_users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.extra_services_contracts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.operational_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.ai_usage_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.client_knowledge_cache ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.knowledge_documents ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.external_approvals ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.analytics_snapshots ENABLE ROW LEVEL SECURITY;
+
+
+-- -------------------------------------------------------------------------------------
+-- SEÇÃO 3: CRIAÇÃO DAS POLÍTICAS DE ACESSO AUTENTICADO (TO authenticated)
+-- -------------------------------------------------------------------------------------
+CREATE POLICY "Allow authenticated on profiles" ON public.profiles FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on leads" ON public.leads FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on crm_leads" ON public.crm_leads FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Allow authenticated on approvals" ON public.approvals FOR ALL TO authenticated USING (true) WITH CHECK (true);
-CREATE POLICY "Allow authenticated on analytics_snapshots" ON public.analytics_snapshots FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on content_assets" ON public.content_assets FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on projects" ON public.projects FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on contracts" ON public.contracts FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on payments" ON public.payments FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on payments_ledger" ON public.payments_ledger FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on governance_users" ON public.governance_users FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on extra_services_contracts" ON public.extra_services_contracts FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on operational_events" ON public.operational_events FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on ai_usage_logs" ON public.ai_usage_logs FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on client_knowledge_cache" ON public.client_knowledge_cache FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on knowledge_documents" ON public.knowledge_documents FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on audit_logs" ON public.audit_logs FOR ALL TO authenticated USING (true) WITH CHECK (true);
 CREATE POLICY "Allow authenticated on external_approvals" ON public.external_approvals FOR ALL TO authenticated USING (true) WITH CHECK (true);
+CREATE POLICY "Allow authenticated on analytics_snapshots" ON public.analytics_snapshots FOR ALL TO authenticated USING (true) WITH CHECK (true);
 ```
 
 ---
@@ -113,10 +187,10 @@ SELECT
     schemaname,
     tablename,
     policyname,
-    roles,
-    cmd,
-    qual,
-    with_check
+    roles AS roles_permitidas,
+    cmd AS comando,
+    qual AS condicao_using,
+    with_check AS condicao_check
 FROM pg_policies
 WHERE schemaname = 'public'
   AND (roles && ARRAY['public'::name, 'anon'::name]);
