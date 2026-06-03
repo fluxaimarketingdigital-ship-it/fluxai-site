@@ -33,7 +33,7 @@
     <div class="container" style="max-width: 800px; margin: 0 auto;">
       
       <!-- HEADER -->
-      <section class="reveal" style="margin-bottom: 60px;">
+      <section class="reveal active" style="margin-bottom: 60px;">
         <span class="section-top-label" style="display: block; margin-bottom: 20px; font-weight: 700; letter-spacing: 2px; color: var(--primary);">[ETAPA DE ENTRADA]</span>
         <h1 style="font-size: clamp(2.2rem, 6vw, 3.5rem); line-height: 1.1; margin-bottom: 30px; color: var(--secondary); font-weight: 800; letter-spacing: -0.03em;">
           Diagnósticos <br><span style="color: var(--primary);">Aplicados.</span>
@@ -99,17 +99,6 @@
   </footer>
 
   <script type="module" src="/src/scripts/script.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      }, { threshold: 0.1 });
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    });
-  </script>
+  <script src="/src/scripts/pages-observer.js"></script>
 </body>
 </html>

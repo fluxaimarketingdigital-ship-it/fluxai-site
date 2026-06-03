@@ -33,7 +33,7 @@
     <div class="container">
       
       <!-- OS GATE HEADER -->
-      <section class="reveal" style="text-align: center; max-width: 800px; margin: 0 auto 80px;">
+      <section class="reveal active" style="text-align: center; max-width: 800px; margin: 0 auto 80px;">
         <span class="section-top-label" style="display: block; margin-bottom: 20px; font-weight: 700; letter-spacing: 2px; color: var(--primary);">[INFRAESTRUTURA OPERACIONAL PROPRIETÁRIA]</span>
         <h1 style="font-size: clamp(2.5rem, 8vw, 4rem); line-height: 1.1; margin-bottom: 30px; color: var(--secondary); font-weight: 800; letter-spacing: -0.03em;">
           FluxAI <span style="color: var(--primary);">OS™</span>
@@ -74,24 +74,16 @@
             </li>
           </ul>
         </div>
-        <div style="background: var(--bg-white); padding: 40px; border-radius: 4px; border: 1px solid var(--border); box-shadow: var(--shadow-layered);">
-          <div style="background: var(--bg-dark); border-radius: 4px; padding: 25px; border: 1px solid rgba(255,255,255,0.05); color: #fff;">
-             <div style="display: flex; gap: 8px; margin-bottom: 20px;">
-               <div style="width: 8px; height: 8px; border-radius: 50%; background: #ff4d4d;"></div>
-               <div style="width: 8px; height: 8px; border-radius: 50%; background: #ffcc00;"></div>
-               <div style="width: 8px; height: 8px; border-radius: 50%; background: #00cc66;"></div>
-             </div>
-             <div style="height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--primary); font-family: monospace; font-size: 0.85rem; text-align: center; gap: 15px;">
-               <div>
-                 [ AMBIENTE PRIVADO E SEGURO ]<br>
-                 <span style="color: #64748b; font-size: 0.75rem;">Acesso exclusivo para clientes e operadores da FluxAI</span>
-               </div>
-               <a href="/os/login.html" class="btn btn-diagnostic" style="background: var(--primary); color: #fff; border: none; padding: 8px 16px; font-size: 0.8rem; font-weight: 600;">
-                 Portal do Cliente <i class="fa-solid fa-chevron-right" style="font-size:0.7rem;"></i>
-               </a>
-             </div>
+        <div style="background: var(--bg-white); padding: 20px; border-radius: 4px; border: 1px solid var(--border); box-shadow: var(--shadow-layered);">
+          <div style="border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08);">
+            <img src="/assets/images/ui/ui-portal-os.png" alt="FluxAI OS™ — Portal do Cliente" style="width: 100%; display: block;" loading="eager" />
           </div>
-          <p style="text-align: center; margin-top: 20px; font-size: 0.85rem; color: var(--text-muted); font-style: italic;">Interface Operacional v1.0.4 - FluxAI Labs</p>
+          <p style="text-align: center; margin-top: 15px; font-size: 0.85rem; color: var(--text-muted); font-style: italic;">Interface Operacional v1.0.4 — FluxAI Labs</p>
+          <div style="text-align: center; margin-top: 15px;">
+            <a href="/os/login.html" class="btn btn-diagnostic" style="background: var(--primary); color: #fff; border: none; padding: 10px 20px; font-size: 0.85rem; font-weight: 600;">
+              Portal do Cliente <i class="fa-solid fa-arrow-right-to-bracket" style="font-size:0.75rem; margin-left:6px;"></i>
+            </a>
+          </div>
         </div>
       </section>
 
@@ -122,17 +114,6 @@
   </footer>
 
   <script type="module" src="/src/scripts/script.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      }, { threshold: 0.1 });
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    });
-  </script>
+  <script src="/src/scripts/pages-observer.js"></script>
 </body>
 </html>

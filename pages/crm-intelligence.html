@@ -33,7 +33,7 @@
     <div class="container">
       
       <!-- EDITORIAL HEADER -->
-      <section class="editorial-header reveal">
+      <section class="editorial-header reveal active">
         <div class="terminal-status">
           <span class="blink"></span> [SYSTEM_ACCESS.GRANTED] // MODULE: CRM_INTELLIGENCE
         </div>
@@ -44,6 +44,9 @@
         <p style="font-size: 1.5rem; line-height: 1.6; color: var(--text-muted); max-width: 750px; font-weight: 500;">
           A camada de inteligência que organiza oportunidades, relacionamento, temperatura comercial e retenção.
         </p>
+        <div style="margin-top: 40px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+          <img src="/assets/images/ui/ui-crm-intelligence.png" alt="FluxAI CRM Intelligence — Pipeline Comercial e Leads" style="width: 100%; display: block; max-height: 380px; object-fit: cover; object-position: top;" loading="eager" />
+        </div>
       </section>
 
       <!-- EDITORIAL CONTENT (AJAX TARGET) -->
@@ -161,17 +164,6 @@
   </footer>
 
   <script type="module" src="/src/scripts/script.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      }, { threshold: 0.1 });
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    });
-  </script>
+  <script src="/src/scripts/pages-observer.js"></script>
 </body>
 </html>

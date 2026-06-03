@@ -33,17 +33,20 @@
     <div class="container">
       
       <!-- EDITORIAL HEADER -->
-      <section class="editorial-header reveal">
+      <section class="editorial-header reveal active">
         <div class="terminal-status">
           <span class="blink"></span> [SYSTEM_ACCESS.GRANTED] // MODULE: AUTOMATION_HUB
         </div>
-        <span class="section-top-label" style="display: block; margin-bottom: 20px; font-weight: 700; letter-spacing: 2px; color: var(--primary);">[MOD.04] AUTOMATION HUB</span>
+        <span class="section-top-label" style="display: block; margin-bottom: 20px; font-weight: 700; letter-spacing: 2px; color: var(--primary);">[MOD.05] AUTOMATION HUB</span>
         <h1 style="font-size: clamp(2.5rem, 8vw, 4.5rem); line-height: 1.1; margin-bottom: 40px; color: var(--secondary); font-weight: 800; letter-spacing: -0.03em;">
           Automation <br><span style="color: var(--primary);">Hub.</span>
         </h1>
         <p style="font-size: 1.5rem; line-height: 1.6; color: var(--text-muted); max-width: 750px; font-weight: 500;">
           A infraestrutura que conecta processos, dados e rotinas para reduzir operação manual e aumentar previsibilidade.
         </p>
+        <div style="margin-top: 40px; border-radius: 4px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
+          <img src="/assets/images/ui/ui-automation-hub.png" alt="FluxAI Automation Hub — Workflows e Automações" style="width: 100%; display: block; max-height: 380px; object-fit: cover; object-position: top;" loading="eager" />
+        </div>
       </section>
 
       <!-- EDITORIAL CONTENT (AJAX TARGET) -->
@@ -161,17 +164,6 @@
   </footer>
 
   <script type="module" src="/src/scripts/script.js"></script>
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      }, { threshold: 0.1 });
-      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    });
-  </script>
+  <script src="/src/scripts/pages-observer.js"></script>
 </body>
 </html>

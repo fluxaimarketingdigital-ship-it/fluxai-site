@@ -75,7 +75,12 @@ export const initDashboard = () => {
             if (mainContent) {
                 const title = mainContent.querySelector('h1')?.innerText || '';
                 const modLabel = mainContent.querySelector('.section-top-label')?.innerText || '';
-                const bodyNodes = mainContent.querySelector('.editorial-content')?.cloneNode(true) || document.createElement('div');
+                const editorialClone = mainContent.querySelector('.editorial-content');
+                const bodyNodes = editorialClone ? editorialClone.cloneNode(true) : document.createElement('div');
+                // Remove 'reveal' so the cloned content is immediately visible (not opacity:0)
+                bodyNodes.classList.remove('reveal');
+                bodyNodes.style.opacity = '1';
+                bodyNodes.style.transform = 'none';
 
                 const formattedNode = document.createElement('div');
                 formattedNode.className = 'display-content reveal';
