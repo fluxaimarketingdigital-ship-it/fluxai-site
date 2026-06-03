@@ -464,11 +464,12 @@ function _applyRBAC(user, requiredRole, requiredPermission) {
     // Bloqueio de URL direta para CLIENT
     if (user.role === 'CLIENT') {
         const currentPath = window.location.pathname.toLowerCase();
-        // CLIENT só pode acessar: client-portal, approval (aprovar entregas), access-denied, login
+        // CLIENT só pode acessar: client-portal, approval (aprovar entregas), access-denied, login, flux-calendar
         const isAllowed = [
             'client-portal',
             'approval',
             'contract-view',
+            'flux-calendar',
             'access-denied',
             'login'
         ].some(allowed => currentPath.includes(allowed));

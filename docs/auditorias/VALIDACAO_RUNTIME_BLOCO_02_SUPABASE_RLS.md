@@ -199,3 +199,21 @@ WHERE schemaname = 'public'
 ### Resultado Esperado
 * **Resultado:** **0 linhas retornadas**.
 * **Significado:** Nenhuma tabela possui políticas expostas a usuários públicos ou anônimos, concluindo a mitigação de segurança.
+
+---
+
+## 📊 4. Resultado da Bateria de Testes em Runtime (Executado)
+
+Rodamos a bateria de testes de controle em runtime via Puppeteer sobre a porta HTTP `8080`, simulando sessões de clientes e administradores em navegadores reais:
+
+1. **Teste 1 (Acesso Deslogado):** Acesso a `flux-calendar.html?project=some-uuid` sem sessão ativa redirecionou com sucesso para `os/login.html`.
+   - **Status:** **SUCESSO**
+2. **Teste 2 (Cross-Tenant / IDOR):** Acesso a `flux-calendar.html?project=projeto_invasor_456` sob uma sessão de `CLIENT` com `project_id = projeto_oficial_maria_123` foi bloqueado, e a URL foi reescrita com segurança pelo Event Guard para o ID oficial.
+   - **Status:** **SUCESSO**
+3. **Teste 3 (Acesso de Administração):** Acesso a `flux-calendar.html?project=projeto_cliente_xyz` sob uma sessão de `ADMIN` foi permitido e mantido normalmente para auditoria.
+   - **Status:** **SUCESSO**
+4. **Teste 4 (Conexão Supabase REST API):** Requisições REST directas às tabelas operacionais (como `projects` e `external_approvals`) usando a chave anônima (`anonKey` sem JWT) retornaram 0 linhas, comprovando o correto funcionamento do RLS.
+   - **Status:** **SUCESSO**
+
+Todos os testes de conformidade técnica em runtime passaram de forma consistente.
+
