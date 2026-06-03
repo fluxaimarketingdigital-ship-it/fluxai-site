@@ -139,48 +139,99 @@ Deno.serve(async (req) => {
     // 3. Validação de campos obrigatórios, formato de e-mail e sanitização de schema no backend
     let sanitizedPayload = payload ?? {};
     if (route === "LEAD_CAPTURE") {
-      const { name, email, company, revenue, spend, gap } = sanitizedPayload;
+      const isHome = sanitizedPayload.origem_site === "site_fluxai" || sanitizedPayload.origem_site === "home_fluxai";
 
-      // Bloqueia se algum campo essencial estiver em branco
-      if (!name || !email || !company || !revenue || !spend || !gap) {
-        console.log("make-proxy:missing-required-fields", { requestId, origin: reqOrigin });
-        return jsonResponse({ ok: false, error: "Missing required lead fields", requestId }, 400, corsHeaders);
+      if (isHome) {
+        // Modelo B: Home Page
+        const nomeLead = sanitizedPayload.nome_lead || sanitizedPayload.name || sanitizedPayload.nome;
+        const telefoneLead = sanitizedPayload.telefone || sanitizedPayload.phone || "";
+        const empresaLead = sanitizedPayload.empresa || sanitizedPayload.instagram || sanitizedPayload.company || "Não informado";
+        const emailLead = sanitizedPayload.email || "";
+        const observacaoInput = sanitizedPayload.observacao || sanitizedPayload.desafio || sanitizedPayload.description || "";
+        const instagramText = String(sanitizedPayload.instagram || "").trim().substring(0, 100);
+        const segmentoText = String(sanitizedPayload.segmento || "").trim().substring(0, 100);
+        const gargaloText = String(sanitizedPayload.gargalo || "").trim().substring(0, 100);
+        const desafioText = String(observacaoInput).trim().substring(0, 1000);
+        
+        // Monta observação rica para a Home
+        const observacaoText = `Instagram/Site: ${instagramText} | Segmento: ${segmentoText} | Gargalo: ${gargaloText} | ${desafioText}`;
+
+        // Valida campos essenciais mínimos para a Home Page
+        if (!nomeLead) {
+          console.log("make-proxy:missing-required-fields-home", { requestId, origin: reqOrigin });
+          return jsonResponse({ ok: false, error: "Missing required lead fields for homepage", requestId }, 400, corsHeaders);
+        }
+
+        // Valida formato de e-mail básico no backend SE fornecido
+        if (emailLead && !isValidEmailBasic(emailLead)) {
+          console.log("make-proxy:invalid-email-format-home", { requestId, email: emailLead, origin: reqOrigin });
+          return jsonResponse({ ok: false, error: "Invalid email format", requestId }, 400, corsHeaders);
+        }
+
+        const leadId = sanitizedPayload.lead_id || `LEAD-${crypto.randomUUID()}`;
+
+        sanitizedPayload = {
+          lead_id: leadId,
+          cliente_id: "FLUXAI_LABS_001",
+          cliente_nome: "FluxAI Labs",
+          origem_site: "site_fluxai",
+          nome_lead: String(nomeLead).trim().substring(0, 100),
+          email: String(emailLead).trim().substring(0, 100),
+          telefone: String(telefoneLead).trim().substring(0, 30),
+          empresa: String(empresaLead).trim().substring(0, 100),
+          servico_interesse: "Diagnóstico Estratégico FluxAI",
+          canal_origem: "site",
+          campanha: "home_fluxai",
+          pagina_origem: "/",
+          status_lead: "novo",
+          responsavel: "FluxAI",
+          observacao: observacaoText
+        };
+      } else {
+        // Modelo A: Landing Page /giaas
+        const { name, email, company, revenue, spend, gap } = sanitizedPayload;
+
+        // Bloqueia se algum campo essencial estiver em branco
+        if (!name || !email || !company || !revenue || !spend || !gap) {
+          console.log("make-proxy:missing-required-fields-landing", { requestId, origin: reqOrigin });
+          return jsonResponse({ ok: false, error: "Missing required lead fields", requestId }, 400, corsHeaders);
+        }
+
+        // Valida formato de e-mail básico no backend
+        if (!isValidEmailBasic(email)) {
+          console.log("make-proxy:invalid-email-format-landing", { requestId, email, origin: reqOrigin });
+          return jsonResponse({ ok: false, error: "Invalid email format", requestId }, 400, corsHeaders);
+        }
+
+        // Constrói o identificador do lead de forma segura
+        const leadId = `LEAD-${crypto.randomUUID()}`;
+
+        // Monta a observação concatenando as informações comerciais
+        const faturamentoText = String(revenue).trim().substring(0, 30);
+        const midiaText = String(spend).trim().substring(0, 30);
+        const gargaloText = String(gap).trim().substring(0, 50);
+        const descricaoText = String(sanitizedPayload.description || "").trim().substring(0, 1000);
+        const observacaoText = `Faturamento: ${faturamentoText} | Mídia: ${midiaText} | Gargalo: ${gargaloText} | ${descricaoText}`;
+
+        // Transforma o payload no formato achatado exigido pelo cenário 02 do Make
+        sanitizedPayload = {
+          lead_id: leadId,
+          cliente_id: "FLUXAI_LABS_001",
+          cliente_nome: "FluxAI Labs",
+          origem_site: "landing_sistema_crescimento",
+          nome_lead: String(name).trim().substring(0, 100),
+          email: String(email).trim().substring(0, 100),
+          telefone: String(sanitizedPayload.phone || sanitizedPayload.telefone || "").trim().substring(0, 30),
+          empresa: String(company).trim().substring(0, 100),
+          servico_interesse: "Sistema de Crescimento FluxAI",
+          canal_origem: "site",
+          campanha: "landing_sistema_crescimento",
+          pagina_origem: String(sanitizedPayload.page_url || "/giaas").trim().substring(0, 100),
+          status_lead: "novo",
+          responsavel: "FluxAI",
+          observacao: observacaoText
+        };
       }
-
-      // Valida formato de e-mail básico no backend
-      if (!isValidEmailBasic(email)) {
-        console.log("make-proxy:invalid-email-format", { requestId, email, origin: reqOrigin });
-        return jsonResponse({ ok: false, error: "Invalid email format", requestId }, 400, corsHeaders);
-      }
-
-      // Constrói o identificador do lead de forma segura
-      const leadId = `LEAD-${crypto.randomUUID()}`;
-
-      // Monta a observação concatenando as informações comerciais
-      const faturamentoText = String(revenue).trim().substring(0, 30);
-      const midiaText = String(spend).trim().substring(0, 30);
-      const gargaloText = String(gap).trim().substring(0, 50);
-      const descricaoText = String(sanitizedPayload.description || "").trim().substring(0, 1000);
-      const observacaoText = `Faturamento: ${faturamentoText} | Mídia: ${midiaText} | Gargalo: ${gargaloText} | ${descricaoText}`;
-
-      // Transforma o payload no formato achatado exigido pelo cenário 02 do Make
-      sanitizedPayload = {
-        lead_id: leadId,
-        cliente_id: "FLUXAI_LABS_001",
-        cliente_nome: "FluxAI Labs",
-        origem_site: "landing_sistema_crescimento",
-        nome_lead: String(name).trim().substring(0, 100),
-        email: String(email).trim().substring(0, 100),
-        telefone: String(sanitizedPayload.phone || sanitizedPayload.telefone || "").trim().substring(0, 30),
-        empresa: String(company).trim().substring(0, 100),
-        servico_interesse: "Sistema de Crescimento FluxAI",
-        canal_origem: "site",
-        campanha: "landing_sistema_crescimento",
-        pagina_origem: String(sanitizedPayload.page_url || "/giaas").trim().substring(0, 100),
-        status_lead: "novo",
-        responsavel: "FluxAI",
-        observacao: observacaoText
-      };
     }
 
     const webhookUrl = Deno.env.get(secretName);

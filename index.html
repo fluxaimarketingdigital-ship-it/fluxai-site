@@ -44,35 +44,13 @@
     <meta name="description" content="Engenharia de autoridade e infraestrutura operacional para marcas que buscam previsibilidade e escala no mercado de alto valor." />
     <meta name="keywords" content="Infraestrutura Digital, Inteligência Operacional, FluxAI OS, Consultoria B2B, Estratégia de Crescimento" />
     
-    <!-- Open Graph / LinkedIn / WhatsApp -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://fluxaidigital.com.br/" />
-    <meta property="og:title" content="FluxAI Labs | Infraestrutura de Crescimento" />
-    <meta property="og:description" content="Engenharia de autoridade e infraestrutura operacional para marcas que buscam previsibilidade e escala no mercado de alto valor." />
-    <meta property="og:image" content="https://fluxaidigital.com.br/hero-arch.png" />
-
-    <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content="https://fluxaidigital.com.br/" />
-    <meta property="twitter:title" content="FluxAI Labs | Infraestrutura de Crescimento" />
-    <meta property="twitter:description" content="Engenharia de autoridade e infraestrutura operacional para marcas que buscam previsibilidade e escala no mercado de alto valor." />
-    <meta property="twitter:image" content="https://fluxaidigital.com.br/hero-arch.webp" />
+    <!-- Metadata consolidated in the social metadata block at the top -->
 
     <!-- Preload Hero Image for LCP Performance -->
     <!-- Preload Hero Image for LCP Performance -->
     <link rel="preload" href="/assets/images/branding/hero-main.webp" as="image" />
 
-    <!-- Schema.org JSON-LD -->
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "ProfessionalService",
-      "name": "FluxAI Labs",
-      "description": "Consultoria de infraestrutura estratégica e Inteligência Operacional.",
-      "url": "https://fluxaidigital.com.br",
-      "logo": "https://fluxaidigital.com.br/logo-principal.png"
-    }
-    </script>
+    <!-- Schema.org JSON-LD consolidated in the Webmaster Authority block below -->
   
   <!-- Fontes -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -90,7 +68,154 @@
     .logo-img { max-width: 195px; height: auto; }
     .hero { padding: 150px 0 80px; min-height: 80vh; }
     .hero-content h1 { color: #fff; }
+
+    /* LGPD Cookie Banner and Modal Styles */
+    .lgpd-cookie-banner {
+        position: fixed;
+        bottom: -150px;
+        left: 0;
+        right: 0;
+        background: #0f172a;
+        border-top: 1px solid rgba(107, 122, 69, 0.4);
+        padding: 20px 24px;
+        z-index: 10000;
+        transition: bottom 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.5);
+    }
+    .lgpd-cookie-banner.active {
+        bottom: 0;
+    }
+    .lgpd-cookie-banner .container-banner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+    }
+    .lgpd-cookie-banner-text {
+        color: #d1d5db;
+        font-size: 0.85rem;
+        line-height: 1.5;
+    }
+    .lgpd-cookie-banner-text a {
+        color: #8e9e68;
+        text-decoration: underline;
+        font-weight: 600;
+        cursor: pointer;
+    }
+    .lgpd-cookie-banner-btn {
+        background: #6b7a45;
+        color: #ffffff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 4px;
+        font-weight: 700;
+        font-size: 0.8rem;
+        cursor: pointer;
+        white-space: nowrap;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+    .lgpd-cookie-banner-btn:hover {
+        background: #8e9e68;
+        transform: translateY(-2px);
+    }
+    @media (max-width: 768px) {
+        .lgpd-cookie-banner .container-banner {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 16px;
+            text-align: center;
+        }
+        .lgpd-cookie-banner-btn {
+            width: 100%;
+        }
+    }
+    .privacy-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(15, 23, 42, 0.95);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        z-index: 10100;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.3s ease;
+        padding: 20px;
+    }
+    .privacy-modal.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .privacy-modal-content {
+        background: #1e293b;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        max-width: 700px;
+        width: 100%;
+        max-height: 80vh;
+        border-radius: 8px;
+        overflow-y: auto;
+        padding: 40px;
+        position: relative;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+    }
+    .privacy-modal-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+    .privacy-modal-close:hover {
+        color: #ffffff;
+    }
+    .privacy-modal h3 {
+        color: #ffffff;
+        font-size: 1.5rem;
+        margin-bottom: 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 10px;
+    }
+    .privacy-modal h4 {
+        color: #8e9e68;
+        font-size: 1rem;
+        margin: 20px 0 10px 0;
+    }
+    .privacy-modal p, .privacy-modal ul {
+        font-size: 0.85rem;
+        color: #cbd5e1;
+        line-height: 1.6;
+        margin-bottom: 12px;
+    }
+    .privacy-modal ul {
+        padding-left: 20px;
+    }
+    .privacy-modal li {
+        margin-bottom: 6px;
+    }
   </style>
+  <script>
+    function trackFacebookEvent(eventName) {
+      if (typeof window.fbq === 'function') {
+        window.fbq('track', eventName);
+      } else {
+        console.info(`[TRACKING] Event "${eventName}" recorded (simulation/Pixel not loaded)`);
+      }
+    }
+  </script>
 
   <link rel="stylesheet" href="/src/styles/style.css" />
 
@@ -153,7 +278,7 @@
         <a href="https://instagram.com/fluxai.mark" target="_blank" class="nav-icon" aria-label="Instagram">
           <svg viewBox="0 0 448 512" width="1em" height="1em" fill="currentColor"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
         </a>
-        <a href="#diagnostico" class="btn btn-diagnostic" rel="noopener noreferrer" onclick="fbq('track', 'Contact');">
+        <a href="#diagnostico" class="btn btn-diagnostic" rel="noopener noreferrer" onclick="trackFacebookEvent('Contact');">
           Garantir Diagnóstico
         </a>
         <button class="menu-toggle" id="mobile-toggle" aria-label="Abrir Menu">
@@ -537,7 +662,7 @@
       <div class="container text-center reveal">
         <h2 class="impact-title">Estruture sua operação para crescer com previsibilidade.</h2>
         <p class="impact-desc">Reduza a dependência de ações isoladas. Estruture uma operação com posicionamento, aquisição, retenção e Inteligência Operacional.</p>
-        <a href="#diagnostico" class="btn btn-primary btn-large" onclick="fbq('track', 'Lead');">
+        <a href="#diagnostico" class="btn btn-primary btn-large" onclick="trackFacebookEvent('Lead');">
           Garantir Meu Diagnóstico Estratégico <i class="fa-solid fa-fire"></i>
         </a>
       </div>
@@ -664,6 +789,7 @@
         <p>© 2026 FluxAI Labs. Todos os direitos reservados.</p>
         <div class="legal-links">
           <span class="data-badge" style="position: static; opacity: 0.2; background: none; border: none;">[CORE_SYSTEM_SECURED]</span>
+          <a href="#" id="openPrivacyModal" style="color: #64748b; text-decoration: underline; margin-left: 15px; cursor: pointer; font-size: 0.85rem;">Política de Privacidade</a>
         </div>
         <a href="#" class="back-to-top" style="color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Voltar ao Topo <i class="fa-solid fa-arrow-up"></i></a>
       </div>
@@ -760,8 +886,169 @@
 
   <script type="module" src="/src/scripts/script.js"></script>
   <script type="module" src="/src/scripts/dashboard.js"></script>
-  <script type="module" src="/os/services/capture.js"></script>
 
+  <!-- LGPD Cookie Banner -->
+  <div id="lgpd-banner" class="lgpd-cookie-banner">
+      <div class="container-banner">
+          <p class="lgpd-cookie-banner-text">
+              Nós utilizamos cookies e tecnologias semelhantes para melhorar a sua experiência, otimizar o desempenho do site e analisar o tráfego de dados em total conformidade com a Lei Geral de Proteção de Dados (LGPD). Ao continuar navegando, você concorda com o uso destas tecnologias. Leia nossa <a id="openPrivacyLink">Política de Privacidade</a>.
+          </p>
+          <button id="lgpd-accept" class="lgpd-cookie-banner-btn">Aceitar e Prosseguir</button>
+      </div>
+  </div>
+
+  <!-- Privacy Policy Modal -->
+  <div id="privacy-modal" class="privacy-modal">
+      <div class="privacy-modal-content">
+          <button id="close-privacy-modal" class="privacy-modal-close"><i class="fa-solid fa-xmark"></i></button>
+          <h3>Diretrizes de Privacidade e LGPD | FluxAI Labs™</h3>
+          
+          <p><strong>Última atualização:</strong> Junho de 2026</p>
+          
+          <p>Nós da <strong>FluxAI Labs™</strong> valorizamos a segurança e a governança dos seus dados. Esta Política de Privacidade descreve de forma transparente como coletamos, armazenamos e tratamos as informações fornecidas voluntariamente na página institucional.</p>
+          
+          <h4>1. Coleta de Dados Voluntária</h4>
+          <p>Coletamos informações exclusivas fornecidas voluntariamente por você ao submeter o formulário de aplicação comercial de triagem:</p>
+          <ul>
+              <li>Nome Completo ou Empresa, WhatsApp de contato e Instagram ou Site;</li>
+              <li>Segmento de mercado, gargalo identificado e descrição opcional do desafio.</li>
+          </ul>
+          
+          <h4>2. Finalidade e Utilização dos Dados</h4>
+          <p>Todos os dados de triagem comercial coletados destinam-se única e exclusivamente a:</p>
+          <ul>
+              <li>Avaliação prévia de qualificação comercial e viabilidade técnica de implantação do ecossistema FluxAI;</li>
+              <li>Contato direto por nossa equipe de governança corporativa e sócios para agendamento de diagnóstico;</li>
+              <li>Nenhum dado é compartilhado com terceiros ou utilizado para fins de spam comercial automatizado.</li>
+          </ul>
+          
+          <h4>3. Segurança, Retenção e Não-Automatização</h4>
+          <p>Garantimos governança avançada de segurança:</p>
+          <ul>
+              <li>Os dados são trafegados via conexão criptografada (HTTPS) diretamente a um proxy Supabase seguro e inseridos na base protegida <code>LEADS_SITE</code>;</li>
+              <li>Respeitamos o Protocolo de Curadoria Humana: novos cadastros não disparam propostas automáticas por e-mail ou ativações críticas de cenários de faturamento, assegurando total discrição antes da verificação estratégica;</li>
+              <li>Nenhum token sensível ou chave de API do ecossistema é exposto publicamente no DOM ou no tráfego público do site.</li>
+          </ul>
+          
+          <h4>4. Seus Direitos sob a LGPD</h4>
+          <p>Conforme a Lei Geral de Proteção de Dados (Lei nº 13.709/18), você possui plenos direitos de confirmar a existência de tratamento, solicitar o acesso, a retificação ou a exclusão total dos seus dados de nossa base de triagem a qualquer momento, mediante solicitação simples aos nossos canais de governança.</p>
+      </div>
+  </div>
+
+  <script>
+    // 1. Controle do Banner de Cookies LGPD e Modal de Privacidade
+    document.addEventListener('DOMContentLoaded', () => {
+        const banner = document.getElementById('lgpd-banner');
+        const acceptBtn = document.getElementById('lgpd-accept');
+        const openModalBtn = document.getElementById('openPrivacyModal');
+        const openModalLink = document.getElementById('openPrivacyLink');
+        const modal = document.getElementById('privacy-modal');
+        const closeModalBtn = document.getElementById('close-privacy-modal');
+
+        // Mostrar banner se não aceito anteriormente
+        if (!localStorage.getItem('lgpd_consent_2026')) {
+            setTimeout(() => {
+                if (banner) banner.classList.add('active');
+            }, 1000);
+        }
+
+        if (acceptBtn) {
+            acceptBtn.addEventListener('click', () => {
+                localStorage.setItem('lgpd_consent_2026', 'true');
+                if (banner) banner.classList.remove('active');
+            });
+        }
+
+        const openModal = (e) => {
+            e.preventDefault();
+            if (modal) modal.classList.add('active');
+        };
+
+        const closeModal = () => {
+            if (modal) modal.classList.remove('active');
+        };
+
+        if (openModalBtn) openModalBtn.addEventListener('click', openModal);
+        if (openModalLink) openModalLink.addEventListener('click', openModal);
+        if (closeModalBtn) closeModalBtn.addEventListener('click', closeModal);
+
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) closeModal();
+            });
+        }
+
+        // 2. Manipulador de Submissão Customizado de Lead da Home
+        const form = document.getElementById('fluxai-lead-form');
+        if (form) {
+            form.addEventListener('submit', async (event) => {
+                event.preventDefault();
+                
+                const btnSubmit = form.querySelector('button[type="submit"]');
+                const originalText = btnSubmit ? btnSubmit.innerHTML : 'Enviar';
+                if (btnSubmit) {
+                    btnSubmit.disabled = true;
+                    btnSubmit.innerHTML = 'Processando... <i class="fa-solid fa-circle-notch fa-spin"></i>';
+                }
+
+                const payload = {
+                    origem_site: "site_fluxai",
+                    name: document.getElementById('nome').value,
+                    phone: document.getElementById('whatsapp').value,
+                    instagram: document.getElementById('instagram').value,
+                    segmento: document.getElementById('segmento').value,
+                    gargalo: document.getElementById('gargalo').value,
+                    description: document.getElementById('desafio').value
+                };
+
+                try {
+                    const response = await fetch('https://mufgwetfhfhhmhowbhjj.supabase.co/functions/v1/make-proxy', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'x-fluxai-proxy-key': 'fluxai-proxy-public-2026'
+                        },
+                        body: JSON.stringify({
+                            route: 'LEAD_CAPTURE',
+                            payload: payload
+                        })
+                    });
+
+                    if (response.ok) {
+                        if (btnSubmit) {
+                            btnSubmit.innerHTML = 'Enviado com sucesso <i class="fa-solid fa-check"></i>';
+                            btnSubmit.style.backgroundColor = '#10b981';
+                        }
+                        setTimeout(() => {
+                            form.reset();
+                            if (btnSubmit) {
+                                btnSubmit.disabled = false;
+                                btnSubmit.innerHTML = originalText;
+                                btnSubmit.style.backgroundColor = '';
+                            }
+                        }, 3000);
+                    } else {
+                        const data = await response.json().catch(() => ({}));
+                        throw new Error(data.error || `HTTP_${response.status}`);
+                    }
+                } catch (err) {
+                    console.error('Erro ao enviar lead da Home:', err);
+                    if (btnSubmit) {
+                        btnSubmit.innerHTML = 'Erro ao enviar. Tente novamente. <i class="fa-solid fa-triangle-exclamation"></i>';
+                        btnSubmit.style.backgroundColor = '#ef4444';
+                        btnSubmit.disabled = false;
+                    }
+                    setTimeout(() => {
+                        if (btnSubmit) {
+                            btnSubmit.innerHTML = originalText;
+                            btnSubmit.style.backgroundColor = '';
+                        }
+                    }, 4000);
+                }
+            });
+        }
+    });
+  </script>
 
 </body>
 </html>
