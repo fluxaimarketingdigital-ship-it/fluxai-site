@@ -60,7 +60,7 @@ O operador técnico deverá validar e checar cada um dos itens abaixo antes de a
 - [x] **Chave do Inbound (Sandbox para Produção):** Para a decolagem oficial em produção, certificar-se de que a ação de `onsubmit` no formulário foi alterada do `alert()` simulado para a rota ativa de proxy/Make no cofre privado de dados, sem expor chaves cruas no DOM.
 - [x] **Sem Ações Automáticas:** O cadastro de novos leads na base `LEADS_SITE` não dispara propostas PDF em relatórios automáticos. O processo respeita rigorosamente a curadoria humana sênior antes de qualquer faturamento.
 - [x] **Blindagem do make-proxy (Backend):** Codificado e estruturado em `supabase/functions/make-proxy/index.ts` com validação de Origin (incluindo preview Vercel), isolamento rígido de escopo da chave pública (apenas para `LEAD_CAPTURE`), validação de campos obrigatórios/email e sanitização física do schema de dados.
-- [ ] **Deploy Real do make-proxy:** Publicar a versão blindada atualizada na nuvem do Supabase via comando CLI (`supabase functions deploy make-proxy`).
+- [x] **Deploy Real do make-proxy:** Publicar a versão blindada atualizada na nuvem do Supabase via comando CLI (`supabase functions deploy make-proxy`).
 
 ### 2.4. Segurança e Auditoria Física de Credenciais (Sanitização)
 - [x] **Sem Webhooks Reais:** Confirmada a ausência de webhooks de produção Make.com expostos no front.
@@ -80,7 +80,7 @@ O processo de deploy de homologação e validações avançadas foi concluído c
     *   **URL de Staging/Preview:** `https://fluxai-site-qw6axk0ky-fluxaimarketingdigital-6611s-projects.vercel.app`
     *   **Rota homologada:** `/giaas`
 4.  **[x] Teste Final Responsivo:** Testado e aprovado com visualização limpa e grid de conversão fluido.
-5.  **[ ] Promoção para Produção:** Promover para a URL definitiva oficial `/giaas` sob aprovação manual estratégica.
+5.  [x] **Promoção para Produção:** Promovido para a URL definitiva oficial `/giaas` sob aprovação manual estratégica.
 
 ---
 
