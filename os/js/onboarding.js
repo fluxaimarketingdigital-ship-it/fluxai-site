@@ -206,14 +206,26 @@ function validateOnboardingBeforeSubmit(raw) {
 
     return errors;
 }
-async function handleOnboarding(e) {
+window.handleOnboarding = async function(e) {
     e.preventDefault();
-    const btn = e.target.querySelector('.btn-save');
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO ECOSSISTEMA...';
-    btn.disabled = true;
+    const btn = document.getElementById('btn-disparar-infraestrutura');
+    if (btn && btn.disabled) return;
 
-    const formData = new FormData(e.target);
+    const form = document.getElementById('onboardingForm');
+    const formData = new FormData(form);
     const raw = Object.fromEntries(formData.entries());
+
+    const errors = validateOnboardingBeforeSubmit(raw);
+    if (errors.length > 0) {
+        alert("⚠️ Pendências encontradas:\n" + errors.join('\n'));
+        return;
+    }
+
+    if (btn) {
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> PREPARANDO ECOSSISTEMA...';
+        btn.disabled = true;
+    }
+
     
     // Identificadores de deploy
     const projectId = "p_" + Date.now();
@@ -397,6 +409,11 @@ async function handleOnboarding(e) {
                 alinhamento_kickoff: 'Agendado'
             }
         };
+
+        // PREVIEW SEGURO (Sem Tokens Sensíveis)
+        const safePreview = JSON.parse(JSON.stringify(webhookPayload));
+        if (safePreview.tokens) safePreview.tokens = '[MASCARADO PARA SEGURANÇA]';
+        console.log('ONBOARDING_PAYLOAD_PREVIEW', safePreview);
 
         // Disparar Webhook
         const webhookResult = await OS_CONFIG.webhooks.send('CLIENT_ONBOARDING', webhookPayload);
@@ -739,5 +756,6 @@ function registerLocalMockProjectAndUser(projectId, projectData, raw, email) {
 }
 
 initOnboarding();
+
 
 
