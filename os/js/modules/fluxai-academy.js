@@ -7,36 +7,36 @@ import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
  */
 const ACADEMY_VIDEOS = [
     {
-        id: 'vid_01_intro',
-        title: 'Visão Geral do FluxAI OS™',
-        desc: 'Neste vídeo, você aprenderá a navegar pelas principais telas do sistema, entender os contextos (Master, Labs e Cliente) e configurar seu perfil básico.',
+        id: 'vid_01_primeiros_passos',
+        title: 'Módulo 01: Primeiros Passos',
+        desc: 'Acesso inicial, visão geral da arquitetura do FluxAI OS™ e gerenciamento básico de perfil.',
         roles: ['ADMIN', 'OPERATOR', 'CLIENT'],
-        videoUrl: './docs/treinamento/videos/03_exports_finais/FLUXAI_ACADEMY_01_VISAO_GERAL.mp4',
-        duration: '01:15'
+        videoUrl: '',
+        duration: 'A gravar'
     },
     {
-        id: 'vid_02_clientes',
-        title: 'Portal do Cliente: Aprovações e Entregas',
-        desc: 'Tutorial focado nos clientes finais: como acessar o Client Portal, revisar conteúdos gerados pelo Motor, solicitar ajustes e aprovar relatórios mensais.',
-        roles: ['ADMIN', 'OPERATOR', 'CLIENT'],
-        videoUrl: './docs/treinamento/videos/03_exports_finais/FLUXAI_ACADEMY_02_PORTAL_CLIENTE.mp4',
-        duration: '01:00'
-    },
-    {
-        id: 'vid_03_operacao',
-        title: 'Command Center & Demandas',
-        desc: 'Para operadores e gestores internos: como processar demandas, criar checklists avançados, mudar os status de kanban e gerenciar tarefas pendentes.',
+        id: 'vid_02_operacao_interna',
+        title: 'Módulo 02: Operação Interna',
+        desc: 'Command Center, Onboarding, Content Engine, CRM Intelligence, Financeiro e Auditoria.',
         roles: ['ADMIN', 'OPERATOR'],
-        videoUrl: './docs/treinamento/videos/03_exports_finais/FLUXAI_ACADEMY_03_COMMAND_CENTER_DEMANDAS.mp4',
-        duration: '01:00'
+        videoUrl: '',
+        duration: 'A gravar'
     },
     {
-        id: 'vid_04_financas',
-        title: 'Contratos e Serviços Extras',
-        desc: 'Exclusivo para ADMIN: Como criar contratos recorrentes baseados em valor, lançar serviços avulsos da tabela e emitir recibos instantâneos via OS.',
-        roles: ['ADMIN'],
-        videoUrl: './docs/treinamento/videos/03_exports_finais/FLUXAI_ACADEMY_04_CONTRATOS_FINANCEIRO.mp4',
-        duration: '01:00'
+        id: 'vid_03_portal_cliente',
+        title: 'Módulo 03: Portal do Cliente',
+        desc: 'Navegação para os clientes da agência: como aprovar relatórios, visualizar entregas e solicitar serviços extras.',
+        roles: ['ADMIN', 'OPERATOR', 'CLIENT'],
+        videoUrl: '',
+        duration: 'A gravar'
+    },
+    {
+        id: 'vid_04_comercial_pitch',
+        title: 'Módulo 04: Comercial & Apresentação',
+        desc: 'Pitch do sistema para reuniões de vendas e demonstração executiva para novos leads.',
+        roles: ['ADMIN', 'OPERATOR'],
+        videoUrl: '',
+        duration: 'A gravar'
     }
 ];
 
