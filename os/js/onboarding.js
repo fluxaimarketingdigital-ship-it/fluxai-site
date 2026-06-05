@@ -228,7 +228,10 @@ window.handleOnboarding = async function(e) {
 
     
     // Identificadores de deploy
-    const projectId = "p_" + Date.now();
+    let projectId = "p_" + Date.now();
+    if (raw.company_name && raw.company_name.trim().toLowerCase().includes("fluxai labs")) {
+        projectId = "FLUXAI_LABS_001";
+    }
     const email = raw.client_instagram_handle 
         ? raw.client_instagram_handle.replace('@', '').trim().toLowerCase() + "@fluxai.com" 
         : raw.responsible_name.toLowerCase().replace(/[^a-z0-9]/g, '') + "@fluxai.com";
@@ -351,6 +354,54 @@ window.handleOnboarding = async function(e) {
 
         // Montar o payload completo para o Make
         const webhookPayload = {
+            // ----- DADOS NORMALIZADOS NA RAIZ (NOVO PADRÃO) -----
+            cliente_id: projectId,
+            client_id: projectId,
+            cliente_nome: raw.company_name,
+            client_name: raw.company_name,
+            responsavel: raw.responsible_name,
+            tipo_cliente: projectId === "FLUXAI_LABS_001" ? "interno" : "externo",
+            status_cliente: statusConfig.value || "ativo",
+            segmento: raw.segment,
+            objetivo_principal: raw.objective,
+            proposta_valor: raw.value_proposition || "",
+            diferenciais: raw.differentiators || "",
+            tom_de_voz: raw.voice_tone || "",
+            posicionamento_editorial: raw.editorial_positioning || "",
+            instagram: raw.client_instagram_handle || "",
+            website: raw.client_website || "",
+            drive_folder_url: raw.asset_drive_link || "",
+            modulos_contratados: Array.from(formData.getAll('modules')).join(", ") || "",
+            reels_mes: raw.escopo_conteudo_reels_qty || "",
+            carrosseis_mes: raw.escopo_conteudo_carrossel_qty || "",
+            stories_mes: raw.escopo_conteudo_stories_qty || "",
+            frequencia_semanal: raw.escopo_conteudo_weekly_freq || "",
+            verba_midia: raw.escopo_trafego_monthly_budget || "",
+            meta_cpl: raw.escopo_trafego_target_cpl || "",
+            meta_roas: raw.escopo_trafego_target_roas || "",
+            crm_atual: raw.escopo_crm_system || "",
+            whatsapp_comercial: raw.escopo_crm_whatsapp || "",
+            sla_comercial: raw.escopo_crm_sla || "",
+            pilares_editoriais: raw.editorial_pillars || "",
+            dores_icp: raw.pain_points || "",
+            objecoes: raw.objections || "",
+            cta_padrao: raw.ideal_cta || "",
+            linguagem_permitida: raw.desired_language || "",
+            linguagem_proibida: raw.forbidden_language || "",
+            fee_mensal: raw.monthly_fee || "",
+            dia_vencimento: raw.payment_day || "",
+            metodo_pagamento: raw.finance_payment_method || "",
+            contrato_assinado: raw.finance_contract_signed || "",
+            data_inicio: raw.finance_start_date || new Date().toISOString().split('T')[0],
+            ciclo_fidelidade: raw.finance_min_duration || "",
+            servico_extra: raw.finance_extra_services_type || "",
+            valor_servico_extra: raw.finance_extra_services_value || "",
+            escopo_setup: raw.first_delivery || "",
+            roadmap_ia: document.getElementById('ia-roadmap-content') ? document.getElementById('ia-roadmap-content').innerText : "",
+            relatorio_incluir: "sim",
+            origem_validacao: "bloco_3_1_cliente_interno",
+            
+            // ----- COLEÇÕES ANINHADAS (PADRÃO ANTIGO - COMPATIBILIDADE) -----
             evento: "client_onboarding",
             timestamp: new Date().toISOString(),
             operador_id: session.id || "admin",
@@ -362,7 +413,7 @@ window.handleOnboarding = async function(e) {
                 telefone: raw.whatsapp_decisor,
                 website: raw.client_website || '',
                 instagram_profile: raw.client_instagram_handle || '',
-                status_ativo: statusConfig.value,
+                status_ativo: statusConfig.value || 'ativo',
                 data_entrada: raw.finance_start_date || new Date().toISOString().split('T')[0]
             },
             contrato: {
@@ -371,7 +422,7 @@ window.handleOnboarding = async function(e) {
                 vigencia_meses: raw.finance_min_duration ? parseInt(raw.finance_min_duration) : 12,
                 dia_vencimento: Number(raw.payment_day) || 5
             },
-            servicos_contratados: Array.from(formData.getAll('modules')),
+            servicos_contratados_list: Array.from(formData.getAll('modules')),
             servicos_extras: raw.finance_extra_services_type ? [{
                 nome_servico: raw.finance_extra_services_type,
                 valor: Number(raw.finance_extra_services_value) || 0,
@@ -394,15 +445,6 @@ window.handleOnboarding = async function(e) {
                 tom_de_voz: raw.voice_tone,
                 palavras_proibidas: raw.forbidden_language,
                 formatacao_exigida: raw.desired_language
-            },
-            tokens: {
-                instagram_business_id: raw.client_instagram_handle || '',
-                meta_ad_account_id: '',
-                ga4_property_id: '',
-                gtm_id: '',
-                clarity_project_id: '',
-                search_console_property: '',
-                status_geral: 'aguardando_autorizacao'
             },
             planejamento_inicial: {
                 briefing_mes_1: raw.first_delivery,
@@ -756,6 +798,8 @@ function registerLocalMockProjectAndUser(projectId, projectData, raw, email) {
 }
 
 initOnboarding();
+
+
 
 
 
