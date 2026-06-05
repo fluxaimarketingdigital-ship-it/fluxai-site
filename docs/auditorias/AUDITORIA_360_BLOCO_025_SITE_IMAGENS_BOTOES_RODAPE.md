@@ -122,3 +122,13 @@ Avaliação dos destinos da barra inferior das páginas públicas.
 - Ajustes em /giaas para refletir onboarding e não ativação imediata.
 - Redes sociais limpas globalmente (Apenas Instagram ativo).
 
+
+---
+### 🛠️ Correção Final e Homologação (Bloco 2.5C)
+**Data:** 05/06/2026
+**Status:** [HOMOLOGADO]
+**Resumo:** 
+- Removido bypass de WhatsApp que estava gerando falso sucesso no formulário da Home.
+- CTA "Garantir meu diagnóstico estratégico" reconfigurado como botão para executar \scrollIntoView('#diagnostico')\ sem instanciar \pi.whatsapp.com\.
+- O endpoint nativo da Edge Function \make-proxy\ foi restaurado.
+- Formulário passa a exibir mensagem de sucesso APENAS após o \esponse.ok === true\ do webhook, garantindo entrada real em \LEADS_SITE\.
