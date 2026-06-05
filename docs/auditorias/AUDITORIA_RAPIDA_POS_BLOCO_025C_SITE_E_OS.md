@@ -1,7 +1,7 @@
 ﻿# AUDITORIA RÁPIDA PÓS-MUDANÇA (BLOCO 2.5C)
 
 **Data:** 05/06/2026
-**Status Global:** [🟢 APROVADO]
+**Status Global:** [🟡 APROVADO COM RESSALVA OPERACIONAL]
 
 ## 1. SITE PÚBLICO (Frontend)
 Foi realizada uma vistoria rápida nos arquivos vitais e na compilação do script.js e index.html.
@@ -18,3 +18,8 @@ Foi realizada uma vistoria rápida nos arquivos vitais e na compilação do scri
 - **Limpeza de Assets:** Todos os arquivos em MP4/PNG obsoletos (os/docs/treinamento/) foram destruídos para salvaguardar a saúde e cache do repositório (alerta de vulnerabilidades do CodeQL de arquivos mortos como old_portal.html resolvido).
 
 **Conclusão da Auditoria:** Não foram inseridos novos bugs ou regressões no processo de correção dos formulários. O sistema está íntegro e estável.
+
+## 3. RESSALVA OPERACIONAL (CLIENT PORTAL & ONBOARDING)
+- **Visualização:** Ambos operam bem visualmente, sem HTML quebrado.
+- **Console Warnings:** Exibem *warnings* aceitáveis devido à ausência de clientes reais no banco (localStorage fallbacks acionados).
+- **Ressalva:** Estas áreas dependem da inserção do primeiro Lead/Contrato real na base para atingirem maturidade de carregamento sem *fallback*. Isto não caracteriza bloqueio técnico impeditivo, apenas pendência operacional.

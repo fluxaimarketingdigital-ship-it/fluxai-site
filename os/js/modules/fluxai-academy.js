@@ -56,7 +56,7 @@ async function initAcademy() {
     // Auto-selecionar o primeiro vídeo disponível para o usuário
     const firstAvailable = getAvailableVideos()[0];
     if (firstAvailable) {
-        loadVideo(firstAvailable.id);
+        window.loadAcademyVideo(firstAvailable.id);
     }
     
     OS_LOGS_ENGINE.userAction('ACADEMY_ACCESSED', 'fluxai-academy', { action: 'Acessou a área de treinamento' }, currentUser.role, null, false);
@@ -121,7 +121,7 @@ window.loadAcademyVideo = (id) => {
                 <i class="fa-solid fa-video-slash" style="font-size: 3rem; color: var(--os-primary); margin-bottom: 15px; opacity: 0.8;"></i>
                 <h3 style="margin:0 0 10px 0; font-family: var(--os-font-mono);">GRAVAÇÃO PENDENTE</h3>
                 <p style="color: var(--os-text-muted); font-size: 0.9rem; max-width: 80%;">
-                    Aguardando a gravação final e upload (Fase 05).<br>O script (roteiro) já está pronto!
+                    Este treinamento será disponibilizado após a gravação oficial.
                 </p>
             </div>
         `;

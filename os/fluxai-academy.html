@@ -6,9 +6,8 @@
     <title>FluxAI OS™ | Academy (Manual Operacional)</title>
     
     <!-- Design System Global -->
-    <link rel="stylesheet" href="./css/os-theme.css">
-    <link rel="stylesheet" href="./css/os-layout.css">
-    <link rel="stylesheet" href="./css/os-components.css">
+    <link rel="stylesheet" href="./styles/interface.css">
+    <link rel="stylesheet" href="./styles/components.css">
     
     <!-- Fontes & Ícones -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -156,6 +155,23 @@
             color: var(--os-text-muted);
             margin-right: 5px;
             text-transform: uppercase;
+        }
+    </style>
+
+    <style>
+        @media (max-width: 768px) {
+            .os-sidebar {
+                display: flex;
+                flex-direction: column;
+                background: #0f120f;
+            }
+            .os-sidebar a {
+                display: block;
+                padding: 15px;
+                border-bottom: 1px solid rgba(255,255,255,0.05);
+                text-decoration: none;
+                color: #fff;
+            }
         }
     </style>
 </head>
