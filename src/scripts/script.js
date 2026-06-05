@@ -248,8 +248,14 @@ document.addEventListener('DOMContentLoaded', () => {
                 try {
                     const response = await fetch(WEBHOOK_URL, {
                         method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
+                        headers: { 
+                            'Content-Type': 'application/json',
+                            'x-fluxai-proxy-key': 'fluxai-proxy-public-2026'
+                        },
+                        body: JSON.stringify({
+                            route: 'LEAD_CAPTURE',
+                            payload: payload
+                        })
                     });
                     
                     if(!response.ok) throw new Error('Network error');
