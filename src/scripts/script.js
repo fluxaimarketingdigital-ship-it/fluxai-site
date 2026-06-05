@@ -263,11 +263,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
 
-            // WhatsApp Redirect
-            const msg = `Olá! Tenho interesse no Diagnóstico Estratégico.%0A%0A*Nome:* ${nome}%0A*WhatsApp:* ${wpp}%0A*Instagram:* ${inst}%0A*Segmento:* ${seg}%0A*Gargalo:* ${gar}%0A*Cenário Atual:* ${des}`;
-            window.open(`${CONTACT_INFO.whatsappLink}?text=${msg}`, '_blank');
-            
-            btnSubmit.innerHTML = 'Enviado com Sucesso <i class="fa-solid fa-check"></i>';
+            // WhatsApp redirect removido para manter no LEADS_SITE apenas.
+btnSubmit.innerHTML = 'Enviado com Sucesso <i class="fa-solid fa-check"></i>';
             setTimeout(() => {
                 btnSubmit.innerHTML = originalText;
                 btnSubmit.disabled = false;
