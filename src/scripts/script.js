@@ -222,7 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Tracking Events (FB & GA4)
             // gtag generate_lead will be called only on success.
 
-            const WEBHOOK_URL = INTEGRATIONS.webhookUrl; 
+            const WEBHOOK_URL = 'https://mufgwetfhfhhmhowbhjj.supabase.co/functions/v1/make-proxy'; 
 
             // Captura de Inteligência de Tráfego (UTMs)
             const urlParams = new URLSearchParams(window.location.search);
@@ -231,45 +231,55 @@ document.addEventListener('DOMContentLoaded', () => {
             const utmCampaign = safeUtmParam('utm_campaign', 'N/A');
 
             const payload = {
-                nome: nome,
+                nome_lead: nome,
                 telefone: wpp,
-                whatsapp: wpp,
-                instagram: inst,
-                site: inst,
+                instagram_site: inst,
                 segmento: seg,
                 gargalo: gar,
-                descricao: des,
-                cenario: des,
+                desafio: des,
                 origem_site: "site_fluxai",
                 servico_interesse: "Diagnóstico Estratégico FluxAI",
-                page_path: window.location.pathname,
-                timestamp: new Date().toISOString(),
-                origem: utmSource,
-                meio: utmMedium,
-                campanha: utmCampaign,
-                referencia: document.referrer || 'Direto'
+                page_path: "/",
+                page_location: window.location.href,
+                timestamp: new Date().toISOString()
             };
 
             if(WEBHOOK_URL) {
                 try {
-                    await fetch(WEBHOOK_URL, {
+                    const response = await fetch(WEBHOOK_URL, {
                         method: 'POST',
-                        mode: 'no-cors',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(payload)
                     });
+                    
+                    if(!response.ok) throw new Error('Network error');
+
+                    if(typeof fbq === 'function') fbq('track', 'Lead');
+                    trackEvent('lead_submit', { form_id: 'diagnosticoForm' });
+                    
+                    btnSubmit.innerHTML = 'Aguarde nosso contato. Sua aplicação foi recebida. <i class="fa-solid fa-check"></i>';
+                    btnSubmit.style.background = '#10b981';
+                    btnSubmit.style.color = '#fff';
+                    
+                    setTimeout(() => {
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.style.background = '';
+                        btnSubmit.style.color = '';
+                        btnSubmit.disabled = false;
+                        diagnosticoForm.reset();
+                    }, 4000);
+
                 } catch(error) {
-                    console.error("Erro ao enviar para webhook, redirecionando para WhatsApp...", error);
+                    console.error("Erro ao enviar form", error);
+                    btnSubmit.innerHTML = 'Não foi possível enviar sua aplicação agora. Revise os dados e tente novamente.';
+                    btnSubmit.style.background = '#ef4444';
+                    setTimeout(() => {
+                        btnSubmit.innerHTML = originalText;
+                        btnSubmit.style.background = '';
+                        btnSubmit.disabled = false;
+                    }, 4000);
                 }
             }
-
-            // WhatsApp redirect removido para manter no LEADS_SITE apenas.
-btnSubmit.innerHTML = 'Enviado com Sucesso <i class="fa-solid fa-check"></i>';
-            setTimeout(() => {
-                btnSubmit.innerHTML = originalText;
-                btnSubmit.disabled = false;
-                diagnosticoForm.reset();
-            }, 3000);
         });
     }
 
@@ -291,9 +301,24 @@ btnSubmit.innerHTML = 'Enviado com Sucesso <i class="fa-solid fa-check"></i>';
         link.addEventListener('click', () => {
             trackEvent('whatsapp_click', { destination: 'whatsapp' });
         });
+    document.querySelector('#impact_diagnostic_cta')?.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.dataLayer = window.dataLayer || [];
+        window.dataLayer.push({
+            event: "diagnostic_cta_click",
+            button_text: "Garantir meu diagnóstico estratégico",
+            button_id: "impact_diagnostic_cta",
+            cta_position: "impact_section",
+            destination: "#diagnostico",
+            page_path: window.location.pathname,
+            page_location: window.location.href
+        });
+
+        const target = document.querySelector('#diagnostico');
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
     });
-
-
 });
 
 // 11. CLEAN UP ELFSIGHT BRANDING
