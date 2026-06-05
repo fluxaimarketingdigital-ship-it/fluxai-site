@@ -188,18 +188,22 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.social-link').forEach(link => {
         link.addEventListener('click', () => {
             const platform = link.getAttribute('data-platform');
-            if(typeof gtag === 'function') {
-                gtag('event', 'click_social_proof', {
-                    'event_category': 'engagement',
-                    'event_label': platform
-                });
-            }
+            trackEvent('click_social_proof', { button_text: 'Social Proof', platform: platform });
         });
     });
 
     // 8. DIAGNOSTICO FORM (WEBHOOK + WHATSAPP REDIRECT)
     const diagnosticoForm = document.getElementById('diagnosticoForm');
     if (diagnosticoForm) {
+
+        let form_start_triggered = false;
+        diagnosticoForm.addEventListener('focusin', () => {
+            if(!form_start_triggered) {
+                form_start_triggered = true;
+                trackEvent('form_start', { form_id: 'diagnosticoForm' });
+            }
+        });
+    
         diagnosticoForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -216,11 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const des = document.getElementById('desafio').value;
             
             // Tracking Events (FB & GA4)
-            if(typeof fbq === 'function') fbq('track', 'Lead');
-            if(typeof gtag === 'function') gtag('event', 'generate_lead', {
-                'event_category': 'engagement',
-                'event_label': 'Formulário Diagnóstico'
-            });
+            // gtag generate_lead will be called only on success.
 
             const WEBHOOK_URL = INTEGRATIONS.webhookUrl; 
 
@@ -286,12 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 10. TRACK WHATSAPP CLICKS (GA4)
     document.querySelectorAll('a[href*="wa.me"]').forEach(link => {
         link.addEventListener('click', () => {
-            if(typeof gtag === 'function') {
-                gtag('event', 'contact_whatsapp', {
-                    'event_category': 'engagement',
-                    'event_label': 'Clique WhatsApp'
-                });
-            }
+            trackEvent('whatsapp_click', { destination: 'whatsapp' });
         });
     });
 

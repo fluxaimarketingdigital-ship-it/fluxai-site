@@ -1049,15 +1049,28 @@
             margin-bottom: 6px;
         }
     </style>
+
+    <!-- FluxAI Tracking -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function trackEvent(eventName, params = {}) {
+            const payload = {
+                event: eventName,
+                page_path: window.location.pathname,
+                page_location: window.location.href,
+                timestamp: new Date().toISOString(),
+                ...params
+            };
+            window.dataLayer.push(payload);
+        }
+    </script>
 </head>
 <body>
 
     <!-- Header Navigation -->
     <header>
         <div class="container nav-container">
-            <a href="#" class="logo">
-                FLUXAI <span>LABS</span>
-            </a>
+            <a href="/" class="logo"><img src="/assets/images/branding/logo-primary.webp" alt="FluxAI Labs" width="195" height="42" class="logo-img" /></a>
             <a href="#aplicar" class="btn-nav-cta">Diagnóstico</a>
         </div>
     </header>
@@ -1065,13 +1078,13 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
-            <span class="mono">Operação de Crescimento & Engenharia de IA Proprietária para Corporações</span>
+            <span class="mono">Operação de Crescimento, Dados e IA aplicada para empresas em fase de escala.</span>
             <h1>Sua operação de marketing controlada por dados, chancelada por tecnologia estratégica proprietária.</h1>
-            <p>Esqueça os PDFs de vaidade no final do mês. A FluxAI Labs™ centraliza sua gestão de tráfego, funis de CRM e geração de IA em uma plataforma operacional exclusiva de comando.</p>
-            <a href="#aplicar" class="btn-primary">
-                Aplicar p/ Reunião de Diagnóstico <i class="fa-solid fa-arrow-right"></i>
+            <p>Uma estrutura mensal que conecta tráfego, CRM, dados, conteúdo e IA aplicada em uma operação acompanhada.</p>
+            <a href="#aplicar" class="btn-primary"  onclick="trackEvent('offer_click', { button_text: 'Aplicar para Diagnóstico', cta_position: 'hero', destination: '/giaas' })">
+                Aplicar para Diagnóstico Estratégico <i class="fa-solid fa-arrow-right"></i>
             </a>
-            <div class="hero-tagline">Triagem obrigatória de faturamento e cota de anúncios</div>
+            <div class="hero-tagline">Triagem obrigatória de faturamento, operação e investimento em mídia.</div>
         </div>
     </section>
 
@@ -1081,7 +1094,7 @@
             <div class="section-header">
                 <span class="mono">A Crítica Executiva</span>
                 <h2>O modelo de agência tradicional está quebrado.</h2>
-                <p>Por que as operações High-Ticket de alta performance abandonaram o marketing analógico.</p>
+                <p>Por que operações de alto valor estão abandonando o marketing solto e migrando para infraestrutura de crescimento.</p>
             </div>
             
             <div class="problem-grid">
@@ -1112,7 +1125,7 @@
             <div class="section-header">
                 <span class="mono">Nossa Engenharia</span>
                 <h2>Conheça o Sistema de Crescimento FluxAI™</h2>
-                <p>Uma estrutura mensal recorrente para empresas: a fusão perfeita entre tráfego qualificado, dados em tempo real e automações de Inteligência Artificial.</p>
+                <p>Uma estrutura mensal recorrente que conecta tráfego qualificado, dados operacionais, CRM e IA aplicada em uma rotina de crescimento acompanhada.</p>
             </div>
             
             <div class="solution-grid">
@@ -1125,7 +1138,7 @@
                 <div class="solution-card">
                     <i class="fa-solid fa-laptop-code"></i>
                     <h3>Plataforma FluxAI OS™</h3>
-                    <p>Licenças exclusivas ao nosso portal proprietário de BI e Mesa Editorial síncrona. Interface leve e segura.</p>
+                    <p>Acesso controlado ao FluxAI OS™, nosso portal operacional para acompanhamento, conteúdo, aprovações, métricas e inteligência do projeto.</p>
                 </div>
                 
                 <div class="solution-card">
@@ -1141,9 +1154,9 @@
     <section id="os-showcase">
         <div class="container os-showcase">
             <div class="os-text">
-                <span class="mono">Transparência síncrona absoluta</span>
+                <span class="mono">Transparência operacional em tempo real</span>
                 <h2>Seu novo portal proprietário de comando operacional.</h2>
-                <p>Nós decidimos destruir a caixa preta das agências tradicionais. Ao integrar sua marca à FluxAI Labs, você recebe acesso imediato a sua própria infraestrutura de controle.</p>
+                <p>A FluxAI reduz a caixa preta da operação ao centralizar métricas, conteúdo, aprovações e relatórios em um ambiente controlado.</p>
                 
                 <div class="feature-bullets">
                     <div class="bullet-item">
@@ -1204,7 +1217,7 @@
                     </div>
                     
                     <div class="mock-activity-log">
-                        <div class="mock-log-title">Auditoria de Logs de IA (Regra P3)</div>
+                        <div class="mock-log-title">Status e Entregáveis</div>
                         <div class="mock-log-item">
                             <span>Sincronia de saldo síncrono</span>
                             <span class="status-green">200 OK</span>
@@ -1354,7 +1367,7 @@
         <div class="container">
             <div class="section-header">
                 <span class="mono">Maturidade de execução</span>
-                <h2>Integração e Onboarding em 48 Horas</h2>
+                <h2>Início de estruturação em até 48 horas após validação</h2>
                 <p>Como estruturamos sua marca no ecossistema operacional de growth com velocidade técnica.</p>
             </div>
             
@@ -1367,7 +1380,7 @@
                 <div class="timeline-card">
                     <span class="timeline-step">02</span>
                     <h3>Wizard de Imersão</h3>
-                    <p>Login seguro. Nosso assistente mapeia em 10 minutos o DNA de sua marca, acessos de tráfego e pastas do Drive.</p>
+                    <p>Login seguro. Nosso assistente coleta os primeiros dados operacionais, acessos, escopo e insumos estratégicos para iniciar o diagnóstico., acessos de tráfego e pastas do Drive.</p>
                 </div>
                 <div class="timeline-card">
                     <span class="timeline-step">03</span>
@@ -1390,19 +1403,19 @@
             <div class="faq-grid">
                 <div class="faq-card">
                     <h3><i class="fa-solid fa-chevron-right"></i> Como o FluxAI OS™ é integrado às minhas contas?</h3>
-                    <p>Atuamos via integrações controladas da API do Supabase e Make.com. Nós nunca armazenamos senhas de suas plataformas de anúncios; as integrações utilizam chaves de tokens oficiais seguras chumbadas no cofre.</p>
+                    <p>Atuamos via integrações controladas da API do Supabase e Make.com. Nós nunca armazenamos senhas de suas plataformas de anúncios; as integrações utilizam chaves de tokens oficiais armazenados em ambiente seguro, com controle de acesso e governança operacional..</p>
                 </div>
                 <div class="faq-card">
                     <h3><i class="fa-solid fa-chevron-right"></i> Posso ter mais créditos de IA do que o previsto?</h3>
-                    <p>Sim. Caso precise de escopo adicional de legendas ou pautas de landing pages, solicitações extras podem ser feitas pelo portal. A aprovação técnica libera cotas adicionais de forma segura e sem duplicidade.</p>
+                    <p>Sim. Escopos adicionais podem ser solicitados e avaliados pela equipe FluxAI. Quando aprovados, ampliam a capacidade operacional de produção assistida por IA dentro do projeto.</p>
                 </div>
                 <div class="faq-card">
                     <h3><i class="fa-solid fa-chevron-right"></i> Meus relatórios de tráfego são expostos na hora?</h3>
-                    <p>Não. Respeitamos o Protocolo de Curadoria Humana. No 1º dia útil, o robô compila as métricas e o rascunho de slides privado permanece oculto em 'rascunho_fluxai'. A visualização só é liberada no portal após conferência de nossos analistas.</p>
+                    <p>As métricas podem ser consolidadas automaticamente, mas os relatórios estratégicos passam por revisão humana antes de serem liberados.</p>
                 </div>
                 <div class="faq-card">
                     <h3><i class="fa-solid fa-chevron-right"></i> Há fidelidade ou multa rescisória nos contratos?</h3>
-                    <p>Nossos planos de Sistema de Crescimento possuem vigência mínima obrigatória de 6 meses para garantir tempo hábil de otimização de funis e BI de conversão. A rescisão antecipada enseja multa de 30% sobre o saldo remanescente.</p>
+                    <p>Os contratos podem prever vigência mínima e condições específicas de rescisão conforme escopo aprovado.</p>
                 </div>
             </div>
         </div>
@@ -1464,7 +1477,7 @@
                     </div>
                     
                     <button type="submit" class="btn-submit">
-                        Enviar Aplicação e Agendar Diagnóstico Estratégico <i class="fa-solid fa-arrow-right"></i>
+                        Enviar aplicação para diagnóstico estratégico <i class="fa-solid fa-arrow-right"></i>
                     </button>
                 </form>
             </div>
@@ -1478,7 +1491,7 @@
                 FLUXAI <span>LABS</span>
             </a>
             <p>Selo de Governança e Autenticidade Tecnológica FluxAI Labs™.</p>
-            <p>Todos os direitos reservados | Em total conformidade com a LGPD e termos síncronos Supabase. <a href="#" id="openPrivacyModal" style="color: var(--color-primary); text-decoration: underline; margin-left: 8px; cursor: pointer;">Política de Privacidade</a></p>
+            <p>Todos os direitos reservados | Em conformidade com a LGPD e com os protocolos internos de segurança e governança da FluxAI Labs™. <a href="#" id="openPrivacyModal" style="color: var(--color-primary); text-decoration: underline; margin-left: 8px; cursor: pointer;" onclick="trackEvent('footer_link_click', { button_text: 'Política de Privacidade' })">Política de Privacidade</a></p>
         </div>
     </footer>
 
@@ -1603,6 +1616,15 @@
         });
 
         // 3. Form Submission
+        
+        let giaas_form_start_triggered = false;
+        document.getElementById('giaas-app-form').addEventListener('focusin', () => {
+            if(!giaas_form_start_triggered) {
+                giaas_form_start_triggered = true;
+                trackEvent('form_start', { form_id: 'giaas-app-form' });
+            }
+        });
+    
         async function submitLead(event) {
             event.preventDefault();
             const btn = document.querySelector('.btn-submit');

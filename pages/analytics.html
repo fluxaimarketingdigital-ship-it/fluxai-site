@@ -7,8 +7,23 @@
     <script>
         window.location.replace("analytics-intelligence.html");
     </script>
+
+    <!-- FluxAI Tracking -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function trackEvent(eventName, params = {}) {
+            const payload = {
+                event: eventName,
+                page_path: window.location.pathname,
+                page_location: window.location.href,
+                timestamp: new Date().toISOString(),
+                ...params
+            };
+            window.dataLayer.push(payload);
+        }
+    </script>
 </head>
 <body>
-    <p>Redirecionando para <a href="analytics-intelligence.html">Analytics Intelligence</a>...</p>
+    <p>Redirecionando para <a href="analytics-intelligence.html">MOD.05 Analytics Intelligence</a>...</p>
 </body>
 </html>

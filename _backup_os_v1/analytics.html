@@ -20,6 +20,21 @@
         .mini-label { font-size: 0.6rem; text-transform: uppercase; color: var(--os-text-muted); display: block; margin-bottom: 5px; }
         .mini-value { font-family: var(--os-font-mono); font-size: 1.1rem; font-weight: 600; }
     </style>
+
+    <!-- FluxAI Tracking -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function trackEvent(eventName, params = {}) {
+            const payload = {
+                event: eventName,
+                page_path: window.location.pathname,
+                page_location: window.location.href,
+                timestamp: new Date().toISOString(),
+                ...params
+            };
+            window.dataLayer.push(payload);
+        }
+    </script>
 </head>
 <body class="os-mode">
 

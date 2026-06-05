@@ -244,6 +244,21 @@
       "description": "Consultoria de Sistemas de Crescimento, Engenharia de Autoridade e Infraestrutura Operacional para marcas de alto valor."
     }
     </script>
+
+    <!-- FluxAI Tracking -->
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function trackEvent(eventName, params = {}) {
+            const payload = {
+                event: eventName,
+                page_path: window.location.pathname,
+                page_location: window.location.href,
+                timestamp: new Date().toISOString(),
+                ...params
+            };
+            window.dataLayer.push(payload);
+        }
+    </script>
 </head>
 <body>
   <!-- Google Tag Manager (noscript) -->
@@ -252,7 +267,7 @@
   <!-- End Google Tag Manager (noscript) -->
 
   <!-- Menu de Navegação -->
-  <header class="header" id="topo">
+  <div id="topo" style="position: absolute; top: 0; left: 0; width: 1px; height: 1px; opacity: 0; pointer-events: none;"></div>`n  <header class="header">
     <div class="container nav-wrapper">
       <a href="#topo" class="logo">
         <img src="/assets/images/branding/logo-primary.webp" alt="FluxAI Labs" width="195" height="42" class="logo-img" />
@@ -271,7 +286,7 @@
           <svg viewBox="0 0 384 512" width="1em" height="1em" fill="currentColor"><path d="M223.5 32C100 32 0 132.3 0 256S100 480 223.5 480c60.6 0 115.5-24.2 155.8-63.4c5-4.9 6.3-12.5 3.1-18.7s-10.1-9.7-17-8.5c-9.8 1.7-19.8 2.6-30.1 2.6c-96.9 0-175.5-78.8-175.5-176c0-65.8 36-123.1 89.3-153.3c6.1-3.5 9.2-10.5 7.7-17.3s-7.3-11.9-14.3-12.5c-6.3-.5-12.6-.8-19-.8z"/></svg>
         </button>
 
-        <a href="https://www.instagram.com/fluxai.labs?igsh=N3pwd3M5aHlreHgz&utm_source=qr" target="_blank" rel="noopener noreferrer" class="nav-icon" aria-label="Instagram">
+        <a href="https://www.instagram.com/fluxai.labs/" target="_blank" rel="noopener noreferrer" class="nav-icon" aria-label="Instagram" onclick="trackEvent('outbound_click', { button_text: 'Instagram', destination: 'instagram' })">
           <svg viewBox="0 0 448 512" width="1em" height="1em" fill="currentColor"><path d="M224.1 141c-63.6 0-114.9 51.3-114.9 114.9s51.3 114.9 114.9 114.9S339 319.5 339 255.9 287.7 141 224.1 141zm0 189.6c-41.1 0-74.7-33.5-74.7-74.7s33.5-74.7 74.7-74.7 74.7 33.5 74.7 74.7-33.6 74.7-74.7 74.7zm146.4-194.3c0 14.9-12 26.8-26.8 26.8-14.9 0-26.8-12-26.8-26.8s12-26.8 26.8-26.8 26.8 12 26.8 26.8zm76.1 27.2c-1.7-35.9-9.9-67.7-36.2-93.9-26.2-26.2-58-34.4-93.9-36.2-37-2.1-147.9-2.1-184.9 0-35.8 1.7-67.6 9.9-93.9 36.1s-34.4 58-36.2 93.9c-2.1 37-2.1 147.9 0 184.9 1.7 35.9 9.9 67.7 36.2 93.9s58 34.4 93.9 36.2c37 2.1 147.9 2.1 184.9 0 35.9-1.7 67.7-9.9 93.9-36.2 26.2-26.2 34.4-58 36.2-93.9 2.1-37 2.1-147.8 0-184.8zM398.8 388c-7.8 19.6-22.9 34.7-42.6 42.6-29.5 11.7-99.5 9-132.1 9s-102.7 2.6-132.1-9c-19.6-7.8-34.7-22.9-42.6-42.6-11.7-29.5-9-99.5-9-132.1s-2.6-102.7 9-132.1c7.8-19.6 22.9-34.7 42.6-42.6 29.5-11.7 99.5-9 132.1-9s102.7-2.6 132.1 9c19.6 7.8 34.7 22.9 42.6 42.6 11.7 29.5 9 99.5 9 132.1s2.7 102.7-9 132.1z"/></svg>
         </a>
         
@@ -369,9 +384,9 @@
             <h3>Sistema de Autoridade™</h3>
             <p>Arquitetamos a consolidação do seu posicionamento. Unimos visão estratégica, CRM Intelligence e autoridade.</p>
             <ul class="eco-list">
-              <li><i class="fa-solid fa-check"></i> Command Center</li>
-              <li><i class="fa-solid fa-check"></i> Content Engine</li>
-              <li><i class="fa-solid fa-check"></i> CRM Intelligence</li>
+              <li><i class="fa-solid fa-check"></i> MOD.01 Command Center</li>
+              <li><i class="fa-solid fa-check"></i> MOD.02 Content Engine</li>
+              <li><i class="fa-solid fa-check"></i> MOD.03 CRM Intelligence</li>
             </ul>
           </div>
           
@@ -475,8 +490,8 @@
                 </ul>
               </div>
               <div class="display-footer" style="display: flex; gap: 15px; flex-wrap: wrap;">
-                <a href="/pages/command-center.html" class="btn btn-secondary">Explorar Conceito <i class="fa-solid fa-book-open"></i></a>
-                <a href="/os/login.html" class="btn btn-primary" style="background: var(--primary); border: none;">Portal do Cliente <i class="fa-solid fa-arrow-right-to-bracket"></i></a>
+                <a href="/pages/command-center.html" class="btn btn-secondary" onclick="trackEvent('module_page_click', { button_text: 'Explorar Conceito', destination: '/pages/command-center.html' })">Explorar Conceito <i class="fa-solid fa-book-open"></i></a>
+                <a href="/os/login.html" class="btn btn-primary" style="background: var(--primary); border: none;" onclick="trackEvent('portal_click', { button_text: 'Portal do Cliente' })">Portal do Cliente <i class="fa-solid fa-arrow-right-to-bracket"></i></a>
               </div>
             </div>
           </div>
@@ -748,20 +763,20 @@
           Posicionamento, conteúdo e infraestrutura estratégica para marcas que querem crescer com inteligência.
         </p>
         <div class="footer-social">
-          <a href="https://www.instagram.com/fluxai.labs?igsh=N3pwd3M5aHlreHgz&utm_source=qr" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-          <a href="https://www.linkedin.com/company/112506521" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="https://www.instagram.com/fluxai.labs/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" onclick="trackEvent('outbound_click', { button_text: 'Instagram', destination: 'instagram' })"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/company/112506521" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" onclick="trackEvent('outbound_click', { button_text: 'LinkedIn', destination: 'linkedin' })"><i class="fa-brands fa-linkedin-in"></i></a>
           <a href="https://facebook.com/fluxaidigital" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
         </div>
       </div>
 
       <div class="footer-col links">
         <h4>Ecossistema</h4>
-        <a href="/pages/command-center.html">Command Center</a>
-        <a href="/pages/content-engine.html">Content Engine</a>
-        <a href="/pages/crm-intelligence.html">CRM Intelligence</a>
-        <a href="/pages/automation-hub.html">Automation Hub</a>
-        <a href="/pages/analytics-intelligence.html">Analytics Intelligence</a>
-        <a href="/pages/governanca.html">Governança</a>
+        <a href="/pages/command-center.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.01 Command Center', destination: '/pages/command-center.html' })">MOD.01 Command Center</a>
+        <a href="/pages/content-engine.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.02 Content Engine', destination: '/pages/content-engine.html' })">MOD.02 Content Engine</a>
+        <a href="/pages/crm-intelligence.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.03 CRM Intelligence', destination: '/pages/crm-intelligence.html' })">MOD.03 CRM Intelligence</a>
+        <a href="/pages/automation-hub.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.04 Automation Hub', destination: '/pages/automation-hub.html' })">MOD.04 Automation Hub</a>
+        <a href="/pages/analytics-intelligence.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.05 Analytics Intelligence', destination: '/pages/analytics-intelligence.html' })">MOD.05 Analytics Intelligence</a>
+        <a href="/pages/governanca.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.06 Governança Operacional', destination: '/pages/governanca.html' })">MOD.06 Governança Operacional</a>
       </div>
 
       <div class="footer-col links">
@@ -786,9 +801,9 @@
         <p>© 2026 FluxAI Labs. Todos os direitos reservados.</p>
         <div class="legal-links">
           <span class="data-badge" style="position: static; opacity: 0.2; background: none; border: none;">[CORE_SYSTEM_SECURED]</span>
-          <a href="#" id="openPrivacyModal" style="color: #64748b; text-decoration: underline; margin-left: 15px; cursor: pointer; font-size: 0.85rem;">Política de Privacidade</a>
+          <a href="#" id="openPrivacyModal" style="color: #64748b; text-decoration: underline; margin-left: 15px; cursor: pointer; font-size: 0.85rem;" onclick="trackEvent('footer_link_click', { button_text: 'Política de Privacidade' })">Política de Privacidade</a>
         </div>
-        <a href="#topo" class="back-to-top" style="color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;">Voltar ao Topo <i class="fa-solid fa-arrow-up"></i></a>
+        <a href="#topo" class="back-to-top" style="color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;" onclick="trackEvent('footer_link_click', { button_text: 'Voltar ao Topo' })">Voltar ao Topo <i class="fa-solid fa-arrow-up"></i></a>
       </div>
     </div>
     
