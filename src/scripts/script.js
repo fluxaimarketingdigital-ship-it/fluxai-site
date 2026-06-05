@@ -301,6 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', () => {
             trackEvent('whatsapp_click', { destination: 'whatsapp' });
         });
+    });
+
     document.querySelector('#impact_diagnostic_cta')?.addEventListener('click', function(e) {
         e.preventDefault();
         window.dataLayer = window.dataLayer || [];
