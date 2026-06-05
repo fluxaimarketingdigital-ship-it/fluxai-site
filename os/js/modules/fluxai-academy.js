@@ -16,26 +16,26 @@ const ACADEMY_VIDEOS = [
     },
     {
         id: 'vid_02_operacao_interna',
-        title: 'Módulo 02: Operação Interna',
+        title: 'Operação Interna',
         desc: 'Command Center, Onboarding, Content Engine, CRM Intelligence, Financeiro e Auditoria.',
         roles: ['ADMIN', 'OPERATOR'],
-        videoUrl: '',
+        videoUrl: '../docs/academy/videos_estrutura/01_primeiros_passos/primeiros_passos.mp4',
         duration: 'A gravar'
     },
     {
         id: 'vid_03_portal_cliente',
-        title: 'Módulo 03: Portal do Cliente',
-        desc: 'Navegação para os clientes da agência: como aprovar relatórios, visualizar entregas e solicitar serviços extras.',
+        title: 'Visão do Cliente',
+        desc: 'Navegação para os clientes da agência: como aprovar relatórios.',
         roles: ['ADMIN', 'OPERATOR', 'CLIENT'],
-        videoUrl: '',
+        videoUrl: '../docs/academy/videos_estrutura/02_gestao_demandas/gestao_demandas.mp4',
         duration: 'A gravar'
     },
     {
         id: 'vid_04_comercial_pitch',
-        title: 'Módulo 04: Comercial & Apresentação',
+        title: 'Apresentação Comercial',
         desc: 'Pitch do sistema para reuniões de vendas e demonstração executiva para novos leads.',
         roles: ['ADMIN', 'OPERATOR'],
-        videoUrl: '',
+        videoUrl: '../docs/academy/videos_estrutura/03_analise_metricas/analise_metricas.mp4',
         duration: 'A gravar'
     }
 ];
