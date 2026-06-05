@@ -674,9 +674,9 @@
       <div class="container text-center reveal">
         <h2 class="impact-title">Estruture sua operação para crescer com previsibilidade.</h2>
         <p class="impact-desc">Reduza a dependência de ações isoladas. Estruture uma operação com posicionamento, aquisição, retenção e Inteligência Operacional.</p>
-        <a href="#diagnostico" class="btn btn-primary btn-large" onclick="trackFacebookEvent('Lead');">
-          Garantir Meu Diagnóstico Estratégico <i class="fa-solid fa-fire"></i>
-        </a>
+        <a href="#diagnostico" class="btn btn-primary btn-large" style="cursor:pointer;" onclick="trackEvent('diagnostic_cta_click', { button_text: 'Garantir meu diagnóstico estratégico', button_id: 'impact_diagnostic_cta', cta_position: 'impact_section', destination: '#diagnostico' })">
+            Garantir Meu Diagnóstico Estratégico <i class="fa-solid fa-fire"></i>
+          </a>
       </div>
     </section>
 
@@ -690,7 +690,7 @@
             <p style="margin-top: 20px; font-size: 0.95rem; opacity: 0.8;">Preencha as informações abaixo para avaliarmos seu cenário atual e identificarmos se existe aderência estratégica para implementação do FluxAI OS™.</p>
           </div>
           <div class="cta-form-side">
-            <form id="fluxai-lead-form" class="contact-form">
+            <form id="diagnosticoForm" class="contact-form">
               <div class="form-block">
                 <span class="block-label">Identificação</span>
                 <input type="text" id="nome" name="name" placeholder="Nome / Empresa" required />
@@ -783,6 +783,7 @@
         <h4>Operacional</h4>
         <a href="/pages/diagnosticos.html">Diagnósticos</a>
         <a href="/pages/mercados.html">Mercados</a>
+          <a href="/giaas" onclick="trackEvent('offer_click', { button_text: 'Sistema de Crescimento', button_id: 'footer_sistema_crescimento', cta_position: 'footer_operacional', destination: '/giaas' })">Sistema de Crescimento</a>
         <a href="https://wa.me/5571981114694" target="_blank" rel="noopener noreferrer">Contato Direto</a>
       </div>
 

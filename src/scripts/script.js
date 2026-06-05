@@ -231,13 +231,19 @@ document.addEventListener('DOMContentLoaded', () => {
             const utmCampaign = safeUtmParam('utm_campaign', 'N/A');
 
             const payload = {
-                data: new Date().toISOString(),
                 nome: nome,
+                telefone: wpp,
                 whatsapp: wpp,
                 instagram: inst,
+                site: inst,
                 segmento: seg,
                 gargalo: gar,
-                desafio: des,
+                descricao: des,
+                cenario: des,
+                origem_site: "site_fluxai",
+                servico_interesse: "Diagnóstico Estratégico FluxAI",
+                page_path: window.location.pathname,
+                timestamp: new Date().toISOString(),
                 origem: utmSource,
                 meio: utmMedium,
                 campanha: utmCampaign,
