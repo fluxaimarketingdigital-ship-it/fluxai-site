@@ -44,3 +44,8 @@ Esta auditoria engloba a inspeção completa do site, landing comerciais e base 
 - [x] Páginas internas mobile aprovadas tecnicamente.
 - [x] Nenhum título detectado cortando.
 - [x] Formulários garantem redimensionamento e toque amigável no smartphone.
+
+---
+### 🔒 HOMOLOGAÇÃO DEFINITIVA (05/06/2026)
+**Status:** [🟢 HOMOLOGADO]
+Responsividade validada na etapa final. Sem vazamentos de overflow no formulário. O modal de Welcome, os botões e os inputs (Home e /giaas) comportam-se dentro do safe-area em iOS/Android.

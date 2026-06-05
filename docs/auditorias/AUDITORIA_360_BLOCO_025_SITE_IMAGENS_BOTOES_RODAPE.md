@@ -132,3 +132,8 @@ Avaliação dos destinos da barra inferior das páginas públicas.
 - CTA "Garantir meu diagnóstico estratégico" reconfigurado como botão para executar \scrollIntoView('#diagnostico')\ sem instanciar \pi.whatsapp.com\.
 - O endpoint nativo da Edge Function \make-proxy\ foi restaurado.
 - Formulário passa a exibir mensagem de sucesso APENAS após o \esponse.ok === true\ do webhook, garantindo entrada real em \LEADS_SITE\.
+
+---
+### 🔒 HOMOLOGAÇÃO DEFINITIVA (05/06/2026)
+**Status:** [🟢 HOMOLOGADO]
+Todas as requisições de Front-End, UX, e links de botões deste bloco foram aprovadas em teste físico. O bloco 2.5C encontra-se congelado. O rodapé aponta para o Sistema de Crescimento (/giaas), e o CTA executa o scroll suave sem vazamento para WhatsApp.

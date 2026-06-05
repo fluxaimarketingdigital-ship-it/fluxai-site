@@ -62,3 +62,8 @@ Esta auditoria documenta o rastreamento implementado no site da FluxAI, de acord
 - CTA "Garantir meu diagnóstico estratégico" reconfigurado como botão para executar \scrollIntoView('#diagnostico')\ sem instanciar \pi.whatsapp.com\.
 - O endpoint nativo da Edge Function \make-proxy\ foi restaurado.
 - Formulário passa a exibir mensagem de sucesso APENAS após o \esponse.ok === true\ do webhook, garantindo entrada real em \LEADS_SITE\.
+
+---
+### 🔒 HOMOLOGAÇÃO DEFINITIVA (05/06/2026)
+**Status:** [🟢 HOMOLOGADO]
+Teste físico final confirmou gravação na LEADS_SITE tanto da /giaas quanto da Home (após remapeamento de payload compatível com make-proxy). Falso-positivo de sucesso da Home foi extinto. O disparo da flag lead_submit no DataLayer é agora 100% dependente da resposta HTTP 200 da Edge Function.
