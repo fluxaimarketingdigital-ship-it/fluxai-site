@@ -231,34 +231,63 @@ document.addEventListener('DOMContentLoaded', () => {
             const utmCampaign = safeUtmParam('utm_campaign', 'N/A');
 
             const payload = {
-                nome_lead: nome,
-                telefone: wpp,
-                instagram_site: inst,
-                segmento: seg,
-                gargalo: gar,
-                desafio: des,
+                type: "lead_capture",
+                source: "site_fluxai",
                 origem_site: "site_fluxai",
-                servico_interesse: "Diagnóstico Estratégico FluxAI",
+                origin: "site_fluxai",
                 page_path: "/",
                 page_location: window.location.href,
+                servico_interesse: "Diagnóstico Estratégico FluxAI",
+                service_interest: "Diagnóstico Estratégico FluxAI",
+                nome_lead: nome,
+                name: nome,
+                telefone: wpp,
+                whatsapp: wpp,
+                phone: wpp,
+                instagram_site: inst,
+                company: inst || "nao_informado_home",
+                segmento: seg,
+                revenue: "nao_informado_home",
+                gargalo: gar,
+                gap: gar,
+                desafio: des,
+                description: des,
+                spend: "nao_informado_home",
                 timestamp: new Date().toISOString()
             };
 
             if(WEBHOOK_URL) {
                 try {
+                    const requestBody = JSON.stringify({
+                        route: 'LEAD_CAPTURE',
+                        payload: payload
+                    });
+                    
+                    console.info('[HOME_LEAD_REQUEST]', payload);
+                    
                     const response = await fetch(WEBHOOK_URL, {
                         method: 'POST',
                         headers: { 
                             'Content-Type': 'application/json',
                             'x-fluxai-proxy-key': 'fluxai-proxy-public-2026'
                         },
-                        body: JSON.stringify({
-                            route: 'LEAD_CAPTURE',
-                            payload: payload
-                        })
+                        body: requestBody
                     });
                     
-                    if(!response.ok) throw new Error('Network error');
+                    console.info('[HOME_LEAD_STATUS]', response.status);
+                    
+                    if(!response.ok) {
+                        try {
+                            const errorData = await response.text();
+                            console.info('[HOME_LEAD_ERROR_RESPONSE]', errorData);
+                        } catch(e) {}
+                        throw new Error('Network error ou proxy negou');
+                    } else {
+                        try {
+                            const resData = await response.text();
+                            console.info('[HOME_LEAD_RESPONSE]', resData);
+                        } catch(e) {}
+                    }
 
                     if(typeof fbq === 'function') fbq('track', 'Lead');
                     trackEvent('lead_submit', { form_id: 'diagnosticoForm' });
