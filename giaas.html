@@ -126,9 +126,8 @@
             gap: 8px;
         }
 
-        .logo span {
-            color: var(--color-primary);
-        }
+        .logo span { color: var(--color-primary); }
+        .logo-img { max-width: 195px; height: auto; display: block; }
 
         .btn-nav-cta {
             background: rgba(142, 158, 104, 0.1);
@@ -1070,7 +1069,7 @@
     <!-- Header Navigation -->
     <header>
         <div class="container nav-container">
-            <a href="/" class="logo"><img src="/assets/images/branding/logo-primary.webp" alt="FluxAI Labs" width="195" height="42" class="logo-img" /></a>
+            <a href="/" class="logo"><img src="/assets/images/branding/logo-primary.webp" alt="FluxAI Labs" width="195" height="42" class="logo-img" style="max-width: 150px; height: auto;" /></a>
             <a href="#aplicar" class="btn-nav-cta">Diagnóstico</a>
         </div>
     </header>
@@ -1487,9 +1486,9 @@
     <!-- Footer -->
     <footer>
         <div class="container">
-            <a href="#" class="logo" style="justify-content: center; margin-bottom: 20px;">
-                FLUXAI <span>LABS</span>
-            </a>
+            <a href="/" class="logo" style="justify-content: center; margin-bottom: 20px;">
+                  <img src="/assets/images/branding/logo-secondary.webp" alt="FluxAI Labs" width="140" height="30" loading="lazy" class="logo-img" style="max-width: 140px; height: auto;" />
+              </a>
             <p>Selo de Governança e Autenticidade Tecnológica FluxAI Labs™.</p>
             <p>Todos os direitos reservados | Em conformidade com a LGPD e com os protocolos internos de segurança e governança da FluxAI Labs™. <a href="#" id="openPrivacyModal" style="color: var(--color-primary); text-decoration: underline; margin-left: 8px; cursor: pointer;" onclick="trackEvent('footer_link_click', { button_text: 'Política de Privacidade' })">Política de Privacidade</a></p>
         </div>
