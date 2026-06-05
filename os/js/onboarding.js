@@ -1,4 +1,4 @@
-import { OS_UI, OS_AUTH } from './os-core.js';
+﻿import { OS_UI, OS_AUTH } from './os-core.js';
 import { getSupabase } from '../services/supabase-client.js';
 import { dispatchEvent } from './os-integration.js';
 import { OS_CONFIG } from '../config/os-config.js';
@@ -186,6 +186,21 @@ function renderDynamicFields() {
     });
 }
 
+function validateOnboardingBeforeSubmit(raw) {
+    const errors = [];
+    
+    // Campos básicos
+    if (!raw.company_name) errors.push("Nome da Marca é obrigatório (Etapa 1)");
+    if (!raw.responsible_name) errors.push("Responsável Principal é obrigatório (Etapa 1)");
+    if (!raw.segment) errors.push("Segmento é obrigatório (Etapa 1)");
+    if (!raw.objective) errors.push("Objetivo Principal é obrigatório (Etapa 1)");
+    if (!raw.asset_drive_link) errors.push("Link do Google Drive é obrigatório (Etapa 4)");
+    
+    // O cliente no caso do teste interno é FLUXAI_LABS_001. A tela não pede 'client_id' diretamente
+    // mas pede Company Name.
+
+    return errors;
+}
 async function handleOnboarding(e) {
     e.preventDefault();
     const btn = e.target.querySelector('.btn-save');
@@ -719,3 +734,4 @@ function registerLocalMockProjectAndUser(projectId, projectData, raw, email) {
 }
 
 initOnboarding();
+
