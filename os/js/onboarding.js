@@ -34,7 +34,12 @@ async function initOnboarding() {
     });
 
     const form = document.getElementById('onboardingForm');
-    if (form) form.onsubmit = handleOnboarding;
+    if (form) form.onsubmit = (e) => e.preventDefault();
+
+    const btnDisparar = document.getElementById('btn-disparar-infraestrutura');
+    if (btnDisparar) {
+        btnDisparar.onclick = window.handleOnboarding;
+    }
 
     const user = await OS_AUTH.check('ADMIN');
     if (!user) {
@@ -734,4 +739,5 @@ function registerLocalMockProjectAndUser(projectId, projectData, raw, email) {
 }
 
 initOnboarding();
+
 
