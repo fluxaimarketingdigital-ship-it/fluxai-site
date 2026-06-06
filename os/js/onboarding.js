@@ -1,4 +1,4 @@
-﻿import { OS_UI, OS_AUTH } from './os-core.js';
+import { OS_UI, OS_AUTH } from './os-core.js';
 import { getSupabase } from '../services/supabase-client.js';
 import { dispatchEvent } from './os-integration.js';
 import { OS_CONFIG } from '../config/os-config.js';
@@ -821,7 +821,12 @@ window.saveOnboardingDraft = function(isAuto = false) {
             draftData[key] = value;
         }
     }
-    localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
+    
+    try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
+    } catch (err) {
+        console.warn("Storage warning:", err);
+    }
     
     if (!isAuto) {
         const btn = document.getElementById('btn-save-draft');
@@ -863,7 +868,7 @@ function restoreOnboardingDraft() {
         let restoredCount = 0;
         Object.keys(draftData).forEach(key => {
             const val = draftData[key];
-            const inputs = form.querySelectorAll([name=" + key + "]);
+            const inputs = form.querySelectorAll(`[name="${key}"]`);
             if (!inputs.length) return;
             
             if (Array.isArray(val)) {
@@ -893,19 +898,19 @@ function restoreOnboardingDraft() {
             renderDynamicFields();
             Object.keys(draftData).forEach(key => {
                 if (key.startsWith('escopo_')) {
-                    const el = form.querySelector([name=" + key + "]);
+                    const el = form.querySelector(`[name="${key}"]`);
                     if (el) el.value = draftData[key];
                 }
             });
         }
         
         if (restoredCount > 0) {
-            const alertHtml = 
+            const alertHtml = `
                 <div id="draft-alert" style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #a7f3d0; display:flex; align-items:center; justify-content:space-between; font-size:0.8rem;">
                     <span><i class="fa-solid fa-rotate-left"></i> Rascunho local recuperado. Continue de onde parou.</span>
                     <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="this.parentElement.remove()"></i>
                 </div>
-            ;
+            `;
             const indicator = document.querySelector('.step-indicator');
             if (indicator) {
                 indicator.insertAdjacentHTML('beforebegin', alertHtml);
