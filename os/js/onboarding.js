@@ -803,3 +803,121 @@ initOnboarding();
 
 
 
+
+const DRAFT_KEY = "fluxai_onboarding_draft_FLUXAI_LABS_001";
+
+window.saveOnboardingDraft = function(isAuto = false) {
+    const form = document.getElementById('onboardingForm');
+    if (!form) return;
+    
+    const formData = new FormData(form);
+    const draftData = {};
+    for (let [key, value] of formData.entries()) {
+        if (key.toLowerCase().includes('password') || key.toLowerCase().includes('token') || key.toLowerCase().includes('secret')) continue;
+        if (draftData[key]) {
+            if (!Array.isArray(draftData[key])) draftData[key] = [draftData[key]];
+            draftData[key].push(value);
+        } else {
+            draftData[key] = value;
+        }
+    }
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(draftData));
+    
+    if (!isAuto) {
+        const btn = document.getElementById('btn-save-draft');
+        if (btn) {
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-check"></i> Salvo!';
+            btn.style.borderColor = '#10b981';
+            btn.style.color = '#10b981';
+            setTimeout(() => {
+                btn.innerHTML = originalText;
+                btn.style.borderColor = 'var(--os-border)';
+                btn.style.color = '#fff';
+            }, 2000);
+        }
+    }
+};
+
+window.clearOnboardingDraft = function() {
+    localStorage.removeItem(DRAFT_KEY);
+    const btn = document.getElementById('btn-clear-draft');
+    if (btn) {
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fa-solid fa-check"></i> Limpo!';
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            window.location.reload();
+        }, 800);
+    }
+};
+
+function restoreOnboardingDraft() {
+    const draft = localStorage.getItem(DRAFT_KEY);
+    if (!draft) return;
+    try {
+        const draftData = JSON.parse(draft);
+        const form = document.getElementById('onboardingForm');
+        if (!form) return;
+        
+        let restoredCount = 0;
+        Object.keys(draftData).forEach(key => {
+            const val = draftData[key];
+            const inputs = form.querySelectorAll([name=" + key + "]);
+            if (!inputs.length) return;
+            
+            if (Array.isArray(val)) {
+                inputs.forEach(input => {
+                    if ((input.type === 'checkbox' || input.type === 'radio') && val.includes(input.value)) {
+                        input.checked = true;
+                        restoredCount++;
+                    }
+                });
+            } else {
+                const input = inputs[0];
+                if (input.type === 'checkbox' || input.type === 'radio') {
+                    inputs.forEach(i => {
+                        if (i.value === val) {
+                            i.checked = true;
+                            restoredCount++;
+                        }
+                    });
+                } else {
+                    input.value = val;
+                    restoredCount++;
+                }
+            }
+        });
+        
+        if (typeof renderDynamicFields === 'function') {
+            renderDynamicFields();
+            Object.keys(draftData).forEach(key => {
+                if (key.startsWith('escopo_')) {
+                    const el = form.querySelector([name=" + key + "]);
+                    if (el) el.value = draftData[key];
+                }
+            });
+        }
+        
+        if (restoredCount > 0) {
+            const alertHtml = 
+                <div id="draft-alert" style="background: rgba(16, 185, 129, 0.1); border: 1px solid #10b981; padding: 15px; border-radius: 8px; margin-bottom: 20px; color: #a7f3d0; display:flex; align-items:center; justify-content:space-between; font-size:0.8rem;">
+                    <span><i class="fa-solid fa-rotate-left"></i> Rascunho local recuperado. Continue de onde parou.</span>
+                    <i class="fa-solid fa-xmark" style="cursor:pointer;" onclick="this.parentElement.remove()"></i>
+                </div>
+            ;
+            const indicator = document.querySelector('.step-indicator');
+            if (indicator) {
+                indicator.insertAdjacentHTML('beforebegin', alertHtml);
+                setTimeout(() => {
+                    const alertEl = document.getElementById('draft-alert');
+                    if (alertEl) alertEl.remove();
+                }, 5000);
+            }
+        }
+    } catch (e) {
+        console.error("Erro ao restaurar rascunho:", e);
+    }
+}
+
+// Attach to bottom
