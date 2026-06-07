@@ -146,14 +146,18 @@ async function loadClientData() {
         startDate: 'Dado pendente de sincronizaÃ§Ã£o',
         status: 'ativo',
         contractType: 'Dado pendente de sincronizaÃ§Ã£o',
+        segment: 'Dado pendente de sincronização',
+        startDate: 'Dado pendente de sincronização',
+        status: 'ativo',
+        contractType: 'Dado pendente de sincronização',
         services: [],
         extras: [],
-        scope: 'Dado pendente de sincronizaÃ§Ã£o',
+        scope: 'Dado pendente de sincronização',
         iaMetrics: { limit: 'Pendente', approved: 0, review: 0, published: 0 },
         metrics: [],
         integrations: [],
         folders: { root: '#', brand: '#', contracts: '#', assets: '#' },
-        responsible: 'Dado pendente de sincronizaÃ§Ã£o'
+        responsible: 'Dado pendente de sincronização'
     };
 
     if (supabase) {
@@ -162,20 +166,14 @@ async function loadClientData() {
         let creditos = null;
 
         try {
-            const { data } = await supabase.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false }).limit(1).maybeSingle();
-            contratos = data;
+            const { data } = await supabase.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false }).limit(1);
+            if (data && data.length > 0) contratos = data[0];
         } catch(e) { console.warn('[COCKPIT] Erro em CONTRATOS_CLIENTES', e); }
 
         try {
-            const { data } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).limit(1).maybeSingle();
-            estrategia = data;
+            const { data } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).limit(1);
+            if (data && data.length > 0) estrategia = data[0];
         } catch(e) { console.warn('[COCKPIT] Erro em CLIENTES_ESTRATEGIA', e); }
-
-        const mesAtual = new Date().toISOString().substring(0, 7);
-        try {
-            const { data } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', mesAtual).eq('status_limite', 'ativo');
-            creditos = data;
-        } catch(e) { console.warn('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
 
         if (estrategia) {
             client.name = estrategia.cliente_nome || activeClientId;
@@ -191,68 +189,81 @@ async function loadClientData() {
             client.responsible = (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
         }
 
-            if (creditos && creditos.length > 0) {
-                let sumLimit = 0;
-                let sumOcup = 0;
-                let sumDisp = 0;
-                let sumPub = 0;
-                creditos.forEach(c => {
-                    sumLimit += Number(c.limite_operacional_mensal) || 0;
-                    sumOcup += Number(c.limite_ocupado) || 0;
-                    sumDisp += Number(c.limite_disponivel_operacional) || 0;
-                    sumPub += Number(c.limite_publicado) || 0;
-                });
-                client.iaMetrics.limit = sumLimit;
-                client.iaMetrics.approved = sumOcup; 
-                client.iaMetrics.review = sumDisp; 
-                client.iaMetrics.published = sumPub;
+        console.log('[Cockpit] carregando limites IA');
+        const mesAtual = new Date().toISOString().substring(0, 7);
+        try {
+            const { data } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', mesAtual).eq('status_limite', 'ativo');
+            creditos = data;
+        } catch(e) { console.warn('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
+
+        if (creditos && creditos.length > 0) {
+            let sumLimit = 0;
+            let sumOcup = 0;
+            let sumDisp = 0;
+            let sumPub = 0;
+            creditos.forEach(c => {
+                sumLimit += Number(c.limite_operacional_mensal) || 0;
+                sumOcup += Number(c.limite_ocupado) || 0;
+                sumDisp += Number(c.limite_disponivel_operacional) || 0;
+                sumPub += Number(c.limite_publicado) || 0;
+            });
+            client.iaMetrics.limit = sumLimit;
+            client.iaMetrics.approved = sumOcup; 
+            client.iaMetrics.review = sumDisp; 
+            client.iaMetrics.published = sumPub;
+        }
+
+        try {
+            console.log('[Cockpit] carregando serviços extras');
+            const { data: servicosExtras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico_extra', 'aprovado').order('data_aprovacao', { ascending: false });
+            renderServicosExtras(servicosExtras);
+            if (servicosExtras && servicosExtras.length > 0) {
+                client.extras = servicosExtras.map(s => s.nome_servico);
             }
+        } catch(e) { renderServicosExtras(null); }
 
-            try {
-                const { data: servicosExtras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico_extra', 'aprovado').order('data_aprovacao', { ascending: false });
-                renderServicosExtras(servicosExtras);
-                if (servicosExtras && servicosExtras.length > 0) {
-                    client.extras = servicosExtras.map(s => s.nome_servico);
-                }
-            } catch(e) { renderServicosExtras(null); }
+        try {
+            console.log('[Cockpit] carregando financeiro');
+            if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'OPERATOR')) {
+                const financeiroWidget = document.getElementById('widget-financeiro');
+                if (financeiroWidget) financeiroWidget.style.display = 'block';
+                const { data: financeiro } = await supabase.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+                renderFinanceiro(financeiro);
+            }
+        } catch(e) { renderFinanceiro(null); }
 
-            try {
-                if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'OPERATOR')) {
-                    const financeiroWidget = document.getElementById('widget-financeiro');
-                    if (financeiroWidget) financeiroWidget.style.display = 'block';
-                    const { data: financeiro } = await supabase.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
-                    renderFinanceiro(financeiro);
-                }
-            } catch(e) { renderFinanceiro(null); }
+        try {
+            console.log('[Cockpit] carregando demandas');
+            const { data: demandas } = await supabase.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+            renderDemandas(demandas);
+        } catch(e) { renderDemandas(null); }
 
-            try {
-                const { data: demandas } = await supabase.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
-                renderDemandas(demandas);
-            } catch(e) { renderDemandas(null); }
+        try {
+            console.log('[Cockpit] carregando comunicações');
+            const { data: comunicacoes } = await supabase.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+            renderComunicacoes(comunicacoes, currentUser?.role);
+        } catch(e) { renderComunicacoes(null); }
 
-            try {
-                const { data: comunicacoes } = await supabase.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
-                renderComunicacoes(comunicacoes, currentUser?.role);
-            } catch(e) { renderComunicacoes(null); }
+        console.log('[Cockpit] dados extras carregados com sucesso');
 
-            try {
-                const { data: srvs } = await supabase.from('SERVICOS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico', 'ativo');
-                const { data: config } = await supabase.from('CLIENTES_CONFIG').select('*').eq('client_id', activeClientId).eq('status_cliente', 'ativo').limit(1).maybeSingle();
-                
-                if (srvs && srvs.length > 0 && config) {
-                    client.integrations = srvs.map(s => {
-                        return {
-                            name: s.nome_servico || s.servico_id,
-                            status: 'Conectado',
-                            token: config.token_status || 'ativo',
-                            manual: s.modo_coleta === 'manual',
-                            alert: 'Integração configurada, aguardando coleta'
-                        };
-                    });
-                }
-            } catch(e) { console.warn('[COCKPIT] Erro integrações', e); }
+        try {
+            const { data: srvs } = await supabase.from('SERVICOS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico', 'ativo');
+            const { data: config } = await supabase.from('CLIENTES_CONFIG').select('*').eq('client_id', activeClientId).eq('status_cliente', 'ativo').limit(1);
             
-            client.metrics = []; 
+            if (srvs && srvs.length > 0 && config && config.length > 0) {
+                client.integrations = srvs.map(s => {
+                    return {
+                        name: s.nome_servico || s.servico_id,
+                        status: 'Conectado',
+                        token: config[0].token_status || 'ativo',
+                        manual: s.modo_coleta === 'manual',
+                        alert: 'Integração configurada, aguardando coleta'
+                    };
+                });
+            }
+        } catch(e) { console.warn('[COCKPIT] Erro integrações', e); }
+        
+        client.metrics = []; 
     }
 
     if (activeClientId !== 'FLUXAI_LABS_001' && Object.prototype.hasOwnProperty.call(CLIENT_COCKPIT_MOCKS, activeClientId)) {
