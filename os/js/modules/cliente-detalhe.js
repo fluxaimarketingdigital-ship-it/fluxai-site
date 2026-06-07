@@ -140,6 +140,33 @@ async function initPage() {
 async function loadClientData() {
     const supabase = getSupabase();
     
+    // ── GUARDA DE SESSÃO ────────────────────────────────────────────────────
+    // O cliente singleton pode ter sido criado antes do login, sem token JWT.
+    // Verificamos a sessão e forçamos setSession para garantir que o Bearer
+    // esteja presente em TODAS as requisições REST subsequentes.
+    if (supabase) {
+        try {
+            const { data: sessionData } = await supabase.auth.getSession();
+            const session = sessionData?.session;
+            const hasSession = !!session;
+            const hasToken  = !!session?.access_token;
+            console.log('[Cockpit-DIAG] Sessão:', { hasSession, hasAccessToken: hasToken, email: session?.user?.email || null, activeClientId });
+
+            if (!hasSession || !hasToken) {
+                console.error('[Cockpit] Sessão expirada ou inválida. Faça login novamente.');
+                const container = document.getElementById('client-detail-content');
+                if (container) container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--os-danger);font-size:1.1rem;"><i class="fa-solid fa-lock"></i> Sessão expirada. <a href="../os/login" style="color:var(--os-primary);">Faça login novamente.</a></div>';
+                return;
+            }
+            // Reinjetar explicitamente o token no cliente singleton para garantir
+            // que o header Authorization: Bearer esteja presente nas queries REST
+            await supabase.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token });
+        } catch(e) {
+            console.error('[Cockpit] Erro ao verificar sessão Supabase', e);
+        }
+    }
+    // ────────────────────────────────────────────────────────────────────────
+
     let client = {
         name: activeClientId,
         segment: 'Dado pendente de sincronização',
@@ -158,6 +185,7 @@ async function loadClientData() {
 
     if (supabase) {
         let contratos = null;
+
         let estrategia = null;
         let creditos = null;
 
