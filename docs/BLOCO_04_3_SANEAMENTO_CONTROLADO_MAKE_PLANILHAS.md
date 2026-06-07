@@ -475,6 +475,29 @@ Frente 01 oficialmente homologada nos cenários originais.
 Observação:
 Os clones FIX_P1 podem permanecer temporariamente como backup técnico até o encerramento completo do Bloco 4.3. Não devem ficar ativos.
 
+### Limpeza final — clones FIX_P1
+
+Status:
+CONCLUÍDA.
+
+Clones excluídos:
+- 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC_FIX_P1
+- 15_FLUXAI_PLANEJAMENTO_CONTEUDO_FIX_P1
+- 16_FLUXAI_CALENDARIO_POSTAGENS_FIX_P1
+- 17_FLUXAI_GPT_GERACOES_LOG_FIX_P1
+
+Motivo:
+Os clones foram usados exclusivamente como ambiente seguro de teste e homologação. Após a correção ser aplicada e validada nos cenários originais, os clones deixaram de ter função operacional.
+
+Cenários preservados:
+- 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC
+- 15_FLUXAI_PLANEJAMENTO_CONTEUDO
+- 16_FLUXAI_CALENDARIO_POSTAGENS
+- 17_FLUXAI_GPT_GERACOES_LOG
+
+Decisão:
+Manter apenas os cenários originais homologados na operação ativa.
+
 ## 6. Frente 02 — Sincronização Supabase
 
 ### Problema
