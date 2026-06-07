@@ -219,7 +219,10 @@ async function loadClientData() {
             if (servicosExtras && servicosExtras.length > 0) {
                 client.extras = servicosExtras.map(s => s.nome_servico);
             }
-        } catch(e) { renderServicosExtras(null); }
+        } catch(e) { 
+            console.warn('[COCKPIT] Erro em SERVICOS_EXTRAS_CLIENTES', e);
+            renderServicosExtras(null); 
+        }
 
         try {
             console.log('[Cockpit] carregando financeiro');
@@ -229,19 +232,28 @@ async function loadClientData() {
                 const { data: financeiro } = await supabase.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId);
                 renderFinanceiro(financeiro);
             }
-        } catch(e) { renderFinanceiro(null); }
+        } catch(e) { 
+            console.warn('[COCKPIT] Erro em FINANCEIRO_CLIENTES', e);
+            renderFinanceiro(null); 
+        }
 
         try {
             console.log('[Cockpit] carregando demandas');
             const { data: demandas } = await supabase.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId);
             renderDemandas(demandas);
-        } catch(e) { renderDemandas(null); }
+        } catch(e) { 
+            console.warn('[COCKPIT] Erro em DEMANDAS_CLIENTES', e);
+            renderDemandas(null); 
+        }
 
         try {
             console.log('[Cockpit] carregando comunicações');
             const { data: comunicacoes } = await supabase.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId);
             renderComunicacoes(comunicacoes, currentUser?.role);
-        } catch(e) { renderComunicacoes(null); }
+        } catch(e) { 
+            console.warn('[COCKPIT] Erro em COMUNICACOES_CLIENTE', e);
+            renderComunicacoes(null); 
+        }
 
         console.log('[Cockpit] dados extras carregados com sucesso');
         client.integrations = [];
