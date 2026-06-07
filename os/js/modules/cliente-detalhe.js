@@ -190,9 +190,8 @@ async function loadClientData() {
         }
 
         console.log('[Cockpit] carregando limites IA');
-        const mesAtual = new Date().toISOString().substring(0, 7);
         try {
-            const { data } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', mesAtual).eq('status_limite', 'ativo');
+            const { data } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', '2026-06').eq('status_limite', 'ativo');
             creditos = data;
         } catch(e) { console.warn('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
 
@@ -215,7 +214,7 @@ async function loadClientData() {
 
         try {
             console.log('[Cockpit] carregando serviços extras');
-            const { data: servicosExtras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico_extra', 'aprovado').order('data_aprovacao', { ascending: false });
+            const { data: servicosExtras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId);
             renderServicosExtras(servicosExtras);
             if (servicosExtras && servicosExtras.length > 0) {
                 client.extras = servicosExtras.map(s => s.nome_servico);
@@ -227,42 +226,25 @@ async function loadClientData() {
             if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'OPERATOR')) {
                 const financeiroWidget = document.getElementById('widget-financeiro');
                 if (financeiroWidget) financeiroWidget.style.display = 'block';
-                const { data: financeiro } = await supabase.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+                const { data: financeiro } = await supabase.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId);
                 renderFinanceiro(financeiro);
             }
         } catch(e) { renderFinanceiro(null); }
 
         try {
             console.log('[Cockpit] carregando demandas');
-            const { data: demandas } = await supabase.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+            const { data: demandas } = await supabase.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId);
             renderDemandas(demandas);
         } catch(e) { renderDemandas(null); }
 
         try {
             console.log('[Cockpit] carregando comunicações');
-            const { data: comunicacoes } = await supabase.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+            const { data: comunicacoes } = await supabase.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId);
             renderComunicacoes(comunicacoes, currentUser?.role);
         } catch(e) { renderComunicacoes(null); }
 
         console.log('[Cockpit] dados extras carregados com sucesso');
-
-        try {
-            const { data: srvs } = await supabase.from('SERVICOS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico', 'ativo');
-            const { data: config } = await supabase.from('CLIENTES_CONFIG').select('*').eq('client_id', activeClientId).eq('status_cliente', 'ativo').limit(1);
-            
-            if (srvs && srvs.length > 0 && config && config.length > 0) {
-                client.integrations = srvs.map(s => {
-                    return {
-                        name: s.nome_servico || s.servico_id,
-                        status: 'Conectado',
-                        token: config[0].token_status || 'ativo',
-                        manual: s.modo_coleta === 'manual',
-                        alert: 'Integração configurada, aguardando coleta'
-                    };
-                });
-            }
-        } catch(e) { console.warn('[COCKPIT] Erro integrações', e); }
-        
+        client.integrations = [];
         client.metrics = []; 
     }
 
