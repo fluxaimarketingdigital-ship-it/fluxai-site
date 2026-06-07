@@ -1,4 +1,4 @@
-﻿import { OS_UI, OS_AUTH } from '../os-core.js';
+import { OS_UI, OS_AUTH } from '../os-core.js';
 import { SheetsService } from '../../services/sheets-service.js';
 import { OS_CONFIG } from '../../config/os-config.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
@@ -206,15 +206,16 @@ async function loadClientData() {
         let creditos = null;
 
         try {
-            const { data } = await authedClient.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false }).limit(1);
+            const { data } = await authedClient.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).limit(1);
             if (data && data.length > 0) contratos = data[0];
+            console.log('[Cockpit-DIAG] CONTRATOS_CLIENTES fetching:', data);
         } catch(e) { console.warn('[COCKPIT] Erro em CONTRATOS_CLIENTES', e); }
 
         try {
             const { data } = await authedClient.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).limit(1);
             if (data && data.length > 0) estrategia = data[0];
+            console.log('[Cockpit-DIAG] CLIENTES_ESTRATEGIA fetching:', data);
         } catch(e) { console.warn('[COCKPIT] Erro em CLIENTES_ESTRATEGIA', e); }
-
 
         if (estrategia) {
             client.name = estrategia.cliente_nome || activeClientId;
@@ -226,6 +227,7 @@ async function loadClientData() {
             client.startDate = contratos.data_inicio || contratos.data_criacao || 'Dado pendente de sincronização';
             client.contractType = contratos.escopo_contratado || 'Dado pendente de sincronização';
             client.responsible = contratos.responsavel_comercial || (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
+            if (contratos.status_contrato) client.status = contratos.status_contrato;
         } else {
             client.responsible = (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
         }
