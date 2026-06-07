@@ -189,11 +189,14 @@ async function loadClientData() {
             client.responsible = (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
         }
 
+        console.log(`[Cockpit-DIAG] activeClientId = ${activeClientId}`);
+
         console.log('[Cockpit] carregando limites IA');
         try {
             const { data } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', '2026-06').eq('status_limite', 'ativo');
             creditos = data;
-        } catch(e) { console.warn('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
+            console.log(`[Cockpit-DIAG] IA_CREDITOS_CLIENTE: qtd=${data?.length || 0}`, data && data.length > 0 ? data[0] : null);
+        } catch(e) { console.error('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
 
         if (creditos && creditos.length > 0) {
             let sumLimit = 0;
@@ -204,7 +207,7 @@ async function loadClientData() {
                 sumLimit += Number(c.limite_operacional_mensal) || 0;
                 sumOcup += Number(c.limite_ocupado) || 0;
                 sumDisp += Number(c.limite_disponivel_operacional) || 0;
-                sumPub += Number(c.limite_publicado) || 0;
+                sumPub += Number(c.limite_published) || 0;
             });
             client.iaMetrics.limit = sumLimit;
             client.iaMetrics.approved = sumOcup; 
@@ -215,12 +218,13 @@ async function loadClientData() {
         try {
             console.log('[Cockpit] carregando serviços extras');
             const { data: servicosExtras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId);
+            console.log(`[Cockpit-DIAG] SERVICOS_EXTRAS_CLIENTES: qtd=${servicosExtras?.length || 0}`, servicosExtras && servicosExtras.length > 0 ? servicosExtras[0] : null);
             renderServicosExtras(servicosExtras);
             if (servicosExtras && servicosExtras.length > 0) {
                 client.extras = servicosExtras.map(s => s.nome_servico);
             }
         } catch(e) { 
-            console.warn('[COCKPIT] Erro em SERVICOS_EXTRAS_CLIENTES', e);
+            console.error('[COCKPIT] Erro em SERVICOS_EXTRAS_CLIENTES', e);
             renderServicosExtras(null); 
         }
 
@@ -230,28 +234,31 @@ async function loadClientData() {
                 const financeiroWidget = document.getElementById('widget-financeiro');
                 if (financeiroWidget) financeiroWidget.style.display = 'block';
                 const { data: financeiro } = await supabase.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId);
+                console.log(`[Cockpit-DIAG] FINANCEIRO_CLIENTES: qtd=${financeiro?.length || 0}`, financeiro && financeiro.length > 0 ? financeiro[0] : null);
                 renderFinanceiro(financeiro);
             }
         } catch(e) { 
-            console.warn('[COCKPIT] Erro em FINANCEIRO_CLIENTES', e);
+            console.error('[COCKPIT] Erro em FINANCEIRO_CLIENTES', e);
             renderFinanceiro(null); 
         }
 
         try {
             console.log('[Cockpit] carregando demandas');
             const { data: demandas } = await supabase.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId);
+            console.log(`[Cockpit-DIAG] DEMANDAS_CLIENTES: qtd=${demandas?.length || 0}`, demandas && demandas.length > 0 ? demandas[0] : null);
             renderDemandas(demandas);
         } catch(e) { 
-            console.warn('[COCKPIT] Erro em DEMANDAS_CLIENTES', e);
+            console.error('[COCKPIT] Erro em DEMANDAS_CLIENTES', e);
             renderDemandas(null); 
         }
 
         try {
             console.log('[Cockpit] carregando comunicações');
             const { data: comunicacoes } = await supabase.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId);
+            console.log(`[Cockpit-DIAG] COMUNICACOES_CLIENTE: qtd=${comunicacoes?.length || 0}`, comunicacoes && comunicacoes.length > 0 ? comunicacoes[0] : null);
             renderComunicacoes(comunicacoes, currentUser?.role);
         } catch(e) { 
-            console.warn('[COCKPIT] Erro em COMUNICACOES_CLIENTE', e);
+            console.error('[COCKPIT] Erro em COMUNICACOES_CLIENTE', e);
             renderComunicacoes(null); 
         }
 
@@ -661,6 +668,7 @@ function renderClientLogs() {
                 </tr>`;
         }).join('');
     } catch (e) {
+        console.error('[COCKPIT] Erro ao renderizar logs', e);
         container.innerHTML = '<tr><td colspan="6">Erro ao renderizar logs do cliente.</td></tr>';
     }
 }
