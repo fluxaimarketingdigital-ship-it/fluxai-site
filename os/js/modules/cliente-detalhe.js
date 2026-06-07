@@ -1,4 +1,4 @@
-import { OS_UI, OS_AUTH } from '../os-core.js';
+﻿import { OS_UI, OS_AUTH } from '../os-core.js';
 import { SheetsService } from '../../services/sheets-service.js';
 import { OS_CONFIG } from '../../config/os-config.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
@@ -140,29 +140,45 @@ async function initPage() {
 async function loadClientData() {
     const supabase = getSupabase();
     
-    // ── GUARDA DE SESSÃO ────────────────────────────────────────────────────
-    // O cliente singleton pode ter sido criado antes do login, sem token JWT.
-    // Verificamos a sessão e forçamos setSession para garantir que o Bearer
-    // esteja presente em TODAS as requisições REST subsequentes.
+    // ── GUARDA DE SESSÃO + CLIENTE AUTENTICADO ──────────────────────────────
+    // O singleton CDN não propaga setSession nos headers REST retroativamente.
+    // Solução: criar um cliente descartável com o Bearer token injetado como
+    // global header, garantindo que TODAS as queries operacionais saiam autenticadas.
+    let authedClient = supabase; // fallback para o singleton caso não haja sessão
+    
     if (supabase) {
         try {
             const { data: sessionData } = await supabase.auth.getSession();
             const session = sessionData?.session;
             const hasSession = !!session;
             const hasToken  = !!session?.access_token;
+
             console.log('[Cockpit-DIAG] Sessão:', { hasSession, hasAccessToken: hasToken, email: session?.user?.email || null, activeClientId });
 
             if (!hasSession || !hasToken) {
-                console.error('[Cockpit] Sessão expirada ou inválida. Faça login novamente.');
+                console.error('[Cockpit] Sessão expirada ou inválida.');
                 const container = document.getElementById('client-detail-content');
                 if (container) container.innerHTML = '<div style="padding:40px;text-align:center;color:var(--os-danger);font-size:1.1rem;"><i class="fa-solid fa-lock"></i> Sessão expirada. <a href="../os/login" style="color:var(--os-primary);">Faça login novamente.</a></div>';
                 return;
             }
-            // Reinjetar explicitamente o token no cliente singleton para garantir
-            // que o header Authorization: Bearer esteja presente nas queries REST
-            await supabase.auth.setSession({ access_token: session.access_token, refresh_token: session.refresh_token });
+
+            // Criar cliente descartável com o token Bearer injetado diretamente
+            // Isso garante que o header Authorization está presente em TODAS as queries
+            if (window.supabase && window.supabase.createClient) {
+                authedClient = window.supabase.createClient(
+                    'https://mufgwetfhfhhmhowbhjj.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI',
+                    {
+                        global: {
+                            headers: { Authorization: `Bearer ${session.access_token}` }
+                        },
+                        auth: { persistSession: false }
+                    }
+                );
+                console.log('[Cockpit-DIAG] Cliente autenticado criado com Bearer token injetado.');
+            }
         } catch(e) {
-            console.error('[Cockpit] Erro ao verificar sessão Supabase', e);
+            console.error('[Cockpit] Erro ao criar cliente autenticado:', e);
         }
     }
     // ────────────────────────────────────────────────────────────────────────
@@ -183,21 +199,22 @@ async function loadClientData() {
         responsible: 'Dado pendente de sincronização'
     };
 
-    if (supabase) {
+    if (authedClient) {
         let contratos = null;
 
         let estrategia = null;
         let creditos = null;
 
         try {
-            const { data } = await supabase.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false }).limit(1);
+            const { data } = await authedClient.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false }).limit(1);
             if (data && data.length > 0) contratos = data[0];
         } catch(e) { console.warn('[COCKPIT] Erro em CONTRATOS_CLIENTES', e); }
 
         try {
-            const { data } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).limit(1);
+            const { data } = await authedClient.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).limit(1);
             if (data && data.length > 0) estrategia = data[0];
         } catch(e) { console.warn('[COCKPIT] Erro em CLIENTES_ESTRATEGIA', e); }
+
 
         if (estrategia) {
             client.name = estrategia.cliente_nome || activeClientId;
@@ -217,7 +234,7 @@ async function loadClientData() {
 
         console.log('[Cockpit] carregando limites IA');
         try {
-            const { data } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', '2026-06').eq('status_limite', 'ativo');
+            const { data } = await authedClient.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', '2026-06').eq('status_limite', 'ativo');
             creditos = data;
             console.log(`[Cockpit-DIAG] IA_CREDITOS_CLIENTE: qtd=${data?.length || 0}`, data && data.length > 0 ? data[0] : null);
         } catch(e) { console.error('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
@@ -241,7 +258,7 @@ async function loadClientData() {
 
         try {
             console.log('[Cockpit] carregando serviços extras');
-            const { data: servicosExtras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId);
+            const { data: servicosExtras } = await authedClient.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId);
             console.log(`[Cockpit-DIAG] SERVICOS_EXTRAS_CLIENTES: qtd=${servicosExtras?.length || 0}`, servicosExtras && servicosExtras.length > 0 ? servicosExtras[0] : null);
             renderServicosExtras(servicosExtras);
             if (servicosExtras && servicosExtras.length > 0) {
@@ -257,7 +274,7 @@ async function loadClientData() {
             if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'OPERATOR')) {
                 const financeiroWidget = document.getElementById('widget-financeiro');
                 if (financeiroWidget) financeiroWidget.style.display = 'block';
-                const { data: financeiro } = await supabase.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId);
+                const { data: financeiro } = await authedClient.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId);
                 console.log(`[Cockpit-DIAG] FINANCEIRO_CLIENTES: qtd=${financeiro?.length || 0}`, financeiro && financeiro.length > 0 ? financeiro[0] : null);
                 renderFinanceiro(financeiro);
             }
@@ -268,7 +285,7 @@ async function loadClientData() {
 
         try {
             console.log('[Cockpit] carregando demandas');
-            const { data: demandas } = await supabase.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId);
+            const { data: demandas } = await authedClient.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId);
             console.log(`[Cockpit-DIAG] DEMANDAS_CLIENTES: qtd=${demandas?.length || 0}`, demandas && demandas.length > 0 ? demandas[0] : null);
             renderDemandas(demandas);
         } catch(e) { 
@@ -278,7 +295,7 @@ async function loadClientData() {
 
         try {
             console.log('[Cockpit] carregando comunicações');
-            const { data: comunicacoes } = await supabase.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId);
+            const { data: comunicacoes } = await authedClient.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId);
             console.log(`[Cockpit-DIAG] COMUNICACOES_CLIENTE: qtd=${comunicacoes?.length || 0}`, comunicacoes && comunicacoes.length > 0 ? comunicacoes[0] : null);
             renderComunicacoes(comunicacoes, currentUser?.role);
         } catch(e) { 
