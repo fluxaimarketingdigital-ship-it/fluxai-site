@@ -520,54 +520,114 @@ Frente 01 finalizada sem resíduos operacionais nas planilhas.
 
 ## 6. Frente 02 — Sincronização Supabase
 
-### Problema
+Objetivo:
+Definir quais cenários Make devem gravar apenas no Google Sheets e quais devem sincronizar também com Supabase para alimentar o FluxAI OS™, Cockpit interno, Portal do Cliente e telas operacionais autenticadas.
 
-Muitos cenários gravam apenas no Google Sheets.
+Regra arquitetural:
+Google Sheets permanece como banco operacional completo.
+Supabase deve armazenar apenas dados necessários para autenticação, consulta rápida, exibição no FluxAI OS™, Portal do Cliente, Cockpit, permissões, governança e interfaces operacionais.
 
-Isso é aceitável para histórico operacional, mas insuficiente se o Cockpit, Portal do Cliente ou camada executiva precisarem consultar esses dados em tempo real.
+Não será criada sincronização Supabase indiscriminada para todos os cenários.
 
-### Cenários que gravam apenas Sheets e podem precisar de Supabase
-
+Cenários operacionais após saneamento da Frente 01:
 - 01_FLUXAI_PORTAL_DEMANDAS
 - 02_FLUXAI_LEADS_SITE
 - 05_FLUXAI_DAILY_SYNC
 - 06_FLUXAI_META_SYNC
 - 07_FLUXAI_RELATORIO_MENSAL
 - 08_FLUXAI_CLIENT_STATUS_MONITOR
-- 09_FLUXAI_NOVO_CLIENTE_ONBOARDING_SEGURO
-- 11_FLUXAI_IA_CREDITOS_CONTROLE_LIMITE_OPERACIONAL
+- 09_FLUXAI_NOVO_CLIENTE_ONBOARDING
+- 10_FLUXAI_SERVICO_EXTRA_REQUEST
+- 11_FLUXAI_IA_CREDITOS_CONTROLE
 - 12_FLUXAI_SERVICO_EXTRA_APROVACAO
-- 13_FLUXAI_IA_GUARDRAIL_LIMITE_OPERACIONAL
+- 13_FLUXAI_IA_GUARDRAIL
 - 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC
 - 15_FLUXAI_PLANEJAMENTO_CONTEUDO
 - 16_FLUXAI_CALENDARIO_POSTAGENS
 - 17_FLUXAI_GPT_GERACOES_LOG
+
+Cenário removido:
 - 18_FLUXAI_LEADS_CLIENTES
 
-### Critério de decisão
+Classificação inicial:
 
-Nem tudo precisa ir para Supabase.
+Grupo A — Forte candidato a Supabase:
+- 01_FLUXAI_PORTAL_DEMANDAS
+- 02_FLUXAI_LEADS_SITE
+- 09_FLUXAI_NOVO_CLIENTE_ONBOARDING
+- 10_FLUXAI_SERVICO_EXTRA_REQUEST
+- 11_FLUXAI_IA_CREDITOS_CONTROLE
+- 12_FLUXAI_SERVICO_EXTRA_APROVACAO
+- 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC
+- 15_FLUXAI_PLANEJAMENTO_CONTEUDO
+- 16_FLUXAI_CALENDARIO_POSTAGENS
 
-Enviar para Supabase apenas quando o dado precisar ser lido por:
-- Cockpit
-- Portal do Cliente
-- Dashboard interno
-- Camada executiva
-- API GPT
-- Governança de IA
-- Relatórios dinâmicos
+Grupo B — Avaliar necessidade conforme tela do FluxAI OS™:
+- 07_FLUXAI_RELATORIO_MENSAL
+- 08_FLUXAI_CLIENT_STATUS_MONITOR
+- 13_FLUXAI_IA_GUARDRAIL
+- 17_FLUXAI_GPT_GERACOES_LOG
 
-Manter somente no Sheets quando o dado for:
-- histórico bruto
-- log de apoio
-- dado manual
-- backup operacional
-- base de consulta eventual
+Grupo C — Manter inicialmente apenas no Google Sheets:
+- 05_FLUXAI_DAILY_SYNC
+- 06_FLUXAI_META_SYNC
 
-### Decisão atual
+Prioridade de auditoria:
+1. 10_FLUXAI_SERVICO_EXTRA_REQUEST
+2. 12_FLUXAI_SERVICO_EXTRA_APROVACAO
+3. 09_FLUXAI_NOVO_CLIENTE_ONBOARDING
+4. 11_FLUXAI_IA_CREDITOS_CONTROLE
+5. 01_FLUXAI_PORTAL_DEMANDAS
+6. 02_FLUXAI_LEADS_SITE
+7. 14, 15 e 16
+8. 07, 08, 13 e 17
+9. 05 e 06 apenas como métricas Sheets neste momento
 
-Status: MAPEAR PRIORIDADE  
-Ação: CLASSIFICAR CENÁRIO POR CENÁRIO
+### Frente 02 — Homologação do cenário 10
+
+Cenário:
+10_FLUXAI_SERVICO_EXTRA_REQUEST
+
+Status:
+HOMOLOGADO.
+
+Decisão:
+O cenário 10 passa a ser a fonte oficial única para serviço extra aprovado no ecossistema FluxAI OS™.
+
+Cenário substituído/descontinuado:
+12_FLUXAI_SERVICO_EXTRA_APROVACAO foi excluído por sobreposição operacional.
+
+Correção aplicada durante teste:
+O erro de range no Google Sheets não era falha de Supabase. A causa foi divergência no nome da aba do Google Sheets, que impedia o Make de interpretar o range SERVICOS_EXTRAS_CLIENTES!A1:ZZ1. Os módulos Sheets do cenário 10 foram mantidos por posição de coluna, com Use column headers as IDs = No, após revalidação controlada.
+
+Teste SEM IA:
+ID: SE_TESTE_10_SEM_IA_001
+Resultado:
+- Gravou em SERVICOS_EXTRAS_CLIENTES
+- Gravou em FINANCEIRO_CLIENTES
+- Gravou em DEMANDAS_CLIENTES
+- Gravou em COMUNICACOES_CLIENTE
+- Não gravou em IA_CREDITOS_CLIENTE
+
+Teste COM IA:
+ID: SE_TESTE_10_COM_IA_002
+Resultado:
+- Gravou em SERVICOS_EXTRAS_CLIENTES
+- Gravou em FINANCEIRO_CLIENTES
+- Gravou em DEMANDAS_CLIENTES
+- Gravou em COMUNICACOES_CLIENTE
+- Gravou em IA_CREDITOS_CLIENTE
+
+Validação Supabase:
+Registros encontrados nas tabelas:
+- SERVICOS_EXTRAS_CLIENTES
+- FINANCEIRO_CLIENTES
+- DEMANDAS_CLIENTES
+- COMUNICACOES_CLIENTE
+- IA_CREDITOS_CLIENTE apenas no teste com IA
+
+Decisão final:
+Cenário 10 homologado na Frente 02.
 
 ## 7. Frente 03 — Padronização de nomes dos cenários Make
 
