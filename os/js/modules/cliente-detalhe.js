@@ -259,7 +259,7 @@ async function loadClientData() {
     renderIntegrationsList();
 
     document.getElementById('contract-services-list').innerHTML = client.services && client.services.length > 0 ? client.services.map(s => `<span class="tag-badge">${s}</span>`).join('') : '<span style="color:var(--os-text-muted);">Dado pendente de sincronização</span>';
-    document.getElementById('contract-extras-list').innerHTML = client.extras && client.extras.length > 0 ? client.extras.map(e => `<span class="tag-badge" style="background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.3); color:#60a5fa;">${e}</span>`).join('') : '<span style="color:var(--os-text-muted);">Nenhum serviço extra aprovado neste ciclo.</span>';/span>).join('') : '<span style="color:var(--os-text-muted);">Nenhum serviÃ§o extra aprovado neste ciclo.</span>';
+    document.getElementById('contract-extras-list').innerHTML = client.extras && client.extras.length > 0 ? client.extras.map(e => `<span class="tag-badge" style="background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.3); color:#60a5fa;">${e}</span>`).join('') : '<span style="color:var(--os-text-muted);">Nenhum serviço extra aprovado neste ciclo.</span>';
     document.getElementById('contract-scope-text').innerText = client.scope;
 
     updateIAMetricsDisplay();
