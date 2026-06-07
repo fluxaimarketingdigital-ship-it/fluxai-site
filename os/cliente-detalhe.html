@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8" />
@@ -536,6 +536,99 @@
                         </div>
                     </div>
                     
+                    <!-- WIDGET EXTRA 1: SERVIÇOS EXTRAS APROVADOS -->
+                    <div class="cockpit-widget col-12">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-plus-circle"></i> Serviços Extras Aprovados</span>
+                        </div>
+                        <div style="max-height: 250px; overflow-y: auto;">
+                            <table class="simple-table">
+                                <thead>
+                                    <tr>
+                                        <th>Serviço</th>
+                                        <th>Status</th>
+                                        <th>Valor</th>
+                                        <th>Prazo</th>
+                                        <th>Crédito IA</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="extras-list-body">
+                                    <tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Sincronizando via Supabase...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- WIDGET EXTRA 2: EXTRATO FINANCEIRO -->
+                    <div class="cockpit-widget col-12" id="widget-financeiro" style="display:none;">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-dollar-sign"></i> Extrato Financeiro Interno</span>
+                            <span style="font-size:0.6rem; color:var(--os-text-muted);">Apenas ADMIN / OPERATOR</span>
+                        </div>
+                        <div style="max-height: 250px; overflow-y: auto;">
+                            <table class="simple-table">
+                                <thead>
+                                    <tr>
+                                        <th>Descrição</th>
+                                        <th>Valor</th>
+                                        <th>Competência</th>
+                                        <th>Pagamento</th>
+                                        <th>Forma</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="financeiro-list-body">
+                                    <tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Sincronizando via Supabase...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- WIDGET EXTRA 3: DEMANDAS OPERACIONAIS -->
+                    <div class="cockpit-widget col-12">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-list-check"></i> Demandas Operacionais</span>
+                        </div>
+                        <div style="max-height: 250px; overflow-y: auto;">
+                            <table class="simple-table">
+                                <thead>
+                                    <tr>
+                                        <th>Demanda</th>
+                                        <th>Status</th>
+                                        <th>Prioridade</th>
+                                        <th>Prazo</th>
+                                        <th>Responsável</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="demandas-list-body">
+                                    <tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Sincronizando via Supabase...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- WIDGET EXTRA 4: COMUNICAÇÕES -->
+                    <div class="cockpit-widget col-12" id="widget-comunicacoes">
+                        <div class="cockpit-widget-title">
+                            <span><i class="fa-solid fa-comments"></i> Comunicações & Notificações</span>
+                        </div>
+                        <div style="max-height: 250px; overflow-y: auto;">
+                            <table class="simple-table">
+                                <thead>
+                                    <tr>
+                                        <th>Título</th>
+                                        <th>Tipo</th>
+                                        <th>Status</th>
+                                        <th>Canal</th>
+                                        <th>Revisão Humana</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="comunicacoes-list-body">
+                                    <tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Sincronizando via Supabase...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <!-- 9. GOVERNANÇA & SEGURANÇA -->
                     <div class="cockpit-widget col-12" style="border: 1px dashed var(--os-danger);">
                         <div class="cockpit-widget-title" style="color: var(--os-danger);">

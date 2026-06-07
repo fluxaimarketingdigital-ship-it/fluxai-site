@@ -1,4 +1,4 @@
-﻿import { OS_UI, OS_AUTH } from '../os-core.js';
+import { OS_UI, OS_AUTH } from '../os-core.js';
 import { SheetsService } from '../../services/sheets-service.js';
 import { OS_CONFIG } from '../../config/os-config.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
@@ -160,8 +160,7 @@ async function loadClientData() {
         try {
             const { data: contratos } = await supabase.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).single();
             const { data: estrategia } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).single();
-            const mesAtual = new Date().toISOString().substring(0, 7);
-            const { data: creditos } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', mesAtual).eq('status_limite', 'ativo').single();
+            const { data: creditos } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', mesAtual).eq('status_limite', 'ativo');
 
             if (estrategia) {
                 client.name = estrategia.cliente_nome || activeClientId;
@@ -177,19 +176,49 @@ async function loadClientData() {
                 client.responsible = (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronizaÃ§Ã£o';
             }
 
-            if (creditos) {
-                client.iaMetrics.limit = creditos.limite_operacional_mensal || 0;
-                client.iaMetrics.approved = creditos.limite_ocupado || 0; 
-                client.iaMetrics.review = creditos.limite_disponivel_operacional || 0; 
-                client.iaMetrics.published = creditos.limite_publicado || 0;
+            if (creditos && creditos.length > 0) {
+                let sumLimit = 0;
+                let sumOcup = 0;
+                let sumDisp = 0;
+                let sumPub = 0;
+                creditos.forEach(c => {
+                    sumLimit += Number(c.limite_operacional_mensal) || 0;
+                    sumOcup += Number(c.limite_ocupado) || 0;
+                    sumDisp += Number(c.limite_disponivel_operacional) || 0;
+                    sumPub += Number(c.limite_publicado) || 0;
+                });
+                client.iaMetrics.limit = sumLimit;
+                client.iaMetrics.approved = sumOcup; 
+                client.iaMetrics.review = sumDisp; 
+                client.iaMetrics.published = sumPub;
             }
 
             try {
-                const { data: servicosExtras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('nome_servico').eq('client_id', activeClientId).eq('status', 'aprovado');
+                const { data: servicosExtras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico_extra', 'aprovado').order('data_aprovacao', { ascending: false });
+                renderServicosExtras(servicosExtras);
                 if (servicosExtras && servicosExtras.length > 0) {
                     client.extras = servicosExtras.map(s => s.nome_servico);
                 }
-            } catch(e) {}
+            } catch(e) { renderServicosExtras(null); }
+
+            try {
+                if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'OPERATOR')) {
+                    const financeiroWidget = document.getElementById('widget-financeiro');
+                    if (financeiroWidget) financeiroWidget.style.display = 'block';
+                    const { data: financeiro } = await supabase.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+                    renderFinanceiro(financeiro);
+                }
+            } catch(e) { renderFinanceiro(null); }
+
+            try {
+                const { data: demandas } = await supabase.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+                renderDemandas(demandas);
+            } catch(e) { renderDemandas(null); }
+
+            try {
+                const { data: comunicacoes } = await supabase.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false });
+                renderComunicacoes(comunicacoes, currentUser?.role);
+            } catch(e) { renderComunicacoes(null); }
 
             try {
                 const { data: srvs } = await supabase.from('SERVICOS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico', 'ativo');
@@ -214,29 +243,23 @@ async function loadClientData() {
         }
     }
 
-    if (activeClientId !== 'FLUXAI_LABS_001' && Object.prototype.hasOwnProperty.call(CLIENT_COCKPIT_MOCKS, activeClientId)) {
-        client = CLIENT_COCKPIT_MOCKS[activeClientId];
-    }
-    
-    currentClientData = client;
-    
-    document.getElementById('client-name-title').innerText = Cockpit: ;
+    if (activeClientId !== 'FLUXAI_LABS_001' && Object.prototype.hasOwnProperty.call(CLIENT_COCKPIT_MOCKS, activeClientId))    document.getElementById('client-name-title').innerText = `Cockpit: ${client.name}`;
     document.getElementById('info-client-name').innerText = client.name;
     document.getElementById('info-segment').innerText = client.segment;
     document.getElementById('info-start-date').innerText = client.startDate;
     document.getElementById('info-contract-type').innerText = client.contractType;
     
     const respEl = document.getElementById('info-responsible');
-    if (respEl) respEl.innerText = client.responsible || 'Dado pendente de sincronizaÃ§Ã£o';
+    if (respEl) respEl.innerText = client.responsible || 'Dado pendente de sincronização';
 
     const badgeStatus = document.getElementById('badge-operational-status');
     badgeStatus.innerText = client.status.toUpperCase();
-    badgeStatus.className = adge-status ;
+    badgeStatus.className = `badge-status ${client.status === 'ativo' ? 'success' : (client.status === 'pausado' ? 'warning' : 'danger')}`;
 
     renderIntegrationsList();
 
-    document.getElementById('contract-services-list').innerHTML = client.services && client.services.length > 0 ? client.services.map(s => <span class="tag-badge"></span>).join('') : '<span style="color:var(--os-text-muted);">Dado pendente de sincronizaÃ§Ã£o</span>';
-    document.getElementById('contract-extras-list').innerHTML = client.extras && client.extras.length > 0 ? client.extras.map(e => <span class="tag-badge" style="background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.3); color:#60a5fa;"></span>).join('') : '<span style="color:var(--os-text-muted);">Nenhum serviÃ§o extra aprovado neste ciclo.</span>';
+    document.getElementById('contract-services-list').innerHTML = client.services && client.services.length > 0 ? client.services.map(s => `<span class="tag-badge">${s}</span>`).join('') : '<span style="color:var(--os-text-muted);">Dado pendente de sincronização</span>';
+    document.getElementById('contract-extras-list').innerHTML = client.extras && client.extras.length > 0 ? client.extras.map(e => `<span class="tag-badge" style="background:rgba(59,130,246,0.1); border-color:rgba(59,130,246,0.3); color:#60a5fa;">${e}</span>`).join('') : '<span style="color:var(--os-text-muted);">Nenhum serviço extra aprovado neste ciclo.</span>';/span>).join('') : '<span style="color:var(--os-text-muted);">Nenhum serviÃ§o extra aprovado neste ciclo.</span>';
     document.getElementById('contract-scope-text').innerText = client.scope;
 
     updateIAMetricsDisplay();
@@ -249,6 +272,95 @@ async function loadClientData() {
     setupDriveLink('drive-assets-link', client.folders.assets, 'Assets e ReferÃªncias');
 
     renderClientLogs();
+}
+
+// === WIDGETS RENDERERS ===
+function renderServicosExtras(data) {
+    const tbody = document.getElementById('extras-list-body');
+    if (!tbody) return;
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Nenhum serviço extra aprovado encontrado. Sincronizado via Supabase.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = data.map(i => {
+        const hasIa = i.gera_credito_ia === 'sim';
+        return `<tr>
+            <td style="font-weight:600; color:#fff;">${i.nome_servico || '-'}</td>
+            <td><span class="badge-status success">${i.status_servico_extra || '-'}</span></td>
+            <td>R$ ${i.valor_aprovado ? Number(i.valor_aprovado).toFixed(2) : '0.00'}</td>
+            <td>${i.prazo_aprovado || '-'}</td>
+            <td>${hasIa ? `<span class="badge-status warning">+${i.quantidade_credito_ia}</span>` : '<span class="badge-status neutral">NÃO</span>'}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderFinanceiro(data) {
+    const tbody = document.getElementById('financeiro-list-body');
+    if (!tbody) return;
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Nenhum lançamento financeiro encontrado. Sincronizado via Supabase.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = data.map(i => {
+        const isPaid = i.status_pagamento === 'pago';
+        return `<tr>
+            <td style="font-weight:600; color:#fff;">${i.descricao_lancamento || '-'}</td>
+            <td>R$ ${i.valor ? Number(i.valor).toFixed(2) : '0.00'}</td>
+            <td>${i.competencia || '-'}</td>
+            <td><span class="badge-status ${isPaid ? 'success' : 'warning'}">${i.status_pagamento || '-'}</span></td>
+            <td>${i.forma_pagamento || '-'}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderDemandas(data) {
+    const tbody = document.getElementById('demandas-list-body');
+    if (!tbody) return;
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Nenhuma demanda operacional encontrada. Sincronizado via Supabase.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = data.map(i => {
+        const isHigh = i.prioridade === 'alta';
+        return `<tr>
+            <td style="font-weight:600; color:#fff;">${i.titulo_demanda || '-'}</td>
+            <td><span class="badge-status neutral">${i.status_demanda || '-'}</span></td>
+            <td><span class="badge-status ${isHigh ? 'danger' : 'neutral'}">${i.prioridade || '-'}</span></td>
+            <td>${i.prazo || '-'}</td>
+            <td>${i.responsavel || '-'}</td>
+        </tr>`;
+    }).join('');
+}
+
+function renderComunicacoes(data, role) {
+    const tbody = document.getElementById('comunicacoes-list-body');
+    if (!tbody) return;
+    if (!data || data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Nenhuma comunicação encontrada. Sincronizado via Supabase.</td></tr>';
+        return;
+    }
+    
+    // Filtro por role
+    const filtered = data.filter(i => {
+        if (role === 'CLIENT' && i.status_notificacao === 'rascunho_fluxai') return false;
+        return true;
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:var(--os-text-muted);">Nenhuma comunicação encontrada. Sincronizado via Supabase.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = filtered.map(i => {
+        const isDraft = i.status_notificacao === 'rascunho_fluxai';
+        return `<tr>
+            <td style="font-weight:600; color:#fff;">${i.titulo || '-'}</td>
+            <td>${i.tipo_notificacao || '-'}</td>
+            <td><span class="badge-status ${isDraft ? 'warning' : 'success'}">${i.status_notificacao || '-'}</span></td>
+            <td>${i.canal_sugerido || '-'}</td>
+            <td>${i.requer_revisao_humana === 'sim' ? '<span class="badge-status danger">SIM</span>' : '<span class="badge-status success">NÃO</span>'}</td>
+        </tr>`;
+    }).join('');
 }
 function setupDriveLink(elementId, url, defaultLabel) {
     const el = document.getElementById(elementId);
@@ -462,31 +574,31 @@ function renderMetricsList() {
     if (!container || !currentClientData) return;
 
     if (!currentClientData.metrics || currentClientData.metrics.length === 0) {
-        container.innerHTML = \
+        container.innerHTML = `
             <tr>
                 <td colspan="5" style="text-align: center; color: var(--os-text-muted); padding: 25px 0;">
                     <div style="font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #888;">
-                        <i class="fa-solid fa-chart-line-slash" style="margin-right: 6px;"></i> Sem mÃ©trica real sincronizada ainda
+                        <i class="fa-solid fa-chart-line-slash" style="margin-right: 6px;"></i> Sem métrica real sincronizada ainda
                     </div>
                     <div style="font-size: 0.65rem; color: #555;">
-                        As tabelas de performance ainda nÃ£o receberam dados oficiais para este ciclo.
+                        As tabelas de performance ainda não receberam dados oficiais para este ciclo.
                     </div>
                 </td>
-            </tr>\;
+            </tr>`;
         return;
     }
 
     container.innerHTML = currentClientData.metrics.map(m => {
         const isTrendUp = m.change.startsWith('+');
         const trendColor = isTrendUp ? 'var(--os-success)' : 'var(--os-danger)';
-        return \
+        return `
             <tr>
-                <td style="font-weight: 600; color: #fff;">\</td>
-                <td>\</td>
-                <td style="font-family: var(--os-font-mono);">\</td>
-                <td style="font-family: var(--os-font-mono); color: \;">\</td>
-                <td style="color: var(--os-text-muted); font-size: 0.7rem;">\</td>
-            </tr>\;
+                <td style="font-weight: 600; color: #fff;">${m.channel}</td>
+                <td>${m.key}</td>
+                <td style="font-family: var(--os-font-mono);">${m.val}</td>
+                <td style="font-family: var(--os-font-mono); color: ${trendColor};">${m.change}</td>
+                <td style="color: var(--os-text-muted); font-size: 0.7rem;">${m.alert}</td>
+            </tr>`;
     }).join('');
 }
 function renderClientLogs() {
