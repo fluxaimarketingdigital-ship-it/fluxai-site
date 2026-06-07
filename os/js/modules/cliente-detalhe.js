@@ -157,24 +157,39 @@ async function loadClientData() {
     };
 
     if (supabase) {
+        let contratos = null;
+        let estrategia = null;
+        let creditos = null;
+
         try {
-            const { data: contratos } = await supabase.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).single();
-            const { data: estrategia } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).single();
-            const { data: creditos } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', mesAtual).eq('status_limite', 'ativo');
+            const { data } = await supabase.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).order('data_criacao', { ascending: false }).limit(1).maybeSingle();
+            contratos = data;
+        } catch(e) { console.warn('[COCKPIT] Erro em CONTRATOS_CLIENTES', e); }
 
-            if (estrategia) {
-                client.name = estrategia.cliente_nome || activeClientId;
-                client.segment = estrategia.segmento || 'Dado pendente de sincronizaÃ§Ã£o';
-                client.scope = estrategia.objetivo_principal || 'Dado pendente de sincronizaÃ§Ã£o';
-            }
+        try {
+            const { data } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).limit(1).maybeSingle();
+            estrategia = data;
+        } catch(e) { console.warn('[COCKPIT] Erro em CLIENTES_ESTRATEGIA', e); }
 
-            if (contratos) {
-                client.startDate = contratos.data_inicio || contratos.data_criacao || 'Dado pendente de sincronizaÃ§Ã£o';
-                client.contractType = contratos.escopo_contratado || 'Dado pendente de sincronizaÃ§Ã£o';
-                client.responsible = contratos.responsavel_comercial || (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronizaÃ§Ã£o';
-            } else {
-                client.responsible = (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronizaÃ§Ã£o';
-            }
+        const mesAtual = new Date().toISOString().substring(0, 7);
+        try {
+            const { data } = await supabase.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', mesAtual).eq('status_limite', 'ativo');
+            creditos = data;
+        } catch(e) { console.warn('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
+
+        if (estrategia) {
+            client.name = estrategia.cliente_nome || activeClientId;
+            client.segment = estrategia.segmento || 'Dado pendente de sincronização';
+            client.scope = estrategia.objetivo_principal || 'Dado pendente de sincronização';
+        }
+
+        if (contratos) {
+            client.startDate = contratos.data_inicio || contratos.data_criacao || 'Dado pendente de sincronização';
+            client.contractType = contratos.escopo_contratado || 'Dado pendente de sincronização';
+            client.responsible = contratos.responsavel_comercial || (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
+        } else {
+            client.responsible = (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
+        }
 
             if (creditos && creditos.length > 0) {
                 let sumLimit = 0;
@@ -222,7 +237,7 @@ async function loadClientData() {
 
             try {
                 const { data: srvs } = await supabase.from('SERVICOS_CLIENTES').select('*').eq('client_id', activeClientId).eq('status_servico', 'ativo');
-                const { data: config } = await supabase.from('CLIENTES_CONFIG').select('*').eq('client_id', activeClientId).eq('status_cliente', 'ativo').single();
+                const { data: config } = await supabase.from('CLIENTES_CONFIG').select('*').eq('client_id', activeClientId).eq('status_cliente', 'ativo').limit(1).maybeSingle();
                 
                 if (srvs && srvs.length > 0 && config) {
                     client.integrations = srvs.map(s => {
@@ -231,19 +246,22 @@ async function loadClientData() {
                             status: 'Conectado',
                             token: config.token_status || 'ativo',
                             manual: s.modo_coleta === 'manual',
-                            alert: 'IntegraÃ§Ã£o configurada, aguardando coleta'
+                            alert: 'Integração configurada, aguardando coleta'
                         };
                     });
                 }
-            } catch(e) {}
+            } catch(e) { console.warn('[COCKPIT] Erro integrações', e); }
             
             client.metrics = []; 
-        } catch(e) {
-            console.warn('[COCKPIT] Erro ao buscar dados reais', e);
-        }
     }
 
-    if (activeClientId !== 'FLUXAI_LABS_001' && Object.prototype.hasOwnProperty.call(CLIENT_COCKPIT_MOCKS, activeClientId))    document.getElementById('client-name-title').innerText = `Cockpit: ${client.name}`;
+    if (activeClientId !== 'FLUXAI_LABS_001' && Object.prototype.hasOwnProperty.call(CLIENT_COCKPIT_MOCKS, activeClientId)) {
+        client = CLIENT_COCKPIT_MOCKS[activeClientId];
+    }
+    
+    currentClientData = client;
+    
+    document.getElementById('client-name-title').innerText = `Cockpit: ${client.name}`;
     document.getElementById('info-client-name').innerText = client.name;
     document.getElementById('info-segment').innerText = client.segment;
     document.getElementById('info-start-date').innerText = client.startDate;
