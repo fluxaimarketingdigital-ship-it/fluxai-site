@@ -142,10 +142,6 @@ async function loadClientData() {
     
     let client = {
         name: activeClientId,
-        segment: 'Dado pendente de sincronizaÃ§Ã£o',
-        startDate: 'Dado pendente de sincronizaÃ§Ã£o',
-        status: 'ativo',
-        contractType: 'Dado pendente de sincronizaÃ§Ã£o',
         segment: 'Dado pendente de sincronização',
         startDate: 'Dado pendente de sincronização',
         status: 'ativo',
