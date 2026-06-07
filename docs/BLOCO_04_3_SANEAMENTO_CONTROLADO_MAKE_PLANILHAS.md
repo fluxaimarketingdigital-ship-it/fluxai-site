@@ -498,6 +498,26 @@ Cenários preservados:
 Decisão:
 Manter apenas os cenários originais homologados na operação ativa.
 
+### Limpeza final das planilhas — Frente 01
+
+Status:
+CONCLUÍDA.
+
+Ação executada:
+As linhas de teste técnico criadas durante a homologação dos cenários 14, 15, 16 e 17 foram removidas das respectivas abas operacionais.
+
+Abas saneadas:
+- CLIENTES_ARQUIVOS
+- PLANEJAMENTO_CONTEUDO
+- CALENDARIO_POSTAGENS
+- GPT_GERACOES_LOG
+
+Critério:
+Foram removidas apenas linhas de teste técnico P1. Cabeçalhos, linhas reais e estrutura das abas foram preservados.
+
+Decisão:
+Frente 01 finalizada sem resíduos operacionais nas planilhas.
+
 ## 6. Frente 02 — Sincronização Supabase
 
 ### Problema
