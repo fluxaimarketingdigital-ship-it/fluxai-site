@@ -66,50 +66,414 @@ O saneamento será dividido em 7 frentes.
 6. Revisão da sobreposição entre cenário 10 e cenário 12.
 7. Plano de rotação de tokens sensíveis.
 
-## 5. Frente 01 — Desalinhamento da coluna A visual
+## 5. Validação visual da Frente 01 — Coluna A Visual
 
-### Problema
+Status:
+DESALINHAMENTO CONFIRMADO EM CENÁRIOS MAKE.
 
-Em alguns cenários, a auditoria identificou o seguinte padrão:
+Resultado da validação no Google Sheets:
 
-- Metadata da planilha mostra coluna A como “▌”
-- Mapper do Make grava o ID principal no índice 0
+1. CLIENTES_ARQUIVOS
+Cabeçalho real:
+A = arquivo_id
+B = client_id
+C = client_name
 
-Isso pode causar deslocamento de dados, campos fora da coluna correta e inconsistência visual na planilha.
+Resultado:
+A aba está limpa no Google Sheets, porém o cenário 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC ainda mostra mapeamento antigo/deslocado no Make.
 
-### Cenários impactados
+2. PLANEJAMENTO_CONTEUDO
 
+#### Validação Make — 15_FLUXAI_PLANEJAMENTO_CONTEUDO
+
+Resultado:
+Desalinhamento confirmado.
+
+A aba PLANEJAMENTO_CONTEUDO está limpa no Google Sheets:
+A = planejamento_id
+B = client_id
+C = client_name
+D = mes_referencia
+E = semana_referencia
+
+Porém, o módulo Google Sheets do cenário 15 mostra schema deslocado:
+[A] genérico recebe planejamento_id
+planejamento_id (B) recebe client_id
+client_id (C) recebe client_name
+client_name (D) recebe mes_referencia
+mes_referencia (E) recebe semana_referencia
+
+Configuração observada:
+- Sheet Name: PLANEJAMENTO_CONTEUDO
+- Use column headers as IDs: No
+
+Decisão:
+DESALINHAMENTO CONFIRMADO.
+
+Ação:
+Não corrigir ainda. Validar os cenários 16 e 17 antes de executar correção controlada.
+
+3. CALENDARIO_POSTAGENS
+
+#### Validação Make — 16_FLUXAI_CALENDARIO_POSTAGENS
+
+Resultado:
+Desalinhamento confirmado.
+
+A aba CALENDARIO_POSTAGENS está limpa no Google Sheets:
+A = postagem_id
+B = planejamento_id
+C = client_id
+D = client_name
+
+Porém, o módulo Google Sheets do cenário 16 mostra schema deslocado:
+[A] genérico recebe postagem_id
+postagem_id (B) recebe planejamento_id
+planejamento_id (C) recebe client_id
+client_id (D) recebe client_name
+client_name (E) recebe canal
+
+Configuração observada:
+- Sheet Name: CALENDARIO_POSTAGENS
+- Use column headers as IDs estava como No na abertura
+- Ao alternar para Yes, o schema não corrigiu automaticamente
+- Não salvar alteração sem correção controlada
+
+Decisão:
+DESALINHAMENTO CONFIRMADO.
+
+Ação:
+Cancelar sem salvar. Corrigir depois por processo controlado: duplicar cenário, recarregar campos, remapear e testar com payload seguro.
+
+4. GPT_GERACOES_LOG
+
+#### Validação Make — 17_FLUXAI_GPT_GERACOES_LOG
+
+Resultado:
+Desalinhamento confirmado.
+
+A aba GPT_GERACOES_LOG está limpa no cabeçalho:
+A = log_id
+B = geracao_id
+C = client_id
+D = client_name
+
+Porém, o módulo Google Sheets do cenário 17 mostra schema deslocado:
+[A] genérico recebe log_id
+log_id (B) recebe geracao_id
+geracao_id (C) recebe client_id
+client_id (D) recebe client_name
+client_name (E) recebe tipo_geracao
+
+Configuração observada:
+- Sheet Name: GPT_GERACOES_LOG
+- Use column headers as IDs: No
+
+Decisão:
+DESALINHAMENTO CONFIRMADO.
+
+Ação:
+Não corrigir agora. Cancelar sem salvar. Corrigir depois por processo controlado, junto com os cenários 14, 15 e 16.
+Próximo passo: criar plano de correção controlada
+
+5. Validação visual 05 — Leads
+
+Resultado:
+A aba encontrada foi LEADS_SITE, não LEADS_CLIENTES.
+
+Cabeçalho real da aba LEADS_SITE:
+A = lead_id
+B = data_entrada
+C = cliente_id
+D = cliente_nome
+E = origem_site
+F = nome_lead
+G = email
+H = telefone
+I = empresa
+J = servico_interesse
+K = canal_origem
+L = campanha
+M = pagina_origem
+N = status_lead
+O = responsavel
+P = observacao
+
+Decisão:
+LEADS_SITE existe, contém dados reais e deve permanecer como MANTER.
+
+Pendência:
+O cenário 18_FLUXAI_LEADS_CLIENTES aponta para uma aba chamada LEADS_CLIENTES, mas essa aba não foi localizada visualmente.
+
+Risco:
+Se LEADS_CLIENTES não existir, o cenário 18 pode estar quebrado, incompleto ou apontando para uma aba que foi removida/renomeada.
+
+Ação Inicial:
+Não criar nem alterar aba agora. Validar no Make se o cenário 18 está ativo, se já rodou alguma vez e se deve continuar existindo ou ser tratado como cenário complementar/legado.
+
+#### Validação Make — 18_FLUXAI_LEADS_CLIENTES
+
+Resultado:
+O cenário 18_FLUXAI_LEADS_CLIENTES existe no Make, porém está desligado.
+
+Configuração observada:
+- Sheet Name: LEADS_CLIENTES
+- Use column headers as IDs: No
+- Status do cenário: desligado
+
+Aba LEADS_CLIENTES:
+Não localizada visualmente na planilha durante a validação.
+
+Aba operacional real encontrada:
+LEADS_SITE, com dados reais de captação do site/landing FluxAI.
+
+Decisão Final:
+Classificar 18_FLUXAI_LEADS_CLIENTES como CENÁRIO COMPLEMENTAR DESLIGADO / NÃO OPERACIONAL AGORA.
+
+Ação Definitiva:
+Não corrigir agora.
+Não ativar.
+Não criar aba LEADS_CLIENTES neste momento.
+Manter documentado para revisão posterior na padronização de CRM/leads.
+
+Risco Secundário:
+Se for ativado sem saneamento, pode falhar por aba inexistente ou gravar em estrutura desalinhada.
+
+## Plano de correção controlada — Frente 01
+
+Cenários com desalinhamento confirmado:
 - 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC
 - 15_FLUXAI_PLANEJAMENTO_CONTEUDO
 - 16_FLUXAI_CALENDARIO_POSTAGENS
 - 17_FLUXAI_GPT_GERACOES_LOG
+
+Cenário complementar desligado:
 - 18_FLUXAI_LEADS_CLIENTES
 
-### Abas impactadas
+Aba operacional real de leads:
+- LEADS_SITE
 
-- CLIENTES_ARQUIVOS
-- PLANEJAMENTO_CONTEUDO
-- CALENDARIO_POSTAGENS
-- GPT_GERACOES_LOG
-- LEADS_CLIENTES
+Decisão:
+A correção será feita cenário por cenário, sem alterar a planilha primeiro.
 
-### Ação planejada
+Ordem de correção:
+1. 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC
+2. 15_FLUXAI_PLANEJAMENTO_CONTEUDO
+3. 16_FLUXAI_CALENDARIO_POSTAGENS
+4. 17_FLUXAI_GPT_GERACOES_LOG
 
-Antes de qualquer correção:
-1. Abrir cada aba no Google Sheets.
-2. Verificar se a coluna A está realmente vazia, simbólica ou estrutural.
-3. Confirmar se os dados atuais estão deslocados.
-4. Registrar evidência visual.
-5. Só depois decidir entre:
-   - manter como está;
-   - remover coluna vazia;
-   - ajustar mapper no Make;
-   - recriar cabeçalho limpo.
+Procedimento obrigatório para cada cenário:
+1. Duplicar o cenário no Make antes de corrigir.
+2. Manter o cenário original desligado ou sem execução durante o ajuste.
+3. Abrir o módulo Google Sheets.
+4. Recarregar a estrutura da aba usando Refresh.
+5. Garantir que o primeiro campo exibido seja o ID real da aba:
+   - arquivo_id
+   - planejamento_id
+   - postagem_id
+   - log_id
+6. Remapear campo por campo.
+7. Não usar coluna [A] genérica se ela representar coluna fantasma.
+8. Rodar teste com payload seguro.
+9. Conferir no Google Sheets se a linha foi gravada nas colunas corretas.
+10. Se aprovado, documentar evidência.
+11. Só então decidir se substitui o cenário original ou mantém o corrigido como nova versão.
 
-### Decisão atual
+Critério de aprovação:
+O cenário só será considerado saneado quando o ID principal cair exatamente na coluna A correta e os demais campos seguirem a ordem real do cabeçalho.
 
-Status: PENDENTE DE VALIDAÇÃO VISUAL  
-Ação: NÃO CORRIGIR AINDA
+Status:
+PLANO APROVADO PARA EXECUÇÃO CONTROLADA E EM ANDAMENTO.
+
+### Execução controlada — 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC_FIX_P1
+
+Status:
+HOMOLOGADO NO CLONE.
+
+Correção realizada:
+- Clone criado a partir do cenário original.
+- Módulo Google Sheets ajustado para usar cabeçalhos reais da aba.
+- Use column headers as IDs of the columns = Yes.
+- Campo inicial passou a ser arquivo_id (A), sem coluna [A] fantasma.
+- Payload seguro enviado via webhook do clone.
+- Linha gravada corretamente na aba CLIENTES_ARQUIVOS.
+
+Evidência de gravação:
+A = ARQ_TESTE_FIX_P1_001
+B = FLUXAI_LABS_001
+C = FluxAI Labs
+D = teste_tecnico
+E = Teste de correção coluna A
+
+Decisão:
+Cenário 14 corrigido e aprovado no clone.
+
+Ação pendente:
+Não substituir o original ainda. Aguardar saneamento dos cenários 15, 16 e 17 para decidir troca oficial em lote controlado.
+
+### Execução controlada — 15_FLUXAI_PLANEJAMENTO_CONTEUDO_FIX_P1
+
+Status:
+HOMOLOGADO NO CLONE.
+
+Correção realizada:
+- Clone criado a partir do cenário original.
+- Módulo Google Sheets ajustado para usar cabeçalhos reais da aba.
+- Use column headers as IDs of the columns = Yes.
+- Campo inicial passou a ser planejamento_id (A), sem coluna [A] fantasma.
+- Payload seguro enviado via webhook do clone.
+- Linha gravada corretamente na aba PLANEJAMENTO_CONTEUDO.
+
+Evidência de gravação:
+A = PLAN_TESTE_FIX_P1_001
+B = FLUXAI_LABS_001
+C = FluxAI Labs
+D = 2026-06
+E = semana_teste
+
+Ressalva:
+Validar antes da troca oficial se data_criacao e data_atualizacao estão mapeadas com formatDate(now; "YYYY-MM-DD HH:mm:ss").
+
+Decisão:
+Cenário 15 corrigido e aprovado no clone.
+
+Ação pendente:
+Não substituir o original ainda. Aguardar saneamento dos cenários 16 e 17 para decidir troca oficial em lote controlado.
+
+### Execução controlada — 16_FLUXAI_CALENDARIO_POSTAGENS_FIX_P1
+
+Status:
+HOMOLOGADO NO CLONE.
+
+Correção realizada:
+- Clone criado a partir do cenário original.
+- Módulo Google Sheets ajustado para usar cabeçalhos reais da aba.
+- Use column headers as IDs of the columns = Yes.
+- Campo inicial passou a ser postagem_id (A), sem coluna [A] fantasma.
+- Payload seguro enviado via webhook do clone.
+- Linha gravada corretamente na aba CALENDARIO_POSTAGENS.
+
+Evidência de gravação:
+A = POST_TESTE_FIX_P1_001
+B = PLAN_TESTE_FIX_P1_001
+C = FLUXAI_LABS_001
+D = FluxAI Labs
+E = instagram
+
+Decisão:
+Cenário 16 corrigido e aprovado no clone.
+
+Ação pendente:
+Não substituir o original ainda. Aguardar saneamento do cenário 17 para decidir troca oficial em lote controlado.
+
+### Execução controlada — 17_FLUXAI_GPT_GERACOES_LOG_FIX_P1
+
+Status:
+HOMOLOGADO NO CLONE.
+
+Correção realizada:
+- Clone criado a partir do cenário original.
+- Módulo Google Sheets ajustado para usar cabeçalhos reais da aba.
+- Use column headers as IDs of the columns = Yes.
+- Campo inicial passou a ser log_id (A), sem coluna [A] fantasma.
+- O cenário foi adaptado ao schema atual da aba GPT_GERACOES_LOG, sem criação de nova aba.
+- A aba GPT_GERACOES_LOG permanece como log híbrido para guardrail e execução GPT.
+
+Evidência de gravação:
+A = LOG_TESTE_FIX_P1_002
+B = GER_TESTE_FIX_P1_002
+C = FLUXAI_LABS_001
+D = FluxAI Labs
+E = 17_FLUXAI_GPT_GERACOES_LOG
+F = 17_FLUXAI_GPT_GERACOES_LOG
+G = execucao_gpt
+H = teste_tecnico
+S = teste
+T = gpt-5.5
+U = 100
+W = Kassia
+X = Payload seguro para validar o cenário 17 dentro do schema atual da aba GPT_GERACOES_LOG.
+Y = 2026-06-07 21:42:56
+Z = 2026-06-07 21:42:56
+
+Decisão:
+Cenário 17 corrigido e aprovado no clone.
+
+Ação pendente:
+Não substituir o original ainda. Decidir troca oficial dos clones 14, 15, 16 e 17 em lote controlado.
+
+### Decisão final — 18_FLUXAI_LEADS_CLIENTES
+
+Status:
+EXCLUÍDO / DESCONTINUADO.
+
+Motivo:
+O cenário estava desligado, apontava para LEADS_CLIENTES e não fazia parte do fluxo operacional real atual. A captação ativa de leads permanece centralizada em LEADS_SITE, alimentada pelo cenário 02_FLUXAI_LEADS_SITE.
+
+Decisão:
+Cenário removido da operação ativa. Não será saneado nesta fase.
+
+Impacto:
+Baixo. Nenhuma dependência operacional ativa foi identificada para esse cenário.
+
+### Virada oficial concluída — Frente 01
+
+Status:
+CONCLUÍDA E HOMOLOGADA NOS CENÁRIOS ORIGINAIS.
+
+Cenários originais corrigidos:
+- 14_FLUXAI_CLIENTES_ARQUIVOS_SYNC
+- 15_FLUXAI_PLANEJAMENTO_CONTEUDO
+- 16_FLUXAI_CALENDARIO_POSTAGENS
+- 17_FLUXAI_GPT_GERACOES_LOG
+
+Correção aplicada:
+- Módulos Google Sheets ajustados para usar cabeçalhos reais da planilha.
+- Use column headers as IDs of the columns = Yes.
+- Campo inicial validado corretamente em cada cenário:
+  - 14: arquivo_id
+  - 15: planejamento_id
+  - 16: postagem_id
+  - 17: log_id
+
+Evidências:
+14_FLUXAI_CLIENTES_ARQUIVOS_SYNC:
+A = ARQ_TESTE_ORIGINAL_P1_001
+B = FLUXAI_LABS_001
+C = FluxAI Labs
+D = teste_tecnico_original
+E = Teste original cenário 14
+
+15_FLUXAI_PLANEJAMENTO_CONTEUDO:
+A = PLAN_TESTE_ORIGINAL_P1_001
+B = FLUXAI_LABS_001
+C = FluxAI Labs
+D = 2026-06
+E = semana_teste_original
+
+16_FLUXAI_CALENDARIO_POSTAGENS:
+A = POST_TESTE_ORIGINAL_P1_001
+B = PLAN_TESTE_ORIGINAL_P1_001
+C = FLUXAI_LABS_001
+D = FluxAI Labs
+E = instagram
+
+17_FLUXAI_GPT_GERACOES_LOG:
+A = LOG_TESTE_ORIGINAL_P1_001
+B = GER_TESTE_ORIGINAL_P1_001
+C = FLUXAI_LABS_001
+D = FluxAI Labs
+E = 17_FLUXAI_GPT_GERACOES_LOG
+F = 17_FLUXAI_GPT_GERACOES_LOG
+G = execucao_gpt
+H = teste_tecnico
+I = 2026-06
+
+Decisão:
+Frente 01 oficialmente homologada nos cenários originais.
+
+Observação:
+Os clones FIX_P1 podem permanecer temporariamente como backup técnico até o encerramento completo do Bloco 4.3. Não devem ficar ativos.
 
 ## 6. Frente 02 — Sincronização Supabase
 
