@@ -1,4 +1,5 @@
 import { OS_UI, OS_AUTH } from '../os-core.js';
+import { useMakeRoute } from '../../services/useMakeRoute.js';
 import { SheetsService } from '../../services/sheets-service.js';
 import { OS_CONFIG } from '../../config/os-config.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
@@ -878,6 +879,58 @@ function setupEventListeners() {
             updateClientStatus('inativo', 'arquivamento_operacional');
         }
     });
+
+    // REGISTRAR ARQUIVO - ROTA_OS_14_ARQUIVOS
+    const btnSubmitArquivo = document.getElementById('btn-submit-arquivo');
+    if (btnSubmitArquivo) {
+        btnSubmitArquivo.addEventListener('click', async () => {
+            const btnOriginalText = btnSubmitArquivo.innerHTML;
+            btnSubmitArquivo.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Enviando...';
+            btnSubmitArquivo.disabled = true;
+
+            try {
+                const payload = {
+                    arquivo_id: "",
+                    client_id: activeClientId,
+                    client_name: currentClientData ? currentClientData.name : "FluxAI Labs",
+                    tipo_arquivo: document.getElementById('arquivo-tipo')?.value || "briefing",
+                    categoria: document.getElementById('arquivo-categoria')?.value || "conteudo",
+                    nome_arquivo: document.getElementById('arquivo-nome')?.value?.trim() || "",
+                    link_drive: document.getElementById('arquivo-link')?.value?.trim() || "",
+                    pasta_drive: document.getElementById('arquivo-pasta')?.value?.trim() || "",
+                    status_arquivo: "ativo",
+                    responsavel: currentUser?.name || "Kassia",
+                    observacao: document.getElementById('arquivo-obs')?.value?.trim() || "Arquivo registrado via FluxAI OS pelo formulário real de Registrar Arquivo."
+                };
+
+                const contextoUsuario = {
+                    userId: currentUser?.id || 'CLIENT',
+                    userRole: currentUser?.role || 'CLIENT',
+                    clientId: activeClientId
+                };
+
+                const response = await useMakeRoute.executeRoute('ROTA_OS_14_ARQUIVOS', payload, contextoUsuario);
+                
+                if (response && response.ok) {
+                    alert('Arquivo registrado com sucesso via Make!');
+                    document.getElementById('modal-registrar-arquivo').style.display = 'none';
+                    // Limpar formulário
+                    document.getElementById('arquivo-nome').value = '';
+                    document.getElementById('arquivo-link').value = '';
+                    document.getElementById('arquivo-pasta').value = '';
+                    document.getElementById('arquivo-obs').value = '';
+                } else {
+                    alert('Falha ao registrar arquivo: ' + (response?.message || 'Erro desconhecido'));
+                }
+            } catch (err) {
+                console.error('[Registrar Arquivo] Erro na execução da rota:', err);
+                alert('Erro ao enviar para o Make.');
+            } finally {
+                btnSubmitArquivo.innerHTML = btnOriginalText;
+                btnSubmitArquivo.disabled = false;
+            }
+        });
+    }
 }
 
 function updateClientStatus(newStatus, detail = 'alteracao_status') {

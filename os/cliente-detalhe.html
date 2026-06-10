@@ -509,6 +509,9 @@
                             <a href="#" id="drive-contracts-link" target="_blank" class="file-link-item"><i class="fa-solid fa-file-pdf"></i> <span>Contratos & Propostas</span> <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto; font-size:0.6rem;"></i></a>
                             <a href="#" id="drive-assets-link" target="_blank" class="file-link-item"><i class="fa-solid fa-photo-film"></i> <span>Assets e Referências</span> <i class="fa-solid fa-arrow-up-right-from-square" style="margin-left:auto; font-size:0.6rem;"></i></a>
                         </div>
+                        <div style="margin-top:15px; border-top:1px solid rgba(255,255,255,0.03); padding-top:12px;">
+                            <button class="control-btn" onclick="document.getElementById('modal-registrar-arquivo').style.display='flex'" style="width:100%; border-color:var(--os-primary); color:var(--os-primary);"><i class="fa-solid fa-cloud-arrow-up"></i> Registrar Arquivo</button>
+                        </div>
                     </div>
                     
                     <!-- 8. LOGS OPERACIONAIS DO CLIENTE -->
@@ -660,6 +663,59 @@
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
                 <button class="control-btn" onclick="document.getElementById('limit-modal').style.display='none'">Cancelar</button>
                 <button class="control-btn" id="btn-save-new-limit" style="background: var(--os-primary); color: #000; font-weight: 700;">Salvar Limite</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Registrar Arquivo -->
+    <div id="modal-registrar-arquivo" class="os-modal">
+        <div class="os-modal-content" style="max-width: 500px;">
+            <h3 style="margin: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--os-primary);"><i class="fa-solid fa-cloud-arrow-up"></i> Registrar Arquivo</h3>
+            <p style="font-size: 0.7rem; color: var(--os-text-muted); margin: 0 0 15px;">Sincronize um arquivo do Drive com o Make.</p>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Tipo de Arquivo</label>
+                <select id="arquivo-tipo" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; font-family: inherit;">
+                    <option value="briefing">Briefing</option>
+                    <option value="contrato">Contrato</option>
+                    <option value="identidade_visual">Identidade Visual</option>
+                    <option value="recurso_audiovisual">Recurso Audiovisual</option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Categoria</label>
+                <select id="arquivo-categoria" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; font-family: inherit;">
+                    <option value="conteudo">Conteúdo</option>
+                    <option value="vendas">Vendas</option>
+                    <option value="institucional">Institucional</option>
+                    <option value="estrategia">Estratégia</option>
+                </select>
+            </div>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Nome do Arquivo</label>
+                <input type="text" id="arquivo-nome" placeholder="Ex: Briefing Institucional v1" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
+            </div>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Link (Drive/Cloud)</label>
+                <input type="url" id="arquivo-link" placeholder="https://drive.google.com/..." style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
+            </div>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Pasta de Destino</label>
+                <input type="text" id="arquivo-pasta" placeholder="Ex: FluxAI Labs/Conteudo/OS" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
+            </div>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Observação Adicional</label>
+                <input type="text" id="arquivo-obs" placeholder="Detalhes extras..." style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="control-btn" onclick="document.getElementById('modal-registrar-arquivo').style.display='none'">Cancelar</button>
+                <button class="control-btn" id="btn-submit-arquivo" style="background: var(--os-primary); color: #000; font-weight: 700;"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
             </div>
         </div>
     </div>

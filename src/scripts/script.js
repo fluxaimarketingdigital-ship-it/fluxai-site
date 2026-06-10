@@ -1,5 +1,6 @@
 import { INTEGRATIONS } from '../config/integrations.js';
 import { CONTACT_INFO } from '../config/constants.js';
+import { useMakeRoute } from '../os/services/useMakeRoute.js';
 
 // Utilitário inline de sanitização para o site público (sem ESM externo)
 const UTM_PATTERN = /^[a-zA-Z0-9_\-\s]{0,100}$/;
@@ -208,112 +209,96 @@ document.addEventListener('DOMContentLoaded', () => {
             e.preventDefault();
             
             const btnSubmit = diagnosticoForm.querySelector('button[type="submit"]');
-            const originalText = btnSubmit.innerHTML;
-            btnSubmit.innerHTML = 'Enviando... <i class="fa-solid fa-spinner fa-spin"></i>';
-            btnSubmit.disabled = true;
+            const originalText = btnSubmit?.innerHTML || 'Enviar';
+            if (btnSubmit) {
+                btnSubmit.innerHTML = 'Enviando... <i class="fa-solid fa-spinner fa-spin"></i>';
+                btnSubmit.disabled = true;
+            }
 
-            const nome = document.getElementById('nome').value;
-            const wpp = document.getElementById('whatsapp').value;
-            const inst = document.getElementById('instagram').value;
-            const seg = document.getElementById('segmento').value;
-            const gar = document.getElementById('gargalo').value;
-            const des = document.getElementById('desafio').value;
+            const nome = document.getElementById('nome')?.value?.trim() || '';
+            const wpp = document.getElementById('whatsapp')?.value?.trim() || '';
+            const inst = document.getElementById('instagram')?.value?.trim() || '';
+            const seg = document.getElementById('segmento')?.value?.trim() || '';
+            const gar = document.getElementById('gargalo')?.value?.trim() || '';
+            const des = document.getElementById('desafio')?.value?.trim() || '';
             
-            // Tracking Events (FB & GA4)
-            // gtag generate_lead will be called only on success.
+            if (!nome || !wpp) {
+                alert("Nome e WhatsApp são obrigatórios.");
+                if (btnSubmit) {
+                    btnSubmit.innerHTML = originalText;
+                    btnSubmit.disabled = false;
+                }
+                return;
+            }
 
-            const WEBHOOK_URL = 'https://mufgwetfhfhhmhowbhjj.supabase.co/functions/v1/make-proxy'; 
-
-            // Captura de Inteligência de Tráfego (UTMs)
-            const urlParams = new URLSearchParams(window.location.search);
-            const utmSource = safeUtmParam('utm_source', 'Direto');
-            const utmMedium = safeUtmParam('utm_medium', 'Orgânico');
-            const utmCampaign = safeUtmParam('utm_campaign', 'N/A');
+            // TODO SEGURANÇA FASE 2:
+            // Esta implementação ainda expõe webhook_url no bundle público se makeRoutes.js for importado no frontend.
+            // Substituir por API/proxy interno antes de escala pública.
 
             const payload = {
-                type: "lead_capture",
-                source: "site_fluxai",
+                lead_id: "",
+                cliente_id: "",
+                cliente_nome: "",
                 origem_site: "site_fluxai",
-                origin: "site_fluxai",
-                page_path: "/",
-                page_location: window.location.href,
-                servico_interesse: "Diagnóstico Estratégico FluxAI",
-                service_interest: "Diagnóstico Estratégico FluxAI",
                 nome_lead: nome,
-                name: nome,
+                email: "", 
                 telefone: wpp,
-                whatsapp: wpp,
-                phone: wpp,
-                instagram_site: inst,
-                company: inst || "nao_informado_home",
-                segmento: seg,
-                revenue: "nao_informado_home",
-                gargalo: gar,
-                gap: gar,
-                desafio: des,
-                description: des,
-                spend: "nao_informado_home",
-                timestamp: new Date().toISOString()
+                empresa: inst,
+                servico_interesse: "Diagnóstico FluxAI",
+                canal_origem: "formulario_site",
+                campanha: safeUtmParam('utm_campaign', ''),
+                pagina_origem: "landing_diagnostico",
+                status_lead: "novo",
+                responsavel: "",
+                observacao: `[SEG] ${seg} | [GAR] ${gar} | [DES] ${des}`
             };
 
-            if(WEBHOOK_URL) {
-                try {
-                    const requestBody = JSON.stringify({
-                        route: 'LEAD_CAPTURE',
-                        payload: payload
-                    });
-                    
-                    console.info('[HOME_LEAD_REQUEST]', payload);
-                    
-                    const response = await fetch(WEBHOOK_URL, {
-                        method: 'POST',
-                        headers: { 
-                            'Content-Type': 'application/json',
-                            'x-fluxai-proxy-key': 'fluxai-proxy-public-2026'
-                        },
-                        body: requestBody
-                    });
-                    
-                    console.info('[HOME_LEAD_STATUS]', response.status);
-                    
-                    if(!response.ok) {
-                        try {
-                            const errorData = await response.text();
-                            console.info('[HOME_LEAD_ERROR_RESPONSE]', errorData);
-                        } catch(e) {}
-                        throw new Error('Network error ou proxy negou');
-                    } else {
-                        try {
-                            const resData = await response.text();
-                            console.info('[HOME_LEAD_RESPONSE]', resData);
-                        } catch(e) {}
-                    }
+            try {
+                console.info('[MakeIntegration] RouteId Usado: ROTA_OS_02_LEADS_SITE');
+                console.info('[MakeIntegration] Payload Final Montado:', payload);
+                
+                const result = await useMakeRoute.executeRoute('ROTA_OS_02_LEADS_SITE', payload, { role: 'CLIENT' });
+                
+                console.info('[MakeIntegration] Status final:', result.success);
+                console.info('[MakeIntegration] Total de POSTs = 1 (garantido pela camada central).');
 
-                    if(typeof fbq === 'function') fbq('track', 'Lead');
-                    trackEvent('lead_submit', { form_id: 'diagnosticoForm' });
-                    
+                if (!result.success) {
+                    throw new Error(result.error || 'Erro no webhook');
+                }
+
+                if(typeof fbq === 'function') fbq('track', 'Lead');
+                trackEvent('lead_submit', { form_id: 'diagnosticoForm' });
+                
+                if (btnSubmit) {
                     btnSubmit.innerHTML = 'Aguarde nosso contato. Sua aplicação foi recebida. <i class="fa-solid fa-check"></i>';
                     btnSubmit.style.background = '#10b981';
                     btnSubmit.style.color = '#fff';
-                    
-                    setTimeout(() => {
+                }
+                
+                setTimeout(() => {
+                    if (btnSubmit) {
                         btnSubmit.innerHTML = originalText;
                         btnSubmit.style.background = '';
                         btnSubmit.style.color = '';
                         btnSubmit.disabled = false;
-                        diagnosticoForm.reset();
-                    }, 4000);
+                    }
+                    diagnosticoForm.reset();
+                }, 4000);
 
-                } catch(error) {
-                    console.error("Erro ao enviar form", error);
+            } catch(error) {
+                console.error("Erro ao enviar form", error);
+                if (btnSubmit) {
                     btnSubmit.innerHTML = 'Não foi possível enviar sua aplicação agora. Revise os dados e tente novamente.';
                     btnSubmit.style.background = '#ef4444';
-                    setTimeout(() => {
+                }
+                // NÃO limpa o formulário se der erro
+                setTimeout(() => {
+                    if (btnSubmit) {
                         btnSubmit.innerHTML = originalText;
                         btnSubmit.style.background = '';
                         btnSubmit.disabled = false;
-                    }, 4000);
-                }
+                    }
+                }, 4000);
             }
         });
     }

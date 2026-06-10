@@ -547,6 +547,7 @@
         import { OS_AUTH } from './js/os-core.js';
         import { getSupabase } from './services/supabase-client.js';
         import { mockCatalogoServicos } from './data/catalogo.data.js';
+        import { useMakeRoute } from './services/useMakeRoute.js';
 
         // Enforce Authentication
         await OS_AUTH.check('CLIENT');
@@ -701,25 +702,14 @@
             const tempClientId = projectId || user.project_id || 'FLUXAI_LABS_001';
             const tempClientNome = document.getElementById('dual-client-name').innerText || 'FluxAI Labs';
 
-            const demandaTipo = document.getElementById('demanda-tipo').value;
-            const demandaTitulo = document.getElementById('demanda-titulo').value;
+            const demandaTipo = document.getElementById('demanda-tipo')?.value || 'solicitacao_conteudo';
+            const demandaTitulo = document.getElementById('demanda-titulo')?.value?.trim();
+            const demandaDesc = document.getElementById('demanda-desc')?.value?.trim();
 
-            if (!demandaTipo || !demandaTitulo) {
-                alert('Por favor, preencha o Tipo de Serviço e o Título da demanda.');
+            if (!demandaTitulo || !demandaDesc || !tempClientId) {
+                alert('Por favor, preencha o Título e a Descrição da demanda.');
                 return;
             }
-
-            const data = {
-                cliente_id: tempClientId,
-                cliente_nome: tempClientNome,
-                tipo_demanda: demandaTipo,
-                titulo_demanda: demandaTitulo,
-                descricao_demanda: document.getElementById('demanda-desc').value,
-                prioridade: document.getElementById('demanda-prioridade').value,
-                prazo_desejado: document.getElementById('demanda-prazo') ? document.getElementById('demanda-prazo').value : '',
-                arquivo_reference: document.getElementById('demanda-arquivo') && document.getElementById('demanda-arquivo').value ? document.getElementById('demanda-arquivo').value : 'N/A',
-                observacao: document.getElementById('demanda-obs') ? document.getElementById('demanda-obs').value : ''
-            };
 
             const btn = document.querySelector('.btn-nova-demanda');
             const originalTextContent = [...btn.childNodes];
@@ -729,87 +719,50 @@
             btn.appendChild(iIcon);
             btn.appendChild(document.createTextNode(' ENVIANDO...'));
             btn.disabled = true;
-            
+
             const isExtra = demandaTipo !== 'DEMANDA_NORMAL';
-            const webhookKey = isExtra ? 'SERVICE_EXTRA_REQUEST' : 'DEMAND_SUBMISSION';
             const logAction = isExtra ? 'EXTRA_SERVICE_REQUESTED' : 'DEMAND_SUBMITTED';
             const category = isExtra ? 'servicos_extras' : 'demandas';
-            const targetStatus = isExtra ? 'solicitado' : 'aberta';
-            const generatedId = 'dem_' + (
-              window.crypto && typeof window.crypto.randomUUID === 'function'
-                ? window.crypto.randomUUID()
-                : `${Date.now()}_${window.crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}`
-            );
-            
+            const targetStatus = isExtra ? 'solicitado' : 'nova';
+
+            const payload = {
+                demanda_id: "", // camada central gera se vazio
+                client_id: tempClientId,
+                client_name: tempClientNome,
+                origem: "portal_cliente",
+                tipo_demanda: demandaTipo,
+                titulo: demandaTitulo,
+                descricao: demandaDesc,
+                prioridade: document.getElementById('demanda-prioridade')?.value || "media",
+                status_demanda: targetStatus,
+                solicitado_por: "Kassia", // fixo para bater payload homologado ou via auth
+                responsavel: "Kassia", // fixo homologado
+                prazo_solicitado: document.getElementById('demanda-prazo')?.value || "",
+                link_referencia: document.getElementById('demanda-arquivo')?.value || "",
+                observacao: "Demanda criada via FluxAI OS pelo formulário real de Nova Demanda."
+            };
+
             try {
-                // Validar transição inicial via StatusEngine
-                const transitionResult = await StatusEngine.transition(
-                    category,
-                    generatedId,
-                    null,
-                    targetStatus,
-                    { role: 'CLIENT' }
-                );
-
-                if (!transitionResult.success) {
-                    throw new Error('Falha na validação de status: ' + transitionResult.error);
-                }
-
                 // Gravar log de governança
                 OS_LOGS_ENGINE.userAction(
                     logAction,
                     'client-portal',
-                    { id: generatedId, ...data },
+                    { ...payload },
                     'CLIENT',
                     tempClientId
                 );
 
-                // Enviar webhook simulado/real
-                const response = await OS_CONFIG.webhooks.send(webhookKey, {
-                    id: generatedId,
-                    ...data,
-                    initial_status: targetStatus,
-                    timestamp: new Date().toISOString()
-                });
-                
-                if (!response.success) {
-                    throw new Error(response.error || 'Falha no webhook');
-                }
-                
-                // Se estiver no mock, persistir na lista local correspondente
-                if (OS_CONFIG.flags.mockData) {
-                    if (isExtra) {
-                        const mockExtras = JSON.parse(localStorage.getItem('fluxai_mock_extras') || '[]');
-                        const safeDesc = data.descricao_demanda;
-                        const safeTitle = demandaTitulo;
-                        mockExtras.push({
-                            id: generatedId,
-                            project_id: tempClientId,
-                            service_id: demandaTipo,
-                            title: safeTitle,
-                            description: safeDesc,
-                            status: targetStatus,
-                            price: null,
-                            created_at: new Date().toISOString()
-                        });
-                        localStorage.setItem('fluxai_mock_extras', JSON.stringify(mockExtras));
-                    } else {
-                        const mockDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands') || '[]'); 
-                        const safeDesc = data.descricao_demanda; 
-                        const safeTitle = demandaTitulo; 
-                        mockDemands.push({ 
-                            id: generatedId, 
-                            project_id: tempClientId, 
-                            type: demandaTipo, 
-                            title: safeTitle, 
-                            description: safeDesc, 
-                            status: targetStatus, 
-                            priority: data.prioridade,
-                            due_date: data.prazo_desejado,
-                            created_at: new Date().toISOString() 
-                        }); 
-                        localStorage.setItem('fluxai_mock_demands', JSON.stringify(mockDemands)); 
-                    }
+                console.info('[MakeIntegration] RouteId Usado: ROTA_OS_01_PORTAL_DEMANDAS');
+                console.info('[MakeIntegration] Payload Final Montado:', payload);
+
+                // Disparo real via Camada Centralizada (useMakeRoute substitui OS_CONFIG.webhooks)
+                const result = await useMakeRoute.executeRoute('ROTA_OS_01_PORTAL_DEMANDAS', payload, { role: 'CLIENT' });
+
+                console.info('[MakeIntegration] Status final:', result.success);
+                console.info('[MakeIntegration] Total de POSTs = 1 (garantido pela camada central).');
+
+                if (!result.success) {
+                    throw new Error(result.error || 'Falha no webhook Make');
                 }
 
                 alert(isExtra ? 'Solicitação de serviço extra enviada com sucesso!' : 'Demanda regular enviada com sucesso!');
@@ -824,9 +777,10 @@
                 OS_LOGS_ENGINE.error(
                     isExtra ? 'EXTRA_SERVICE_REQUEST_ERROR' : 'DEMAND_SUBMISSION_ERROR',
                     err.message,
-                    { data }
+                    { data: payload }
                 );
                 alert('Não foi possível enviar sua solicitação agora. Tente novamente.');
+                // NÃO limpamos os dados em caso de falha (se result.success === false)
             } finally {
                 btn.replaceChildren(...originalTextContent);
                 btn.disabled = false;

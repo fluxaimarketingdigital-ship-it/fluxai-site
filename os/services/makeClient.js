@@ -1,0 +1,86 @@
+import { ROLE_CONFIG } from '../config/os-config.js';
+
+export const MakeClient = {
+    /**
+     * Gera ID padronizado no formato PREFIX_YYYY_MM_XXXX
+     */
+    generateId: (prefix) => {
+        const date = new Date();
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const randomStr = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+        return `${prefix}_${yyyy}_${mm}_${randomStr}`;
+    },
+
+    /**
+     * Valida se a rota pode ser executada baseado no status e no role do usuário.
+     */
+    validateAccess: (routeConfig, userRole) => {
+        if (!routeConfig) {
+            return { valid: false, error: 'Rota não encontrada na configuração oficial.' };
+        }
+        if (routeConfig.status_rota === 'inativo') {
+            return { valid: false, error: 'Rota inativa. Envio bloqueado por segurança.' };
+        }
+        if (routeConfig.status_rota === 'manual' && !ROLE_CONFIG.hasAccess(userRole, 'OPERATOR')) {
+            return { valid: false, error: 'Acesso negado. Esta operação é restrita a níveis ADMIN ou OPERATOR.' };
+        }
+        return { valid: true };
+    },
+
+    /**
+     * Valida os campos obrigatórios básicos exigidos por rotas (pode ser estendido por cenário).
+     */
+    validatePayload: (routeConfig, payload) => {
+        if (routeConfig.rota_id === 'ROTA_OS_01_PORTAL_DEMANDAS') {
+            if (!payload.titulo || !payload.descricao) return { valid: false, error: 'Título e descrição são obrigatórios para demandas.' };
+        }
+        if (routeConfig.rota_id === 'ROTA_OS_02_LEADS_SITE') {
+            if (!payload.nome_lead) return { valid: false, error: 'Nome é obrigatório para leads.' };
+        }
+        return { valid: true };
+    },
+
+    /**
+     * Dispara requisição POST real para o Webhook homologado
+     */
+    sendPost: async (routeConfig, payload) => {
+        if (!routeConfig.webhook_url) {
+            throw new Error(`Webhook URL ausente para a rota ${routeConfig.rota_id}. A rota pode não estar homologada ou precisa ser atualizada via planilha.`);
+        }
+
+        try {
+            const response = await fetch(routeConfig.webhook_url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            // Make.com tipicamente retorna "Accepted" (texto) ou um JSON (para rotas com Webhook Response)
+            let responseData = {};
+            const textRaw = await response.text();
+            
+            try {
+                responseData = JSON.parse(textRaw);
+            } catch (e) {
+                // Se não for JSON (ex: "Accepted")
+                responseData = { text: textRaw, ok: response.ok };
+            }
+
+            if (!response.ok) {
+                return { success: false, data: responseData, status: response.status };
+            }
+
+            // O Make.com customizado pela FluxAI retorna ok: false em lógicas de bloqueio
+            if (responseData.ok === false) {
+                return { success: false, data: responseData, status: response.status };
+            }
+
+            return { success: true, data: responseData, status: response.status };
+
+        } catch (networkError) {
+            console.error('[MakeClient] Falha de rede no disparo do webhook:', networkError);
+            throw new Error('Não foi possível enviar para o Make. Verifique sua conexão ou a rota em ROTAS_OS_MAKE.');
+        }
+    }
+};
