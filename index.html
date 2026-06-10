@@ -894,6 +894,19 @@
       // Forçar loaders se clicar em CTAs de conversão
       document.querySelectorAll('a[href="#diagnostico"], .btn').forEach(btn => {
          btn.addEventListener('click', () => { loadTracking(); loadSupabase(); });
+      });
+
+    })();
+  </script>
+
+  <script type="module" src="/src/scripts/script.js"></script>
+  <script type="module" src="/src/scripts/diagnostico-make.js"></script>
+  <script type="module" src="/src/scripts/dashboard.js"></script>
+
+  <!-- LGPD Cookie Banner -->
+  <div id="lgpd-banner" class="lgpd-cookie-banner">
+      <div class="container-banner">
+          <p class="lgpd-cookie-banner-text">
               Nós utilizamos cookies e tecnologias semelhantes para melhorar a sua experiência, otimizar o desempenho do site e analisar o tráfego de dados em total conformidade com a Lei Geral de Proteção de Dados (LGPD). Ao continuar navegando, você concorda com o uso destas tecnologias. Leia nossa <a id="openPrivacyLink">Política de Privacidade</a>.
           </p>
           <button id="lgpd-accept" class="lgpd-cookie-banner-btn">Aceitar e Prosseguir</button>
