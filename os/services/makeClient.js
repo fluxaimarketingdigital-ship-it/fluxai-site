@@ -47,15 +47,28 @@ export const MakeClient = {
      * Dispara requisição POST real para o Webhook homologado
      */
     sendPost: async (routeConfig, payload) => {
-        if (!routeConfig.webhook_url) {
-            throw new Error(`Webhook URL ausente para a rota ${routeConfig.rota_id}. A rota pode não estar homologada ou precisa ser atualizada via planilha.`);
+        // 5. makeClient.js deve enviar: { routeId, payload }
+        // 4. O frontend deve chamar apenas: /api/make-proxy
+        let targetUrl = '/api/make-proxy';
+        let finalBody = JSON.stringify({
+            routeId: routeConfig.rota_id,
+            payload: payload
+        });
+
+        // Fallback for non-proxy routes (if any in the future)
+        if (!routeConfig.use_proxy) {
+            if (!routeConfig.webhook_url) {
+                throw new Error(`Webhook URL ausente para a rota ${routeConfig.rota_id}. Rota não utiliza proxy e não tem URL local.`);
+            }
+            targetUrl = routeConfig.webhook_url;
+            finalBody = JSON.stringify(payload);
         }
 
         try {
-            const response = await fetch(routeConfig.webhook_url, {
+            const response = await fetch(targetUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+                body: finalBody
             });
 
             // Make.com tipicamente retorna "Accepted" (texto) ou um JSON (para rotas com Webhook Response)
