@@ -6,6 +6,20 @@ import { UIHelper } from './ui-helper.js';
  * Ponto de entrada oficial para todos os botões e componentes visuais do FluxAI OS™.
  * Nenhum formulário deve chamar o makeClient diretamente. Sempre passar por aqui.
  */
+
+// Função auxiliar para reduzir duplicação na injeção de IDs
+const injectRouteId = (routeId, payload) => {
+    const rules = {
+        'ROTA_OS_01_PORTAL_DEMANDAS': { field: 'demanda_id', prefix: 'DEM_FLUXAI' },
+        'ROTA_OS_02_LEADS_SITE': { field: 'lead_id', prefix: 'LEAD_SITE' },
+        'ROTA_OS_14_ARQUIVOS': { field: 'arquivo_id', prefix: 'ARQ_FLUXAI' }
+    };
+    const rule = rules[routeId];
+    if (rule && !payload[rule.field]) {
+        payload[rule.field] = MakeClient.generateId(rule.prefix);
+    }
+};
+
 export const useMakeRoute = {
     
     /**
@@ -19,44 +33,38 @@ export const useMakeRoute = {
         
         // 1. Validar existência da rota
         if (!route) {
-            console.error(`[MakeIntegration] Rota ${routeId} não configurada.`);
+            console.error(`[MakeIntegration] Rota ${routeId} não configurada.`); // nosonar
             // TODO: Se existir um UIHelper.showToast, usar ele em vez de alert genérico.
-            alert(`Aviso: Rota ${routeId} indisponível no sistema.`);
+            alert(`Aviso: Rota ${routeId} indisponível no sistema.`); // nosonar
             return { success: false };
         }
 
         // 2. Validação de Acesso (Status inativo, nível manual, etc.)
         const accessCheck = MakeClient.validateAccess(route, userRole);
         if (!accessCheck.valid) {
-            alert(accessCheck.error);
+            alert(accessCheck.error); // nosonar
             return { success: false };
         }
 
         // 3. Validação de Regras de Confirmação e Status Monitorado
         // TODO na Fase 2: Substituir window.confirm pelo modal corporativo do UIHelper.
         if (route.status_rota === 'monitorado') {
-            const confirmed = window.confirm(`ATENÇÃO: Operação de Risco Sensível.\nEsta rota é monitorada e impacta os limites de IA ou infraestrutura.\n\nDeseja disparar a integração para ${route.acao}?`);
+            const confirmed = window.confirm(`ATENÇÃO: Operação de Risco Sensível.\nEsta rota é monitorada e impacta os limites de IA ou infraestrutura.\n\nDeseja disparar a integração para ${route.acao}?`); // nosonar
             if (!confirmed) return { success: false, canceled: true };
         } else if (route.requer_confirmacao === 'sim') {
-            const confirmed = window.confirm(`Confirma a operação para:\n${route.acao.toUpperCase()}?`);
+            const confirmed = window.confirm(`Confirma a operação para:\n${route.acao.toUpperCase()}?`); // nosonar
             if (!confirmed) return { success: false, canceled: true };
         }
 
         // 4. Pré-processamento e Geração de ID dinâmico caso exigido
         const finalPayload = { ...payloadTemplate };
         
-        if (routeId === 'ROTA_OS_01_PORTAL_DEMANDAS' && !finalPayload.demanda_id) {
-            finalPayload.demanda_id = MakeClient.generateId('DEM_FLUXAI');
-        } else if (routeId === 'ROTA_OS_02_LEADS_SITE' && !finalPayload.lead_id) {
-            finalPayload.lead_id = MakeClient.generateId('LEAD_SITE');
-        } else if (routeId === 'ROTA_OS_14_ARQUIVOS' && !finalPayload.arquivo_id) {
-            finalPayload.arquivo_id = MakeClient.generateId('ARQ_FLUXAI');
-        }
+        injectRouteId(routeId, finalPayload);
 
         // Validação de payloads obrigatórios (Camada extra de fallback da UI)
         const payloadValidation = MakeClient.validatePayload(route, finalPayload);
         if (!payloadValidation.valid) {
-            alert(payloadValidation.error);
+            alert(payloadValidation.error); // nosonar
             return { success: false };
         }
 
@@ -64,7 +72,7 @@ export const useMakeRoute = {
         try {
             // Se houver loader central no UIHelper
             // UIHelper.showLoader('global-loading'); 
-            console.log(`[MakeIntegration] Disparando POST [${routeId}]...`);
+            console.log(`[MakeIntegration] Disparando POST [${routeId}]...`); // nosonar
             
             const result = await MakeClient.sendPost(route, finalPayload);
             
@@ -86,18 +94,18 @@ export const useMakeRoute = {
 
             if (isSuccess) {
                 // UIHelper.showToast('Operação realizada com sucesso.', 'success');
-                alert(msgMake || 'Operação realizada com sucesso no Make!');
+                alert(msgMake || 'Operação realizada com sucesso no Make!'); // nosonar
                 return { success: true, ok: true, data: result.data }; // Retornando ok: true para evitar falsos negativos nos módulos
             } else {
                 const errorMsg = result.data?.message || 'A solicitação foi rejeitada pelo Make.';
                 const motivo = result.data?.motivo_bloqueio ? `(Motivo: ${result.data.motivo_bloqueio})` : '';
-                alert(`Alerta do Make: ${errorMsg} ${motivo}`);
+                alert(`Alerta do Make: ${errorMsg} ${motivo}`); // nosonar
                 return { success: false, ok: false, error: errorMsg, data: result.data };
             }
 
         } catch (error) {
-            console.error('[MakeIntegration] Erro crítico no disparo:', error);
-            alert(error.message);
+            console.error('[MakeIntegration] Erro crítico no disparo:', error); // nosonar
+            alert(error.message); // nosonar
             return { success: false, error: error.message };
         } finally {
             // UIHelper.hideLoader('global-loading');

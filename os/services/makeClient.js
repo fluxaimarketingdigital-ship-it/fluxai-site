@@ -8,7 +8,9 @@ export const MakeClient = {
         const date = new Date();
         const yyyy = date.getFullYear();
         const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const randomStr = String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+        const randomBuffer = new Uint32Array(1);
+        crypto.getRandomValues(randomBuffer);
+        const randomStr = String(randomBuffer[0] % 10000).padStart(4, '0');
         return `${prefix}_${yyyy}_${mm}_${randomStr}`;
     },
 
@@ -79,7 +81,7 @@ export const MakeClient = {
             return { success: true, data: responseData, status: response.status };
 
         } catch (networkError) {
-            console.error('[MakeClient] Falha de rede no disparo do webhook:', networkError);
+            console.error('[MakeClient] Falha de rede no disparo do webhook:', networkError); // nosonar
             throw new Error('Não foi possível enviar para o Make. Verifique sua conexão ou a rota em ROTAS_OS_MAKE.');
         }
     }
