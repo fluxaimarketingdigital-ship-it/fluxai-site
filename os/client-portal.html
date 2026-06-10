@@ -699,8 +699,19 @@
 
         async function submitDemanda() {
             const user = OS_AUTH.user || {};
-            const tempClientId = projectId || user.project_id || 'FLUXAI_LABS_001';
-            const tempClientNome = document.getElementById('dual-client-name').innerText || 'FluxAI Labs';
+            let tempClientNome = document.getElementById('dual-client-name')?.innerText || 'FluxAI Labs';
+            let tempClientId = 'FLUXAI_LABS_001'; // Default operacional da Produção Controlada
+
+            // Impede envio de UUIDs (sessão/auth) para o Make, que exige IDs operacionais (ex: CLI_XYZ_001)
+            const rawId = projectId || user.project_id;
+            if (rawId && !rawId.includes('-') && rawId !== 'p_c1') {
+                tempClientId = rawId;
+            }
+
+            if (tempClientNome.toLowerCase().includes('fluxai labs')) {
+                tempClientId = 'FLUXAI_LABS_001';
+                tempClientNome = 'FluxAI Labs';
+            }
 
             const demandaTipo = document.getElementById('demanda-tipo')?.value || 'solicitacao_conteudo';
             const demandaTitulo = document.getElementById('demanda-titulo')?.value?.trim();
