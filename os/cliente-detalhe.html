@@ -674,7 +674,7 @@
             <p style="font-size: 0.7rem; color: var(--os-text-muted); margin: 0 0 15px;">Sincronize um arquivo do Drive com o Make.</p>
             
             <div class="form-group" style="margin-bottom:15px;">
-                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Tipo de Arquivo</label>
+                <label for="arquivo-tipo" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Tipo de Arquivo</label>
                 <select id="arquivo-tipo" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; font-family: inherit;">
                     <option value="briefing">Briefing</option>
                     <option value="contrato">Contrato</option>
@@ -684,7 +684,7 @@
             </div>
             
             <div class="form-group" style="margin-bottom:15px;">
-                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Categoria</label>
+                <label for="arquivo-categoria" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Categoria</label>
                 <select id="arquivo-categoria" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; font-family: inherit;">
                     <option value="conteudo">Conteúdo</option>
                     <option value="vendas">Vendas</option>
@@ -694,22 +694,22 @@
             </div>
             
             <div class="form-group" style="margin-bottom:15px;">
-                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Nome do Arquivo</label>
+                <label for="arquivo-nome" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Nome do Arquivo</label>
                 <input type="text" id="arquivo-nome" placeholder="Ex: Briefing Institucional v1" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
             </div>
             
             <div class="form-group" style="margin-bottom:15px;">
-                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Link (Drive/Cloud)</label>
+                <label for="arquivo-link" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Link (Drive/Cloud)</label>
                 <input type="url" id="arquivo-link" placeholder="https://drive.google.com/..." style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
             </div>
             
             <div class="form-group" style="margin-bottom:15px;">
-                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Pasta de Destino</label>
+                <label for="arquivo-pasta" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Pasta de Destino</label>
                 <input type="text" id="arquivo-pasta" placeholder="Ex: FluxAI Labs/Conteudo/OS" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
             </div>
             
             <div class="form-group" style="margin-bottom:15px;">
-                <label style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Observação Adicional</label>
+                <label for="arquivo-obs" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Observação Adicional</label>
                 <input type="text" id="arquivo-obs" placeholder="Detalhes extras..." style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
             </div>
 

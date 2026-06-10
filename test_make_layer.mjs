@@ -66,7 +66,7 @@ async function runTests() {
     console.log("Resultado Função Teste 2:", res2, "\n");
 
     // Teste 3: Rota Inativa
-    ROTAS_OS_MAKE['ROTA_TESTE_INATIVA'] = { rota_id: 'R_INATIVA', status_rota: 'inativo', webhook_url: 'http://mock' };
+    ROTAS_OS_MAKE['ROTA_TESTE_INATIVA'] = { rota_id: 'R_INATIVA', status_rota: 'inativo', webhook_url: 'https://mock.local' };
     console.log("--> TESTE 3: Rota inativa");
     const res3 = await useMakeRoute.executeRoute('ROTA_TESTE_INATIVA', {}, { role: 'ADMIN' });
     console.log("Resultado Função Teste 3:", res3, "\n");

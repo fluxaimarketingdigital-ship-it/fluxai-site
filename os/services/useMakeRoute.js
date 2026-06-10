@@ -93,7 +93,6 @@ export const useMakeRoute = {
             }
 
             if (isSuccess) {
-                // UIHelper.showToast('Operação realizada com sucesso.', 'success');
                 alert(msgMake || 'Operação realizada com sucesso no Make!'); // nosonar
                 return { success: true, ok: true, data: result.data }; // Retornando ok: true para evitar falsos negativos nos módulos
             } else {
