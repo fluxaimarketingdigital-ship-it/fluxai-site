@@ -584,7 +584,7 @@
         }
 
         async function init() {
-            const session = OS_AUTH.user || {};
+            const session = window.FLUXAI_RUNTIME_CONTEXT || {};
             
             // CROSS-TENANT SECURITY (IDOR PATCH)
             if (session.role === 'CLIENT') {
@@ -700,7 +700,8 @@
         }
 
         async function submitDemanda() {
-            const user = OS_AUTH.user || {};
+            // OS_AUTH.user não existe nativamente, o contexto real está em window.FLUXAI_RUNTIME_CONTEXT
+            const user = window.FLUXAI_RUNTIME_CONTEXT || {};
             let tempClientId = 'FLUXAI_LABS_001';
             let tempClientNome = document.getElementById('dual-client-name')?.innerText || 'FluxAI Labs';
 
