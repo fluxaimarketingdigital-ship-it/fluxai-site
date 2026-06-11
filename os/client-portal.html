@@ -710,7 +710,8 @@
                 tempClientId = rawId;
             }
 
-            if (tempClientNome.toLowerCase().includes('fluxai')) {
+            // Se client_id for FLUXAI_LABS_001, client_name deve ser exatamente FluxAI Labs, ignorando texto visual
+            if (tempClientId === 'FLUXAI_LABS_001' || tempClientNome.toLowerCase().includes('fluxai')) {
                 tempClientId = 'FLUXAI_LABS_001';
                 tempClientNome = 'FluxAI Labs';
             }
