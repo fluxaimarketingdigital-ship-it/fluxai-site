@@ -458,17 +458,16 @@
         }
 
         const getMockUsers = () => {
-            let mock = localStorage.getItem('fluxai_mock_users');
-            if (!mock) {
+            let mock = JSON.parse(localStorage.getItem('fluxai_mock_users'));
+            if (!mock || mock.some(u => u.id === 'u3' && u.email === 'maria.nutri@gmail.com')) {
                 const initialMock = [
                     { id: 'u1', full_name: 'Admin FluxAI', email: 'admin@fluxai.com', password: 'fluxai@2026', role: 'ADMIN', needsPasswordChange: false, permissions: ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub', 'contracts-finance', 'client-portal', 'governance-users'] },
-                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', password: 'fluxai@2026', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] },
-                    { id: 'u3', full_name: 'Maria Aparecida', email: 'maria.nutri@gmail.com', password: 'fluxai@2026', role: 'CLIENT', needsPasswordChange: false, permissions: ['client-portal'] }
+                    { id: 'u2', full_name: 'Kassia Gomes', email: 'kassia@fluxai.com', password: 'fluxai@2026', role: 'OPERATOR', needsPasswordChange: false, permissions: ['command-center', 'content-engine', 'crm-intelligence', 'analytics', 'automation-hub'] }
                 ];
                 localStorage.setItem('fluxai_mock_users', JSON.stringify(initialMock));
                 return initialMock;
             }
-            return JSON.parse(mock);
+            return mock;
         };
 
         const saveMockUsers = (users) => {
