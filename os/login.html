@@ -186,13 +186,24 @@
                         .eq('id', data.user.id)
                         .single();
 
-                    if (dbError || !profile) throw new Error('Perfil não encontrado no sistema.');
-
-                    safeRole      = OS_AUTH.normalizeRole(profile.role);
-                    safeName      = profile.full_name;
-                    safeId        = data.user.id;
-                    safeProjectId = data.user.user_metadata?.client_id || null;
+                    if (dbError || !profile) {
+                        // Tentar usar metadata da sessão (Auth) como fallback seguro
+                        if (data.user.user_metadata && data.user.user_metadata.client_id) {
+                            safeRole      = 'CLIENT';
+                            safeName      = data.user.user_metadata.full_name || email;
+                            safeId        = data.user.id;
+                            safeProjectId = data.user.user_metadata.client_id;
+                        } else {
+                            throw new Error('Perfil não encontrado no banco nem nos metadados.');
+                        }
+                    } else {
+                        safeRole      = OS_AUTH.normalizeRole(profile.role);
+                        safeName      = profile.full_name;
+                        safeId        = data.user.id;
+                        safeProjectId = data.user.user_metadata?.client_id || null;
+                    }
                 } catch (err) {
+                    console.error("[LOGIN_AUTH_ERROR]", err);
                     alert('Falha de Acesso: Conta não possui um perfil operacional válido autorizado nesta infraestrutura.');
                     if (typeof OS_LOGS_ENGINE !== 'undefined') {
                         OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { reason: 'No valid profile found for authenticated user', userId: data.user.id }, 'critical');

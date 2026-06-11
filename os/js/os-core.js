@@ -422,13 +422,22 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
                 .eq('id', sessionUser.id)
                 .single();
             if (dbError || !profile) {
-                throw new Error('Perfil não encontrado no sistema.');
+                if (sessionUser.user_metadata && sessionUser.user_metadata.client_id) {
+                    safeRole        = 'CLIENT';
+                    safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
+                    safeId          = sessionUser.id;
+                    safeName        = sessionUser.user_metadata.full_name || email;
+                    safeProjectId   = sessionUser.user_metadata.client_id;
+                } else {
+                    throw new Error('Perfil não encontrado no sistema.');
+                }
+            } else {
+                safeRole        = OS_AUTH.normalizeRole(profile.role);
+                safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
+                safeId          = sessionUser.id;
+                safeName        = profile.full_name || email;
+                safeProjectId   = sessionUser.user_metadata?.client_id || null;
             }
-            safeRole        = OS_AUTH.normalizeRole(profile.role);
-            safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
-            safeId          = sessionUser.id;
-            safeName        = profile.full_name || email;
-            safeProjectId   = sessionUser.user_metadata?.client_id || null;
         } catch (err) {
             console.error('[RBAC] Bloqueio: Conta sem perfil operacional válido.', err.message);
             alert('Falha de Acesso: Sua conta não possui um perfil operacional válido. Contate o administrador.');
