@@ -39,18 +39,36 @@ export default async function handler(req, res) {
       body: JSON.stringify(payload)
     });
 
-    const text = await makeRes.text();
-    let data;
+    const responseText = await makeRes.text();
+
+    let parsed = null;
     try {
-      data = JSON.parse(text);
-    } catch (e) {
-      data = { text, ok: makeRes.ok };
+      parsed = responseText ? JSON.parse(responseText) : null;
+    } catch {
+      parsed = null;
+    }
+
+    if (!makeRes.ok) {
+      console.error(`[Make Proxy] Forwarded ${routeId} mas o Make rejeitou. Status: ${makeRes.status}`);
+      return res.status(makeRes.status).json({
+        success: false,
+        ok: false,
+        error: 'Make rejected request',
+        status: makeRes.status,
+        message: responseText || null
+      });
     }
 
     // 9. Não registrar webhook completo em console/log
     console.info(`[Make Proxy] Forwarded ${routeId}. Status: ${makeRes.status}`);
 
-    return res.status(makeRes.status).json(data);
+    return res.status(200).json({
+      success: true,
+      ok: true,
+      status: makeRes.status,
+      message: responseText || 'OK',
+      data: parsed || { text: responseText }
+    });
   } catch (error) {
     console.error(`[Make Proxy] Network error when forwarding route: ${routeId}`);
     return res.status(502).json({ error: 'Bad Gateway. Failed to reach upstream service.' });
