@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('node:fs');
 
 const outFile = '09_FLUXAI_NOVO_CLIENTE_ONBOARDING_SEGURO_FINAL_V3.json';
 

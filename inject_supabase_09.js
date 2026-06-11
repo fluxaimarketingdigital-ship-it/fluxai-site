@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('node:fs');
 
 const inputFile = '09_FLUXAI_NOVO_CLIENTE_ONBOARDING_SEGURO.blueprint (4).json';
 const outputFile = '09_FLUXAI_NOVO_CLIENTE_ONBOARDING_COM_SUPABASE.json';
