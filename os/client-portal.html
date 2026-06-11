@@ -701,19 +701,26 @@
 
         async function submitDemanda() {
             const user = OS_AUTH.user || {};
+            let tempClientId = 'FLUXAI_LABS_001';
             let tempClientNome = document.getElementById('dual-client-name')?.innerText || 'FluxAI Labs';
-            let tempClientId = 'FLUXAI_LABS_001'; // Default operacional da Produção Controlada
 
-            // Impede envio de UUIDs (sessão/auth) para o Make, que exige IDs operacionais (ex: CLI_XYZ_001)
-            const rawId = projectId || user.project_id;
-            if (rawId && !rawId.includes('-') && rawId !== 'p_c1') {
-                tempClientId = rawId;
-            }
-
-            // Se client_id for FLUXAI_LABS_001, client_name deve ser exatamente FluxAI Labs, ignorando texto visual
-            if (tempClientId === 'FLUXAI_LABS_001' || tempClientNome.toLowerCase().includes('fluxai')) {
-                tempClientId = 'FLUXAI_LABS_001';
-                tempClientNome = 'FluxAI Labs';
+            if (user.role === 'CLIENT') {
+                if (!user.project_id || user.project_id.includes('-')) {
+                    alert('Falha de Segurança: Cliente autenticado sem ID Operacional válido.');
+                    return;
+                }
+                tempClientId = user.project_id;
+                tempClientNome = user.full_name || 'Cliente';
+            } else {
+                // Lógica original para ADMIN/OPERATOR (Seletor global / Fallback)
+                const rawId = window.projectId || user.project_id;
+                if (rawId && !rawId.includes('-') && rawId !== 'p_c1') {
+                    tempClientId = rawId;
+                }
+                if (tempClientId === 'FLUXAI_LABS_001' || tempClientNome.toLowerCase().includes('fluxai')) {
+                    tempClientId = 'FLUXAI_LABS_001';
+                    tempClientNome = 'FluxAI Labs';
+                }
             }
 
             const demandaTipo = document.getElementById('demanda-tipo')?.value || 'solicitacao_conteudo';
