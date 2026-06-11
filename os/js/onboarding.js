@@ -5,6 +5,8 @@ import { OS_CONFIG } from '../config/os-config.js';
 import { OS_LOGS_ENGINE } from '../services/logs-engine.js';
 import { StatusEngine } from '../config/status-system.js';
 import { SERVICES_CATALOG } from './config/services-catalog.js';
+import { MakeClient } from '../services/makeClient.js';
+import { ROTAS_OS_MAKE } from '../services/makeRoutes.js';
 
 let currentStep = 1;
 const totalSteps = 7;
@@ -206,6 +208,7 @@ function validateOnboardingBeforeSubmit(raw) {
 
     return errors;
 }
+
 window.handleOnboarding = async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-disparar-infraestrutura');
@@ -226,438 +229,56 @@ window.handleOnboarding = async function(e) {
         btn.disabled = true;
     }
 
-    
-    // Identificadores de deploy
-    let projectId = "p_" + Date.now();
-    if (raw.company_name && raw.company_name.trim().toLowerCase().includes("fluxai labs")) {
-        projectId = "FLUXAI_LABS_001";
-    }
-    const email = raw.client_instagram_handle 
-        ? raw.client_instagram_handle.replace('@', '').trim().toLowerCase() + "@fluxai.com" 
-        : raw.responsible_name.toLowerCase().replace(/[^a-z0-9]/g, '') + "@fluxai.com";
+    // Geração rigorosa de client_id (NOME_CLIENTE_YYYY_MM_XXX)
+    const date = new Date();
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const randomStr = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
+    const projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
 
-    // 2. Construir Dados estruturados
-    const digital_infrastructure = {
-        web: {
-            current_domain: raw.domain_dns || '',
-            desired_domain: raw.client_website || '',
-            blog_seo: 'Não',
-            client_portal: 'Sim',
-            notes: ''
+    // Payload de 7 Camadas (Fase 2A Seguro)
+    const webhookPayload = {
+        client_id: projectId,
+        client_name: raw.company_name || "",
+        origem: "onboarding_os",
+        status_cliente: "em_onboarding",
+        camada_identidade: {
+            responsavel: raw.responsible_name || "",
+            segmento: raw.segment || "",
+            objetivo_principal: raw.objective || ""
         },
-        active_platforms: Array.from(formData.getAll('infra_active_platforms')),
-        operational_links: {
-            instagram: raw.client_instagram_handle ? `https://instagram.com/${raw.client_instagram_handle.replace('@','')}` : '',
-            website: raw.client_website || '',
-            drive: raw.asset_drive_link || '',
-            whatsapp: raw.whatsapp_comercial || ''
-        }
-    };
-
-    const operational_activation = {
-        identity: {
-            instagram: raw.client_instagram_handle || '',
-            website: raw.client_website || '',
-            responsible_name: raw.responsible_name || '',
-            voice_tone: raw.voice_tone || '',
-            positioning: raw.editorial_positioning || '',
-            value_proposition: raw.value_proposition || '',
-            differentiators: raw.differentiators || ''
+        camada_digital: {
+            instagram: raw.client_instagram_handle || "",
+            website: raw.client_website || "",
+            whatsapp_comercial: raw.whatsapp_comercial || ""
         },
-        pain_points: raw.pain_points ? raw.pain_points.split('\n').filter(l => l.trim() !== '') : [],
-        dna: {
-            competitors: raw.references || '',
-            forbidden_themes: raw.forbidden_language || '',
-            desired_language: raw.desired_language || '',
-            editorial_pillars: raw.editorial_pillars || ''
+        camada_servicos: {
+            status_servico: "pendente",
+            modulos_contratados: Array.from(formData.getAll('modules')).join(", ") || "",
+            servico_extra: raw.finance_extra_services_type || "",
+            valor_servico_extra: raw.finance_extra_services_value || ""
         },
-        smart_scope: {
-            conteudo: {
-                reels: raw.escopo_conteudo_reels_qty || 12,
-                carrossel: raw.escopo_conteudo_carrossel_qty || 8,
-                stories: raw.escopo_conteudo_stories_qty || 20,
-                freq: raw.escopo_conteudo_weekly_freq || '5x na semana'
-            },
-            trafego: {
-                budget: raw.escopo_trafego_monthly_budget || 0,
-                goal: raw.escopo_trafego_primary_goal || '',
-                cpl: raw.escopo_trafego_target_cpl || 0,
-                roas: raw.escopo_trafego_target_roas || 0
-            },
-            crm: {
-                system: raw.escopo_crm_system || '',
-                whatsapp: raw.escopo_crm_whatsapp || '',
-                team: raw.escopo_crm_sales_team || '',
-                sla: raw.escopo_crm_sla || ''
-            }
-        },
-        finance: {
-            method: raw.finance_payment_method || 'Pix',
-            signed: raw.finance_contract_signed || 'Sim',
-            start_date: raw.finance_start_date || new Date().toISOString(),
-            duration: raw.finance_min_duration || '6 meses',
-            extra_services_type: raw.finance_extra_services_type || '',
-            extra_services_value: raw.finance_extra_services_value || 0,
-            extra_services_desc: raw.finance_extra_services_desc || ''
-        },
-        bridges: {
-            comercial: raw.responsible_comercial || '',
-            marketing: raw.responsible_marketing || '',
-            aprovacao: raw.approval_responsible || '',
-            whatsapp_decisor: raw.whatsapp_decisor || ''
-        },
-        activation: {
-            risk: raw.activation_operational_risk || 'Baixo',
-            priority: raw.priority_30d || 'AUTORIDADE',
-            dependencies: Array.from(formData.getAll('activation_dependencies'))
-        }
-    };
-
-    const projectData = {
-        company_name: raw.company_name,
-        segment: raw.segment,
-        status: 'ATIVO',
-        digital_infrastructure: digital_infrastructure,
-        operational_activation: operational_activation,
-        tone: raw.voice_tone,
-        objectives: raw.objective,
-        metadata: {
-            responsible: raw.responsible_name,
-            onboarding: {
-                goals: [raw.objective],
-                voice_tone: raw.voice_tone,
-                modules: Array.from(formData.getAll('modules')),
-                ops: {
-                    whatsapp: raw.whatsapp_decisor,
-                    approval: raw.approval_responsible,
-                    instagram: raw.client_instagram_handle,
-                    assets: raw.asset_drive_link
-                },
-                activation: {
-                    priority: raw.priority_30d,
-                    first_delivery: raw.first_delivery
-                },
-                next_cycle_day: 20
-            }
-        }
-    };
-
-    let dbSuccess = false;
-    let makeSuccess = false;
-    let totalFailure = false;
-
-    // 3. Executar o webhook e provisionamento real
-    try {
-        const session = window.FLUXAI_RUNTIME_CONTEXT || {};
-        const statusConfig = StatusEngine.resolve('clientes', 'onboarding');
-        projectData.status = statusConfig.value;
-
-        // Montar o payload completo para o Make
-        const webhookPayload = {
-            // ----- DADOS NORMALIZADOS NA RAIZ (NOVO PADRÃO) -----
-            cliente_id: projectId,
-            client_id: projectId,
-            cliente_nome: raw.company_name,
-            client_name: raw.company_name,
-            responsavel: raw.responsible_name,
-            tipo_cliente: projectId === "FLUXAI_LABS_001" ? "interno" : "externo",
-            status_cliente: statusConfig.value || "ativo",
-            segmento: raw.segment,
-            objetivo_principal: raw.objective,
+        camada_conteudo: {
+            dna_status: "pendente_revisao",
             proposta_valor: raw.value_proposition || "",
             diferenciais: raw.differentiators || "",
             tom_de_voz: raw.voice_tone || "",
             posicionamento_editorial: raw.editorial_positioning || "",
-            instagram: raw.client_instagram_handle || "",
-            website: raw.client_website || "",
-            drive_folder_url: raw.asset_drive_link || "",
-            modulos_contratados: Array.from(formData.getAll('modules')).join(", ") || "",
             reels_mes: raw.escopo_conteudo_reels_qty || "",
             carrosseis_mes: raw.escopo_conteudo_carrossel_qty || "",
             stories_mes: raw.escopo_conteudo_stories_qty || "",
-            frequencia_semanal: raw.escopo_conteudo_weekly_freq || "",
-            verba_midia: raw.escopo_trafego_monthly_budget || "",
-            meta_cpl: raw.escopo_trafego_target_cpl || "",
-            meta_roas: raw.escopo_trafego_target_roas || "",
-            crm_atual: raw.escopo_crm_system || "",
-            whatsapp_comercial: raw.escopo_crm_whatsapp || "",
-            sla_comercial: raw.escopo_crm_sla || "",
-            pilares_editoriais: raw.editorial_pillars || "",
-            dores_icp: raw.pain_points || "",
-            objecoes: raw.objections || "",
-            cta_padrao: raw.ideal_cta || "",
-            linguagem_permitida: raw.desired_language || "",
-            linguagem_proibida: raw.forbidden_language || "",
+            frequencia_semanal: raw.escopo_conteudo_weekly_freq || ""
+        },
+        camada_assets: {
+            drive_folder_url: raw.asset_drive_link || ""
+        },
+        camada_operacao: {
+            status_contrato: "rascunho",
             fee_mensal: raw.monthly_fee || "",
             dia_vencimento: raw.payment_day || "",
             metodo_pagamento: raw.finance_payment_method || "",
-            contrato_assinado: raw.finance_contract_signed || "",
             data_inicio: raw.finance_start_date || new Date().toISOString().split('T')[0],
-            ciclo_fidelidade: raw.finance_min_duration || "",
-            servico_extra: raw.finance_extra_services_type || "",
-            valor_servico_extra: raw.finance_extra_services_value || "",
-            escopo_setup: raw.first_delivery || "",
-            roadmap_ia: document.getElementById('ia-roadmap-content') ? document.getElementById('ia-roadmap-content').innerText : "",
-            relatorio_incluir: "sim",
-            origem_validacao: "bloco_3_1_cliente_interno",
-            
-            // ----- COLEÇÕES ANINHADAS (PADRÃO ANTIGO - COMPATIBILIDADE) -----
-            evento: "client_onboarding",
-            timestamp: new Date().toISOString(),
-            operador_id: session.id || "admin",
-            dados_principais: {
-                cliente_id: projectId,
-                nome_interno: raw.company_name,
-                nome_comercial: raw.company_name,
-                email: email,
-                telefone: raw.whatsapp_decisor,
-                website: raw.client_website || '',
-                instagram_profile: raw.client_instagram_handle || '',
-                status_ativo: statusConfig.value || 'ativo',
-                data_entrada: raw.finance_start_date || new Date().toISOString().split('T')[0]
-            },
-            contrato: {
-                drive_url: raw.asset_drive_link || '',
-                valor_global: Number(raw.monthly_fee) || 0,
-                vigencia_meses: raw.finance_min_duration ? parseInt(raw.finance_min_duration) : 12,
-                dia_vencimento: Number(raw.payment_day) || 5
-            },
-            servicos_contratados_list: Array.from(formData.getAll('modules')),
-            servicos_extras: raw.finance_extra_services_type ? [{
-                nome_servico: raw.finance_extra_services_type,
-                valor: Number(raw.finance_extra_services_value) || 0,
-                descricao: raw.finance_extra_services_desc || ''
-            }] : [],
-            drive: {
-                pasta_cliente: raw.asset_drive_link || '',
-                identidade_visual: raw.asset_brand_guidelines || '',
-                contrato: raw.asset_documents || '',
-                logo_principal: raw.asset_logos || '',
-                referencias: raw.references || '',
-                entregas: raw.asset_videos || ''
-            },
-            dna: {
-                objetivo_principal: raw.objective,
-                publico_alvo: raw.segment,
-                oferta_principal: raw.value_proposition,
-                dor_mais_forte: raw.pain_points,
-                diferencial_real: raw.differentiators,
-                tom_de_voz: raw.voice_tone,
-                palavras_proibidas: raw.forbidden_language,
-                formatacao_exigida: raw.desired_language
-            },
-            planejamento_inicial: {
-                briefing_mes_1: raw.first_delivery,
-                alinhamento_kickoff: 'Agendado'
-            }
-        };
-
-        // PREVIEW SEGURO (Sem Tokens Sensíveis)
-        const safePreview = JSON.parse(JSON.stringify(webhookPayload));
-        if (safePreview.tokens) safePreview.tokens = '[MASCARADO PARA SEGURANÇA]';
-        console.log('ONBOARDING_PAYLOAD_PREVIEW', safePreview);
-
-        // Disparar Webhook
-        const webhookResult = await OS_CONFIG.webhooks.send('CLIENT_ONBOARDING', webhookPayload);
-        if (webhookResult.success) {
-            makeSuccess = true;
-        } else {
-            console.warn('[ONBOARDING] Webhook não enviado ou falhou:', webhookResult.error);
-        }
-
-        const supabase = getSupabase();
-        let project = null;
-        let pError = null;
-
-        // Inserir Projeto no Supabase
-        try {
-            const res = await supabase.from('projects').insert([projectData]).select().single();
-            project = res.data;
-            pError = res.error;
-        } catch (dbErr) {
-            pError = dbErr;
-        }
-
-        // Bypass de segurança se o Supabase não tiver colunas novas
-        if (pError && (pError.code === 'PGRST204' || pError.code === '42703' || (pError.message && pError.message.includes('column')))) {
-            console.warn('[ONBOARDING] Coluna ausente no Supabase (Bypass Ativado). Tentando inserção compatível.');
-            const safeProj = { ...projectData };
-            delete safeProj.digital_infrastructure;
-            delete safeProj.operational_activation;
-            
-            const retryRes = await supabase.from('projects').insert([safeProj]).select().single();
-            if (retryRes.error) throw retryRes.error;
-            project = retryRes.data;
-        } else if (pError) {
-            throw pError;
-        }
-
-        if (project && project.id) {
-            dbSuccess = true;
-            
-            // Inserir Contrato no Supabase
-            const extraValue = Number(raw.finance_extra_services_value) || 0;
-            let finalDeliverables = `FEE MENSAL: Módulos contratados (${Array.from(formData.getAll('modules')).join(', ')})`;
-            if (extraValue > 0) {
-                finalDeliverables += `\n[EXTRA]: ${raw.finance_extra_services_type} - ${raw.finance_extra_services_desc}`;
-            }
-
-            const contractRes = await supabase.from('contracts').insert([{
-                project_id: project.id,
-                client_name: raw.responsible_name,
-                company_name: raw.company_name,
-                deliverables: finalDeliverables,
-                contract_value: Number(raw.monthly_fee) || 0,
-                due_day: Number(raw.payment_day) || 5,
-                status: 'ATIVO',
-                start_date: raw.finance_start_date || new Date().toISOString().split('T')[0]
-            }]).select().single();
-            const contract = contractRes.data;
-
-            // ── FINANCIAL LAYER: Criar 1ª fatura na payments_ledger ──
-            if (contract && contract.id && Number(raw.monthly_fee) > 0) {
-                const firstDue = calcFirstDueDate(Number(raw.payment_day) || 5);
-                await createPayment({
-                    contract_id: contract.id,
-                    due_date: firstDue,
-                    amount_due: Number(raw.monthly_fee),
-                    payment_type: 'RECORRENTE',
-                    project_id: project.id
-                });
-            }
-
-            // Inserir Conta de Governança do Cliente
-            await supabase.from('governance_users').insert([{
-                project_id: project.id,
-                scoped_project_id: project.id,
-                name: raw.responsible_name,
-                email: email,
-                role: 'CLIENT',
-                permissions: JSON.stringify(['client-portal']),
-                status: 'ACTIVE'
-            }]);
-
-            // ── CONTENT ENGINE: 3 Pautas Editoriais Iniciais ──
-            const pautas = generatePautasTemplates(project.id, raw);
-            await supabase.from('content_assets').insert(pautas);
-
-            // ── SERVIÇO EXTRA (Operational Linking™) ──
-            const serviceExtraValue = Number(raw.finance_extra_services_value) || 0;
-            if (serviceExtraValue > 0 && raw.finance_extra_services_type && contract) {
-                const serviceTypeKey = raw.finance_extra_services_type
-                    .replace('[FluxAI Labs] ', '').replace('[FluxAI] ', '')
-                    .toUpperCase().replace(/[\s\-\/\(\)]/g, '_').substring(0, 20);
-                await activateExtraService({
-                    project_id: project.id,
-                    contract_id: contract.id,
-                    service_type: serviceTypeKey,
-                    service_value: serviceExtraValue,
-                    deadline: null,
-                    responsible: raw.responsible_comercial || 'Admin FluxAI'
-                });
-            }
-
-            // ── EVENT BUS: Disparar evento de onboarding concluído ──
-            await dispatchEvent(
-                'ONBOARDING_CONCLUIDO',
-                raw.responsible_name || 'Admin FluxAI',
-                `Workspace de "${raw.company_name}" ativado. Contrato de R$ ${raw.monthly_fee}/mês criado. ${pautas.length} pautas injetadas.`,
-                { company_name: raw.company_name, contract_value: raw.monthly_fee, pautas_qty: pautas.length },
-                project.id
-            );
-
-            // Logs de Segurança e Auditoria
-            if (typeof OS_LOGS_ENGINE !== 'undefined') {
-                if (makeSuccess) {
-                    OS_LOGS_ENGINE.userAction('ONBOARDING_OFFICIAL_SUCCESS', webhookPayload, false);
-                } else {
-                    OS_LOGS_ENGINE.userAction('ONBOARDING_MAKE_DISPATCH_FAILED', webhookPayload, false);
-                }
-            }
-        }
-
-    } catch (err) {
-        console.warn('[ONBOARDING] Falha de comunicação ou Supabase offline. Rodando persistência local mock.', err);
-        totalFailure = !dbSuccess;
-        if (typeof OS_LOGS_ENGINE !== 'undefined') {
-            OS_LOGS_ENGINE.userAction('ONBOARDING_TOTAL_FAILURE', { error: err.message }, false);
-        }
-    } finally {
-        // Garantir gravação robusta em localStorage (offline fallback primário)
-        registerLocalMockProjectAndUser(projectId, projectData, raw, email);
-    }
-
-    // 4. Lidar com Interface Visual e Feedback de Status
-    const alertContainer = document.querySelector('#step-7 .form-section');
-
-    if (dbSuccess && makeSuccess) {
-        // SUCCESSO OFICIAL ABSOLUTO
-        const overlay = document.getElementById('deploy-overlay');
-        const deployBar = document.getElementById('deploy-bar');
-        const deployLogs = document.getElementById('deploy-logs');
-        
-        if (overlay) overlay.style.display = 'flex';
-
-        const logMessages = [
-            { progress: 10, text: `> [SISTEMA] Inicializando provisionamento de infraestrutura FluxAI OS™...` },
-            { progress: 25, text: `> [DB ENGINE] Conectando ao cluster de banco de dados e aplicando políticas RLS...` },
-            { progress: 40, text: `> [WORKSPACE] Workspace '${raw.company_name}' criado com sucesso. Tenant ID: tenant_${projectId}` },
-            { progress: 55, text: `> [GOVERNANÇA] Conta de Portal '${email}' gerada.` },
-            { progress: 70, text: `> [SLA ENGINE] SLAs operacionais calibrados para ${raw.sla_minutes} min.` },
-            { progress: 85, text: `> [IA MEMORY] Consolidando DNA estratégico. Tom: '${raw.voice_tone}'...` },
-            { progress: 95, text: `> [MESA EDITORIAL] Mesa ativada! Injetando pautas iniciais...` },
-            { progress: 100, text: `> [SISTEMA] Deploy oficial concluído com 100% de sucesso no Make e Banco!` }
-        ];
-
-        const runLogs = async () => {
-            for (let i = 0; i < logMessages.length; i++) {
-                await new Promise(res => setTimeout(res, 400));
-                if (deployBar) deployBar.style.width = `${logMessages[i].progress}%`;
-                if (deployLogs) {
-                    deployLogs.innerHTML += `<br/>${logMessages[i].text}`;
-                    deployLogs.scrollTop = deployLogs.scrollHeight;
-                }
-            }
-        };
-
-        await runLogs();
-        setTimeout(() => {
-            window.location.href = `cliente-detalhe.html?client_id=${projectId}`;
-        }, 500);
-
-    } else if (dbSuccess && !makeSuccess) {
-        // PARCIAL: BANCO OK, MAKE ERROR
-        btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> SALVO NO BANCO COM ALERTA';
-        btn.style.background = '#f59e0b';
-        btn.disabled = false;
-        
-        const alertHtml = `
-            <div style="background: rgba(245, 158, 11, 0.1); border: 1px solid #f59e0b; padding: 20px; border-radius: 8px; margin-top: 20px; color: #fbd38d;">
-                <strong>⚠️ ATENÇÃO OPERACIONAL</strong><br/>
-                Cliente salvo no banco, mas automação Make não confirmou execução. Revisar fila operacional.
-            </div>
-            <button type="button" onclick="window.location.href='cliente-detalhe.html?client_id=${projectId}'" style="margin-top:15px; padding:10px 20px; background:#f59e0b; color:#000; font-weight:800; border-radius:6px; cursor:pointer; border:none; transition:0.2s;">Prosseguir ao Perfil</button>
-        `;
-        alertContainer.insertAdjacentHTML('beforeend', alertHtml);
-
-    } else {
-        // FALHA TOTAL / FALLBACK
-        if (typeof OS_LOGS_ENGINE !== 'undefined') {
-            OS_LOGS_ENGINE.userAction('ONBOARDING_LOCAL_FALLBACK_DRAFT', projectData, false);
-        }
-        btn.innerHTML = '<i class="fa-solid fa-wifi"></i> SALVO COMO RASCUNHO OFFLINE';
-        btn.style.background = '#ef4444';
-        btn.disabled = false;
-        
-        const alertHtml = `
-            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 8px; margin-top: 20px; color: #fca5a5;">
-                <strong>🚨 MODO OFFLINE — Cliente salvo apenas como rascunho local. Não foi oficializado no banco nem enviado ao Make.</strong><br/>
-                O cliente não tem ID persistente na nuvem e o webhook Make não ativou a jornada. Certifique-se de ter rede e refaça a tentativa quando o Supabase estiver online.
-            </div>
-        `;
-        alertContainer.insertAdjacentHTML('beforeend', alertHtml);
-    }
-}
 
 function generatePautasTemplates(projId, raw) {
     const segmentLabel = raw.segment || "SAUDE";
