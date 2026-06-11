@@ -182,7 +182,7 @@
                 try {
                     const { data: profile, error: dbError } = await supabase
                         .from('profiles')
-                        .select('role, full_name, project_id')
+                        .select('role, full_name')
                         .eq('id', data.user.id)
                         .single();
 
@@ -191,7 +191,7 @@
                     safeRole      = OS_AUTH.normalizeRole(profile.role);
                     safeName      = profile.full_name;
                     safeId        = data.user.id;
-                    safeProjectId = profile.project_id || null;
+                    safeProjectId = data.user.user_metadata?.client_id || null;
                 } catch (err) {
                     alert('Falha de Acesso: Conta não possui um perfil operacional válido autorizado nesta infraestrutura.');
                     if (typeof OS_LOGS_ENGINE !== 'undefined') {
