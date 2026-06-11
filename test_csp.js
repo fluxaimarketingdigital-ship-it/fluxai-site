@@ -23,6 +23,7 @@ fetch('https://hook.us2.make.com/au4ko54wey2q3b98crpfmo55w8viy481', {
 })
 .then(async (res) => {
     console.log("Status:", res.status);
-    console.log("Response:", await res.text());
+    const text = await res.text();
+    console.log("Response recebida com", text.length, "bytes.");
 })
 .catch(console.error);

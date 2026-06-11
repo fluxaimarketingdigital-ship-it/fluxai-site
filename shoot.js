@@ -47,7 +47,7 @@ async function sendWebhook() {
 
         const text = await response.text();
         console.log(`[STATUS DO MAKE] ${response.status} ${response.statusText}`);
-        console.log(`[RESPOSTA DO MAKE] ${text}`);
+        console.log(`[RESPOSTA DO MAKE] Recebida resposta do servidor (${text.length} bytes)`);
         
         if (response.ok) {
             console.log("\n[SUCESSO] Webhook ativado! Vá conferir os balões verdes no Make.com.");
