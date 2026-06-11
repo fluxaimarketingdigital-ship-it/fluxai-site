@@ -28,8 +28,8 @@ export default async function handler(req, res) {
   const webhookUrl = allowedRoutes[routeId];
 
   if (!webhookUrl) {
-    console.error(`[Make Proxy] Webhook URL not configured in Vercel env for route: ${routeId}`);
-    return res.status(500).json({ error: 'Internal Configuration Error.' });
+    console.error(`[Make Proxy] Webhook não configurado para esta rota na Vercel: ${routeId}`);
+    return res.status(500).json({ error: 'Webhook não configurado para esta rota.' });
   }
 
   try {
