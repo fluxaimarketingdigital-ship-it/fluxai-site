@@ -364,12 +364,11 @@
         <div id="modal-demanda" class="os-modal">
             <div class="os-modal-content">
                 <button class="close-modal" onclick="closeDemandaModal()"><i class="fa-solid fa-xmark"></i></button>
-                <h2 style="margin-top:0; color:var(--os-primary); text-transform:uppercase; font-weight:900; font-size:1.2rem; border-bottom:1px solid var(--os-border); padding-bottom:15px; margin-bottom:20px;">
-                    <i class="fa-solid fa-rocket"></i> Solicitar Novo Serviço
-                </h2>
+                <h2 style="font-weight: 800; font-size: 1.2rem; margin-bottom: 5px;"><i class="fa-solid fa-rocket"></i> Solicitar Serviço Extra</h2>
+                <p style="color: var(--os-text-muted); font-size: 0.8rem; margin-bottom: 25px;">Preencha os detalhes do serviço desejado.</p>
                 
                 <div class="form-group">
-                    <label>Serviço Extra (Catálogo FluxAI)</label>
+                    <label>Tipo de Serviço Extra</label>
                     <select id="demanda-tipo" class="form-control">
                         <option value="">Carregando Catálogo...</option>
                     </select>
@@ -534,7 +533,7 @@
             <div style="background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 8px; padding: 20px;">
                 <p style="color: var(--os-text-light); font-size: 0.85rem; margin-top: 0;">Precisa de uma landing page, campanha avulsa ou design extra? Faça sua solicitação aqui e ela será adicionada ao próximo faturamento após aprovação.</p>
                 <button onclick="openDemandaModal()" style="background: var(--os-primary); color: #050705; border: none; padding: 12px 24px; border-radius: 8px; font-weight: 800; font-size: 0.85rem; cursor: pointer; text-transform: uppercase;">
-                    <i class="fa-solid fa-paper-plane"></i> Adicionar Nova Demanda
+                    <i class="fa-solid fa-paper-plane"></i> Solicitar Serviço Extra
                 </button>
             </div>
         </div>
@@ -752,16 +751,19 @@
                 client_id: tempClientId,
                 client_name: tempClientNome,
                 origem: "portal_cliente",
-                tipo_demanda: demandaTipo,
+                tipo_demanda: "SERVICO_EXTRA",
                 titulo: demandaTitulo,
                 descricao: demandaDesc,
                 prioridade: document.getElementById('demanda-prioridade')?.value || "media",
-                status_demanda: targetStatus,
+                status_demanda: "pendente_analise",
+                status_comercial: "pendente_orcamento",
+                ocupa_escopo_contratado: "nao",
+                requer_aprovacao_fluxai: "sim",
                 solicitado_por: "Kassia", // fixo para bater payload homologado ou via auth
                 responsavel: "Kassia", // fixo homologado
                 prazo_solicitado: document.getElementById('demanda-prazo')?.value || "",
                 link_referencia: document.getElementById('demanda-arquivo')?.value || "",
-                observacao: "Demanda criada via FluxAI OS pelo formulário real de Nova Demanda."
+                observacao: "Serviço Extra solicitado via FluxAI OS pelo formulário do Portal do Cliente."
             };
 
             try {
