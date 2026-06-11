@@ -418,7 +418,7 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
         try {
             const { data: profile, error: dbError } = await supabase
                 .from('profiles')
-                .select('role, full_name, project_id')
+                .select('role, full_name')
                 .eq('id', sessionUser.id)
                 .single();
             if (dbError || !profile) {
@@ -428,7 +428,7 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
             safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
             safeId          = sessionUser.id;
             safeName        = profile.full_name || email;
-            safeProjectId   = profile.project_id || null;
+            safeProjectId   = sessionUser.user_metadata?.client_id || null;
         } catch (err) {
             console.error('[RBAC] Bloqueio: Conta sem perfil operacional válido.', err.message);
             alert('Falha de Acesso: Sua conta não possui um perfil operacional válido. Contate o administrador.');
