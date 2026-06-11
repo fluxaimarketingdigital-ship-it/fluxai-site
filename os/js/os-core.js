@@ -347,13 +347,6 @@ const FLUXAI_ALLOWED_USERS = Object.freeze({
         role: 'ADMIN',
         permissions: ['*'],
         project_id: 'FLUXAI_LABS_001'
-    },
-    'maria.nutri@gmail.com': {
-        id: 'CLIENT_002',
-        full_name: 'Maria Aparecida',
-        role: 'CLIENT',
-        permissions: ['client_portal:view', 'delivery:approve', 'extra_service:request'],
-        project_id: 'MARIA_APARECIDA_002'
     }
 });
 
@@ -423,23 +416,24 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
     } else {
         // Tentar buscar perfil no banco de dados se não estiver na allowlist
         try {
-            const { data: profile } = await supabase
+            const { data: profile, error: dbError } = await supabase
                 .from('profiles')
                 .select('role, full_name, project_id')
                 .eq('id', sessionUser.id)
                 .single();
-            safeRole        = OS_AUTH.normalizeRole(profile?.role);
+            if (dbError || !profile) {
+                throw new Error('Perfil não encontrado no sistema.');
+            }
+            safeRole        = OS_AUTH.normalizeRole(profile.role);
             safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
             safeId          = sessionUser.id;
-            safeName        = profile?.full_name || email;
-            safeProjectId   = profile?.project_id || null;
-        } catch {
-            // Fallback restritivo: CLIENT por padrão
-            safeRole        = 'CLIENT';
-            safePermissions = OS_AUTH.getPermissionsForRole('CLIENT');
-            safeId          = sessionUser.id;
-            safeName        = email;
-            safeProjectId   = null;
+            safeName        = profile.full_name || email;
+            safeProjectId   = profile.project_id || null;
+        } catch (err) {
+            console.error('[RBAC] Bloqueio: Conta sem perfil operacional válido.', err.message);
+            alert('Falha de Acesso: Sua conta não possui um perfil operacional válido. Contate o administrador.');
+            await OS_AUTH.logout();
+            return null;
         }
     }
 

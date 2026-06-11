@@ -274,10 +274,10 @@ export const SHEETS_CONFIG = {
 
     // Mapeamento de abas (nome exato como aparece na planilha)
     tabs: {
-        CLIENTES:          'CLIENTES_CONFIG',
-        SERVICOS:          'SERVICOS_CLIENTES',
+        CLIENTES:          '04_CLIENTES_CONFIG',
+        SERVICOS:          '03_SERVICOS_CLIENTES',
         ROTAS:             'ROTAS_AUTOMACOES',
-        DEMANDAS:          'DEMANDAS_CLIENTES',
+        DEMANDAS:          '07_DEMANDAS_CLIENTES',
         LEADS_SITE:        'LEADS_SITE',
         LEADS_CLIENTES:    'LEADS_CLIENTES',
         GA4:               'GA4_DIARIO',
@@ -286,7 +286,7 @@ export const SHEETS_CONFIG = {
         INSTAGRAM:         'INSTAGRAM_DIARIO',
         META_ADS:          'META_ADS_DIARIO',
         STATUS:            'STATUS_MONITOR_DIARIO',
-        ANALISE_MENSAL:    'ANALISE_MENSAL_CLIENTE',
+        ANALISE_MENSAL:    '29_ANALISE_MENSAL_CLIENTE',
         ARQUIVOS:          'CLIENTES_ARQUIVOS',
         ESTRATEGIA:        'CLIENTES_ESTRATEGIA',
         CONTRATOS:         'CONTRATOS_CLIENTES',

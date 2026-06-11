@@ -74,42 +74,9 @@ async function loadFinanceData() {
     const now = new Date();
     const nextWeek = new Date(now); nextWeek.setDate(now.getDate() + 5);
     
-    // Inicializar mockProjects no localStorage para persistência cadastral
     let mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects'));
-    if (mockProjects && mockProjects[1] && (!mockProjects[1].digital_infrastructure?.operational_links?.canva || !mockProjects[1].digital_infrastructure.operational_links.canva.includes('folders'))) {
-        mockProjects = null;
-    }
-    if (!mockProjects || !mockProjects[0] || !mockProjects[0].metadata || !mockProjects[0].metadata.dna) {
+    if (!mockProjects || !mockProjects[0] || !mockProjects[0].metadata || !mockProjects[0].metadata.dna || mockProjects.find(p => p.id === 'p_c1')) {
         mockProjects = [
-            { 
-                id: "p_c1", 
-                company_name: "Maria Aparecida Nutricionista & Consultora Alimentar",
-                segment: "Nutrição Clínica + Consultoria Alimentar",
-                digital_infrastructure: {
-                    operational_links: {
-                        instagram: "https://www.instagram.com/mariaaparecida.nutri",
-                        website: "",
-                        canva: "https://drive.google.com/drive/folders/1K__Y4QTCfJ_4cnr54iocJyhFEDsPa5iZ?usp=drive_link",
-                        drive: "https://drive.google.com/drive/folders/14stjSxP6piUM2w0gFmRS-v9H2zjFIE0P?usp=drive_link",
-                        whatsapp: "5582993051282"
-                    }
-                },
-                metadata: {
-                    dna: {
-                        desired_patterns: ["Alimentação Real", "Rotina Prática", "Saúde Sustentável", "Orientação Humanizada"],
-                        anti_patterns: ["Terrorismo Nutricional", "Estética Fitness Genérica", "Promessas Milagrosas", "Sensacionalismo", "Antes e Depois Proibido", "Publicidade Antiética"],
-                        forbidden_themes: "Promessas de emagrecimento rápido, antes e depois, propaganda irregular, terrorismo nutricional, associação indevida com marcas, publicidade antiética, discurso alarmista, recomendações irresponsáveis"
-                    },
-                    tone_of_voice: "Humano, técnico, confiável, acolhedor, sofisticado, claro, sem terrorismo alimentar, sem radicalismo",
-                    strategic_roadmap: {
-                        semana_1: "organização estratégica, alinhamento da marca, análise do Instagram, definição de pilares editoriais, definição da linguagem visual, alinhamento ético CFN",
-                        semana_2: "primeiros conteúdos, construção de autoridade, otimização de bio, organização editorial, início da percepção premium",
-                        semana_3: "fortalecimento regional, conteúdo educativo estratégico, conteúdo humanizado, aproximação com empresas locais, estruturação de narrativa profissional",
-                        semana_4: "análise de métricas, ajustes de posicionamento, melhoria de retenção, consolidação da presença digital, evolução da autoridade"
-                    },
-                    cfn_rules: "Respeito ético profissional, comunicação responsável, ausência de promessas milagrosas, ausência de sensacionalismo, ausência de publicidade irregular, ausência de associação inadequada com marcas/suplementos, comunicação humanizada e técnica, valorização da autonomia alimentar, posicionamento profissional premium."
-                }
-            },
             { 
                 id: "p_c2", 
                 company_name: "Alves Odonto Premium",
@@ -174,20 +141,17 @@ async function loadFinanceData() {
 
     // Inicializar mockContracts no localStorage para persistência interativa
     let mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts'));
-    if (!mockContracts || (mockContracts[0] && mockContracts[0].client_name === "Maria Aparecida")) {
+    if (!mockContracts || mockContracts.find(c => c.id === 'c1')) {
         mockContracts = [
-            { id: "c1", project_id: "p_c1", client_name: "Maria Aparecida da Silva", company_name: "Maria Aparecida Nutricionista & Consultora Alimentar", deliverables: "2 carrosséis + 2 reels/mês", contract_value: 800, status: "ATIVO", created_at: "2026-05-10T00:00:00Z", due_day: 5 },
             { id: "c2", project_id: "p_c2", client_name: "Dr. Roberto Alves", company_name: "Alves Odonto Premium", deliverables: "Gestão de Tráfego + CRM", contract_value: 5000, status: "ATIVO", created_at: "2025-03-15T00:00:00Z", due_day: 15 },
             { id: "c3", project_id: "p_c3", client_name: "Instituto Apex", company_name: "Apex Educacional", deliverables: "Governança Full-Stack", contract_value: 8500, status: "ATIVO", created_at: "2024-11-20T00:00:00Z", due_day: 10 }
         ];
         localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
     }
 
-    // Inicializar mockPayments no localStorage para persistência interativa
     let mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments'));
-    if (!mockPayments) {
+    if (!mockPayments || mockPayments.find(p => p.id === 'p1')) {
         mockPayments = [
-            { id: "p1", contract_id: "c1", amount_due: 800, due_date: "2026-06-04T00:00:00Z", status: "PAGO", payment_method: "Pix" },
             { id: "p2", contract_id: "c2", amount_due: 5000, due_date: nextWeek.toISOString(), status: "PENDENTE", payment_method: "Boleto" },
             { id: "p3", contract_id: "c3", amount_due: 8500, amount_paid: 8500, due_date: "2026-05-10T00:00:00Z", status: "PAGO", payment_method: "Pix" }
         ];

@@ -129,8 +129,7 @@
         const LOGIN_ALLOWED_USERS = Object.freeze({
             'kassiadgomes@hotmail.com': { id: 'ADMIN_001', full_name: 'Kássia Gomes',   role: 'ADMIN',  project_id: 'FLUXAI_LABS_001' },
             'admin@fluxai.com':         { id: 'ADMIN_002', full_name: 'Admin FluxAI',   role: 'ADMIN',  project_id: 'FLUXAI_LABS_001' },
-            'kassia@fluxai.com':        { id: 'ADMIN_003', full_name: 'Kássia Gomes',   role: 'ADMIN',  project_id: 'FLUXAI_LABS_001' },
-            'maria.nutri@gmail.com':    { id: 'CLIENT_002', full_name: 'Maria Aparecida', role: 'CLIENT', project_id: 'MARIA_APARECIDA_002' }
+            'kassia@fluxai.com':        { id: 'ADMIN_003', full_name: 'Kássia Gomes',   role: 'ADMIN',  project_id: 'FLUXAI_LABS_001' }
         });
 
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
@@ -181,20 +180,27 @@
             } else {
                 // Buscar perfil no banco se não estiver na allowlist
                 try {
-                    const { data: profile } = await supabase
+                    const { data: profile, error: dbError } = await supabase
                         .from('profiles')
                         .select('role, full_name, project_id')
                         .eq('id', data.user.id)
                         .single();
-                    safeRole      = OS_AUTH.normalizeRole(profile?.role);
-                    safeName      = profile?.full_name || email;
+
+                    if (dbError || !profile) throw new Error('Perfil não encontrado no sistema.');
+
+                    safeRole      = OS_AUTH.normalizeRole(profile.role);
+                    safeName      = profile.full_name;
                     safeId        = data.user.id;
-                    safeProjectId = profile?.project_id || null;
-                } catch {
-                    safeRole      = 'CLIENT';
-                    safeName      = email;
-                    safeId        = data.user.id;
-                    safeProjectId = null;
+                    safeProjectId = profile.project_id || null;
+                } catch (err) {
+                    alert('Falha de Acesso: Conta não possui um perfil operacional válido autorizado nesta infraestrutura.');
+                    if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                        OS_LOGS_ENGINE.security('SECURITY_ACCESS_DENIED', { reason: 'No valid profile found for authenticated user', userId: data.user.id }, 'critical');
+                    }
+                    btn.replaceChildren(...originalNodes);
+                    btn.disabled = false;
+                    await supabase.auth.signOut();
+                    return;
                 }
             }
 
