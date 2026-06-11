@@ -321,13 +321,13 @@
         <a href="command-center.html" class="btn-back-portal">
             <i class="fa-solid fa-arrow-left"></i> Voltar ao Painel
         </a>
-        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;">
+        <div id="portal-header-title-container" style="display: flex; justify-content: center; align-items: center; gap: 20px; margin-bottom: 20px;">
             <div style="font-weight:900; font-size:1.5rem; color:var(--os-primary); letter-spacing: 2px;">FLUXAI</div>
             <i class="fa-solid fa-xmark" style="font-size:1rem; color:var(--os-text-muted);"></i>
             <div id="dual-client-name" style="font-weight:900; font-size:1.5rem; color:#fff; letter-spacing: 2px;">CLIENTE</div>
         </div>
         
-        <p id="client-profession" style="opacity: 0.5; margin-top: 5px; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">SINCRONIZANDO ECOSSISTEMA DIGITAL...</p>
+        <p id="client-profession" style="opacity: 0.5; margin-top: 5px; font-size: 0.75rem; letter-spacing: 1px; text-transform: uppercase;">Workspace operacional ativo.</p>
     </header>
 
     <div id="expiration-alert-container"></div>
@@ -375,8 +375,8 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Título da Demanda</label>
-                    <input type="text" id="demanda-titulo" class="form-control" placeholder="Ex: Criação de LP para o Produto X" />
+                    <label>Título da Solicitação</label>
+                    <input type="text" id="demanda-titulo" class="form-control" placeholder="Ex: Landing page, captação avulsa, campanha extra ou peça institucional" />
                 </div>
                 
                 <div class="form-group">
@@ -442,25 +442,28 @@
                 <div class="calendar-day empty"></div>
                 <div class="calendar-day">
                     <div class="day-number">1</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Lançamento Campanha</div>
+                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Reel Institucional</div>
                 </div>
                 <div class="calendar-day"><div class="day-number">2</div></div>
                 <div class="calendar-day">
                     <div class="day-number">3</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Bastidores (Trend)</div>
+                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Bastidores Operacionais</div>
                 </div>
                 <div class="calendar-day">
                     <div class="day-number">4</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Artigo Corporativo</div>
+                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Carrossel Estratégico</div>
                 </div>
                 
                 <!-- Semana 2 -->
                 <div class="calendar-day"><div class="day-number">5</div></div>
                 <div class="calendar-day">
                     <div class="day-number">6</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#f59e0b"></span> Depoimento Cliente</div>
+                    <div class="calendar-event"><span class="event-status" style="background:#f59e0b"></span> Prova de Estrutura</div>
                 </div>
-                <div class="calendar-day"><div class="day-number">7</div></div>
+                <div class="calendar-day">
+                    <div class="day-number">7</div>
+                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Conteúdo Institucional</div>
+                </div>
                 <div class="calendar-day"><div class="day-number">8</div></div>
                 <div class="calendar-day"><div class="day-number">9</div></div>
                 <div class="calendar-day"><div class="day-number">10</div></div>
@@ -495,6 +498,7 @@
             </div>
             
             <style>
+                input[type="date"]::-webkit-calendar-picker-indicator { filter: invert(1); opacity: 0.7; }
                 .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
                 .calendar-day { background: var(--os-surface); border: 1px solid var(--os-border); border-radius: 8px; min-height: 100px; padding: 10px; position: relative; display: flex; flex-direction: column; gap: 5px; }
                 .calendar-day.empty { opacity: 0.1; background: transparent; }
@@ -662,12 +666,21 @@
                 const proj = mockProjects.find(p => p.id === projectId);
                 
                 if (proj) {
-                    document.getElementById('dual-client-name').innerText = (proj.company_name || proj.name).split(' ')[0].toUpperCase();
+                    companyNameStr = (proj.company_name || proj.name).split(' ')[0].toUpperCase();
                     const profession = proj.metadata?.onboarding?.profession || proj.segment || 'Estratégia Institucional';
                     document.getElementById('client-profession').innerText = profession.toUpperCase();
-                } else {
-                    document.getElementById('dual-client-name').innerText = 'CLIENTE';
                 }
+            }
+            
+            if (session.role === 'CLIENT' && session.full_name) {
+                document.getElementById('dual-client-name').textContent = session.full_name.toUpperCase();
+            } else if (session.role === 'CLIENT') {
+                const headerContainer = document.getElementById('portal-header-title-container');
+                if (headerContainer) {
+                    headerContainer.innerHTML = '<div style="font-weight:900; font-size:1.5rem; color:#fff; letter-spacing: 2px;">PORTAL DO CLIENTE</div>';
+                }
+            } else {
+                document.getElementById('dual-client-name').textContent = companyNameStr;
             }
             
             // Renderizar Dados Fakes de Exemplo (ou reais no futuro)
@@ -682,33 +695,73 @@
         
         function openDemandaModal() {
             const select = document.getElementById('demanda-tipo');
-            if (select && window.mockCatalogoServicos) {
+            if (select) {
                 select.replaceChildren();
                 const defaultOpt = document.createElement('option');
                 defaultOpt.value = '';
-                defaultOpt.textContent = 'Selecione o Tipo de Solicitação...';
+                defaultOpt.textContent = 'Selecione o serviço desejado...';
                 select.appendChild(defaultOpt);
 
-                const normalOpt = document.createElement('option');
-                normalOpt.value = 'DEMANDA_NORMAL';
-                normalOpt.textContent = 'Demanda Regular (Inclusa no Plano/Contrato)';
-                select.appendChild(normalOpt);
+                const groups = {
+                    'Estratégia e Conteúdo': [
+                        {val: 'plan_estrategico', text: 'Planejamento Estratégico Avulso'},
+                        {val: 'pacote_reels', text: 'Pacote Extra de Reels'},
+                        {val: 'pacote_carrosseis', text: 'Pacote Extra de Carrosséis'},
+                        {val: 'roteiro_video', text: 'Roteiro para Vídeo/Reels'},
+                        {val: 'legendas_estrategicas', text: 'Legendas Estratégicas'},
+                        {val: 'calendario_editorial', text: 'Calendário Editorial Extra'}
+                    ],
+                    'Design e Marca': [
+                        {val: 'peca_institucional', text: 'Peça Institucional Avulsa'},
+                        {val: 'apresentacao_comercial', text: 'Apresentação Comercial'},
+                        {val: 'identidade_visual', text: 'Identidade Visual'},
+                        {val: 'ajuste_marca', text: 'Ajuste ou Padronização de Marca'},
+                        {val: 'material_grafico_evento', text: 'Material Gráfico para Evento'}
+                    ],
+                    'Site e Conversão': [
+                        {val: 'criacao_landing_page', text: 'Criação de Landing Page'},
+                        {val: 'pagina_institucional', text: 'Página Institucional'},
+                        {val: 'pagina_captura', text: 'Página de Captura'},
+                        {val: 'ajuste_site', text: 'Ajuste em Site Existente'},
+                        {val: 'formulario_diagnostico', text: 'Formulário ou Página de Diagnóstico'}
+                    ],
+                    'Tráfego e Aquisição': [
+                        {val: 'campanha_trafego', text: 'Campanha de Tráfego Pago'},
+                        {val: 'criativos_anuncios', text: 'Criativos para Anúncios'},
+                        {val: 'configuracao_meta_ads', text: 'Configuração de Meta Ads'},
+                        {val: 'otimizacao_campanha', text: 'Otimização de Campanha'},
+                        {val: 'relatorio_performance', text: 'Relatório Extra de Performance'}
+                    ],
+                    'CRM, Automação e IA': [
+                        {val: 'automacao_atendimento', text: 'Automação de Atendimento'},
+                        {val: 'crm_pipeline', text: 'CRM e Pipeline Comercial'},
+                        {val: 'integracao_whatsapp', text: 'Integração com WhatsApp'},
+                        {val: 'fluxo_captacao_leads', text: 'Fluxo de Captação de Leads'},
+                        {val: 'agente_ia', text: 'Agente de IA Personalizado'}
+                    ],
+                    'Captação e Produção': [
+                        {val: 'captacao_conteudo', text: 'Captação de Conteúdo'},
+                        {val: 'ensaio_fotografico', text: 'Ensaio Fotográfico Corporativo'},
+                        {val: 'cobertura_evento', text: 'Cobertura de Evento'},
+                        {val: 'edicao_video_avulsa', text: 'Edição de Vídeo Avulsa'},
+                        {val: 'banco_imagens_videos', text: 'Banco de Imagens/Vídeos'}
+                    ],
+                    'Outros Serviços (Serviços extras sob orçamento)': [
+                        {val: 'outro_servico', text: 'Outro Serviço Personalizado'}
+                    ]
+                };
 
-                const optGroup = document.createElement('optgroup');
-                optGroup.label = 'Serviços Extras (Avulsos - Faturamento Adicional)';
-                window.mockCatalogoServicos.filter(s => s.permite_orcamento).forEach(s => {
-                    const opt = document.createElement('option');
-                    opt.value = s.servico_id;
-                    opt.textContent = s.nome_servico;
-                    optGroup.appendChild(opt);
-                });
-                
-                const customOpt = document.createElement('option');
-                customOpt.value = 'SRV_EXTRA_CUSTOM';
-                customOpt.textContent = 'Outro Serviço Extra Customizado';
-                optGroup.appendChild(customOpt);
-                
-                select.appendChild(optGroup);
+                for (const [groupName, options] of Object.entries(groups)) {
+                    const optGroup = document.createElement('optgroup');
+                    optGroup.label = groupName;
+                    options.forEach(optData => {
+                        const opt = document.createElement('option');
+                        opt.value = optData.val;
+                        opt.textContent = optData.text;
+                        optGroup.appendChild(opt);
+                    });
+                    select.appendChild(optGroup);
+                }
             }
             document.getElementById('modal-demanda').style.display = 'flex';
         }
@@ -760,10 +813,14 @@
             btn.appendChild(document.createTextNode(' ENVIANDO...'));
             btn.disabled = true;
 
-            const isExtra = demandaTipo !== 'DEMANDA_NORMAL';
-            const logAction = isExtra ? 'EXTRA_SERVICE_REQUESTED' : 'DEMAND_SUBMITTED';
-            const category = isExtra ? 'servicos_extras' : 'demandas';
-            const targetStatus = isExtra ? 'solicitado' : 'nova';
+            const demandaSelect = document.getElementById('demanda-tipo');
+            const demandaTipoVal = demandaSelect?.value || "";
+            const demandaTipoText = demandaSelect?.options[demandaSelect.selectedIndex]?.text || "";
+
+            const isExtra = true;
+            const logAction = 'EXTRA_SERVICE_REQUESTED';
+            const category = 'servicos_extras';
+            const targetStatus = 'solicitado';
 
             const payload = {
                 demanda_id: "", // camada central gera se vazio
@@ -771,6 +828,8 @@
                 client_name: tempClientNome,
                 origem: "portal_cliente",
                 tipo_demanda: "SERVICO_EXTRA",
+                servico_extra_tipo: demandaTipoVal,
+                servico_extra_nome: demandaTipoText,
                 titulo: demandaTitulo,
                 descricao: demandaDesc,
                 prioridade: document.getElementById('demanda-prioridade')?.value || "media",
