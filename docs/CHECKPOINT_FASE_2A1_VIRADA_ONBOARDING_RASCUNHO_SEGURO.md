@@ -27,7 +27,15 @@ O `webhook-dispatcher.js` da Edge Function moderna **não** é utilizado neste f
 *   **Risco Supabase/Auth/IA:** Não houve nenhum trigger a estes ecossistemas (conforme previsto pelo blueprint Fase 2A).
 
 ## 5. Limpeza de Base
-**Pendência:** O Administrador deve executar a limpeza (exclusão das linhas nas 6 abas do Google Sheets) para o cliente `CANARY_ONBOARDING_FASE2A1_2026_06_001` (provavelmente via AuditoriaFluxAISheets.gs).
+A limpeza foi processada com sucesso. As linhas do cliente fake `CANARY_ONBOARDING_FASE2A1_2026_06_001` foram removidas das seguintes 6 abas estratégicas:
+- 01_CLIENTES_ESTRATEGIA
+- 04_CLIENTES_CONFIG
+- 03_SERVICOS_CLIENTES
+- 02_CONTRATOS_CLIENTES
+- 11_DNA_CLIENTE_GPT
+- CLIENTES_ARQUIVOS
+
+**Validação de Ausência:** O client_id não existe mais em nenhuma das 6 abas. Base operacional limpa e isolada.
 
 ## 6. Parecer Final
-A Fase 2A.1 está **liberada para operação assistida**. A Rota 09 foi migrada e protegida contra perda de caracteres UTF-8 e contra exposição de credencial na Vercel.
+A Fase 2A.1 está oficialmente **CONCLUÍDA**. A Rota 09 foi migrada e protegida contra perda de caracteres UTF-8 e exposição de credenciais. Todos os testes de segurança e duplicidade passaram.
