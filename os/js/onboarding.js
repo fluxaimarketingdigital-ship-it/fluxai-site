@@ -279,6 +279,102 @@ window.handleOnboarding = async function(e) {
             dia_vencimento: raw.payment_day || "",
             metodo_pagamento: raw.finance_payment_method || "",
             data_inicio: raw.finance_start_date || new Date().toISOString().split('T')[0],
+            ciclo_fidelidade: raw.finance_min_duration || ""
+        },
+        camada_ativacao: {
+            status_acesso: "nao_criado",
+            ia_bloqueada: true,
+            prioridade_30d: raw.priority_30d || "",
+            primeira_entrega: raw.first_delivery || ""
+        }
+    };
+
+    console.log('ONBOARDING_PAYLOAD_PREVIEW (FASE 2A)', webhookPayload);
+
+    let makeSuccess = false;
+    const alertContainer = document.querySelector('#step-7 .form-section');
+
+    try {
+        // Disparo para o Make via Proxy Oficial (ROTA 09)
+        const makeRes = await MakeClient.sendPost(ROTAS_OS_MAKE['ROTA_OS_09_ONBOARDING'], webhookPayload);
+        
+        if (makeRes.success) {
+            makeSuccess = true;
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.userAction('ONBOARDING_OFFICIAL_SUCCESS', webhookPayload, false);
+            }
+
+            const overlay = document.getElementById('deploy-overlay');
+            const deployBar = document.getElementById('deploy-bar');
+            const deployLogs = document.getElementById('deploy-logs');
+            
+            if (overlay) overlay.style.display = 'flex';
+
+            const logMessages = [
+                { progress: 10, text: `> [SISTEMA] Iniciando requisição segura para o Make (Fase 2A)...` },
+                { progress: 25, text: `> [SANEAMENTO] Bloqueando criação de usuário e permissões no Supabase.` },
+                { progress: 40, text: `> [WORKFLOW] Payload dividido em 7 camadas. ID Gerado: ${projectId}` },
+                { progress: 55, text: `> [WORKFLOW] Cliente classificado como 'em_onboarding'.` },
+                { progress: 70, text: `> [WORKFLOW] Contrato submetido como 'rascunho'.` },
+                { progress: 85, text: `> [WORKFLOW] Inteligência Artificial permanece 'bloqueada'.` },
+                { progress: 95, text: `> [PROXY] Resposta 200 OK do Make. Camadas registradas com sucesso!` },
+                { progress: 100, text: `> [SISTEMA] Onboarding enviado! Confirme a gravação das 7 planilhas.` }
+            ];
+
+            const runLogs = async () => {
+                for (let i = 0; i < logMessages.length; i++) {
+                    await new Promise(res => setTimeout(res, 400));
+                    if (deployBar) deployBar.style.width = `${logMessages[i].progress}%`;
+                    if (deployLogs) {
+                        deployLogs.innerHTML += `<br/>${logMessages[i].text}`;
+                        deployLogs.scrollTop = deployLogs.scrollHeight;
+                    }
+                }
+            };
+
+            await runLogs();
+            setTimeout(() => {
+                alert('Onboarding enviado ao Make. Valide o cenário 09.');
+                window.location.href = 'command-center.html';
+            }, 500);
+
+        } else {
+            console.warn('[ONBOARDING] Falha no Make ou cliente duplicado:', makeRes);
+            if (typeof OS_LOGS_ENGINE !== 'undefined') {
+                OS_LOGS_ENGINE.userAction('ONBOARDING_MAKE_DISPATCH_FAILED', { response: makeRes }, false);
+            }
+            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> FALHA NO ENVIO AO MAKE';
+            btn.style.background = '#ef4444';
+            btn.disabled = false;
+            
+            const alertHtml = `
+                <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 8px; margin-top: 20px; color: #fca5a5;">
+                    <strong>🚨 ERRO DE VALIDAÇÃO NO MAKE</strong><br/>
+                    O Make bloqueou o registro ou não respondeu. Detalhe: ${makeRes.data?.status || 'Erro interno'}.<br/>
+                    Verifique se o cliente já existe ou revise o histórico do webhook 09.
+                </div>
+            `;
+            alertContainer.insertAdjacentHTML('beforeend', alertHtml);
+        }
+
+    } catch (err) {
+        console.warn('[ONBOARDING] Exceção crítica:', err);
+        if (typeof OS_LOGS_ENGINE !== 'undefined') {
+            OS_LOGS_ENGINE.userAction('ONBOARDING_TOTAL_FAILURE', { error: err.message }, false);
+        }
+        btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERRO CRÍTICO';
+        btn.style.background = '#ef4444';
+        btn.disabled = false;
+        
+        const alertHtml = `
+            <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 8px; margin-top: 20px; color: #fca5a5;">
+                <strong>🚨 FALHA NA CONEXÃO COM O PROXY</strong><br/>
+                Erro de rede ou proxy inacessível. O onboarding não prosseguiu.
+            </div>
+        `;
+        alertContainer.insertAdjacentHTML('beforeend', alertHtml);
+    }
+}
 
 function generatePautasTemplates(projId, raw) {
     const segmentLabel = raw.segment || "SAUDE";
