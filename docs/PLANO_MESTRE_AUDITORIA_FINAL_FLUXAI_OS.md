@@ -13,9 +13,9 @@ Este documento rastreia a evolução, testes e liberação para produção dos m
 *   **Ação:** Varredura *Read-Only* de todos os Blueprints JSON contra os schemas JSON reais da planilha no Google Sheets.
 *   **Resultado:** Mapeamento completo. Confirmada a obsolescência de nomes de abas nos cenários 03 a 08 e identificado risco financeiro autônomo na Rota 10. Documento `AUDITORIA_CRUZADA_PLANILHA_MAKE_BLUEPRINTS.md` gerado.
 
-### [~] PACOTE SEGURO 02 — Saneamento Documental e Preparação da Virada
+### [x] PACOTE SEGURO 02 — Saneamento Documental e Preparação da Virada
 *   **Ação:** Estruturação dos planos de mitigação e refinamento narrativo da UI sem quebras de código.
-*   **Status:** Em execução. Checklists de virada criados. Textos de ativação mitigados para controle humano.
+*   **Status:** Concluído. Checklists de virada criados. Textos de ativação mitigados para controle humano.
 
 ---
 
@@ -27,10 +27,10 @@ Este documento rastreia a evolução, testes e liberação para produção dos m
     *   Rotação/Inserção do Webhook definitivo do cenário V6/V7 no Vercel/Supabase Secret.
 *   **Status:** Concluído. Testes Canary executados, payload em UTF-8 forçado com sucesso e duplicidades bloqueadas. Produção controlada liberada.
 
-### [ ] Cenários 03 a 08 — Remapeamento pendente
+### [x] PACOTE SEGURO 03 — Remapeamento dos Cenários 03 a 08
 *   **Problema:** Estes cenários de monitoramento (Daily, Meta, Relatórios) usam os nomes antigos das abas (`CLIENTES_CONFIG`, `SERVICOS_CLIENTES`, `GA4_DIARIO`).
 *   **Ação:** Refazer o mapping visual de cada aba nos módulos do Make.co.
-*   **Status da Produção:** Bloqueada. Relatórios/métricas não podem rodar em ambiente real até a reconfiguração.
+*   **Status da Produção:** Concluído e homologado visualmente no Make. A execução real permanece bloqueada aguardando simulação com cliente interno FluxAI.
 
 ### [ ] ROTA 10/12 — Teste E2E pendente (Serviços Extras)
 *   **Problema:** O botão atual do portal dispara para a `ROTA 01`. Além disso, a `ROTA 10` oficial no Make realiza escrita no Supabase e na aba Financeira.
