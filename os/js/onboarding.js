@@ -254,7 +254,7 @@ window.handleOnboarding = async function(e) {
             whatsapp_comercial: raw.whatsapp_comercial || ""
         },
         camada_servicos: {
-            status_servico: "pendente",
+            status_servico: "inativo",
             modulos_contratados: Array.from(formData.getAll('modules')).join(", ") || "",
             servico_extra: raw.finance_extra_services_type || "",
             valor_servico_extra: raw.finance_extra_services_value || ""
