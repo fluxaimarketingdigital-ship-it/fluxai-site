@@ -15,6 +15,7 @@ export default async function handler(req, res) {
   const allowedRoutes = {
     'ROTA_OS_01_PORTAL_DEMANDAS': process.env.MAKE_WEBHOOK_ROTA_OS_01_PORTAL_DEMANDAS,
     'ROTA_OS_02_LEADS_SITE': process.env.MAKE_WEBHOOK_ROTA_OS_02_LEADS_SITE,
+    'ROTA_OS_09_ONBOARDING': process.env.MAKE_WEBHOOK_ROTA_OS_09_ONBOARDING,
     'ROTA_OS_14_ARQUIVOS': process.env.MAKE_WEBHOOK_ROTA_OS_14_ARQUIVOS
   };
 

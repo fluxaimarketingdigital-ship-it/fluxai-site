@@ -21,11 +21,11 @@ Este documento rastreia a evolução, testes e liberação para produção dos m
 
 ## Marcos Operacionais e Funcionalidades
 
-### [~] Fase 2A.1 — Virada Onboarding Rascunho Seguro
+### [x] Fase 2A.1 — Virada Onboarding Rascunho Seguro
 *   **Dependências:** 
     *   Correção de UTF-8 no envio do payload.
     *   Rotação/Inserção do Webhook definitivo do cenário V6/V7 no Vercel/Supabase Secret.
-*   **Status:** Testes técnicos (Make Rascunho) validados. Preparado para a ativação final no ambiente real.
+*   **Status:** Concluído. Testes Canary executados, payload em UTF-8 forçado com sucesso e duplicidades bloqueadas. Produção controlada liberada.
 
 ### [ ] Cenários 03 a 08 — Remapeamento pendente
 *   **Problema:** Estes cenários de monitoramento (Daily, Meta, Relatórios) usam os nomes antigos das abas (`CLIENTES_CONFIG`, `SERVICOS_CLIENTES`, `GA4_DIARIO`).

@@ -67,7 +67,10 @@ export const MakeClient = {
         try {
             const response = await fetch(targetUrl, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json; charset=utf-8',
+                    'Accept': 'application/json'
+                },
                 body: finalBody
             });
 
