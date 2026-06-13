@@ -21,9 +21,14 @@ Antes de qualquer "Run Once", é OBRIGATÓRIO confirmar se todas essas condiçõ
 ## 🚫 CENÁRIOS NÃO APLICÁVEIS / BLOQUEADOS
 
 ### `03_FLUXAI_INSTAGRAM_MANUAL_READER_REMAPEADO_TESTE`
-*   **Status:** NÃO APLICÁVEL TEMPORARIAMENTE
-*   **Motivo:** Ausência de cliente ativo com `modo_coleta = manual` (O cliente `FLUXAI_LABS_001` utiliza coleta API/Meta).
-*   **Run Once:** NÃO EXECUTADO
+*   **Status:** NÃO APLICÁVEL TEMPORARIAMENTE (Bloqueado)
+*   **Motivo:** A linha de `modo_coleta = manual` da `FLUXAI_LABS_001` está propositalmente isolada em status `teste_bloqueado` com `uso_operacional = teste`.
+*   **Como Destravar (Apenas para Homologação Futura):**
+    1. Alterar `status_servico` para `ativo_teste`.
+    2. Alterar `status_validacao` para `em_teste`.
+    3. Manter `relatorio_incluir` como `nao`.
+    4. Garantir que os filtros no Make busquem exclusivamente o modo_coleta manual.
+*   **Run Once:** NÃO EXECUTADO ATÉ A ATIVAÇÃO MANUAL DE TESTE.
 
 ---
 
@@ -86,7 +91,19 @@ Antes de qualquer "Run Once", é OBRIGATÓRIO confirmar se todas essas condiçõ
 
 ### 4. 07_FLUXAI_RELATORIO_MENSAL_REMAPEADO_TESTE (ÚLTIMO)
 
-**🔒 Regra de Segurança Máxima:**
-Qualquer módulo de *e-mail, WhatsApp, notificação, webhook externo, ou envio ao cliente* deve estar **fisicamente desabilitado, desconectado ou bloqueado por filtro impossível** na cópia de teste (`1 = 2`, por exemplo).
-- [ ] Critério de Gate: `Notificou cliente externo = NÃO`
-*(Uma falha neste gate implica o bloqueio total do Pacote 04)*
+**🔒 Regras de Segurança e Preparação (Checklist Técnico):**
+A arquitetura do blueprint atual não apresentou módulos nativos de disparo. No entanto, é OBRIGATÓRIA a inspeção visual na UI do Make antes do teste, garantindo o bloqueio total.
+
+- [ ] **Lista Completa de Módulos Inspecionados na UI:** Confirmar se há apenas (Google Sheets: 1, 2, 6, 23, 22 e Router 3).
+- [ ] **Identificação de Envios Externos:** Identificar se algum módulo de `Email`, `Gmail`, `WhatsApp`, `Slack` ou `Webhook (HTTP)` foi adicionado à cópia de teste.
+- [ ] **Procedimento de Bloqueio Físico (Caso exista módulo de envio):** 
+    1. Desconectar o módulo fisicamente na UI; ou 
+    2. Adicionar um filtro impossível (Ex: Condição `1 = 2`) na rota que leva ao módulo de envio.
+- [ ] **Abas Lidas:** `04_CLIENTES_CONFIG`, `03_SERVICOS_CLIENTES` e `23_INSTAGRAM_DIARIO`.
+- [ ] **Aba de Destino:** `29_ANALISE_MENSAL_CLIENTE`.
+- [ ] **Cliente Utilizado:** `FLUXAI_LABS_001`.
+- [ ] **Período do Relatório:** Validar se a data consultada no Make condiz com o mês em vigor (somente teste interno).
+- [ ] **Schedule OFF:** Confirmado.
+- [ ] **Garantia de Isolamento:** Nenhum cliente externo será notificado. O relatório será gravado estritamente de forma silenciosa na aba.
+
+*(Não executar o Cenário 07 automaticamente. Aguardar inspeção visual e autorização manual na UI do Make)*

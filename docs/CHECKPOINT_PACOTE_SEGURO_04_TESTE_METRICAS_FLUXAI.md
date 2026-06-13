@@ -7,7 +7,7 @@
 
 ### 1. `03_FLUXAI_INSTAGRAM_MANUAL_READER`
 *   **Status:** `NÃO_APLICÁVEL TEMPORARIAMENTE`
-*   **Motivo:** Ausência de cliente manual homologado para esse teste nas condições iniciais (A `FLUXAI_LABS_001` atua via API).
+*   **Motivo:** A linha de `modo_coleta = manual` da `FLUXAI_LABS_001` foi inserida como *fallback/contingência*, mas está com `status_servico = teste_bloqueado`. Apenas após a ativação temporária manual dessa chave (via UI) esse cenário poderá ser testado.
 
 ### 2. `04_FLUXAI_CONTENT_INTELLIGENCE_REMAPEADO_TESTE`
 *   **Status:** `BLOQUEADO PARA REESTRUTURAÇÃO DA UI`
