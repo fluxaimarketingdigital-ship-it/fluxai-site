@@ -1,37 +1,43 @@
-# CHECKPOINT FINAL — PACOTE SEGURO 04 (PARCIAL: CENÁRIO 06)
+# CHECKPOINT FINAL — PACOTE SEGURO 04 (CONSOLIDADO DE METRICAS E MONITORAMENTO)
 
-**Data da Validação:** 12/06/2026
-**Responsável Operacional:** Administrador
+**Data da Atualização:** 13/06/2026
 **Ambiente:** Make.com (Run Once) / Planilha Google Sheets
 
-## 📊 Status Consolidado dos Cenários (Pacote 04)
+## 📊 Status Consolidado dos Cenários
 
-### 1. `06_FLUXAI_META_SYNC_REMAPEADO_TESTE`
-*   **Status Geral:** `HOMOLOGADO PARA O ESTADO SEM CAMPANHAS`
-*   **Aba `23_INSTAGRAM_DIARIO`:** 
-    *   **Status:** APROVADO.
-    *   **Validação:** Gravadas linhas limpas e idempotentes para `profile` e `insights`. Nenhuma duplicação (chave ajustada para `client_id + date + tipo_coleta`).
-*   **Aba `26_META_ADS_DIARIO` (Rota Sem Campanhas - Módulo 30):** 
-    *   **Status:** APROVADO.
-    *   **Validação:** Filtro `length(6.Data) = 0` funcionando. Linha com métricas zeradas e `meta_ads_status_200_sem_dados` escrita perfeitamente. Linha vazia/fantasma foi exterminada após a correção dos filtros no Router 29.
-*   **Aba `26_META_ADS_DIARIO` (Rota Com Campanhas Reais - Módulo 8):** 
-    *   **Status:** CONFIGURADA, MAS NÃO HOMOLOGADA POR AUSÊNCIA DE CAMPANHAS.
-    *   **Validação:** A rota `length(6.Data) > 0` que passa pelo `Iterator 7` até desaguar no `Google Sheets 8` está fisicamente configurada e mapeada, mas não pode ser homologada até que ocorra uma sincronização com campanhas ativas. 
+### 1. `03_FLUXAI_INSTAGRAM_MANUAL_READER`
+*   **Status:** `NÃO_APLICÁVEL TEMPORARIAMENTE`
+*   **Motivo:** Ausência de cliente manual homologado para esse teste nas condições iniciais (A `FLUXAI_LABS_001` atua via API).
 
-### 2. `03_FLUXAI_INSTAGRAM_MANUAL_READER`
-*   **Status Geral:** `NÃO_APLICÁVEL TEMPORARIAMENTE`
-*   **Motivo:** Este cenário só aceita clientes com `modo_coleta = manual`. Como a `FLUXAI_LABS_001` atua via API/Meta, o teste deste cenário está suspenso até encontrarmos um cliente compatível. Filtros hardcoded como `EXECUTA_GROUP_003` devem ser ignorados.
+### 2. `04_FLUXAI_CONTENT_INTELLIGENCE_REMAPEADO_TESTE`
+*   **Status:** `BLOQUEADO PARA REESTRUTURAÇÃO DA UI`
+*   **Histórico:** Destino legado `INSIGHTS_CONTEUDO` foi expurgado. Aba oficial `31_INSIGHTS_CONTEUDO` criada com dicionário/governança definidos. Roteamento manual/API documentado.
+*   **Pendente:** Aguarda implementação da arquitetura do Router Primário na UI do Make.
 
----
+### 3. `05_FLUXAI_DAILY_SYNC_REMAPEADO_TESTE`
+*   **Status Geral:** `APROVADO PARCIALMENTE`
+*   **GA4:** `HOMOLOGADO` (Dados gravados em `20_GA4_DIARIO`).
+*   **Search Console:** `HOMOLOGADO` (Conexão e consulta operacionais, aba permaneceu vazia por ausência real de dados no período - retorno sem bundles).
+*   **Clarity:** `FALLBACK HOMOLOGADO` (Rota salva como status 200 sem parse. Parse de métricas reais pendente na aba `22_CLARITY_DIARIO`).
+*   **Consolidado Diário:** `BLOQUEADO PARA REESTRUTURAÇÃO`. Módulo de gravação prematura removido; não recolocar até fechar a consolidação final das abas brutas.
 
-## 🔒 Restrições e Bloqueios Mantidos (Governança)
+### 4. `06_FLUXAI_META_SYNC_REMAPEADO_TESTE`
+*   **Status:** `HOMOLOGADO PARA O ESTADO SEM CAMPANHAS`
+*   **Validado:** Instagram Profile e Insights. Meta Ads sem campanhas (Módulo 30).
+*   **Pendente:** Meta Ads com campanhas reais (Módulo 8 mantido e configurado, mas aguarda dados reais). Linha fantasma extinta. Chave de idempotência recomendada confirmada.
 
-1.  **Módulo 8:** O `Add Row` de Campanhas Reais do cenário 06 (Módulo 8) está mantido e deve continuar sendo o destino das ramificações com dados válidos, jamais sendo excluído.
-2.  **Módulo 30:** O `Add Row` Sem Campanhas do cenário 06 atende de forma unânime e exclusiva o fallback `length = 0`.
-3.  **Token Meta:** O token original e todos os resquícios dele foram irrevogavelmente expurgados dos nossos *blueprints* e histórico do Git na fase anterior. Ele não existe aqui. A planilha sustenta apenas `[PROTEGIDO_NO_MAKE]`.
-4.  **Cenário 05 (`05_FLUXAI_DAILY_SYNC`):** Encontra-se **BLOQUEADO**. Seu Checklist já está no Roteiro, mas o aval para execução está pendente.
-5.  **Schedules Ativos:** **DESLIGADOS**. É expressamente proibido ligar a automação recorrente sem as devidas homologações.
-6.  **Fuso Horário (Google Sheets):** Pendente de ação externa (Administrador) para alterar as propriedades da planilha matriz de `America/Los_Angeles` para `America/Bahia` visando não corromper datas na reativação do painel.
+### 5. `08_FLUXAI_CLIENT_STATUS_MONITOR_REMAPEADO_TESTE`
+*   **Status:** `HOMOLOGADO FUNCIONALMENTE`
+*   **Validado:** 26 operações executadas gravando 11 linhas em `STATUS_MONITOR_DIARIO` sem mistura de clientes ou duplicidade. 
+*   **Chave de Idempotência Fixada:** `date(data_verificacao) + cliente_id + rota_id`
+*   **Executa Group:** O status `manual_ativo` gerado está **CORRETO** sob a condição transitória (Modo atual: manual, Serviço: ativo, Token: aguardando_autorizacao Meta, Migração API futura). **NÃO é erro** ou inconsistência. Não apagar as rotas ativas da Executa sem auditoria de dependências.
+*   **FluxAI Labs:** Rotas API e Webhooks detectadas perfeitamente.
 
----
-*Este documento atesta as diretrizes validadas após correção do falso negativo das abas 23 e 26, garantindo alinhamento e documentação segura no framework FluxAI OS.*
+## 📌 Ajustes Documentais & Governança (Cenário 08)
+1.  **Nomes das Abas de Destino (`aba_destino`):** Observou-se o registro de nomes legados (sem os prefixos numéricos, ex: `GA4_DIARIO`). **Regra:** Não alterar rotas automaticamente no Make por causa do nome na coluna de monitoramento; a fonte oficial deve ser checada e consertada em `05_ROTAS_AUTOMACOES` na planilha.
+2.  **Semântica de Configuração (`status_config`):** A leitura de "preencher depois" para a FluxAI (onde a integração já opera) indica que a coluna `status_config` na aba `04_CLIENTES_CONFIG` está fisicamente desatualizada. O cenário está lendo o valor literal que consta lá. Recomenda-se atualização manual do registro.
+
+## 🔒 Próximo Passo: Cenário 07
+O `07_FLUXAI_RELATORIO_MENSAL_REMAPEADO_TESTE` é o último deste pacote.
+*   **Ação:** O checklist técnico ultrarrígido exigindo o bloqueio explícito de Módulos de Envio Externos (Email/WhatsApp/Webhook) foi injetado no Roteiro.
+*   **Gate:** O cenário NÃO SERÁ executado até uma inspeção física da UI e a sua autorização final. O Schedule de todos os cenários permanece OFF.
