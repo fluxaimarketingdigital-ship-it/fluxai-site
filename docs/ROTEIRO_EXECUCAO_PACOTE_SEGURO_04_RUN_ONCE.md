@@ -27,6 +27,16 @@ Antes de qualquer "Run Once", é OBRIGATÓRIO confirmar se todas essas condiçõ
 
 ---
 
+### `04_FLUXAI_CONTENT_INTELLIGENCE_REMAPEADO_TESTE`
+*   **Status:** BLOQUEADO TEMPORARIAMENTE
+*   **Motivo:** Erro `400 INVALID_ARGUMENT` devido ao destino legado `INSIGHTS_CONTEUDO` e incompatibilidade do modo_coleta API com a antiga Rota Manual.
+*   **Ação Pendente (Admin):** Reestruturar a arquitetura na UI do Make com um Router Primário:
+    *   **Rota Manual:** Lê de `25_INSTAGRAM_CONTEUDO_MANUAL` ➔ Grava em `31_INSIGHTS_CONTEUDO`
+    *   **Rota API:** Lê via Meta API ➔ Grava em `31_INSIGHTS_CONTEUDO`
+*   **Run Once:** NÃO EXECUTAR até a arquitetura estar 100% refletida no Make.
+
+---
+
 ## ✅ CENÁRIOS CONCLUÍDOS / HOMOLOGADOS
 
 ### `06_FLUXAI_META_SYNC_REMAPEADO_TESTE`
@@ -69,16 +79,7 @@ Antes de qualquer "Run Once", é OBRIGATÓRIO confirmar se todas essas condiçõ
 | **Duplicações (Sim/Não):** | |
 | **Mistura de client_id (Sim/Não):** | |
 | **Erro de autenticação (Descreva):** | |
-| **Status final:** | |
-
----
-
-### 2. 04_FLUXAI_CONTENT_INTELLIGENCE_REMAPEADO_TESTE
-*(Preenchimento bloqueado. Aguardar conclusão do Cenário 05)*
-
----
-
-### 3. 08_FLUXAI_CLIENT_STATUS_MONITOR_REMAPEADO_TESTE
+### 2. 08_FLUXAI_CLIENT_STATUS_MONITOR_REMAPEADO_TESTE
 *(Preenchimento bloqueado. Aguardar conclusão do Cenário 04)*
 
 ---
