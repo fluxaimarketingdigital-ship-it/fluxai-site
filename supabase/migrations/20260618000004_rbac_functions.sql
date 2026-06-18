@@ -18,3 +18,10 @@ BEGIN
   RETURN v_role;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
+
+-- Restrição de execução (GATE 4E)
+REVOKE EXECUTE ON FUNCTION public.is_active_user(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.is_active_user(uuid) TO authenticated, service_role;
+
+REVOKE EXECUTE ON FUNCTION public.current_user_role(uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.current_user_role(uuid) TO authenticated, service_role;

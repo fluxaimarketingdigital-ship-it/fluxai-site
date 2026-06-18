@@ -1,3 +1,33 @@
--- Rollback de Staging
-DROP SCHEMA public CASCADE;
-CREATE SCHEMA public;
+-- Rollback Controlado de Staging (GATE 4E)
+-- Proibido DISABLE RLS como rollback normal
+-- Proibido GRANT ALL TO PUBLIC
+-- Proibido DROP SCHEMA CASCADE
+
+-- 1. Rollback da 005 (Remover policies e grants de authenticated, mantendo RLS)
+DROP POLICY IF EXISTS "admin_all_contratos" ON public."CONTRATOS_CLIENTES";
+DROP POLICY IF EXISTS "admin_all_dna" ON public."DNA_CLIENTE_GPT";
+DROP POLICY IF EXISTS "admin_all_creditos" ON public."IA_CREDITOS_CLIENTE";
+DROP POLICY IF EXISTS "admin_all_estrategia" ON public."CLIENTES_ESTRATEGIA";
+DROP POLICY IF EXISTS "admin_all_servicos" ON public."SERVICOS_EXTRAS_CLIENTES";
+DROP POLICY IF EXISTS "admin_all_financeiro" ON public."FINANCEIRO_CLIENTES";
+DROP POLICY IF EXISTS "admin_all_demandas" ON public."DEMANDAS_CLIENTES";
+DROP POLICY IF EXISTS "admin_all_comunicacoes" ON public."COMUNICACOES_CLIENTE";
+
+REVOKE ALL ON public."CONTRATOS_CLIENTES" FROM authenticated;
+REVOKE ALL ON public."DNA_CLIENTE_GPT" FROM authenticated;
+REVOKE ALL ON public."IA_CREDITOS_CLIENTE" FROM authenticated;
+REVOKE ALL ON public."CLIENTES_ESTRATEGIA" FROM authenticated;
+REVOKE ALL ON public."SERVICOS_EXTRAS_CLIENTES" FROM authenticated;
+REVOKE ALL ON public."FINANCEIRO_CLIENTES" FROM authenticated;
+REVOKE ALL ON public."DEMANDAS_CLIENTES" FROM authenticated;
+REVOKE ALL ON public."COMUNICACOES_CLIENTE" FROM authenticated;
+
+-- 2. Rollback Destrutivo da 0606 (Somente para Staging vazio e com autorização explícita)
+DROP TABLE IF EXISTS public."CONTRATOS_CLIENTES" CASCADE;
+DROP TABLE IF EXISTS public."DNA_CLIENTE_GPT" CASCADE;
+DROP TABLE IF EXISTS public."IA_CREDITOS_CLIENTE" CASCADE;
+DROP TABLE IF EXISTS public."CLIENTES_ESTRATEGIA" CASCADE;
+DROP TABLE IF EXISTS public."SERVICOS_EXTRAS_CLIENTES" CASCADE;
+DROP TABLE IF EXISTS public."FINANCEIRO_CLIENTES" CASCADE;
+DROP TABLE IF EXISTS public."DEMANDAS_CLIENTES" CASCADE;
+DROP TABLE IF EXISTS public."COMUNICACOES_CLIENTE" CASCADE;
