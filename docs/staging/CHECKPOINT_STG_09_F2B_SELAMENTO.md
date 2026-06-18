@@ -1,0 +1,3 @@
+# CHECKPOINT STG-09 F2B
+MIGRATIONS STG-09 SELADAS E APTAS PARA APLICAÇÃO.
+(Falta apenas aprovação executiva)
