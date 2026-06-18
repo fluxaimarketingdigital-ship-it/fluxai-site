@@ -26,12 +26,36 @@ import { STATUS_SYSTEM, StatusEngine } from './status-system.js';
  * Em desenvolvimento, ativa os mocks locais.
  */
 const _detectEnvironment = () => {
+    if (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.FLUXAI_ENVIRONMENT) {
+        return window.FLUXAI_ENV.FLUXAI_ENVIRONMENT.toUpperCase();
+    }
     if (typeof window === 'undefined') return 'PRODUCTION';
     const host = window.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return 'DEVELOPMENT';
     if (host.includes('staging') || host.includes('preview') || host.includes('vercel.app')) return 'STAGING';
     return 'PRODUCTION';
 };
+
+// [STG-04] FAIL-CLOSED ASSERTIONS
+if (typeof window !== 'undefined') {
+    const env = _detectEnvironment();
+    const subUrl = window.FLUXAI_ENV ? window.FLUXAI_ENV.SUPABASE_URL : '';
+    
+    if (env === 'STAGING') {
+        if (!subUrl || subUrl.includes('mufgwetfhfhhmhowbhjj')) {
+            document.body.innerHTML = '<div style="padding:50px;font-family:sans-serif;color:red;"><h1>🚨 FAIL-CLOSED ATIVADO</h1><p>O ambiente foi detectado como STAGING, mas a URL do Supabase aponta para Produção (mufgwetfhfhhmhowbhjj) ou está ausente. Por medida de segurança (STG-04), a inicialização do OS foi abortada.</p></div>';
+            throw new Error('[FAIL-CLOSED] Abortando inicialização: Risco de cross-contamination detectado.');
+        }
+
+        // [STG-04] AVISO VISUAL DE STAGING (Gate 12)
+        window.addEventListener('DOMContentLoaded', () => {
+            const badge = document.createElement('div');
+            badge.innerHTML = 'STG — AMBIENTE DE STAGING';
+            badge.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:red;color:white;text-align:center;z-index:999999;font-weight:bold;padding:5px;font-family:sans-serif;';
+            document.body.prepend(badge);
+        });
+    }
+}
 
 export const ENVIRONMENT_CONFIG = {
     current: _detectEnvironment(),
@@ -245,8 +269,8 @@ export const WEBHOOK_CONFIG = {
  * Apenas a anon_key é segura para uso público.
  */
 export const SUPABASE_CONFIG = {
-    url:     'https://mufgwetfhfhhmhowbhjj.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI',
+    url:     (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_URL) ? window.FLUXAI_ENV.SUPABASE_URL : 'https://mufgwetfhfhhmhowbhjj.supabase.co',
+    anonKey: (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_ANON_KEY) ? window.FLUXAI_ENV.SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI',
 
     // Tabelas do Supabase
     tables: {
