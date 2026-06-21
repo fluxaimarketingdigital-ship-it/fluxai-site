@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
+  <defs>
+    <style>
+      
+      .bg { fill: #0f172a; }
+      .text-main { fill: #ffffff; font-family: "Inter", Arial, sans-serif; font-weight: 800; }
+      .text-sub { fill: #94a3b8; font-family: "Inter", Arial, sans-serif; font-weight: 400; }
+      .accent-orange { fill: #f86018; }
+      .accent-green { fill: #6b7a45; }
+      .grid-line { stroke: rgba(255,255,255,0.05); stroke-width: 1; }
+      .text-badge { font-family: "Inter", Arial, sans-serif; font-size: 24px; fill: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 4px; }
+    </style>
+    <pattern id="grid" width="120" height="120" patternUnits="userSpaceOnUse">
+      <path d="M 120 0 L 0 0 0 120" fill="none" class="grid-line"/>
+    </pattern>
+  </defs>
+
+  <rect width="1080" height="1440" class="bg"/>
+  <rect width="1080" height="1440" fill="url(#grid)" />
+
+  <!-- Logo na base, discreto -->
+  
+  <text x="984" y="1320" text-anchor="end" class="text-badge">3/5</text>
+  
+  
+      <path d="M 900 200 L 900 1000" stroke="#f86018" stroke-width="4" stroke-dasharray="20 20" />
+      <text x="96" y="550" class="text-main" font-size="60">
+        <tspan x="96" dy="0">Publica&#231;&#227;o sem</tspan>
+        <tspan x="96" dy="80">estrutura de</tspan>
+        <tspan x="96" dy="80">atendimento,</tspan>
+        <tspan x="96" dy="80">dados e convers&#227;o</tspan>
+        <tspan x="96" dy="80">gera resultados</tspan>
+        <tspan x="96" dy="80" fill="#94a3b8">isolados.</tspan>
+      </text>
+    
+</svg>
+
+

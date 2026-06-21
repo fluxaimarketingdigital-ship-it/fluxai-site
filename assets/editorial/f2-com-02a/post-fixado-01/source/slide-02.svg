@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
+  <defs>
+    <style>
+      
+      .bg { fill: #0f172a; }
+      .text-main { fill: #ffffff; font-family: "Inter", Arial, sans-serif; font-weight: 800; }
+      .text-sub { fill: #94a3b8; font-family: "Inter", Arial, sans-serif; font-weight: 400; }
+      .accent-orange { fill: #f86018; }
+      .accent-green { fill: #6b7a45; }
+      .grid-line { stroke: rgba(255,255,255,0.05); stroke-width: 1; }
+      .text-badge { font-family: "Inter", Arial, sans-serif; font-size: 24px; fill: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 4px; }
+    </style>
+    <pattern id="grid" width="120" height="120" patternUnits="userSpaceOnUse">
+      <path d="M 120 0 L 0 0 0 120" fill="none" class="grid-line"/>
+    </pattern>
+  </defs>
+
+  <rect width="1080" height="1440" class="bg"/>
+  <rect width="1080" height="1440" fill="url(#grid)" />
+
+  <!-- Logo na base, discreto -->
+  
+  <text x="984" y="1320" text-anchor="end" class="text-badge">2/5</text>
+  
+  
+      <g fill="none" stroke="#ffffff" stroke-width="2" stroke-dasharray="4 4" opacity="0.15">
+        <rect x="750" y="750" width="120" height="120" />
+        <rect x="750" y="890" width="120" height="120" />
+        <rect x="890" y="750" width="120" height="120" />
+      </g>
+      <text x="96" y="550" class="text-main" font-size="64">
+        <tspan x="96" dy="0">Muitas empresas</tspan>
+        <tspan x="96" dy="80">compram artes</tspan>
+        <tspan x="96" dy="80">esperando que a</tspan>
+        <tspan x="96" dy="80" fill="#f86018">visibilidade</tspan><tspan fill="#ffffff">, por</tspan>
+        <tspan x="96" dy="80">si s&#243;, consolide a</tspan>
+        <tspan x="96" dy="80">opera&#231;&#227;o.</tspan>
+      </text>
+    
+</svg>
+
+
