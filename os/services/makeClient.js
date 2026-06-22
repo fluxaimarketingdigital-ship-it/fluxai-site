@@ -55,13 +55,11 @@ export const MakeClient = {
             payload: payload
         });
 
-        // Fallback for non-proxy routes (if any in the future)
-        if (!routeConfig.use_proxy) {
-            if (!routeConfig.webhook_url) {
-                throw new Error(`Webhook URL ausente para a rota ${routeConfig.rota_id}. Rota não utiliza proxy e não tem URL local.`);
-            }
-            targetUrl = routeConfig.webhook_url;
-            finalBody = JSON.stringify(payload);
+        // [STG-04] Bloqueio preventivo de Bypass. 
+        // O frontend em staging (e futuramente produção) NUNCA disparará fetch direto para hook.make.com
+        if (routeConfig.use_proxy === false) {
+            console.warn(`[STG-BLOCKED] Tentativa de bypass do proxy bloqueada para rota ${routeConfig.rota_id}`);
+            throw new Error(`A rota ${routeConfig.rota_id} solicita conexão direta (use_proxy=false). Isso é proibido pela política de segurança.`);
         }
 
         try {

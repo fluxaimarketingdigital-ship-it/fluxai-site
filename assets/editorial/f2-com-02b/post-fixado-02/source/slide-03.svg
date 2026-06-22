@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1440" width="1080" height="1440">
+  <defs>
+    <linearGradient id="bg03" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#0d1424"/>
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1440" fill="url(#bg03)"/>
+  <!-- Grade sutil -->
+  <g opacity="0.08" stroke="#6b7a45" stroke-width="1" fill="none">
+    <line x1="0" y1="180" x2="1080" y2="180"/>
+    <line x1="0" y1="360" x2="1080" y2="360"/>
+    <line x1="0" y1="540" x2="1080" y2="540"/>
+    <line x1="0" y1="720" x2="1080" y2="720"/>
+    <line x1="0" y1="900" x2="1080" y2="900"/>
+    <line x1="0" y1="1080" x2="1080" y2="1080"/>
+    <line x1="0" y1="1260" x2="1080" y2="1260"/>
+    <line x1="180" y1="0" x2="180" y2="1440"/>
+    <line x1="360" y1="0" x2="360" y2="1440"/>
+    <line x1="540" y1="0" x2="540" y2="1440"/>
+    <line x1="720" y1="0" x2="720" y2="1440"/>
+    <line x1="900" y1="0" x2="900" y2="1440"/>
+  </g>
+  <!-- Numeração -->
+  <text x="96" y="180" font-family="Inter, Arial, sans-serif" font-size="22" fill="#6b7a45" opacity="0.80" letter-spacing="4">3/4</text>
+  <rect x="96" y="194" width="80" height="4" fill="#6b7a45" opacity="0.90" rx="2"/>
+  <!-- COPY — zona segura acima dos grafismos (y < 620) -->
+  <text x="96" y="278" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="700" fill="#f1f5f9" letter-spacing="-1">Ele ajuda a organizar</text>
+  <text x="96" y="346" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="700" fill="#94a3b8">clientes,</text>
+  <text x="96" y="414" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="700" fill="#94a3b8">estrat&#233;gia de conte&#250;do,</text>
+  <text x="96" y="482" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="700" fill="#94a3b8">demandas, dados</text>
+  <text x="96" y="550" font-family="Inter, Arial, sans-serif" font-size="44" font-weight="700" fill="#94a3b8">e relat&#243;rios.</text>
+  <rect x="96" y="576" width="160" height="2" fill="#f86018" opacity="0.55" rx="1"/>
+  <!-- ── ÁREA DOS MÓDULOS: y 640–1350 ── -->
+  <!-- Hub central — mais visível -->
+  <circle cx="540" cy="960" r="28" fill="#f86018" opacity="0.28"/>
+  <circle cx="540" cy="960" r="14" fill="#f86018" opacity="0.65"/>
+  <!-- Linhas de conexão hub → 5 nós — mais espessas e visíveis -->
+  <g stroke="#6b7a45" stroke-width="2" opacity="0.45" fill="none">
+    <line x1="540" y1="960" x2="240" y2="770"/>
+    <line x1="540" y1="960" x2="840" y2="770"/>
+    <line x1="540" y1="960" x2="200" y2="1070"/>
+    <line x1="540" y1="960" x2="880" y2="1070"/>
+    <line x1="540" y1="960" x2="540" y2="700"/>
+  </g>
+  <!-- Módulo 1 (clientes) — hexágono topo — mais visível -->
+  <polygon points="540,645 590,672 590,726 540,753 490,726 490,672" fill="#1e2d45" opacity="0.80" stroke="#6b7a45" stroke-width="2"/>
+  <circle cx="540" cy="699" r="14" fill="#6b7a45" opacity="0.70"/>
+  <!-- Módulo 2 (conteúdo) — retângulo esq-cima — mais visível -->
+  <rect x="158" y="720" width="164" height="100" rx="14" fill="#1e2d45" opacity="0.80" stroke="#6b7a45" stroke-width="2"/>
+  <circle cx="240" cy="770" r="14" fill="#6b7a45" opacity="0.72"/>
+  <!-- Módulo 3 (demandas) — retângulo dir-cima — mais visível -->
+  <rect x="758" y="720" width="164" height="100" rx="14" fill="#1e2d45" opacity="0.80" stroke="#f86018" stroke-width="2"/>
+  <circle cx="840" cy="770" r="14" fill="#f86018" opacity="0.65"/>
+  <!-- Módulo 4 (dados) — retângulo esq-baixo -->
+  <rect x="118" y="1020" width="164" height="100" rx="14" fill="#1e2d45" opacity="0.80" stroke="#6b7a45" stroke-width="2"/>
+  <circle cx="200" cy="1070" r="14" fill="#6b7a45" opacity="0.60"/>
+  <!-- Módulo 5 (relatórios) — retângulo dir-baixo -->
+  <rect x="798" y="1020" width="164" height="100" rx="14" fill="#1e2d45" opacity="0.80" stroke="#6b7a45" stroke-width="2"/>
+  <circle cx="880" cy="1070" r="14" fill="#6b7a45" opacity="0.60"/>
+  <!-- Conexões secundárias entre módulos laterais -->
+  <line x1="322" y1="770" x2="490" y2="699" stroke="#6b7a45" stroke-width="1" opacity="0.22"/>
+  <line x1="758" y1="770" x2="590" y2="699" stroke="#6b7a45" stroke-width="1" opacity="0.22"/>
+</svg>
