@@ -64,9 +64,9 @@ npx serve .
 
 ---
 
-## 🔗 Integração com Make.com
+## 🔗 Integração com Make.com (Proxy Seguro)
 
-O FluxAI OS atua de forma passiva-agressiva com o Make.com. O frontend dispara intenções (POST Webhooks) e o Make orquestra os dados entre Google Sheets, Slack, Meta Ads e CRM.
+O FluxAI OS atua de forma passiva-agressiva com o Make.com. O frontend dispara intenções para os nossos **Edge Functions (Vercel)** na pasta `/api/`, que atuam como um Proxy Seguro (escondendo as URLs reais), e então repassam os dados para os Webhooks do Make. O Make orquestra os dados entre Google Sheets, Slack, Meta Ads e CRM.
 
 Para visualizar o Payload exato necessário para configurar novos Webhooks, acesse a documentação da API fornecida nos manuais de entrega.
 
@@ -85,7 +85,7 @@ O FluxAI OS™ agora atua como uma **interface de comando real** (Command Center
 - Nenhum relatório mensal é enviado automaticamente ao cliente. Eles nascem como `rascunho` e passam por aprovação interna.
 - Clientes com coleta manual geram alertas e pendências operacionais.
 - Rotas pausadas ou com token ausente geram alertas críticos no Command Center.
-- A comunicação futura entre OS e Sheets se dará pelos adapters na pasta `/os/services/`.
+- A comunicação entre o OS e o Make/Sheets ocorre estritamente pelos adaptadores na pasta `/os/services/` (`makeClient.js` e `makeRoutes.js`).
 
 **Fluxo de Novo Cliente (Onboarding):**
 O onboarding não salva mídias (imagens, PDFs) nativamente no banco (Supabase) nesta fase. Tudo funciona via referências do Google Drive para manter o servidor ágil e leve.
