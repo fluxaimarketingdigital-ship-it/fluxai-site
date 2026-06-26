@@ -640,7 +640,7 @@
       <div class="container text-center">
         <span class="section-top-label">A Tese</span>
         <div class="manifesto-content">
-          <h2 class="manifesto-title">Marcas não são construídas com sorte, <br>mas com <strong>arquitetura.</strong></h2>
+          <h2 class="manifesto-title">Marcas não são construídas com sorte,  mas com <strong>arquitetura.</strong></h2>
           <p class="manifesto-text">
             O <strong>FluxAI OS™</strong> é a resposta à fragilidade do marketing comum. <br>
             Construímos uma infraestrutura onde posicionamento, aquisição e inteligência <br>
@@ -702,6 +702,11 @@
                 <textarea id="desafio" name="internal_notes" placeholder="Descreva brevemente seu cenário atual" required></textarea>
               </div>
 
+              <div style="margin-bottom: 15px; display: flex; align-items: start; gap: 10px; text-align: left;">
+                <input type="checkbox" id="aceite_lgpd" name="aceite_lgpd" required style="width:auto; margin-top: 4px;">
+                <label for="aceite_lgpd" style="font-size: 0.85rem; color: #cbd5e1;">Li e aceito a <a href="#" onclick="document.getElementById('privacy-modal').classList.add('active');" style="color: #6b7a45; text-decoration: underline;">Política de Privacidade</a>.</label>
+              </div>
+
               <button type="submit" class="btn btn-primary btn-full">
                 Enviar para avaliação <i class="fa-solid fa-paper-plane"></i>
               </button>
@@ -742,8 +747,8 @@
         </p>
         <div class="footer-social">
           <a href="https://www.instagram.com/fluxai.labs/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" onclick="trackEvent('outbound_click', { button_text: 'Instagram', destination: 'instagram' })"><i class="fa-brands fa-instagram"></i></a>
-          <a href="https://www.linkedin.com/company/112506521" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" onclick="trackEvent('outbound_click', { button_text: 'LinkedIn', destination: 'linkedin' })"><i class="fa-brands fa-linkedin-in"></i></a>
-          <a href="https://facebook.com/fluxaidigital" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://www.linkedin.com/company/fluxai-labs" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" onclick="trackEvent('outbound_click', { button_text: 'LinkedIn', destination: 'linkedin' })"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="https://www.facebook.com/fluxailabs" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
         </div>
       </div>
 
@@ -811,6 +816,7 @@
       // 1. Loader de Analytics Híbrido
       const loadTracking = () => {
         if (trackingLoaded) return;
+        if (localStorage.getItem('lgpd_consent_2026') !== 'true') return;
         trackingLoaded = true;
         // GTM
         (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -826,6 +832,7 @@
             y=l.getElementsByTagName(r)[0];if(y) y.parentNode.insertBefore(t,y);
         })(window, document, "clarity", "script", "n72q8vcl9y");
       };
+      window.loadFluxAITracking = loadTracking;
 
       // Carregar Analytics na 1ª interação ou Fallback de 10s
       let fallbackTimer = setTimeout(loadTracking, 10000);
@@ -843,7 +850,7 @@
         supabaseLoaded = true;
         const script = document.createElement('script');
         script.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.106.2/dist/umd/supabase.min.js";
-        script.integrity = "sha384-4Cjkyy4cE1EgIS0C+Y3xzGmJ2noQFRRU91yKAW8IxtPfVtbQXPMqadSc3sYnjwou";
+        script.integrity = "sha384-nWa0WrJ8Dl90YqhjSU0vNB8IxSO54t6AmEmV83LMTb/Img+Af2MfK7XJE54mwpSR";
         script.crossOrigin = "anonymous";
         script.defer = true;
         document.head.appendChild(script);
@@ -886,7 +893,10 @@
           <p class="lgpd-cookie-banner-text">
               Utilizamos cookies necessários para o funcionamento do site. Leia nossa <a id="openPrivacyLink">Política de Privacidade</a>.
           </p>
-          <button id="lgpd-accept" class="lgpd-cookie-banner-btn">Aceitar e Prosseguir</button>
+          <div style="display: flex; gap: 10px;">
+              <button id="lgpd-reject" class="lgpd-cookie-banner-btn" style="background: transparent; border: 1px solid rgba(255,255,255,0.2);">Recusar</button>
+              <button id="lgpd-accept" class="lgpd-cookie-banner-btn">Aceitar e Prosseguir</button>
+          </div>
       </div>
   </div>
 
@@ -951,6 +961,15 @@
             acceptBtn.addEventListener('click', () => {
                 localStorage.setItem('lgpd_consent_2026', 'true');
                 if (banner) banner.classList.remove('active');
+                if (window.loadFluxAITracking) window.loadFluxAITracking();
+            });
+        }
+
+        const rejectBtn = document.getElementById('lgpd-reject');
+        if (rejectBtn) {
+            rejectBtn.addEventListener('click', () => {
+                localStorage.setItem('lgpd_consent_2026', 'false');
+                if (banner) banner.classList.remove('active');
             });
         }
 
@@ -997,7 +1016,7 @@
                 };
 
                 try {
-                    const response = await fetch('https://mufgwetfhfhhmhowbhjj.supabase.co/functions/v1/make-proxy', {
+                    const response = await fetch('https://rmbxeikejzbcfiooylsd.supabase.co/functions/v1/make-proxy', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

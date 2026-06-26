@@ -42,8 +42,8 @@ if (typeof window !== 'undefined') {
     const subUrl = window.FLUXAI_ENV ? window.FLUXAI_ENV.SUPABASE_URL : '';
     
     if (env === 'STAGING') {
-        if (!subUrl || subUrl.includes('mufgwetfhfhhmhowbhjj')) {
-            document.body.innerHTML = '<div style="padding:50px;font-family:sans-serif;color:red;"><h1>🚨 FAIL-CLOSED ATIVADO</h1><p>O ambiente foi detectado como STAGING, mas a URL do Supabase aponta para Produção (mufgwetfhfhhmhowbhjj) ou está ausente. Por medida de segurança (STG-04), a inicialização do OS foi abortada.</p></div>';
+        if (!subUrl || subUrl.includes('rmbxeikejzbcfiooylsd')) {
+            document.body.innerHTML = '<div style="padding:50px;font-family:sans-serif;color:red;"><h1>🚨 FAIL-CLOSED ATIVADO</h1><p>O ambiente foi detectado como STAGING, mas a URL do Supabase aponta para Produção (rmbxeikejzbcfiooylsd) ou está ausente. Por medida de segurança (STG-04), a inicialização do OS foi abortada.</p></div>';
             throw new Error('[FAIL-CLOSED] Abortando inicialização: Risco de cross-contamination detectado.');
         }
 
@@ -269,7 +269,7 @@ export const WEBHOOK_CONFIG = {
  * Apenas a anon_key é segura para uso público.
  */
 export const SUPABASE_CONFIG = {
-    url:     (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_URL) ? window.FLUXAI_ENV.SUPABASE_URL : 'https://mufgwetfhfhhmhowbhjj.supabase.co',
+    url:     (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_URL) ? window.FLUXAI_ENV.SUPABASE_URL : 'https://rmbxeikejzbcfiooylsd.supabase.co',
     anonKey: (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_ANON_KEY) ? window.FLUXAI_ENV.SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI',
 
     // Tabelas do Supabase

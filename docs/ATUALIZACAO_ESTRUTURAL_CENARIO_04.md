@@ -58,3 +58,33 @@ O cenÃ¡rio 04 deve receber um Router primÃ¡rio logo apÃ³s o filtro inicial do cl
 2. MÃ³dulo HTTP: Make a Request na API da Meta (Endpoint: `instagram_business_id/media` ou similar)
 3. Processamento: Iterators para desmembrar o JSON retornado pela Meta.
 4. MÃ³dulo Google Sheets: Add a Row mapeado para o destino `31_INSIGHTS_CONTEUDO`
+
+
+## 5. Nova Aba API: 32_INSTAGRAM_CONTEUDO_API
+Finalidade: Fonte normalizada de conteúdo por publicação obtido por API. Esta aba serve de entrada primária para o cenário 04 (Rota API) e não deve ser confundida com a 23_INSTAGRAM_DIARIO, que armazena métricas agregadas do perfil.
+
+| Coluna | Tipo | Obrigatório | Descrição |
+| :--- | :--- | :--- | :--- |
+| client_id | Chave (Texto) | Sim | ID único do cliente. |
+| date | Data | Sim | Data de coleta. |
+| content_id | Chave (Texto) | Sim | ID único do post no Meta. |
+| published_at | Data/Hora | Não | Data oficial da publicação na rede. |
+| origem_dados | Enum | Sim | Fonte (ex: api). |
+| tipo_conteudo | Texto | Não | Tipo de mídia retornado pela API. |
+| formato | Enum | Sim | reels, carrossel, imagem, etc. |
+| permalink | URL | Não | Link direto para o post. |
+| caption_resumo | Texto | Não | Legenda extraída. |
+| reach | Numérico | Não | Contas alcançadas. |
+| impressions | Numérico | Não | Visualizações totais. |
+| views_plays | Numérico | Não | Plays de vídeos. |
+| likes | Numérico | Não | Curtidas. |
+| comments | Numérico | Não | Comentários. |
+| shares | Numérico | Não | Compartilhamentos. |
+| saves | Numérico | Não | Salvamentos. |
+| engagement_total | Numérico | Não | Soma total. |
+| engagement_rate | Numérico | Não | engagement_total / reach. |
+| rota_id | Texto | Sim | Identificador técnico. |
+| status_coleta | Enum | Sim | Status da requisição. |
+| observacao | Texto | Não | Fallbacks. |
+| data_criacao | Data/Hora | Sim | Timestamp automático. |
+| data_atualizacao | Data/Hora | Não | Timestamp da última sobreposição. |

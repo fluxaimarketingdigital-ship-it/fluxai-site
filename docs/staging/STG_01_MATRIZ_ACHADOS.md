@@ -1,9 +1,0 @@
-# MATRIZ CENTRAL DE ACHADOS
-
-| ID | Linha Aud. | Categoria | Componente | Arquivo | Linha/Local | Fato Observado | Evidência | Classificação | Impacto | Risco | Ambiente | Dependência | Item Congelado Envolvido | Ação Futura | Pode ser executada agora? | Rollback | Limitação | Status |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
-| A01 | Linha A | Variáveis | Frontend / Vercel | `.env`, `make-proxy.js` | N/A | Chaves secretas em proxy público sem auth | Headers abertos no Client JS | CONFIRMADO | Exposição | RISCO CRÍTICO | PRODUÇÃO | N/A | N/A | Criar Proxy Autenticado (STG) | NÃO | N/A | Auth JWT Inexistente | Pendente |
-| B01 | Linha B | RBAC / RLS | Supabase | `rls_homologacao.sql` | N/A | 18 policies atreladas a `USING (true)` genérico | Arquivo SQL | CONFIRMADO | Acesso amplo | RISCO CRÍTICO | PRODUÇÃO | Supabase Auth | N/A | Implementar `governance_users` | NÃO | N/A | Roles não relativas no SQL | Pendente |
-| C01 | Linha C | Rotas | Frontend | `makeClient.js` | L.59 | Lógica `!use_proxy` permitindo POST direto ao Make | Código Fonte | CONFIRMADO | Bypass Vercel | RISCO CRÍTICO | PRODUÇÃO | N/A | Cenário 10 | Bloquear `use_proxy` falso | NÃO | N/A | N/A | Pendente |
-| C02 | Linha C | Transacional| Frontend | `makeClient.js` | L.84 | Falso Sucesso: Aceita HTTP 200 "Accepted" como Concluído | Código Fonte | CONFIRMADO | Confiabilidade | RISCO CRÍTICO | PRODUÇÃO | N/A | Todos os 24 Cenários | Substituir leitura por `business_status`| NÃO | N/A | N/A | Pendente |
-| E01 | Linha E | Webhooks | Make | Vários | N/A | Cenário 10 oficial e 17/19 congelados estruturalmente | Matriz Mestra | CONFIRMADO | Operacional | DEPENDÊNCIA CONGELADA| PRODUÇÃO | Roteamento Proxy | Cenários 10, 17, 19 | Migrar para webhook custom header | NÃO | N/A | N/A | Pendente |
