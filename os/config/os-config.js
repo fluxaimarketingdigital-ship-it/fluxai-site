@@ -269,7 +269,7 @@ export const WEBHOOK_CONFIG = {
  * Apenas a anon_key é segura para uso público.
  */
 export const SUPABASE_CONFIG = {
-    url:     (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_URL) ? window.FLUXAI_ENV.SUPABASE_URL : 'https://rmbxeikejzbcfiooylsd.supabase.co',
+    url:     (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_URL) ? window.FLUXAI_ENV.SUPABASE_URL : 'https://mufgwetfhfhhmhowbhjj.supabase.co',
     anonKey: (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_ANON_KEY) ? window.FLUXAI_ENV.SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI',
 
     // Tabelas do Supabase
