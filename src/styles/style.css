@@ -2691,3 +2691,9 @@ a[href*="typebot.io"],
 @media (max-width: 1024px) { .pipeline-visual { justify-content: flex-start; } .matrix-grid { grid-template-columns: 1fr; } }
 
 .thesis-box p, .thesis-box li, .thesis-box strong { color: rgba(255,255,255,0.95) !important; }
+
+/* Classes utilitárias adicionadas - Frente 2 */
+.eco-grid--four-pillars { grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); }
+.segments-editorial--centered { display: flex; justify-content: center; }
+.adherence-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%; }
+.segment-number--check { font-size: 1.2rem; }

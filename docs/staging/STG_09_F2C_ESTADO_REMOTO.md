@@ -1,0 +1,2 @@
+# GATE 8 - ESTADO REMOTO
+[BLOQUEADO] Abortado.
