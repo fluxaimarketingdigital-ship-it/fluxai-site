@@ -466,7 +466,7 @@ function registerLocalMockProjectAndUser(projectId, projectData, raw, email) {
             project_id: projectId,
             full_name: raw.responsible_name,
             email: email,
-            password: "fluxai@2026",
+            password: "TEMP_" + Date.now().toString(),
             role: "CLIENT",
             permissions: ["client-portal"],
             needsPasswordChange: true
