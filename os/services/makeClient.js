@@ -63,11 +63,24 @@ export const MakeClient = {
         }
 
         try {
+            // Obter JWT dinâmico do usuário atual
+            let token = '';
+            if (typeof window.supabase !== 'undefined') {
+                const { data: { session } } = await window.supabase.auth.getSession();
+                if (session?.access_token) {
+                    token = session.access_token;
+                }
+            }
+
+            const idempotencyKey = crypto.randomUUID();
+
             const response = await fetch(targetUrl, {
                 method: 'POST',
                 headers: { 
                     'Content-Type': 'application/json; charset=utf-8',
-                    'Accept': 'application/json'
+                    'Accept': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : '',
+                    'Idempotency-Key': idempotencyKey
                 },
                 body: finalBody
             });
