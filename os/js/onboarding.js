@@ -14,7 +14,7 @@ const totalSteps = 7;
 async function initOnboarding() {
     // Renderiza topbar imediatamente (não depende de auth)
     try {
-        OS_UI.renderTopbar();
+        await OS_UI.renderTopbar();
     } catch(e) { console.error('[ONBOARDING] Falha ao renderizar interface base:', e); }
 
     // Permitir clique direto nas bolinhas das etapas lá em cima
