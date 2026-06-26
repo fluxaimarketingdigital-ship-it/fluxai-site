@@ -233,7 +233,9 @@ window.handleOnboarding = async function(e) {
     const date = new Date();
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const randomStr = String(Math.floor(Math.random() * 1000)).padStart(3, '0');
+    const cryptoArray = new Uint32Array(1);
+    window.crypto.getRandomValues(cryptoArray);
+    const randomStr = String(cryptoArray[0] % 1000).padStart(3, '0');
     const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
     const projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
 
