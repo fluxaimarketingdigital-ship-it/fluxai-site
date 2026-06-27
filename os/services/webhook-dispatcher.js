@@ -38,9 +38,12 @@ const PROXY_ACCESS_KEY = 'fluxai-proxy-public-2026';
  * @returns {Promise<{ok: boolean, status: number, data?: object, error?: string}>}
  */
 export async function dispatchWebhook(route, payload, token = null) {
+    const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `idk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
     const headers = {
         'Content-Type': 'application/json',
         'x-fluxai-proxy-key': PROXY_ACCESS_KEY,
+        'Idempotency-Key': idempotencyKey,
     };
 
     if (!token) {
