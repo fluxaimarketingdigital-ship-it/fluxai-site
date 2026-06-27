@@ -31,6 +31,15 @@ async function initFinance() {
     };
 
     // Ativar auto-preenchimento inteligente de escopo e preço para Serviços Extras
+    const selectExtra = document.getElementById('edit-extra-type');
+    if (selectExtra) {
+        selectExtra.addEventListener('change', () => {
+            const val = selectExtra.value;
+            const extraValField = document.getElementById('edit-extra-value');
+            const extraDescField = document.getElementById('edit-extra-desc');
+
+            if (val && SERVICES_CATALOG[val]) {
+                extraValField.value = SERVICES_CATALOG[val].value;
                 extraDescField.value = SERVICES_CATALOG[val].desc;
             } else {
                 extraValField.value = '';

@@ -4,6 +4,7 @@ import { OS_CONFIG } from '../../config/os-config.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { StatusEngine } from '../../config/status-system.js';
 import { mockCatalogoServicos } from '../../data/catalogo.data.js';
+import { SERVICES_CATALOG } from '../config/services-catalog.js';
 
 let currentUser = null;
 
@@ -405,9 +406,17 @@ async function loadClients() {
         
         const catalogSelect = document.getElementById('extra-catalog-id');
         if (catalogSelect) {
-            import('../../data/catalogo.data.js').then((module) => {
-                catalogSelect.innerHTML = module.mockCatalogoServicos.map(s => `<option value="${s.servico_id}">${s.nome_servico} (Base: R$ ${s.valor_base})</option>`).join('');
-                catalogSelect.innerHTML += `<option value="SRV_EXTRA_CUSTOM">Outro Serviço Personalizado</option>`;
+            catalogSelect.addEventListener('change', () => {
+                const val = catalogSelect.value;
+                const extraValField = document.getElementById('extra-valor-est');
+                const extraDescField = document.getElementById('extra-obs');
+                if (val && SERVICES_CATALOG[val]) {
+                    extraValField.value = SERVICES_CATALOG[val].value;
+                    extraDescField.value = SERVICES_CATALOG[val].desc;
+                } else {
+                    extraValField.value = '';
+                    extraDescField.value = '';
+                }
             });
         }
 
