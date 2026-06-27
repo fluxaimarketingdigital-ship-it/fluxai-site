@@ -92,9 +92,6 @@ function safeStringify(obj) {
         }
         return value;
     });
-    if (str && str.length > OPERATION_LOGS_CONFIG.maxPayloadSize) {
-        return str.substring(0, OPERATION_LOGS_CONFIG.maxPayloadSize) + '...[TRUNCATED]';
-    }
     return str || '';
 }
 

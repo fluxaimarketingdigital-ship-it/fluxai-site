@@ -613,6 +613,7 @@
 
         async function init() {
             const session = window.FLUXAI_RUNTIME_CONTEXT || {};
+            let companyNameStr = 'CLIENTE';
             
             // CROSS-TENANT SECURITY (IDOR PATCH)
             if (session.role === 'CLIENT') {
