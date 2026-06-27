@@ -143,6 +143,7 @@ function setupEventListeners() {
                         id: "extra_app_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36),
                         client_id: clientId,
                         cliente_id: clientId,
+                        client_name: (document.querySelector(`#extra-client-id option[value="${clientId}"]`) || {}).text || clientId,
                         cliente_nome: (document.querySelector(`#extra-client-id option[value="${clientId}"]`) || {}).text || clientId,
                         service_id: catalogId,
                         tipo_servico: catalogId,
