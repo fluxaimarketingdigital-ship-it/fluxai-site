@@ -65,7 +65,7 @@ async function loadFinanceData() {
                 id: ex.servico_extra_id,
                 amount_due: ex.valor_aprovado,
                 amount_paid: 0,
-                due_date: ex.data_solicitacao || ex.created_at || new Date().toISOString(),
+                due_date: ex.data_vencimento || ex.data_solicitacao || ex.created_at || new Date().toISOString(),
                 status: 'PENDENTE', // Extras nascem pendentes
                 payment_method: 'Serviço Extra',
                 is_extra: true,
@@ -195,7 +195,7 @@ async function loadFinanceData() {
                     id: ex.servico_extra_id,
                     amount_due: ex.valor_aprovado,
                     amount_paid: 0,
-                    due_date: ex.data_solicitacao || ex.created_at || new Date().toISOString(),
+                    due_date: ex.data_vencimento || ex.data_solicitacao || ex.created_at || new Date().toISOString(),
                     status: 'PENDENTE',
                     payment_method: 'Serviço Extra',
                     is_extra: true,
@@ -342,13 +342,38 @@ function renderPayments(payments) {
         btnDoc.className = 'btn-mini';
         btnDoc.title = 'Gerar Recibo';
         btnDoc.innerHTML = '<i class="fa-solid fa-file-invoice"></i>';
+        if (!p.is_extra) {
+            btnDoc.onclick = () => window.generateContractDoc(p.contracts?.id);
+        } else {
+            btnDoc.onclick = () => alert('Recibo de serviço extra em breve!');
+        }
         actionDiv.appendChild(btnDoc);
 
         const btnWork = document.createElement('button');
         btnWork.className = 'btn-mini';
         btnWork.title = 'Abrir Workspace';
         btnWork.innerHTML = '<i class="fa-solid fa-briefcase"></i>';
+        btnWork.onclick = () => window.location.href = `/os/client-portal.html?project_id=${encodeURIComponent(p.contracts?.project_id)}`;
         actionDiv.appendChild(btnWork);
+
+        const btnWpp = document.createElement('button');
+        btnWpp.className = 'btn-mini btn-whatsapp';
+        btnWpp.title = 'Cobrar via WhatsApp';
+        btnWpp.innerHTML = '<i class="fa-brands fa-whatsapp"></i>';
+        btnWpp.onclick = () => {
+            const msg = window.getWhatsAppBillingMessage(p);
+            // Copia para a área de transferência usando API moderna e faz o fallback manual se precisar
+            try {
+                navigator.clipboard.writeText(msg).then(() => {
+                    alert('Mensagem de cobrança copiada! Cole no WhatsApp Web para enviar ao cliente.');
+                }).catch(() => {
+                    alert('Mensagem de cobrança:\n\n' + msg);
+                });
+            } catch (e) {
+                alert('Mensagem de cobrança:\n\n' + msg);
+            }
+        };
+        actionDiv.appendChild(btnWpp);
 
         td7.appendChild(actionDiv);
         tr.appendChild(td7);
@@ -535,18 +560,27 @@ function renderOperationalAlerts(contracts, payments) {
     const container = document.getElementById('alerts-container');
     if (!container) return;
     const now = new Date();
+    // Reseta horas para comparação de dias precisa
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const alerts = [];
 
     payments.forEach(p => {
         const d = new Date(p.due_date);
-        const diff = Math.ceil((d - now) / (1000 * 60 * 60 * 24));
+        const dueDateObj = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+        const diff = Math.ceil((dueDateObj - today) / (1000 * 60 * 60 * 24));
         
         if (p.status !== 'PAGO') {
-            if (diff === 1) {
+            if (diff === 2) {
                 alerts.push({
                     type: 'warning',
-                    title: `Vencimento Próximo: ${p.contracts?.client_name}`,
-                    desc: `Pagamento vence amanhã (${d.toLocaleDateString('pt-BR')}). Cobrança automática agendada.`
+                    title: `Alerta: Vencimento em 2 dias (${p.contracts?.client_name})`,
+                    desc: `Vence dia ${dueDateObj.toLocaleDateString('pt-BR')}. Lembre-se de mandar a mensagem de cobrança.`
+                });
+            } else if (diff === 0) {
+                alerts.push({
+                    type: 'critical',
+                    title: `VENCIMENTO HOJE: ${p.contracts?.client_name}`,
+                    desc: `Pagamento vence hoje! Envie a mensagem com o PIX.`
                 });
             } else if (diff < 0) {
                 alerts.push({
@@ -700,6 +734,7 @@ window.saveContractEdit = async () => {
                 impact: document.getElementById('edit-extra-impact').value || 'baixo',
                 description: document.getElementById('edit-extra-desc').value || '',
                 drive_link: document.getElementById('edit-extra-drive-link').value || '',
+                data_vencimento: document.getElementById('edit-extra-due-date').value || null,
                 created_at: new Date().toISOString()
             };
         }
@@ -778,6 +813,40 @@ window.saveContractEdit = async () => {
         btnSubmit.disabled = false;
         btnSubmit.textContent = originalText;
     }
+};
+
+window.getWhatsAppBillingMessage = (p) => {
+    const isExtra = p.is_extra;
+    const desc = isExtra ? 'Serviço Extra' : 'Mensalidade do Contrato';
+    
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const d = new Date(p.due_date);
+    const dueDateObj = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    const diff = Math.ceil((dueDateObj - today) / (1000 * 60 * 60 * 24));
+    
+    let greeting = '';
+    if (diff > 0) {
+        greeting = `Olá! Passando para lembrar que o vencimento do seu ${desc} está programado para o dia ${dueDateObj.toLocaleDateString('pt-BR')}.`;
+    } else if (diff === 0) {
+        greeting = `Olá! Passando para lembrar que o vencimento do seu ${desc} é HOJE (${dueDateObj.toLocaleDateString('pt-BR')}).`;
+    } else {
+        greeting = `Olá! Passando para informar que consta um atraso no pagamento do seu ${desc} que venceu dia ${dueDateObj.toLocaleDateString('pt-BR')}.`;
+    }
+
+    const value = formatCurrency(p.amount_due);
+    
+    let msg = `${greeting}\n\n`;
+    msg += `Valor: *${value}*\n\n`;
+    msg += `💳 *Dados para PIX:*\n`;
+    msg += `Chave PIX (Celular): 7198111-4694\n`;
+    msg += `Nome: Kássia Drucila Gomes de Farias\n`;
+    msg += `Banco Itaú - Ag: 1576\n\n`;
+    msg += `⚠️ _Por favor, confirme o nome do recebedor antes de concluir a transação._\n\n`;
+    msg += `Assim que efetuar o pagamento, por favor, anexe o comprovante aqui mesmo nesta mensagem para darmos baixa no sistema!\n\n`;
+    msg += `Qualquer dúvida, estamos à disposição. Equipe FluxAI.`;
+    
+    return msg;
 };
 
 window.generateContractDoc = (contractId) => {
