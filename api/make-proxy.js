@@ -10,8 +10,7 @@ export default async function handler(req, res) {
     return res.status(400).json({ error: 'Bad Request. Missing routeId or payload.' });
   }
 
-  // 6. Allowlist rígida
-  // 2. Usar variáveis de ambiente da Vercel
+  // Allowlist e Busca Dinâmica nas Variáveis de Ambiente da Vercel
   const allowedRoutes = {
     'ROTA_OS_01_PORTAL_DEMANDAS': process.env.MAKE_WEBHOOK_ROTA_OS_01_PORTAL_DEMANDAS,
     'ROTA_OS_02_LEADS_SITE': process.env.MAKE_WEBHOOK_ROTA_OS_02_LEADS_SITE,
@@ -19,14 +18,7 @@ export default async function handler(req, res) {
     'ROTA_OS_14_ARQUIVOS': process.env.MAKE_WEBHOOK_ROTA_OS_14_ARQUIVOS
   };
 
-  // 7. Qualquer routeId desconhecido deve ser bloqueado
-  if (!allowedRoutes.hasOwnProperty(routeId)) {
-    // 9. Não registrar webhook completo em console/log
-    console.warn(`[Make Proxy] Blocked attempt to access unknown route: ${routeId}`);
-    return res.status(403).json({ error: 'Forbidden. Route is not allowed or not implemented.' });
-  }
-
-  const webhookUrl = allowedRoutes[routeId];
+  const webhookUrl = process.env[`MAKE_WEBHOOK_${routeId}`] || process.env[routeId] || allowedRoutes[routeId];
 
   if (!webhookUrl) {
     console.error(`[Make Proxy] Webhook não configurado para esta rota na Vercel: ${routeId}`);

@@ -19,7 +19,7 @@ import { SUPABASE_CONFIG } from '../config/os-config.js';
 // O Endpoint da Edge Function será gerado dinamicamente para evitar
 // problemas de inicialização (dependência circular com os-config.js).
 function getProxyEndpoint() {
-    return `${SUPABASE_CONFIG.url}/functions/v1/make-proxy`;
+    return `/api/make-proxy`;
 }
 
 // ─── Proxy-Key pública (não é secret — apenas identifica o frontend) ────────
