@@ -362,15 +362,15 @@ function renderPayments(payments) {
         btnWpp.innerHTML = '<i class="fa-brands fa-whatsapp"></i>';
         btnWpp.onclick = () => {
             const msg = window.getWhatsAppBillingMessage(p);
-            // Copia para a área de transferência usando API moderna e faz o fallback manual se precisar
-            try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
                 navigator.clipboard.writeText(msg).then(() => {
                     alert('Mensagem de cobrança copiada! Cole no WhatsApp Web para enviar ao cliente.');
-                }).catch(() => {
-                    alert('Mensagem de cobrança:\n\n' + msg);
+                }).catch(err => {
+                    console.warn('Falha no clipboard:', err);
+                    alert('Por favor, copie esta mensagem manualmente:\n\n' + msg);
                 });
-            } catch (e) {
-                alert('Mensagem de cobrança:\n\n' + msg);
+            } else {
+                alert('Sua área de transferência está indisponível. Mensagem:\n\n' + msg);
             }
         };
         actionDiv.appendChild(btnWpp);
@@ -567,7 +567,7 @@ function renderOperationalAlerts(contracts, payments) {
     payments.forEach(p => {
         const d = new Date(p.due_date);
         const dueDateObj = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        const diff = Math.ceil((dueDateObj - today) / (1000 * 60 * 60 * 24));
+        const diff = Math.ceil((dueDateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
         
         if (p.status !== 'PAGO') {
             if (diff === 2) {
@@ -823,7 +823,7 @@ window.getWhatsAppBillingMessage = (p) => {
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
     const d = new Date(p.due_date);
     const dueDateObj = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    const diff = Math.ceil((dueDateObj - today) / (1000 * 60 * 60 * 24));
+    const diff = Math.ceil((dueDateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
     
     let greeting = '';
     if (diff > 0) {
