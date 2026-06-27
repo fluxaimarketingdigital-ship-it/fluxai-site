@@ -308,33 +308,50 @@ function renderPayments(payments) {
         tr.appendChild(td1);
 
         const td2 = document.createElement('td');
-        const healthSpan = document.createElement('span');
-        healthSpan.className = `health-pill ${healthClass}`;
-        healthSpan.textContent = health;
-        td2.appendChild(healthSpan);
+        td2.style.cssText = 'font-family: var(--os-font-mono); font-weight: 600;';
+        td2.textContent = formatCurrency(p.amount_due);
         tr.appendChild(td2);
 
         const td3 = document.createElement('td');
-        td3.style.cssText = 'font-size: 0.7rem;';
-        td3.style.color = finRisk === 'Nulo' ? 'var(--os-success)' : 'var(--os-warning)';
-        td3.textContent = finRisk;
+        td3.textContent = new Date(p.due_date).toLocaleDateString('pt-BR');
         tr.appendChild(td3);
 
         const td4 = document.createElement('td');
-        td4.style.cssText = 'font-size: 0.7rem; color: var(--os-success);';
-        td4.textContent = opRisk;
+        td4.style.cssText = 'font-size: 0.7rem; text-transform: uppercase;';
+        td4.textContent = p.payment_method || '-';
         tr.appendChild(td4);
 
         const td5 = document.createElement('td');
-        td5.style.cssText = 'font-size: 0.7rem; color: var(--os-success);';
-        td5.textContent = 'Em Conformidade';
+        const spanStatus = document.createElement('span');
+        spanStatus.className = `status-badge ${statusClass}`;
+        spanStatus.textContent = p.status;
+        td5.appendChild(spanStatus);
         tr.appendChild(td5);
 
         const td6 = document.createElement('td');
-        td6.style.cssText = 'font-size: 0.75rem; font-weight: 700; color: var(--os-primary);';
-        td6.textContent = nextAction;
+        td6.style.cssText = `font-size: 0.75rem; font-weight: 700; ${delayClass}`;
+        td6.textContent = delayText;
         tr.appendChild(td6);
 
+        const td7 = document.createElement('td');
+        const actionDiv = document.createElement('div');
+        actionDiv.className = 'action-btns';
+        actionDiv.style.justifyContent = 'flex-end';
+        
+        const btnDoc = document.createElement('button');
+        btnDoc.className = 'btn-mini';
+        btnDoc.title = 'Gerar Recibo';
+        btnDoc.innerHTML = '<i class="fa-solid fa-file-invoice"></i>';
+        actionDiv.appendChild(btnDoc);
+
+        const btnWork = document.createElement('button');
+        btnWork.className = 'btn-mini';
+        btnWork.title = 'Abrir Workspace';
+        btnWork.innerHTML = '<i class="fa-solid fa-briefcase"></i>';
+        actionDiv.appendChild(btnWork);
+
+        td7.appendChild(actionDiv);
+        tr.appendChild(td7);
         
         body.appendChild(tr);
     });
