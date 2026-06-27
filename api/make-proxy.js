@@ -4,10 +4,11 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method Not Allowed. Only POST is allowed.' });
   }
 
-  const { routeId, payload } = req.body;
+  const payload = req.body.payload;
+  const routeId = req.body.routeId || req.body.route;
 
   if (!routeId || !payload) {
-    return res.status(400).json({ error: 'Bad Request. Missing routeId or payload.' });
+    return res.status(400).json({ error: 'Bad Request. Missing routeId (or route) or payload.' });
   }
 
   // Allowlist e Busca Dinâmica nas Variáveis de Ambiente da Vercel
