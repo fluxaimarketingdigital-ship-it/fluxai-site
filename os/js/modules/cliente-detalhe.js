@@ -167,7 +167,7 @@ async function loadClientData() {
             // Isso garante que o header Authorization está presente em TODAS as queries
             if (window.supabase && window.supabase.createClient) {
                 authedClient = window.supabase.createClient(
-                    'https://mufgwetfhfhhmhowbhjj.supabase.co',
+                    'https://rmbxeikejzbcfiooylsd.supabase.co',
                     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI',
                     {
                         global: {
