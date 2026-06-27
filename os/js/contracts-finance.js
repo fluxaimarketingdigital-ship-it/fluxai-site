@@ -52,6 +52,7 @@ async function loadFinanceData() {
         try {
             const { data: contracts, error: cErr } = await supabase.from('contracts').select('*, projects(is_billing_exempt)').order('created_at', { ascending: false });
             const { data: payments, error: pErr } = await supabase.from('payments_ledger').select('*, contracts(client_name, company_name, project_id, projects(is_billing_exempt))').order('due_date', { ascending: true });
+            const { data: extras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*');
 
             if (cErr || pErr) throw cErr || pErr;
 
@@ -59,11 +60,29 @@ async function loadFinanceData() {
             const activeContracts = (contracts || []).filter(c => !c.projects?.is_billing_exempt);
             const activePayments = (payments || []).filter(p => !p.contracts?.projects?.is_billing_exempt);
 
-            renderStats(activeContracts, activePayments);
-            renderPayments(activePayments);
+            // Mapeia os serviços extras para o formato de pagamentos e injeta na lista
+            const extraPayments = (extras || []).map(ex => ({
+                id: ex.servico_extra_id,
+                amount_due: ex.valor_aprovado,
+                amount_paid: 0,
+                due_date: ex.data_solicitacao || ex.created_at || new Date().toISOString(),
+                status: 'PENDENTE', // Extras nascem pendentes
+                payment_method: 'Serviço Extra',
+                is_extra: true,
+                contracts: {
+                    client_name: ex.client_name,
+                    company_name: ex.client_name + ' [EXTRA]',
+                    project_id: ex.client_id
+                }
+            }));
+
+            const allPayments = [...activePayments, ...extraPayments];
+
+            renderStats(activeContracts, allPayments);
+            renderPayments(allPayments);
             renderContracts(activeContracts);
-            renderContractHealth(activeContracts, activePayments);
-            renderOperationalAlerts(activeContracts, activePayments);
+            renderContractHealth(activeContracts, allPayments);
+            renderOperationalAlerts(activeContracts, allPayments);
             return;
         } catch (error) {
             console.warn('[FINANCE] Erro na API do Supabase. Carregando Dados Simulados Premium.', error);
