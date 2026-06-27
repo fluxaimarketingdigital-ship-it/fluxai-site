@@ -15,6 +15,7 @@
 'use strict';
 
 import { SUPABASE_CONFIG } from '../config/os-config.js';
+import { getSupabase } from './supabase-client.js';
 
 // O Endpoint da Edge Function será gerado dinamicamente para evitar
 // problemas de inicialização (dependência circular com os-config.js).
@@ -41,6 +42,25 @@ export async function dispatchWebhook(route, payload, token = null) {
         'Content-Type': 'application/json',
         'x-fluxai-proxy-key': PROXY_ACCESS_KEY,
     };
+
+    if (!token) {
+        try {
+            const supabase = getSupabase();
+            if (supabase) {
+                const { data } = await supabase.auth.getSession();
+                if (data && data.session && data.session.access_token) {
+                    token = data.session.access_token;
+                }
+            }
+        } catch (e) {
+            console.warn('[DISPATCHER] Falha ao buscar token JWT:', e);
+        }
+    }
+
+    // Se for mock mode local, cria um token fake para passar pelo proxy em ambiente DEV
+    if (!token && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        token = 'dev-mock-token';
+    }
 
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
