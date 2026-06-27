@@ -3,6 +3,7 @@ import { SheetsService } from '../../services/sheets-service.js';
 import { OS_CONFIG } from '../../config/os-config.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { StatusEngine } from '../../config/status-system.js';
+import { mockCatalogoServicos } from '../../data/catalogo.data.js';
 
 let currentUser = null;
 
@@ -138,6 +139,13 @@ function setupEventListeners() {
 
             try {
                 if (isApproval) {
+                    const catalogItem = mockCatalogoServicos.find(s => s.servico_id === catalogId) || {};
+                    const tipoServicoExt = catalogItem.tipo_servico_ext || catalogId;
+                    const prioridade = catalogItem.prioridade || 'media';
+                    const impacto = catalogItem.impacto_planejamento || 'nao_impacta';
+                    const geraCredito = catalogItem.gera_credito_ia ? 'sim' : 'nao';
+                    const qtyCredito = catalogItem.quantidade_credito_ia || 0;
+
                     // Preparar payload para o webhook de aprovação real
                     const payload = {
                         id: "extra_app_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36),
@@ -147,12 +155,17 @@ function setupEventListeners() {
                         cliente_nome: (document.querySelector(`#extra-client-id option[value="${clientId}"]`) || {}).text || clientId,
                         service_id: catalogId,
                         servico_extra_id: catalogId,
-                        tipo_servico: catalogId,
+                        tipo_servico: tipoServicoExt,
+                        tipo_servico_ext: tipoServicoExt,
                         nome_servico: serviceName,
                         categoria: categoryName,
                         descricao: obs || serviceName,
                         status: "aprovado",
-                        status_servico_extra: "aprovado",
+                        status_servico_extra: "orcamento_aprovado",
+                        prioridade: prioridade,
+                        impacto_planejamento: impacto,
+                        gera_credito_ia: geraCredito,
+                        quantidade_credito_ia: qtyCredito,
                         approved_by: currentUser ? (currentUser.email || currentUser.username || role) : role,
                         approved_at: new Date().toISOString(),
                         limite_operacional_adicionado: addLimit,

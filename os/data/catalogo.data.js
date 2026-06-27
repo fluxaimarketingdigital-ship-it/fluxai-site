@@ -1,6 +1,7 @@
 export const mockCatalogoServicos = [
     {
         servico_id: 'SRV_FLX_001',
+        tipo_servico_ext: 'landing_page',
         nome_servico: 'Criação de Landing Page',
         categoria: 'desenvolvimento',
         descricao: 'Design e desenvolvimento de página de alta conversão.',
@@ -10,10 +11,13 @@ export const mockCatalogoServicos = [
         permite_orcamento: true,
         gera_credito_ia: true,
         quantidade_credito_ia: 5,
+        impacto_planejamento: 'alto',
+        prioridade: 'alta',
         observacao: 'Inclui copy inicial baseada em IA.'
     },
     {
         servico_id: 'SRV_FLX_002',
+        tipo_servico_ext: 'captacao_video',
         nome_servico: 'Ensaio Fotográfico Corporativo',
         categoria: 'audiovisual',
         descricao: 'Captação de imagens profissionais na sede do cliente.',
@@ -23,10 +27,13 @@ export const mockCatalogoServicos = [
         permite_orcamento: true,
         gera_credito_ia: false,
         quantidade_credito_ia: 0,
+        impacto_planejamento: 'medio',
+        prioridade: 'media',
         observacao: 'Deslocamento cobrado à parte.'
     },
     {
         servico_id: 'SRV_FLX_003',
+        tipo_servico_ext: 'reels',
         nome_servico: 'Pacote Extra de Reels (4x)',
         categoria: 'conteudo',
         descricao: 'Roteirização, gravação e edição de 4 vídeos curtos.',
@@ -36,10 +43,13 @@ export const mockCatalogoServicos = [
         permite_orcamento: true,
         gera_credito_ia: true,
         quantidade_credito_ia: 4,
+        impacto_planejamento: 'baixo',
+        prioridade: 'media',
         observacao: 'Necessita do DNA de conteúdo aprovado.'
     },
     {
         servico_id: 'SRV_FLX_004',
+        tipo_servico_ext: 'crm',
         nome_servico: 'Setup de CRM (ActiveCampaign/Hubspot)',
         categoria: 'automacao',
         descricao: 'Configuração de pipeline, tags e integrações básicas.',
@@ -49,19 +59,24 @@ export const mockCatalogoServicos = [
         permite_orcamento: true,
         gera_credito_ia: false,
         quantidade_credito_ia: 0,
+        impacto_planejamento: 'alto',
+        prioridade: 'alta',
         observacao: 'Licença da ferramenta não inclusa.'
     },
     {
         servico_id: 'SRV_FLX_005',
+        tipo_servico_ext: 'consultoria_estrategica',
         nome_servico: 'Auditoria Estratégica Completa',
         categoria: 'consultoria',
         descricao: 'Diagnóstico profundo de posicionamento e tráfego.',
         valor_base: 5000.00,
         unidade: 'projeto',
         ativo: true,
-        permite_orcamento: false, // Só a FluxAI pode sugerir, não o cliente direto pelo portal
+        permite_orcamento: false,
         gera_credito_ia: true,
         quantidade_credito_ia: 10,
+        impacto_planejamento: 'critico',
+        prioridade: 'urgente',
         observacao: 'Venda consultiva B2B.'
     }
 ];
