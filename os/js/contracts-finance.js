@@ -78,6 +78,8 @@ async function loadFinanceData() {
 
             const allPayments = [...activePayments, ...extraPayments];
 
+            window.__FINANCE_CONTRACTS = activeContracts; // Salva na memória global para os modais
+
             renderStats(activeContracts, allPayments);
             renderPayments(allPayments);
             renderContracts(activeContracts);
@@ -210,6 +212,8 @@ async function loadFinanceData() {
     }
 
     const allPayments = [...mockPayments, ...extraPayments];
+
+    window.__FINANCE_CONTRACTS = mockContracts; // Salva na memória global
 
     renderStats(mockContracts, allPayments);
     renderPayments(allPayments);
@@ -665,9 +669,12 @@ window.closeEditContractModal = () => {
 };
 
 window.editContract = (contractId) => {
-    const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-    const contract = mockContracts.find(c => c.id === contractId);
-    if (!contract) return;
+    const contractsList = window.__FINANCE_CONTRACTS || JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+    const contract = contractsList.find(c => c.id === contractId);
+    if (!contract) {
+        alert('Erro: Contrato não encontrado na base de dados ativa.');
+        return;
+    }
     
     document.getElementById('edit-contract-id').value = contract.id;
     document.getElementById('edit-project-id').value = contract.project_id || '';
@@ -850,9 +857,12 @@ window.getWhatsAppBillingMessage = (p) => {
 };
 
 window.generateContractDoc = (contractId) => {
-    const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-    const contract = mockContracts.find(c => c.id === contractId);
-    if (!contract) return;
+    const contractsList = window.__FINANCE_CONTRACTS || JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+    const contract = contractsList.find(c => c.id === contractId);
+    if (!contract) {
+        alert('Erro: Contrato não encontrado.');
+        return;
+    }
     
     if (window.OS_LOGS_ENGINE) {
         window.OS_LOGS_ENGINE.userAction('CONTRACT_DOC_REQUESTED', `Geração de recibo HTML simples para ${contractId}`);
