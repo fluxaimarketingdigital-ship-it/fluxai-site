@@ -718,8 +718,7 @@ window.openEditModal = async (id) => {
             }
         };
         
-        // Trigger inicial do seletor
-        selector.dispatchEvent(new Event('change'));
+        // Trigger inicial do seletor (removido daqui, movido para o final da função)
 
         // 3. Renderizar Aprovações Trilaterais checkboxes
         document.getElementById('approve-strategic').checked = c.metadata?.strategic_approved || false;
@@ -914,6 +913,9 @@ window.openEditModal = async (id) => {
                 } catch (e) {}
             }
         }
+
+        // Disparar o trigger do seletor agora que o DOM interno (caption) já foi gerado
+        selector.dispatchEvent(new Event('change'));
 
         document.getElementById('modal-edit-asset').style.display = 'flex';
     }
