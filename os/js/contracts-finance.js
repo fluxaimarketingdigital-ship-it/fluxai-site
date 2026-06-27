@@ -213,7 +213,8 @@ async function loadFinanceData() {
 
     const allPayments = [...mockPayments, ...extraPayments];
 
-    window.__FINANCE_CONTRACTS = mockContracts; // Salva na memória global
+    window.__FINANCE_CONTRACTS = window.__FINANCE_CONTRACTS || mockContracts; // Salva na memória global
+
 
     renderStats(mockContracts, allPayments);
     renderPayments(allPayments);
@@ -346,11 +347,7 @@ function renderPayments(payments) {
         btnDoc.className = 'btn-mini';
         btnDoc.title = 'Gerar Recibo';
         btnDoc.innerHTML = '<i class="fa-solid fa-file-invoice"></i>';
-        if (!p.is_extra) {
-            btnDoc.onclick = () => window.generateContractDoc(p.contracts?.id);
-        } else {
-            btnDoc.onclick = () => alert('Recibo de serviço extra em breve!');
-        }
+        btnDoc.onclick = () => window.generateReceiptDoc(p);
         actionDiv.appendChild(btnDoc);
 
         const btnWork = document.createElement('button');
@@ -954,21 +951,21 @@ window.saveBaixaPagamento = async () => {
 };
 
 window.generateContractDoc = (contractId) => {
-    const contractsList = window.__FINANCE_CONTRACTS || JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-    const contract = contractsList.find(c => c.id === contractId);
-    if (!contract) {
-        alert('Erro: Contrato não encontrado.');
-        return;
-    }
+window.generateContractDoc = (contractId) => {
+    alert('Visualizador de Contrato (PDF) será integrado na próxima fase!');
+};
+
+window.generateReceiptDoc = (payment) => {
+    if (!payment) return;
     
     if (window.OS_LOGS_ENGINE) {
-        window.OS_LOGS_ENGINE.userAction('CONTRACT_DOC_REQUESTED', `Geração de recibo HTML simples para ${contractId}`);
+        window.OS_LOGS_ENGINE.userAction('RECEIPT_DOC_REQUESTED', `Geração de recibo HTML para pagamento ${payment.id}`);
     }
 
     const contentDiv = document.getElementById('receipt-content');
     
     let extrasHtmlNode = null;
-    if (contract.extras && contract.extras.length > 0) {
+    if (!payment.is_extra && payment.contracts?.extras && payment.contracts.extras.length > 0) {
         const extrasWrapper = document.createElement('div');
         const extrasHeader = document.createElement('h4');
         extrasHeader.style.cssText = "margin: 15px 0 5px 0; color: var(--os-primary);";
@@ -976,7 +973,7 @@ window.generateContractDoc = (contractId) => {
         const extrasUl = document.createElement('ul');
         extrasUl.style.cssText = "padding-left: 20px; color: var(--os-text-muted);";
         
-        contract.extras.forEach(ext => {
+        payment.contracts.extras.forEach(ext => {
             const li = document.createElement('li');
             const strongExtType = document.createElement('strong');
             strongExtType.textContent = ext.type;
@@ -987,10 +984,10 @@ window.generateContractDoc = (contractId) => {
         });
         extrasWrapper.appendChild(extrasHeader);
         extrasWrapper.appendChild(extrasUl);
-        extrasHtmlNode = extrasWrapper; // We'll append this down below
+        extrasHtmlNode = extrasWrapper;
     }
 
-    contentDiv.textContent = ''; // clear it
+    contentDiv.textContent = '';
     
     const headerDiv = document.createElement('div');
     headerDiv.style.cssText = "display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;";
@@ -1000,11 +997,11 @@ window.generateContractDoc = (contractId) => {
     const strongClient = document.createElement('strong');
     strongClient.textContent = "Para o Cliente:";
     const br1 = document.createElement('br');
-    const clientNameNode = document.createTextNode(contract.client_name);
+    const clientNameNode = document.createTextNode(payment.contracts?.client_name || 'Cliente');
     const br2 = document.createElement('br');
     const spanCompany = document.createElement('span');
     spanCompany.style.color = "var(--os-text-muted)";
-    spanCompany.textContent = contract.company_name;
+    spanCompany.textContent = payment.contracts?.company_name || '';
     pClient.appendChild(strongClient);
     pClient.appendChild(br1);
     pClient.appendChild(clientNameNode);
@@ -1016,12 +1013,12 @@ window.generateContractDoc = (contractId) => {
     infoDiv.style.textAlign = "right";
     const pInfo = document.createElement('p');
     const strongRef = document.createElement('strong');
-    strongRef.textContent = "Contrato Ref:";
-    const refNode = document.createTextNode(" #" + contract.id.toUpperCase());
+    strongRef.textContent = "Pagamento Ref:";
+    const refNode = document.createTextNode(" #" + payment.id.toUpperCase());
     const br3 = document.createElement('br');
     const strongStatus = document.createElement('strong');
     strongStatus.textContent = "Status:";
-    const statusNode = document.createTextNode(" " + contract.status);
+    const statusNode = document.createTextNode(" " + payment.status);
     pInfo.appendChild(strongRef);
     pInfo.appendChild(refNode);
     pInfo.appendChild(br3);
@@ -1037,28 +1034,30 @@ window.generateContractDoc = (contractId) => {
     const pScope = document.createElement('p');
     pScope.style.margin = "0";
     const strongScope = document.createElement('strong');
-    strongScope.textContent = "Escopo Recorrente Acordado:";
+    strongScope.textContent = payment.is_extra ? "Serviço Extra:" : "Escopo Recorrente Acordado:";
     const br4 = document.createElement('br');
     pScope.appendChild(strongScope);
     pScope.appendChild(br4);
     
-    // Add lines safely
-    const deliverablesLines = contract.deliverables.split('\\n');
-    deliverablesLines.forEach((line, index) => {
-        pScope.appendChild(document.createTextNode(line));
-        if (index < deliverablesLines.length - 1) {
-            pScope.appendChild(document.createElement('br'));
-        }
-    });
+    let desc = payment.is_extra ? (payment.contracts?.company_name || 'Serviço Extra') : (payment.contracts?.deliverables || 'Contrato Base');
+    if (desc) {
+        const deliverablesLines = desc.split('\\n');
+        deliverablesLines.forEach((line, index) => {
+            pScope.appendChild(document.createTextNode(line));
+            if (index < deliverablesLines.length - 1) {
+                pScope.appendChild(document.createElement('br'));
+            }
+        });
+    }
     
     scopeDiv.appendChild(pScope);
     
     const valueDiv = document.createElement('div');
     valueDiv.style.cssText = "display: flex; justify-content: space-between; font-size: 1.1rem; font-family: var(--os-font-mono); font-weight: 700; border-top: 1px solid var(--os-border); padding-top: 15px;";
     const spanValText = document.createElement('span');
-    spanValText.textContent = "Valor Mensal Base:";
+    spanValText.textContent = payment.is_extra ? "Valor do Serviço:" : "Valor da Parcela / Fatura:";
     const spanVal = document.createElement('span');
-    spanVal.textContent = formatCurrency(contract.contract_value);
+    spanVal.textContent = formatCurrency(payment.amount_due);
     valueDiv.appendChild(spanValText);
     valueDiv.appendChild(spanVal);
     
@@ -1071,7 +1070,7 @@ window.generateContractDoc = (contractId) => {
     }
 
     document.getElementById('receipt-date').innerText = new Date().toLocaleString('pt-BR');
-    document.getElementById('receipt-hash').innerText = btoa(contractId + Date.now()).substring(0, 16).toUpperCase();
+    document.getElementById('receipt-hash').innerText = btoa(payment.id + Date.now()).substring(0, 16).toUpperCase();
     
     document.getElementById('receipt-modal').style.display = 'flex';
 };
