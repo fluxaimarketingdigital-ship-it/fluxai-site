@@ -86,6 +86,9 @@
                         <button class="btn-os" id="btn-sync-finance" style="background: var(--os-card); border: 1px solid var(--os-border); color: #fff; padding: 10px 20px; font-size: 0.75rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">
                             <i class="fa-solid fa-rotate"></i> Sincronizar Pipeline
                         </button>
+                        <button class="btn-os" id="btn-manage-banks" style="background: var(--os-card); border: 1px solid var(--os-primary); color: var(--os-primary); padding: 10px 20px; font-size: 0.75rem; font-weight: 700; border-radius: 4px; cursor: pointer; text-transform: uppercase; letter-spacing: 1px;">
+                            <i class="fa-solid fa-building-columns"></i> Contas Bancárias
+                        </button>
                     </div>
                 </div>
 
@@ -521,17 +524,7 @@
                 <div class="form-group">
                     <label>Conta Recebedora (Banco)</label>
                     <select id="baixa-conta" class="form-control" required>
-                        <option value="">Selecione o banco de destino...</option>
-                        <option value="Itaú">Itaú</option>
-                        <option value="Nubank">Nubank</option>
-                        <option value="Banco do Brasil">Banco do Brasil</option>
-                        <option value="Bradesco">Bradesco</option>
-                        <option value="Santander">Santander</option>
-                        <option value="Banco Inter">Banco Inter</option>
-                        <option value="Caixa Econômica">Caixa Econômica Federal</option>
-                        <option value="Sicredi">Sicredi</option>
-                        <option value="Sicoob">Sicoob</option>
-                        <option value="Outro">Outro Banco / Carteira Digital</option>
+                        <option value="">Carregando contas...</option>
                     </select>
                 </div>
 
@@ -560,6 +553,56 @@
                     <button type="button" onclick="window.closeBaixaModal()" class="btn-mini" style="padding:10px 20px; height:auto; width:auto; border-radius:4px;">Cancelar</button>
                     <button type="submit" class="btn-mini" style="padding:10px 25px; height:auto; width:auto; background:var(--os-success); color:#000; font-weight:800; border-radius:4px; border-color:var(--os-success);">
                         Confirmar Baixa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL DE CONTAS BANCÁRIAS -->
+    <div id="bank-accounts-modal" class="os-modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+        <div class="os-widget" style="background: var(--os-bg); border: 1px solid var(--os-border); border-radius: 8px; width: 100%; max-width: 600px; padding: 30px; position: relative;">
+            <button type="button" onclick="document.getElementById('bank-accounts-modal').style.display='none'" style="position:absolute; right: 20px; top: 20px; background:transparent; border:none; color:var(--os-text-muted); cursor:pointer; font-size:1.5rem;">&times;</button>
+            
+            <h3 style="font-size:0.9rem; text-transform:uppercase; color:var(--os-primary); letter-spacing:1px; margin-top:0; margin-bottom:20px; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-building-columns"></i> Gerenciar Contas Recebedoras
+            </h3>
+
+            <div style="margin-bottom: 20px; max-height: 200px; overflow-y: auto; border: 1px solid var(--os-border); border-radius: 4px; padding: 10px;">
+                <ul id="bank-accounts-list" style="list-style: none; padding: 0; margin: 0; font-size: 0.8rem; color: var(--os-text-muted);">
+                    <li>Carregando contas...</li>
+                </ul>
+            </div>
+
+            <form id="add-bank-form" onsubmit="event.preventDefault(); window.saveBankAccount();">
+                <h4 style="font-size: 0.8rem; color: #fff; margin-bottom: 10px;">Adicionar Nova Conta</h4>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Banco</label>
+                        <input type="text" id="new-bank-name" class="form-control" placeholder="Ex: Itaú, Nubank" required />
+                    </div>
+                    <div class="form-group">
+                        <label>Titular</label>
+                        <input type="text" id="new-bank-owner" class="form-control" placeholder="Nome da sua Empresa" required />
+                    </div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Agência</label>
+                        <input type="text" id="new-bank-agency" class="form-control" placeholder="0001" />
+                    </div>
+                    <div class="form-group">
+                        <label>Conta</label>
+                        <input type="text" id="new-bank-account" class="form-control" placeholder="123456-7" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Chave PIX (Opcional)</label>
+                    <input type="text" id="new-bank-pix" class="form-control" placeholder="CNPJ, Celular, Email ou Aleatória" />
+                </div>
+                <div style="margin-top: 20px; display: flex; justify-content: flex-end;">
+                    <button type="submit" class="btn-mini" style="padding:8px 15px; background:var(--os-primary); color:#000; font-weight:800; border-radius:4px;">
+                        Salvar Conta
                     </button>
                 </div>
             </form>

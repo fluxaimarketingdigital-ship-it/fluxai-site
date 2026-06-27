@@ -25,17 +25,12 @@ async function initFinance() {
     await loadFinanceData();
 
     document.getElementById('btn-sync-finance').onclick = loadFinanceData;
+    document.getElementById('btn-manage-banks').onclick = () => {
+        loadBankAccounts();
+        document.getElementById('bank-accounts-modal').style.display = 'flex';
+    };
 
     // Ativar auto-preenchimento inteligente de escopo e preço para Serviços Extras
-    const selectExtra = document.getElementById('edit-extra-type');
-    if (selectExtra) {
-        selectExtra.addEventListener('change', () => {
-            const val = selectExtra.value;
-            const extraValField = document.getElementById('edit-extra-value');
-            const extraDescField = document.getElementById('edit-extra-desc');
-
-            if (val && SERVICES_CATALOG[val]) {
-                extraValField.value = SERVICES_CATALOG[val].value;
                 extraDescField.value = SERVICES_CATALOG[val].desc;
             } else {
                 extraValField.value = '';
@@ -79,6 +74,7 @@ async function loadFinanceData() {
             const allPayments = [...activePayments, ...extraPayments];
 
             window.__FINANCE_CONTRACTS = activeContracts; // Salva na memória global para os modais
+            window.__FINANCE_PAYMENTS = allPayments;
 
             renderStats(activeContracts, allPayments);
             renderPayments(allPayments);
@@ -214,7 +210,7 @@ async function loadFinanceData() {
     const allPayments = [...mockPayments, ...extraPayments];
 
     window.__FINANCE_CONTRACTS = window.__FINANCE_CONTRACTS || mockContracts; // Salva na memória global
-
+    window.__FINANCE_PAYMENTS = window.__FINANCE_PAYMENTS || allPayments;
 
     renderStats(mockContracts, allPayments);
     renderPayments(allPayments);
@@ -897,11 +893,10 @@ window.saveBaixaPagamento = async () => {
     try {
         const payload = {
             status: 'PAGO',
-            receiving_account: conta,
-            payment_method_ref: forma,
-            reference_period: ref,
-            receipt_url: comprovante,
-            amount_paid: 0 // Will be set dynamically by backend, or we can assume paid full
+            receiving_account_id: conta || null,
+            payment_method_real: forma,
+            reference_month_year: ref,
+            receipt_url: comprovante
         };
 
         const supabase = getSupabase();
@@ -910,12 +905,8 @@ window.saveBaixaPagamento = async () => {
         if (supabase) {
             try {
                 if (isExtra) {
-                    // Update extra service
-                    payload.status = 'aprovado'; // Ou algo equivalente
-                    await supabase.from('SERVICOS_EXTRAS_CLIENTES').update(payload).eq('servico_extra_id', paymentId);
+                    await supabase.from('SERVICOS_EXTRAS_CLIENTES').update({ status_servico_extra: 'pago' }).eq('servico_extra_id', paymentId);
                 } else {
-                    // Update payments_ledger
-                    payload.financial_status = 'PAID';
                     await supabase.from('payments_ledger').update(payload).eq('id', paymentId);
                 }
                 remoteSuccess = true;
@@ -948,6 +939,98 @@ window.saveBaixaPagamento = async () => {
         btnSubmit.disabled = false;
         btnSubmit.textContent = originalText;
     }
+};
+
+async function loadBankAccounts() {
+    const list = document.getElementById('bank-accounts-list');
+    const select = document.getElementById('baixa-conta');
+    
+    list.innerHTML = '<li>Carregando...</li>';
+    if(select) select.innerHTML = '<option value="">Selecione o banco de destino...</option>';
+
+    const supabase = getSupabase();
+    let accounts = [];
+    
+    if (supabase) {
+        const { data } = await supabase.from('fluxai_bank_accounts').select('*').order('created_at', { ascending: false });
+        if (data) accounts = data;
+    } else {
+        accounts = JSON.parse(localStorage.getItem('fluxai_bank_accounts') || '[]');
+    }
+
+    list.replaceChildren();
+    
+    if (accounts.length === 0) {
+        list.innerHTML = '<li>Nenhuma conta cadastrada. Adicione abaixo.</li>';
+        return;
+    }
+
+    accounts.forEach(acc => {
+        if (acc.is_active !== false) {
+            if(select) {
+                const opt = document.createElement('option');
+                opt.value = acc.id;
+                opt.textContent = `${acc.bank_name} - ${acc.agency || ''} / ${acc.account_number || ''}`;
+                select.appendChild(opt);
+            }
+            
+            const li = document.createElement('li');
+            li.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--os-border);";
+            
+            const info = document.createElement('div');
+            info.innerHTML = `<strong style="color:var(--os-text);">${acc.bank_name}</strong> - ${acc.owner_name}<br/><span style="opacity:0.6;">Ag: ${acc.agency} | Cc: ${acc.account_number} | PIX: ${acc.pix_key || '-'}</span>`;
+            
+            const delBtn = document.createElement('button');
+            delBtn.className = 'btn-mini';
+            delBtn.innerHTML = '<i class="fa-solid fa-trash"></i>';
+            delBtn.style.cssText = "background: transparent; color: var(--os-danger); border: none;";
+            delBtn.onclick = async () => {
+                if(confirm('Remover esta conta?')) {
+                    if (supabase) {
+                        await supabase.from('fluxai_bank_accounts').delete().eq('id', acc.id);
+                    } else {
+                        const newAccs = accounts.filter(a => a.id !== acc.id);
+                        localStorage.setItem('fluxai_bank_accounts', JSON.stringify(newAccs));
+                    }
+                    loadBankAccounts();
+                }
+            };
+            
+            li.appendChild(info);
+            li.appendChild(delBtn);
+            list.appendChild(li);
+        }
+    });
+}
+
+window.saveBankAccount = async () => {
+    const name = document.getElementById('new-bank-name').value;
+    const owner = document.getElementById('new-bank-owner').value;
+    const agency = document.getElementById('new-bank-agency').value;
+    const account = document.getElementById('new-bank-account').value;
+    const pix = document.getElementById('new-bank-pix').value;
+
+    const payload = {
+        id: crypto.randomUUID(),
+        bank_name: name,
+        owner_name: owner,
+        agency: agency,
+        account_number: account,
+        pix_key: pix,
+        is_active: true
+    };
+
+    const supabase = getSupabase();
+    if (supabase) {
+        await supabase.from('fluxai_bank_accounts').insert([payload]);
+    } else {
+        const accounts = JSON.parse(localStorage.getItem('fluxai_bank_accounts') || '[]');
+        accounts.push(payload);
+        localStorage.setItem('fluxai_bank_accounts', JSON.stringify(accounts));
+    }
+    
+    document.getElementById('add-bank-form').reset();
+    loadBankAccounts();
 };
 
 window.generateContractDoc = (contractId) => {
