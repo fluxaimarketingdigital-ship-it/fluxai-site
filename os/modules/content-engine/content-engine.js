@@ -263,6 +263,11 @@ window.calculateIACredits = async (clientId) => {
     const manualAdjustments = JSON.parse(localStorage.getItem('fluxai_ia_manual_adjustments') || '{}');
     manualLimit = parseInt(manualAdjustments[clientId] || 0, 10);
 
+    // Fallback de teste para evitar bloqueio caso a tabela IA_CREDITOS_CLIENTE ainda não tenha dados
+    if (baseLimit === 0 && extraLimit === 0 && manualLimit === 0) {
+        baseLimit = 20; 
+    }
+
     const totalLimit = baseLimit + extraLimit + manualLimit;
 
     let occupied = 0; 
@@ -608,6 +613,11 @@ function renderCalendar(containerId, contents, mode) {
             const statusColor = getStatusBg(c.status);
             
             if (!isStrategic && !['IN_PRODUCTION', 'INTERNAL_QA', 'CLIENT_REVIEW_CONTENT', 'READY_TO_POST', 'POSTED'].includes(std)) return;
+            
+            if (isStrategic) {
+                const planningStatuses = ['DRAFT_PLANNING', 'INTERNAL_REVIEW', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVISION_PLANNING'];
+                if (planningStatuses.includes(std)) return;
+            }
 
             const evtNode = document.createElement('div');
             evtNode.className = 'calendar-event';

@@ -61,8 +61,9 @@ async function handleWebhookFailure(app, response, transitionResult, actionName)
 async function initApproval() {
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
+    const assetId = params.get('id');
 
-    if (!token) {
+    if (!token && !assetId) {
         showError('Link de aprovação inválido ou expirado.');
         return;
     }
@@ -71,22 +72,47 @@ async function initApproval() {
     if (!supabase) return;
 
     try {
-        // RLS / MITIGAÇÃO DE SEGURANÇA BLOCO 2
-        // Bloquear consulta direta de visitante anônimo à tabela external_approvals
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-            showError('Acesso Anônimo Bloqueado: Por motivos de conformidade com a LGPD e regras rígidas de RLS, o acesso direto de visitantes não logados a esta tabela foi desativado. A aprovação por token externo está suspensa e aguarda a implantação da Edge Function controladora. Por favor, autentique-se no painel do FluxAI OS™ para realizar a aprovação.');
+            showError('Acesso Anônimo Bloqueado: Por favor, autentique-se no painel do FluxAI OS™ para realizar a aprovação.');
             return;
         }
 
-        // 1. Buscar item de aprovação pelo token
-        const { data: app, error } = await supabase
-            .from('external_approvals')
-            .select('*, projects(company_name)')
-            .eq('token', token)
-            .single();
+        let app = null;
 
-        if (error || !app) throw new Error('Aprovação não encontrada.');
+        if (token) {
+            // Fluxo Genérico (external_approvals)
+            const { data, error } = await supabase
+                .from('external_approvals')
+                .select('*, projects(company_name)')
+                .eq('token', token)
+                .single();
+            if (error || !data) throw new Error('Aprovação não encontrada (token).');
+            app = data;
+        } else if (assetId) {
+            // Fluxo Direto (content_assets)
+            const { data, error } = await supabase
+                .from('content_assets')
+                .select('*')
+                .eq('id', assetId)
+                .single();
+            if (error || !data) throw new Error('Ativo não encontrado (id).');
+            
+            // Adaptar asset para o formato esperado pelo renderApproval
+            app = {
+                id: data.id,
+                is_asset: true,
+                project_id: data.project_id,
+                type: 'CONTENT',
+                status: data.status,
+                content_data: {
+                    description: data.title + '\n\n' + (data.caption || ''),
+                    preview_url: data.metadata?.final_asset_url || data.metadata?.reference_url
+                },
+                projects: { company_name: 'Ativo de Conteúdo' }, // mock para renderApproval
+                original_asset: data
+            };
+        }
 
         renderApproval(app);
         bindEvents(app);
@@ -158,7 +184,12 @@ function bindEvents(app) {
         const transitionResult = { webhook: exec.webhook };
 
         try {
-            await supabase.from('external_approvals').update({ status: 'APROVADO' }).eq('id', app.id);
+            if (app.is_asset) {
+                const newMeta = { ...app.original_asset.metadata, client_approved: true };
+                await supabase.from('content_assets').update({ status: 'READY_TO_POST', metadata: newMeta }).eq('id', app.id);
+            } else {
+                await supabase.from('external_approvals').update({ status: 'APROVADO' }).eq('id', app.id);
+            }
             
             // Gravar log de governança/ação do usuário
             OS_LOGS_ENGINE.userAction(
@@ -215,10 +246,22 @@ function bindEvents(app) {
         const transitionResult = { webhook: exec.webhook };
 
         try {
-            await supabase.from('external_approvals').update({ 
-                status: 'ALTERACAO',
-                feedback: feedback
-            }).eq('id', app.id);
+            if (app.is_asset) {
+                const hist = app.original_asset.metadata?.history || [];
+                hist.push({ date: new Date().toISOString(), type: 'CLIENT', author: 'Cliente (Aprovação Externa)', note: feedback.description });
+                const newMeta = { ...app.original_asset.metadata, history: hist, client_approved: false };
+                
+                // Determinar o status
+                const currentStatus = String(app.original_asset.status).toUpperCase();
+                const nextStatus = currentStatus === 'CLIENT_REVIEW_PLANNING' ? 'CLIENT_REVISION_PLANNING' : 'CLIENT_REVISION_CONTENT';
+                
+                await supabase.from('content_assets').update({ status: nextStatus, metadata: newMeta }).eq('id', app.id);
+            } else {
+                await supabase.from('external_approvals').update({ 
+                    status: 'ALTERACAO',
+                    feedback: feedback
+                }).eq('id', app.id);
+            }
 
             // Gravar log
             OS_LOGS_ENGINE.userAction(
@@ -259,7 +302,14 @@ function bindEvents(app) {
         const transitionResult = { webhook: exec.webhook };
 
         try {
-            await supabase.from('external_approvals').update({ status: 'REPROVADO' }).eq('id', app.id);
+            if (app.is_asset) {
+                const hist = app.original_asset.metadata?.history || [];
+                hist.push({ date: new Date().toISOString(), type: 'CLIENT', author: 'Cliente (Aprovação Externa)', note: 'Material Reprovado integralmente.' });
+                const newMeta = { ...app.original_asset.metadata, history: hist, client_approved: false };
+                await supabase.from('content_assets').update({ status: 'CLIENT_REVISION_CONTENT', metadata: newMeta }).eq('id', app.id);
+            } else {
+                await supabase.from('external_approvals').update({ status: 'REPROVADO' }).eq('id', app.id);
+            }
 
             // Gravar log
             OS_LOGS_ENGINE.userAction(
