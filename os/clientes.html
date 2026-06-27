@@ -199,7 +199,7 @@
 
                 <!-- Modal Adicionar Serviço Extra -->
                 <div id="modal-extra" class="os-modal">
-                    <div class="os-modal-content">
+                    <div class="os-modal-content" style="max-height: 90vh; overflow-y: auto;">
                         <h2 style="margin: 0 0 20px; color: var(--os-primary); font-size: 1.1rem; text-transform: uppercase; letter-spacing: 1px;">Adicionar Serviço Extra</h2>
                         
                         <div style="display: flex; flex-direction: column; gap: 15px;">
@@ -207,41 +207,100 @@
                                 <label style="font-size: 0.75rem; color: var(--os-text-muted);">Cliente Alvo</label>
                                 <select id="extra-client-id" class="os-input"></select>
                             </div>
+                            
                             <div>
-                                <label style="font-size: 0.75rem; color: var(--os-text-muted);">Serviço Extra (Catálogo)</label>
-                                <select id="extra-catalog-id" class="os-input"></select>
-                            </div>
-                            <div>
-                                <label style="font-size: 0.75rem; color: var(--os-text-muted);">Status do Extra</label>
-                                <select id="extra-status" class="os-input">
-                                    <option value="solicitado">Solicitado</option>
-                                    <option value="em_orcamento">Em Orçamento</option>
-                                    <option value="orcamento_enviado">Orçamento Enviado</option>
-                                    <option value="aprovado">Aprovado</option>
-                                    <option value="em_producao">Em Produção</option>
-                                    <option value="entregue">Entregue</option>
+                                <label style="font-size: 0.75rem; color: var(--os-text-muted);">Tipo de Serviço Extra</label>
+                                <select id="extra-catalog-id" class="os-input">
+                                    <option value="">Nenhum Serviço Extra</option>
+                                    <optgroup label="FLUXAI (Agência & Marketing)">
+                                        <option value="[FluxAI] Gravação / Captação Audiovisual">Gravação / Captação Audiovisual (Rec. R$ 400)</option>
+                                        <option value="[FluxAI] Produção de Reels Extra (Unidade)">Produção de Reels Extra - Unidade (Rec. R$ 100)</option>
+                                        <option value="[FluxAI] Produção de Carrosséis Extra (Unidade)">Produção de Carrosséis Extra - Unidade (Rec. R$ 80)</option>
+                                        <option value="[FluxAI] Apresentação Comercial / Pitch Deck">Apresentação Comercial / Pitch Deck (Rec. R$ 500)</option>
+                                        <option value="[FluxAI] Branding & Identidade Visual Express">Branding & Identidade Visual Express (Rec. R$ 1.200)</option>
+                                        <option value="[FluxAI] Gestão de Anúncios Meta Ads">Gestão de Anúncios Meta Ads (Rec. R$ 600)</option>
+                                    </optgroup>
+                                    <optgroup label="FLUXAI LABS (Tecnologia & Sistemas)">
+                                        <option value="[FluxAI Labs] Automação de Processos (Make / n8n)">Automação de Processos - Make/n8n (Rec. R$ 800)</option>
+                                        <option value="[FluxAI Labs] Landing Page (LP) de Alta Conversão">Landing Page (LP) de Alta Conversão (Rec. R$ 1.500)</option>
+                                        <option value="[FluxAI Labs] Site Institucional Completo">Site Institucional Completo (Rec. R$ 2.500)</option>
+                                        <option value="[FluxAI Labs] Arquitetura de CRM & Pipeline de Vendas">Arquitetura de CRM & Pipeline (Rec. R$ 900)</option>
+                                        <option value="[FluxAI Labs] Chatbot de IA & Agente de Triagem">Chatbot de IA & Agente de Triagem (Rec. R$ 1.200)</option>
+                                        <option value="[FluxAI Labs] Dashboard de Analytics Personalizado">Dashboard de Analytics Personalizado (Rec. R$ 1.000)</option>
+                                    </optgroup>
+                                    <option value="Outro Serviço Avulso">Outro Serviço Avulso (Customizado)</option>
                                 </select>
                             </div>
+                            
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                                 <div>
-                                    <label style="font-size: 0.75rem; color: var(--os-text-muted);">Valor Estimado</label>
-                                    <input type="text" id="extra-valor-est" class="os-input" />
+                                    <label style="font-size: 0.75rem; color: var(--os-text-muted);">Valor Estimado (R$)</label>
+                                    <input type="number" step="0.01" id="extra-valor-est" class="os-input" placeholder="0.00" />
                                 </div>
                                 <div>
-                                    <label style="font-size: 0.75rem; color: var(--os-text-muted);">Valor Aprovado</label>
-                                    <input type="text" id="extra-valor-apr" class="os-input" />
+                                    <label style="font-size: 0.75rem; color: var(--os-text-muted);">Valor Aprovado (R$)</label>
+                                    <input type="number" step="0.01" id="extra-valor-apr" class="os-input" placeholder="0.00" />
                                 </div>
                             </div>
+                            
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--os-text-muted);">Status do Serviço</label>
+                                    <select id="extra-status" class="os-input">
+                                        <option value="solicitado">Solicitado</option>
+                                        <option value="em_analise">Em Análise</option>
+                                        <option value="orcamento_enviado">Orçamento Enviado</option>
+                                        <option value="aprovado">Aprovado</option>
+                                        <option value="recusado">Recusado</option>
+                                        <option value="em_producao">Em Produção</option>
+                                        <option value="entregue">Entregue</option>
+                                        <option value="cancelado">Cancelado</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--os-text-muted);">Responsável</label>
+                                    <input type="text" id="extra-owner" class="os-input" placeholder="Ex: Financeiro" />
+                                </div>
+                            </div>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--os-text-muted);">Prazo de Entrega (Dias)</label>
+                                    <input type="number" id="extra-deadline" class="os-input" placeholder="Ex: 5" />
+                                </div>
+                                <div>
+                                    <label style="font-size: 0.75rem; color: var(--os-text-muted);">Data de Vencimento</label>
+                                    <input type="date" id="extra-due-date" class="os-input" />
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <label style="font-size: 0.75rem; color: var(--os-text-muted);">Crédito IA Necessário?</label>
+                                <select id="extra-ai-credits" class="os-input">
+                                    <option value="0">Não consome IA</option>
+                                    <option value="1">Baixo (1 Crédito)</option>
+                                    <option value="3">Médio (3 Créditos)</option>
+                                    <option value="5">Alto (5 Créditos)</option>
+                                </select>
+                            </div>
+
                             <div>
                                 <label style="font-size: 0.75rem; color: var(--os-text-muted);">Impacto no Planejamento GPT?</label>
                                 <select id="extra-impact" class="os-input">
-                                    <option value="nao">Não</option>
-                                    <option value="sim">Sim (Alterar escopo)</option>
+                                    <option value="baixo">Baixo (Não afeta entregas mensais)</option>
+                                    <option value="medio">Médio (Requer ajuste de agenda)</option>
+                                    <option value="alto">Alto (Pausa parcial do escopo mensal)</option>
                                 </select>
                             </div>
+                            
                             <div>
-                                <label style="font-size: 0.75rem; color: var(--os-text-muted);">Observações</label>
-                                <textarea id="extra-obs" class="os-input" style="height: 50px;"></textarea>
+                                <label style="font-size: 0.75rem; color: var(--os-text-muted);">Escopo do Extra (Descrição detalhada)</label>
+                                <textarea id="extra-obs" class="os-input" style="height: 60px;" placeholder="O que será entregue?"></textarea>
+                            </div>
+
+                            <div>
+                                <label style="font-size: 0.75rem; color: var(--os-text-muted);"><i class="fa-brands fa-google-drive"></i> Link de Entrega (Google Drive / Doc)</label>
+                                <input type="url" id="extra-drive-link" class="os-input" placeholder="https://..." />
                             </div>
                         </div>
 

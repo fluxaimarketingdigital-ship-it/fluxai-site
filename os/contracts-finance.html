@@ -498,6 +498,67 @@
         </div>
     </div>
 
+    <!-- MODAL DE BAIXA DE PAGAMENTO -->
+    <div id="baixa-modal" class="os-modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
+        <div class="os-widget" style="background: var(--os-bg); border: 1px solid var(--os-border); border-radius: 8px; width: 100%; max-width: 500px; padding: 30px; position: relative;">
+            <button type="button" onclick="window.closeBaixaModal()" style="position:absolute; right: 20px; top: 20px; background:transparent; border:none; color:var(--os-text-muted); cursor:pointer; font-size:1.5rem;">&times;</button>
+            
+            <h3 style="font-size:0.9rem; text-transform:uppercase; color:var(--os-success); letter-spacing:1px; margin-top:0; margin-bottom:20px; display:flex; align-items:center; gap:8px;">
+                <i class="fa-solid fa-check-double"></i> Dar Baixa no Pagamento
+            </h3>
+
+            <form id="baixa-form" onsubmit="event.preventDefault(); window.saveBaixaPagamento();">
+                <input type="hidden" id="baixa-payment-id" />
+                <input type="hidden" id="baixa-is-extra" />
+
+                <div class="form-group">
+                    <label>Conta Recebedora (Banco)</label>
+                    <select id="baixa-conta" class="form-control" required>
+                        <option value="">Selecione o banco de destino...</option>
+                        <option value="Itaú">Itaú</option>
+                        <option value="Nubank">Nubank</option>
+                        <option value="Banco do Brasil">Banco do Brasil</option>
+                        <option value="Bradesco">Bradesco</option>
+                        <option value="Santander">Santander</option>
+                        <option value="Banco Inter">Banco Inter</option>
+                        <option value="Caixa Econômica">Caixa Econômica Federal</option>
+                        <option value="Sicredi">Sicredi</option>
+                        <option value="Sicoob">Sicoob</option>
+                        <option value="Outro">Outro Banco / Carteira Digital</option>
+                    </select>
+                </div>
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Forma de Pagamento</label>
+                        <select id="baixa-forma" class="form-control" required>
+                            <option value="PIX">PIX</option>
+                            <option value="Boleto">Boleto</option>
+                            <option value="TED/DOC">TED / Transferência</option>
+                            <option value="Dinheiro">Dinheiro</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Mês/Ano de Referência</label>
+                        <input type="month" id="baixa-ref" class="form-control" required />
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fa-brands fa-google-drive"></i> Link do Comprovante (Drive ou Imagem)</label>
+                    <input type="url" id="baixa-comprovante" class="form-control" placeholder="https://..." required />
+                </div>
+
+                <div style="margin-top: 30px; display: flex; justify-content: flex-end; gap: 10px;">
+                    <button type="button" onclick="window.closeBaixaModal()" class="btn-mini" style="padding:10px 20px; height:auto; width:auto; border-radius:4px;">Cancelar</button>
+                    <button type="submit" class="btn-mini" style="padding:10px 25px; height:auto; width:auto; background:var(--os-success); color:#000; font-weight:800; border-radius:4px; border-color:var(--os-success);">
+                        Confirmar Baixa
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- MODAL DE RECIBO SIMPLES / HTML -->
     <div id="receipt-modal" class="os-modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 10000; align-items: center; justify-content: center;">
         <div class="os-widget" style="background: var(--os-bg); border: 1px solid var(--os-border); border-radius: 8px; width: 100%; max-width: 600px; padding: 30px; position: relative;">

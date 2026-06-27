@@ -379,6 +379,16 @@ function renderPayments(payments) {
         };
         actionDiv.appendChild(btnWpp);
 
+        if (p.status !== 'PAGO') {
+            const btnBaixa = document.createElement('button');
+            btnBaixa.className = 'btn-mini';
+            btnBaixa.style.cssText = 'background: rgba(142, 158, 104, 0.2); color: var(--os-success); border-color: var(--os-success);';
+            btnBaixa.title = 'Dar Baixa / Conciliar';
+            btnBaixa.innerHTML = '<i class="fa-solid fa-check-double"></i>';
+            btnBaixa.onclick = () => window.openBaixaModal(p.id, p.is_extra);
+            actionDiv.appendChild(btnBaixa);
+        }
+
         td7.appendChild(actionDiv);
         tr.appendChild(td7);
         
@@ -854,6 +864,93 @@ window.getWhatsAppBillingMessage = (p) => {
     msg += `Qualquer dúvida, estamos à disposição. Equipe FluxAI.`;
     
     return msg;
+};
+
+window.openBaixaModal = (paymentId, isExtra) => {
+    document.getElementById('baixa-payment-id').value = paymentId;
+    document.getElementById('baixa-is-extra').value = isExtra ? 'true' : 'false';
+    document.getElementById('baixa-form').reset();
+    
+    // Auto-preencher o mês atual como sugestão
+    const now = new Date();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    document.getElementById('baixa-ref').value = `${now.getFullYear()}-${month}`;
+    
+    document.getElementById('baixa-modal').style.display = 'flex';
+};
+
+window.closeBaixaModal = () => {
+    document.getElementById('baixa-modal').style.display = 'none';
+};
+
+window.saveBaixaPagamento = async () => {
+    const paymentId = document.getElementById('baixa-payment-id').value;
+    const isExtra = document.getElementById('baixa-is-extra').value === 'true';
+    const conta = document.getElementById('baixa-conta').value;
+    const forma = document.getElementById('baixa-forma').value;
+    const ref = document.getElementById('baixa-ref').value;
+    const comprovante = document.getElementById('baixa-comprovante').value;
+
+    const btnSubmit = document.querySelector('#baixa-form button[type="submit"]');
+    if (btnSubmit.disabled) return;
+    btnSubmit.disabled = true;
+    const originalText = btnSubmit.textContent;
+    btnSubmit.textContent = 'Salvando...';
+
+    try {
+        const payload = {
+            status: 'PAGO',
+            receiving_account: conta,
+            payment_method_ref: forma,
+            reference_period: ref,
+            receipt_url: comprovante,
+            amount_paid: 0 // Will be set dynamically by backend, or we can assume paid full
+        };
+
+        const supabase = getSupabase();
+        let remoteSuccess = false;
+
+        if (supabase) {
+            try {
+                if (isExtra) {
+                    // Update extra service
+                    payload.status = 'aprovado'; // Ou algo equivalente
+                    await supabase.from('SERVICOS_EXTRAS_CLIENTES').update(payload).eq('servico_extra_id', paymentId);
+                } else {
+                    // Update payments_ledger
+                    payload.financial_status = 'PAID';
+                    await supabase.from('payments_ledger').update(payload).eq('id', paymentId);
+                }
+                remoteSuccess = true;
+            } catch (e) {
+                console.warn('[BAIXA] Falha remota', e);
+            }
+        }
+
+        // Mock UI Update
+        let mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
+        const idx = mockPayments.findIndex(p => p.id === paymentId);
+        if (idx !== -1) {
+            mockPayments[idx].status = 'PAGO';
+            mockPayments[idx].amount_paid = mockPayments[idx].amount_due;
+            localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
+        }
+
+        if (window.OS_LOGS_ENGINE) {
+            window.OS_LOGS_ENGINE.userAction('PAYMENT_RECONCILED', `Baixa do pagamento ${paymentId} concluída. Conta: ${conta}`);
+        }
+
+        await loadFinanceData();
+        window.closeBaixaModal();
+        alert('Pagamento reconciliado com sucesso! Baixa concluída.');
+
+    } catch (err) {
+        console.error('[BAIXA_ERROR]', err);
+        alert('Erro ao dar baixa. Tente novamente.');
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = originalText;
+    }
 };
 
 window.generateContractDoc = (contractId) => {

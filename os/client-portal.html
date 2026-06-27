@@ -994,6 +994,13 @@
                     const diffTime = dueDate - today;
                     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
                     
+                    if (diffDays < -5) {
+                        document.getElementById('locked-portal-overlay').style.display = 'flex';
+                        const alertContainer = document.getElementById('expiration-alert-container');
+                        if (alertContainer) alertContainer.style.display = 'none';
+                        return; // Para a execução do resto dos alertas
+                    }
+
                     const alertContainer = document.getElementById('expiration-alert-container');
                     alertContainer.replaceChildren();
                     
@@ -1125,5 +1132,20 @@
             </div>
         </div>
     </div>
+    <div id="locked-portal-overlay" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 99999; flex-direction: column; align-items: center; justify-content: center; backdrop-filter: blur(20px); text-align: center; padding: 20px;">
+        <i class="fa-solid fa-lock" style="font-size: 4rem; color: var(--os-danger, #f87171); margin-bottom: 20px;"></i>
+        <h1 style="color: #fff; font-size: 2rem; margin: 0 0 15px 0; font-weight: 900; text-transform: uppercase;">Acesso Suspenso</h1>
+        <p style="color: var(--os-text-muted); font-size: 1.1rem; max-width: 500px; line-height: 1.6; margin-bottom: 30px;">
+            Identificamos faturas em aberto há mais de 5 dias em seu contrato ou serviços avulsos. <br><br>
+            Para manter a excelência operacional do seu ecossistema digital, o portal e as novas solicitações foram temporariamente paralisados.
+        </p>
+        <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); padding: 20px; border-radius: 8px; margin-bottom: 30px;">
+            <p style="margin: 0; font-size: 0.9rem; color: #fff;">Por favor, regularize suas pendências financeiras para a liberação automática imediata.</p>
+        </div>
+        <a href="https://wa.me/5581981114694?text=Ol%C3%A1%2C%20gostaria%20de%20regularizar%20minhas%20faturas%20em%20aberto%20na%20FluxAI." target="_blank" style="background: #25d366; color: #000; padding: 15px 30px; border-radius: 6px; font-size: 0.9rem; font-weight: 900; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: transform 0.2s;">
+            <i class="fa-brands fa-whatsapp" style="font-size: 1.2rem;"></i> Falar com o Financeiro
+        </a>
+    </div>
+
 </body>
 </html>

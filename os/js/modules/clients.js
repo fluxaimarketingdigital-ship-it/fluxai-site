@@ -72,6 +72,11 @@ function setupEventListeners() {
             const valorApr = document.getElementById('extra-valor-apr').value;
             const impact = document.getElementById('extra-impact').value;
             const obs = document.getElementById('extra-obs').value;
+            const extraOwner = document.getElementById('extra-owner').value;
+            const extraDeadline = document.getElementById('extra-deadline').value;
+            const extraDueDate = document.getElementById('extra-due-date').value;
+            const extraAiCredits = document.getElementById('extra-ai-credits').value;
+            const extraDriveLink = document.getElementById('extra-drive-link').value;
 
             // Encontrar nome do serviço e categoria
             let serviceName = "Serviço Personalizado";
@@ -163,10 +168,10 @@ function setupEventListeners() {
                         status: "aprovado",
                         status_servico_extra: "orcamento_aprovado",
                         prioridade: prioridade,
-                        impacto_planejamento: impacto,
-                        gera_credito_ia: geraCredito,
-                        quantidade_credito_ia: qtyCredito,
-                        approved_by: currentUser?.email || currentUser?.username || role,
+                        impacto_planejamento: impact,
+                        gera_credito_ia: extraAiCredits > 0 ? "sim" : "nao",
+                        quantidade_credito_ia: extraAiCredits,
+                        approved_by: extraOwner || currentUser?.email || currentUser?.username || role,
                         approved_at: new Date().toISOString(),
                         limite_operacional_adicionado: addLimit,
                         origem_servico_extra: "painel_operacoes",
@@ -175,7 +180,9 @@ function setupEventListeners() {
                         valor_base: Number(valorEst) || 0,
                         valor_estimado: Number(valorEst) || 0,
                         valor_aprovado: Number(valorApr) || 0,
-                        prazo: "N/A",
+                        prazo: extraDeadline || "N/A",
+                        data_vencimento: extraDueDate,
+                        link_entrega: extraDriveLink,
                         timestamp: new Date().toISOString()
                     };
 
