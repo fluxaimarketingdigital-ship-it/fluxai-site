@@ -23,6 +23,7 @@ async function initFinance() {
     await OS_UI.renderTopbar();
 
     await loadFinanceData();
+    await loadBankAccounts();
 
     document.getElementById('btn-sync-finance').onclick = loadFinanceData;
     document.getElementById('btn-manage-banks').onclick = () => {
@@ -976,10 +977,10 @@ async function loadBankAccounts() {
 
     accounts.forEach(acc => {
         if (acc.is_active !== false) {
-            if(select) {
+            if (select) {
                 const opt = document.createElement('option');
                 opt.value = acc.id;
-                opt.textContent = `${acc.bank_name} - ${acc.agency || ''} / ${acc.account_number || ''}`;
+                opt.textContent = `${acc.bank_name} - Ag: ${acc.agency || '-'} | CC: ${acc.account_number || '-'}`;
                 select.appendChild(opt);
             }
             
