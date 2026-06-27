@@ -1,7 +1,7 @@
 import { OS_UI, OS_AUTH } from '../../js/os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
 import { contentEngineData } from './content-engine.data.js';
-import { StatusEngine } from '../../config/status-system.js';
+import { StatusEngine, STATUS_SYSTEM } from '../../config/status-system.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { OS_CONFIG } from '../../config/os-config.js';
 import { AIPlanner } from '../../services/ai-planner.js';
