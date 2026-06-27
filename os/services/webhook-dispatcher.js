@@ -14,7 +14,6 @@
 
 'use strict';
 
-import { SUPABASE_CONFIG } from '../config/os-config.js';
 import { getSupabase } from './supabase-client.js';
 
 // O Endpoint da Edge Function será gerado dinamicamente para evitar
@@ -29,6 +28,25 @@ function getProxyEndpoint() {
 // Function restringe chamadas a domínios não-autorizados.
 const PROXY_ACCESS_KEY = 'fluxai-proxy-public-2026';
 
+async function resolveToken(providedToken) {
+    if (providedToken) return providedToken;
+    try {
+        const supabase = getSupabase();
+        const { data } = await supabase?.auth.getSession() || {};
+        if (data?.session?.access_token) {
+            return data.session.access_token;
+        }
+    } catch (e) {
+        console.warn('[DISPATCHER] Falha ao buscar token JWT:', e);
+    }
+    // Se for mock mode local, cria um token fake para passar pelo proxy em ambiente DEV
+    const hostname = globalThis.location?.hostname || '';
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+        return 'dev-mock-token';
+    }
+    return null;
+}
+
 /**
  * Dispara um webhook via Supabase Edge Function make-proxy.
  *
@@ -38,7 +56,8 @@ const PROXY_ACCESS_KEY = 'fluxai-proxy-public-2026';
  * @returns {Promise<{ok: boolean, status: number, data?: object, error?: string}>}
  */
 export async function dispatchWebhook(route, payload, token = null) {
-    const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `idk_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const fallbackIdk = typeof crypto !== 'undefined' && crypto.getRandomValues ? `idk_${Date.now()}_${crypto.getRandomValues(new Uint32Array(1))[0].toString(36)}` : `idk_${Date.now()}_fallback`;
+    const idempotencyKey = typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : fallbackIdk;
 
     const headers = {
         'Content-Type': 'application/json',
@@ -46,27 +65,9 @@ export async function dispatchWebhook(route, payload, token = null) {
         'Idempotency-Key': idempotencyKey,
     };
 
-    if (!token) {
-        try {
-            const supabase = getSupabase();
-            if (supabase) {
-                const { data } = await supabase.auth.getSession();
-                if (data && data.session && data.session.access_token) {
-                    token = data.session.access_token;
-                }
-            }
-        } catch (e) {
-            console.warn('[DISPATCHER] Falha ao buscar token JWT:', e);
-        }
-    }
-
-    // Se for mock mode local, cria um token fake para passar pelo proxy em ambiente DEV
-    if (!token && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
-        token = 'dev-mock-token';
-    }
-
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
+    const finalToken = await resolveToken(token);
+    if (finalToken) {
+        headers['Authorization'] = `Bearer ${finalToken}`;
     }
 
     let response;

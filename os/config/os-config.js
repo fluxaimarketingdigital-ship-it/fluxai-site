@@ -26,11 +26,11 @@ import { STATUS_SYSTEM, StatusEngine } from './status-system.js';
  * Em desenvolvimento, ativa os mocks locais.
  */
 const _detectEnvironment = () => {
-    if (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.FLUXAI_ENVIRONMENT) {
-        return window.FLUXAI_ENV.FLUXAI_ENVIRONMENT.toUpperCase();
+    if (typeof window !== 'undefined' && globalThis.FLUXAI_ENV?.FLUXAI_ENVIRONMENT) {
+        return globalThis.FLUXAI_ENV.FLUXAI_ENVIRONMENT.toUpperCase();
     }
     if (typeof window === 'undefined') return 'PRODUCTION';
-    const host = window.location.hostname;
+    const host = globalThis.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.')) return 'DEVELOPMENT';
     if (host.includes('staging') || host.includes('preview') || host.includes('vercel.app')) return 'STAGING';
     return 'PRODUCTION';
@@ -39,7 +39,7 @@ const _detectEnvironment = () => {
 // [STG-04] FAIL-CLOSED ASSERTIONS
 if (typeof window !== 'undefined') {
     const env = _detectEnvironment();
-    const subUrl = window.FLUXAI_ENV ? window.FLUXAI_ENV.SUPABASE_URL : '';
+    const subUrl = globalThis.FLUXAI_ENV?.SUPABASE_URL || '';
     
     if (env === 'STAGING') {
         if (!subUrl || subUrl.includes('rmbxeikejzbcfiooylsd')) {
@@ -48,7 +48,7 @@ if (typeof window !== 'undefined') {
         }
 
         // [STG-04] AVISO VISUAL DE STAGING (Gate 12)
-        window.addEventListener('DOMContentLoaded', () => {
+        globalThis.addEventListener('DOMContentLoaded', () => {
             const badge = document.createElement('div');
             badge.innerHTML = 'STG — AMBIENTE DE STAGING';
             badge.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:red;color:white;text-align:center;z-index:999999;font-weight:bold;padding:5px;font-family:sans-serif;';
@@ -269,8 +269,8 @@ export const WEBHOOK_CONFIG = {
  * Apenas a anon_key é segura para uso público.
  */
 export const SUPABASE_CONFIG = {
-    url:     (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_URL) ? window.FLUXAI_ENV.SUPABASE_URL : 'https://mufgwetfhfhhmhowbhjj.supabase.co',
-    anonKey: (typeof window !== 'undefined' && window.FLUXAI_ENV && window.FLUXAI_ENV.SUPABASE_ANON_KEY) ? window.FLUXAI_ENV.SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI',
+    url:     (typeof window !== 'undefined' && globalThis.FLUXAI_ENV?.SUPABASE_URL) ? globalThis.FLUXAI_ENV.SUPABASE_URL : 'https://mufgwetfhfhhmhowbhjj.supabase.co',
+    anonKey: (typeof window !== 'undefined' && globalThis.FLUXAI_ENV?.SUPABASE_ANON_KEY) ? globalThis.FLUXAI_ENV.SUPABASE_ANON_KEY : 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Zmd3ZXRmaGZoaG1ob3diaGpqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg1Mzg1MDYsImV4cCI6MjA5NDExNDUwNn0.G0VxvE6acPRKZIwee7d2ARBkIdqf9SRvVI1uagMrBZI',
 
     // Tabelas do Supabase
     tables: {

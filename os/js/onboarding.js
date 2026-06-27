@@ -1,9 +1,4 @@
 import { OS_UI, OS_AUTH } from './os-core.js';
-import { getSupabase } from '../services/supabase-client.js';
-import { dispatchEvent } from './os-integration.js';
-import { OS_CONFIG } from '../config/os-config.js';
-import { OS_LOGS_ENGINE } from '../services/logs-engine.js';
-import { StatusEngine } from '../config/status-system.js';
 import { SERVICES_CATALOG } from './config/services-catalog.js';
 import { MakeClient } from '../services/makeClient.js';
 import { ROTAS_OS_MAKE } from '../services/makeRoutes.js';
@@ -27,7 +22,7 @@ async function initOnboarding() {
     const stepItems = document.querySelectorAll('.step-item');
     stepItems.forEach(item => {
         item.onclick = () => {
-            const targetStep = parseInt(item.getAttribute('data-step'));
+            const targetStep = Number.parseInt(item.getAttribute('data-step'), 10);
             if (targetStep !== currentStep) {
                 const delta = targetStep - currentStep;
                 moveStep(delta);
@@ -234,7 +229,7 @@ window.handleOnboarding = async function(e) {
     const yyyy = date.getFullYear();
     const mm = String(date.getMonth() + 1).padStart(2, '0');
     const cryptoArray = new Uint32Array(1);
-    window.crypto.getRandomValues(cryptoArray);
+    globalThis.crypto.getRandomValues(cryptoArray);
     const randomStr = String(cryptoArray[0] % 1000).padStart(3, '0');
     const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
     const projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
