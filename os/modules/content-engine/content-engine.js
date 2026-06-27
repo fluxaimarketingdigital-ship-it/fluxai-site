@@ -2253,3 +2253,16 @@ async function setupRealtime() {
         loadContent(); 
     }).subscribe(); 
 }
+
+window.copyPortalLink = () => {
+    if (!currentProject) {
+        alert('Selecione um cliente primeiro.');
+        return;
+    }
+    const url = window.location.origin + '/os/client-portal.html?project_id=' + currentProject;
+    navigator.clipboard.writeText(url).then(() => {
+        alert('Link do Portal do Cliente copiado com sucesso!\\n' + url);
+    }).catch(err => {
+        alert('Erro ao copiar o link. Você pode copiar manualmente: ' + url);
+    });
+};
