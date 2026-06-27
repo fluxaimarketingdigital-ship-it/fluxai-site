@@ -951,7 +951,6 @@ window.saveBaixaPagamento = async () => {
 };
 
 window.generateContractDoc = (contractId) => {
-window.generateContractDoc = (contractId) => {
     alert('Visualizador de Contrato (PDF) será integrado na próxima fase!');
 };
 
