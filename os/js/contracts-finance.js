@@ -185,11 +185,37 @@ async function loadFinanceData() {
         }
     });
 
-    renderStats(mockContracts, mockPayments);
-    renderPayments(mockPayments);
+    // Tenta puxar os serviços extras reais do banco, mesmo no modo de simulação
+    let extraPayments = [];
+    if (supabase) {
+        try {
+            const { data: extras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*');
+            if (extras) {
+                extraPayments = extras.map(ex => ({
+                    id: ex.servico_extra_id,
+                    amount_due: ex.valor_aprovado,
+                    amount_paid: 0,
+                    due_date: ex.data_solicitacao || ex.created_at || new Date().toISOString(),
+                    status: 'PENDENTE',
+                    payment_method: 'Serviço Extra',
+                    is_extra: true,
+                    contracts: {
+                        client_name: ex.client_name,
+                        company_name: ex.client_name + ' [EXTRA]',
+                        project_id: ex.client_id
+                    }
+                }));
+            }
+        } catch(e) { }
+    }
+
+    const allPayments = [...mockPayments, ...extraPayments];
+
+    renderStats(mockContracts, allPayments);
+    renderPayments(allPayments);
     renderContracts(mockContracts);
-    renderContractHealth(mockContracts, mockPayments);
-    renderOperationalAlerts(mockContracts, mockPayments);
+    renderContractHealth(mockContracts, allPayments);
+    renderOperationalAlerts(mockContracts, allPayments);
 }
 
 function renderStats(contracts, payments) {
