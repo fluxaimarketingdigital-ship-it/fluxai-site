@@ -16,10 +16,15 @@
 
 import { getSupabase } from './supabase-client.js';
 
-// O Endpoint da Edge Function será gerado dinamicamente para evitar
-// problemas de inicialização (dependência circular com os-config.js).
+// O Endpoint da Edge Function será gerado dinamicamente.
+// Agora aponta diretamente para o Túnel Blindado do Supabase (Edge Function)
 function getProxyEndpoint() {
-    return `/api/make-proxy`;
+    // Busca a URL do Supabase do ambiente ou usa a oficial
+    const baseUrl = (typeof window !== 'undefined' && globalThis.FLUXAI_ENV?.SUPABASE_URL) 
+        ? globalThis.FLUXAI_ENV.SUPABASE_URL 
+        : 'https://mufgwetfhfhhmhowbhjj.supabase.co';
+        
+    return `${baseUrl}/functions/v1/make-proxy`;
 }
 
 // ─── Proxy-Key pública (não é secret — apenas identifica o frontend) ────────
