@@ -84,6 +84,18 @@ export async function dispatchWebhook(route, payload, token = null) {
         finalPayload.client_id = legacyClientId;
     }
 
+    // Garante que o ecossistema antigo do Make receba o mes_referencia e tipo_entrega
+    if (finalPayload.action && finalPayload.action.startsWith('IA_GENERATION')) {
+        const now = new Date();
+        finalPayload.mes_referencia = finalPayload.mes_referencia || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        
+        let tipo_entrega = 'conteudo_estrategico';
+        if (finalPayload.title && finalPayload.title.toLowerCase().includes('carrossel')) {
+            tipo_entrega = 'carrossel';
+        }
+        finalPayload.tipo_entrega = finalPayload.tipo_entrega || tipo_entrega;
+    }
+
     let response;
     try {
         const endpoint = getProxyEndpoint();
