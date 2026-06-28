@@ -358,7 +358,9 @@ export const AIPlanner = {
                     if (kcResult && !kcResult.error && kcResult.content) {
                         // Tentar parsear JSON retornado pelo template
                         try {
-                            const parsed = JSON.parse(kcResult.content);
+                            // Limpa possveis formataes markdown antes do parse
+                            let cleanContent = kcResult.content.replace(/^```json/i, '').replace(/```$/i, '').trim();
+                            const parsed = JSON.parse(cleanContent);
                             const firstPauta = parsed.pautas?.[0];
                             if (firstPauta) {
                                 captionText = [
