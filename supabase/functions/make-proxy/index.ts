@@ -17,7 +17,7 @@ function getCorsHeaders(requestOrigin: string | null) {
   const origin = (requestOrigin && isOriginAllowed(requestOrigin)) ? requestOrigin : "https://www.fluxaidigital.com.br";
   return {
     "Access-Control-Allow-Origin": origin,
-    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-fluxai-proxy-key",
+    "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-fluxai-proxy-key, idempotency-key",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
   };
 }
