@@ -77,7 +77,7 @@ export async function dispatchWebhook(route, payload, token = null) {
 
     // Injeta o client_id legado (ex: FLUXAI_LABS_001) no payload para no quebrar o ecossistema Make
     let finalPayload = { ...payload };
-    const legacyClientId = typeof window !== 'undefined' && window.currentUser?.user_metadata?.client_id;
+    const legacyClientId = typeof window !== 'undefined' && window.FLUXAI_RUNTIME_CONTEXT?.project_id;
     if (legacyClientId) {
         finalPayload.legacy_client_id = legacyClientId;
         // Substitui tambm o client_id oficial pelo legado para garantir 100% de retrocompatibilidade com o Make
