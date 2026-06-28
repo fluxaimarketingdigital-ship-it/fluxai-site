@@ -94,18 +94,7 @@
                                 Gerencie aqui as chaves de integração para os motores de inteligência, análise de dados e automação (Make/n8n). Todas as chaves são criptografadas e mantidas seguras no contexto operacional.
                             </p>
                             
-                            <!-- OpenAI -->
-                            <div style="margin-bottom: 20px;">
-                                <label style="display:block; font-size: 0.75rem; font-weight: 800; color: #fff; margin-bottom: 8px;"><i class="fa-solid fa-brain" style="color: var(--os-primary); margin-right: 5px;"></i> OpenAI (ChatGPT)</label>
-                                <div style="display: flex; gap: 15px; align-items: center;">
-                                    <input type="password" id="openai-api-key" placeholder="sk-proj-..." style="flex: 1; max-width: 500px; padding: 12px 15px; background: #000; border: 1px solid var(--os-border); color: #fff; border-radius: 4px; font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;" />
-                                    <button id="btn-save-openai-key" class="btn-action btn-approve" style="height: 40px; padding: 0 25px; border-radius: 4px;" onclick="window.saveAPIKey('openai', 'openai-api-key')">Salvar</button>
-                                    <button id="btn-delete-openai-key" class="btn-action btn-review" style="height: 40px; padding: 0 15px; border-radius: 4px; display: none;" onclick="window.deleteAPIKey('openai')">Excluir</button>
-                                </div>
-                                <div id="openai-status-msg" style="margin-top: 10px; font-size: 0.75rem; color: var(--os-primary); display: none;">
-                                    <i class="fa-solid fa-circle-check"></i> Chave OpenAI ativa no sistema.
-                                </div>
-                            </div>
+
                             
                             <!-- Google APIs -->
                             <div style="margin-bottom: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">

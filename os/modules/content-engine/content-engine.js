@@ -172,22 +172,6 @@ export async function initEngine() {
             };
         }
 
-        const btnConfigOpenai = document.getElementById('btn-config-openai');
-        if (btnConfigOpenai) {
-            btnConfigOpenai.onclick = () => {
-                const currentKey = localStorage.getItem('openai_api_key') || '';
-                const newKey = prompt('Insira sua Chave de API da OpenAI (sk-...):', currentKey);
-                if (newKey !== null) {
-                    if (newKey.trim() === '') {
-                        localStorage.removeItem('openai_api_key');
-                        alert('Chave OpenAI removida.');
-                    } else {
-                        localStorage.setItem('openai_api_key', newKey.trim());
-                        alert('Chave OpenAI salva com sucesso!');
-                    }
-                }
-            };
-        }
 
     } catch (err) {
         sLog('ERRO NO MOTOR: ' + err.message);

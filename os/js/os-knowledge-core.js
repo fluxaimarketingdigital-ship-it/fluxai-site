@@ -270,16 +270,11 @@ export const KnowledgeCore = {
         const model = selectModel(template.complexity);
 
         // Chamar API OpenAI
-        const apiKey = localStorage.getItem('openai_api_key');
-        if (!apiKey) {
-            return { error: 'Chave OpenAI não configurada. Acesse Configurações para inserir sua chave sk-...' };
-        }
+        // REMOVIDO: apiKey local. A chave agora vem de forma segura via Edge Function.
 
         try {
-            const res = await fetch('https://api.openai.com/v1/chat/completions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${apiKey}` },
-                body: JSON.stringify({
+            const res = await getSupabase().functions.invoke('openai-proxy', {
+                body: {
                     model,
                     messages: [
                         { role: 'system', content: systemPrompt },
@@ -287,15 +282,18 @@ export const KnowledgeCore = {
                     ],
                     max_tokens: template.maxTokens || 1200,
                     temperature: template.temperature || 0.7
-                })
+                }
             });
-
-            if (!res.ok) {
-                const errData = await res.json();
-                throw new Error(errData.error?.message || `HTTP ${res.status}`);
+            
+            // Supabase devolve { data, error } 
+            if (res.error) {
+                throw new Error(res.error.message || 'Erro na Edge Function openai-proxy');
             }
-
-            const data = await res.json();
+            
+            const data = res.data;
+            if (data.error) {
+                throw new Error(data.error || 'HTTP_ERRO_OPENAI');
+            }
             const content = data.choices?.[0]?.message?.content || '';
             const tokensUsed = data.usage?.total_tokens || 0;
 
