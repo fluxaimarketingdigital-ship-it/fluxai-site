@@ -90,7 +90,7 @@ export const SYSTEM_IDENTITY = {
 export const FEATURE_FLAGS = {
     // Fonte de dados
     mockData:             true,                       // Forçando true temporariamente para testes
-    sendRealWebhooks:     false,                      // GLOBALMENTE DESATIVADO por padrão para segurança
+    sendRealWebhooks:     true,                      // GLOBALMENTE ATIVADO para testes reais
     enabledRealWebhooks:  ['LEAD_CAPTURE', 'DEMAND_SUBMISSION', 'CLIENT_ONBOARDING', 'SERVICE_EXTRA_REQUEST', 'SERVICE_EXTRA_APPROVAL'], // Apenas estes webhooks listados disparam real (homologação gradual)
     useSupabaseAuth:      true,   // Supabase é o auth primário (fallback: mock users)
     useSheetsAPI:         false,  // Google Sheets API direta (fase 2)
