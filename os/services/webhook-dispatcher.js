@@ -75,13 +75,22 @@ export async function dispatchWebhook(route, payload, token = null) {
         headers['Authorization'] = `Bearer ${finalToken}`;
     }
 
+    // Injeta o client_id legado (ex: FLUXAI_LABS_001) no payload para no quebrar o ecossistema Make
+    let finalPayload = { ...payload };
+    const legacyClientId = typeof window !== 'undefined' && window.currentUser?.user_metadata?.client_id;
+    if (legacyClientId) {
+        finalPayload.legacy_client_id = legacyClientId;
+        // Substitui tambm o client_id oficial pelo legado para garantir 100% de retrocompatibilidade com o Make
+        finalPayload.client_id = legacyClientId;
+    }
+
     let response;
     try {
         const endpoint = getProxyEndpoint();
         response = await fetch(endpoint, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ route, payload }),
+            body: JSON.stringify({ route, payload: finalPayload }),
         });
     } catch (networkError) {
         console.warn(`[DISPATCHER] Falha de rede ao chamar make-proxy para ${route}:`, networkError?.message);
