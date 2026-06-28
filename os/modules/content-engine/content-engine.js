@@ -525,6 +525,7 @@ function renderContentTable(contents) {
                         <button class="btn-mini safe-btn-force" title="Forçar Conclusão" style="display:none; background: rgba(16, 185, 129, 0.1); border-color: var(--os-success); color: var(--os-success);">  
                             <i class="fa-solid fa-circle-check"></i>  
                         </button>  
+                        <button class="btn-mini safe-btn-link" title="Copiar Link Cliente" style="background: rgba(255, 255, 255, 0.05); border-color: #444; color: #fff;"><i class="fa-solid fa-link"></i></button>
                         <button class="btn-mini safe-btn-edit" title="Editar/Governar" style="background: rgba(107, 122, 69, 0.2); border-color: var(--os-primary); color: var(--os-primary);">  
                             <i class="fa-solid fa-pen-to-square"></i>  
                         </button>  
@@ -564,6 +565,7 @@ function renderContentTable(contents) {
             tr.querySelector('.safe-btn-force').style.display = 'inline-block';
             tr.querySelector('.safe-btn-force').onclick = () => window.forceReady(c.id); 
         } 
+        tr.querySelector('.safe-btn-link').onclick = () => { const url = window.location.origin + '/os/approval.html?id=' + c.id; navigator.clipboard.writeText(url).then(() => alert('Link de aprovação copiado!\n' + url)); };
         tr.querySelector('.safe-btn-edit').onclick = () => window.openEditModal(c.id); 
         tr.querySelector('.safe-btn-del').onclick = () => window.deleteAsset(c.id);
 
@@ -2263,6 +2265,6 @@ window.copyPortalLink = () => {
     navigator.clipboard.writeText(url).then(() => {
         alert('Link do Portal do Cliente copiado com sucesso!\\n' + url);
     }).catch(err => {
-        alert('Erro ao copiar o link. Voc� pode copiar manualmente: ' + url);
+        alert('Erro ao copiar o link. Voc� pode copiar manualmente: ' + url);
     });
 };
