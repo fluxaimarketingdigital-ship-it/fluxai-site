@@ -663,6 +663,7 @@
                 if (error) throw error;
                 if (proj) {
                     document.getElementById('dual-client-name').innerText = (proj.name || proj.company_name).split(' ')[0].toUpperCase();
+                    window.currentClientDriveLink = proj.metadata?.onboarding?.asset_drive_link || proj.metadata?.asset_drive_link || '#';
                     const profession = proj.metadata?.onboarding?.profession || 'Estratégia Institucional';
                     document.getElementById('client-profession').innerText = profession.toUpperCase();
                 }
@@ -674,6 +675,7 @@
                 
                 if (proj) {
                     companyNameStr = (proj.company_name || proj.name).split(' ')[0].toUpperCase();
+                    window.currentClientDriveLink = proj.metadata?.onboarding?.asset_drive_link || proj.metadata?.asset_drive_link || '#';
                     const profession = proj.metadata?.onboarding?.profession || proj.segment || 'Estratégia Institucional';
                     document.getElementById('client-profession').innerText = profession.toUpperCase();
                 }
@@ -917,7 +919,7 @@
             
             const btn1 = document.createElement('button');
             btn1.className = 'btn-upload-receipt';
-            btn1.onclick = () => window.location.href = '#';
+            btn1.onclick = () => { const driveUrl = window.currentClientDriveLink || '#'; if (driveUrl !== '#') { window.open(driveUrl, '_blank'); } else { alert('Link da pasta do cliente (Drive) não configurado no Onboarding.'); } };
             btn1.innerHTML = '<i class="fa-solid fa-upload"></i> Enviar Comprovante';
             
             item1.appendChild(date1);
