@@ -1841,6 +1841,10 @@ async function runAiPlanner() {
         newAsset.metadata = newAsset.metadata || {};
         newAsset.metadata.ai_generated = true; // Flag for credits computation
         
+        const now = new Date();
+        const mes_referencia = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const tipo_entrega = (serviceKey && serviceKey.toLowerCase() === 'carrossel') ? 'carrossel' : 'conteudo_estrategico';
+
         // Webhook de controle operacional de IA
         const payload = {
             client_id: selectedId,
@@ -1851,7 +1855,9 @@ async function runAiPlanner() {
             action: 'IA_GENERATION_CREATED',
             limite_anterior: limits.available,
             limite_novo: limits.available, // Rascunho doesn't consume yet
-            timestamp: new Date().toISOString()
+            timestamp: now.toISOString(),
+            tipo_entrega: tipo_entrega,
+            mes_referencia: mes_referencia
         };
 
         const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
