@@ -583,8 +583,11 @@
                             actionsContainer.appendChild(btn); 
                         }
 
-                    document.getElementById('success-ui').style.display = 'block';
-                    return;
+                    // Se não for um dos status de planejamento permitidos, mostra a tela de sucesso/preparação e para
+                    if (!(currentStatus === 'PLANEJAMENTO' || currentStatus === 'REVISÃO GESTÃO' || currentStatus === 'DRAFT_PLANNING' || currentStatus === 'INTERNAL_REVIEW')) {
+                        document.getElementById('success-ui').style.display = 'block';
+                        return;
+                    }
                 }
 
                 const isFinalArt = currentStatus === 'APROVAÇÃO FINAL';

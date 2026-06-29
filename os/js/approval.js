@@ -185,8 +185,12 @@ function bindEvents(app) {
 
         try {
             if (app.is_asset) {
+                const currentStatus = String(app.original_asset.status).toUpperCase();
+                // Se estiver aprovando planejamento/rascunho, vai pra produção. Se for aprovação final, vai pra publicação.
+                const nextStatus = (currentStatus === 'APROVAÇÃO FINAL' || currentStatus === 'CLIENT_REVIEW_CONTENT') ? 'READY_TO_POST' : 'PRODUCTION_QUEUE';
+                
                 const newMeta = { ...app.original_asset.metadata, client_approved: true };
-                await supabase.from('content_assets').update({ status: 'READY_TO_POST', metadata: newMeta }).eq('id', app.id);
+                await supabase.from('content_assets').update({ status: nextStatus, metadata: newMeta }).eq('id', app.id);
             } else {
                 await supabase.from('external_approvals').update({ status: 'APROVADO' }).eq('id', app.id);
             }
