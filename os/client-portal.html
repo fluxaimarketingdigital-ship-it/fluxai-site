@@ -360,6 +360,14 @@
             </div>
         </div>
 
+        <!-- APROVAÇÕES PENDENTES -->
+        <div class="portal-section" id="section-pending-approvals" style="display: none;">
+            <div class="section-title"><i class="fa-solid fa-clipboard-check"></i> Aguardando Sua Aprovação</div>
+            <div id="pending-approvals-list" style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Itens injetados via JS -->
+            </div>
+        </div>
+
         <!-- MODAL NOVA DEMANDA -->
         <div id="modal-demanda" class="os-modal">
             <div class="os-modal-content">
@@ -698,10 +706,74 @@
             document.getElementById('val-leads').innerText = '32';
             document.getElementById('val-roi').innerText = '1.8x';
 
+            await renderPendingApprovals();
             await renderFinanceList();
             await checkFinancialAlerts();
         }
+
+        async function renderPendingApprovals() {
+            if (!_supabaseClient || !projectId) return;
+            
+            try {
+                // Buscamos apenas os status que requerem ação do cliente
+                const { data: assets, error } = await _supabaseClient.from('content_assets')
+                    .select('*')
+                    .eq('project_id', projectId)
+                    .in('status', ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT']);
+                    
+                const container = document.getElementById('section-pending-approvals');
+                const list = document.getElementById('pending-approvals-list');
+                
+                if (error || !assets || assets.length === 0) {
+                    container.style.display = 'none';
+                    return;
+                }
+                
+                container.style.display = 'block';
+                list.replaceChildren();
+                
+                assets.forEach(asset => {
+                    const div = document.createElement('div');
+                    div.style.cssText = 'background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); border-left: 4px solid var(--os-primary); padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;';
+                    
+                    const info = document.createElement('div');
+                    info.style.cssText = 'flex: 1; min-width: 200px;';
+                    
+                    const title = document.createElement('div');
+                    title.style.cssText = 'font-weight: 800; font-size: 1.1rem; color: #fff; margin-bottom: 8px;';
+                    title.textContent = asset.title || 'Ativo Sem Título';
+                    
+                    const meta = document.createElement('div');
+                    meta.style.cssText = 'font-size: 0.8rem; color: var(--os-text-muted); display: flex; gap: 20px; flex-wrap: wrap;';
+                    
+                    const statusSpan = document.createElement('span');
+                    statusSpan.innerHTML = `<i class="fa-solid fa-clock" style="color: #f59e0b;"></i> <strong style="color:#fff;">${asset.status}</strong>`;
+                    
+                    const dateSpan = document.createElement('span');
+                    const pubDate = asset.scheduled_at ? new Date(asset.scheduled_at).toLocaleDateString('pt-BR') : 'Sem data';
+                    dateSpan.innerHTML = `<i class="fa-solid fa-calendar"></i> Publicação: ${pubDate}`;
+                    
+                    meta.appendChild(statusSpan);
+                    meta.appendChild(dateSpan);
+                    info.appendChild(title);
+                    info.appendChild(meta);
+                    
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-nova-demanda';
+                    btn.style.cssText = 'padding: 12px 24px; font-size: 0.8rem; background: var(--os-primary); color: #000; flex-shrink: 0;';
+                    btn.innerHTML = '<i class="fa-solid fa-eye"></i> Revisar Conteúdo';
+                    btn.onclick = () => window.open(`/os/approval.html?id=${asset.id}`, '_blank');
+                    
+                    div.appendChild(info);
+                    div.appendChild(btn);
+                    list.appendChild(div);
+                });
+            } catch (err) {
+                console.error("Erro ao renderizar aprovações pendentes:", err);
+            }
+        }
         
+
         function openDemandaModal() {
             const select = document.getElementById('demanda-tipo');
             if (select) {

@@ -553,6 +553,12 @@ function renderContentTable(contents) {
         tr.querySelector('.safe-btn-edit').onclick = () => window.openEditModal(c.id); 
         tr.querySelector('.safe-btn-del').onclick = () => window.deleteAsset(c.id);
 
+        if (stdStatus === 'DESCARTADO' || c.status === 'DESCARTADO') {
+            tr.style.opacity = '0.4';
+            tr.querySelector('.safe-title').style.textDecoration = 'line-through';
+            tr.querySelector('.action-btns').style.display = 'none';
+        }
+
         body.appendChild(tr);
     }); 
 }
@@ -1734,7 +1740,7 @@ window.deleteAsset = async (id) => {
         const supabase = getSupabase();
         let error = null;
         try {
-            const res = await supabase.from('content_assets').delete().eq('id', id);
+            const res = await supabase.from('content_assets').update({ status: 'DESCARTADO' }).eq('id', id);
             error = res.error;
         } catch (e) {
             error = e;
@@ -1742,8 +1748,9 @@ window.deleteAsset = async (id) => {
 
         if (error) {
             const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-            const filtered = mockAssets.filter(item => item.id !== id);
-            localStorage.setItem('fluxai_mock_assets', JSON.stringify(filtered));
+            const idx = mockAssets.findIndex(item => item.id === id);
+            if (idx !== -1) mockAssets[idx].status = 'DESCARTADO';
+            localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
         }
 
         // Registrar logs
