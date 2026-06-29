@@ -607,11 +607,6 @@ function renderCalendar(containerId, contents, mode) {
             const statusColor = getStatusBg(c.status);
             
             if (!isStrategic && !['IN_PRODUCTION', 'INTERNAL_QA', 'CLIENT_REVIEW_CONTENT', 'READY_TO_POST', 'POSTED'].includes(std)) return;
-            
-            if (isStrategic) {
-                const planningStatuses = ['DRAFT_PLANNING', 'INTERNAL_REVIEW', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVISION_PLANNING'];
-                if (planningStatuses.includes(std)) return;
-            }
 
             const evtNode = document.createElement('div');
             evtNode.className = 'calendar-event';
