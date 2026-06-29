@@ -299,14 +299,14 @@
                     <div class="radio-opt" data-val="Revisão completa">Revisão completa</div>
                 </div>
 
-                <span class="section-label">CAMPO FINAL</span>
+                <span class="section-label">OBSERVAÇÕES ADICIONAIS</span>
                 <textarea id="feedback-text" rows="4" placeholder="Descreva objetivamente o ajuste desejado..."></textarea>
                 <button class="btn btn-approve" style="width: 100%;" id="btn-submit-feedback">ENVIAR SOLICITAÇÃO DE AJUSTE</button>
             </div>
         </div>
     </div>
 
-    <div class="success-msg" id="success-ui">
+    <div class="success-msg" id="success-ui" style="display: none;">
         <i class="fa-solid fa-circle-check"></i>
         <h2 id="success-title">Planejamento Aprovado!</h2>
         <p id="success-message">Excelente. Esta pauta foi enviada para a Execução Operacional.</p>
@@ -448,6 +448,21 @@
         };
 
         let _supabaseClient = null;
+
+        function mapToStandardStatus(status) {
+            const upper = status.toUpperCase();
+            if (upper === 'PLANEJAMENTO') return 'DRAFT_PLANNING';
+            if (upper === 'REVISÃO GESTÃO') return 'INTERNAL_REVIEW';
+            if (upper === 'APROVAÇÃO PLANEJAMENTO') return 'CLIENT_REVIEW_PLANNING';
+            if (upper === 'AJUSTE') return 'CLIENT_REVISION_PLANNING';
+            if (upper === 'PRODUÇÃO') return 'IN_PRODUCTION';
+            if (upper === 'AJUSTE DE PRODUÇÃO') return 'CLIENT_REVISION_CONTENT';
+            if (upper === 'REVISÃO INTERNA FINAL') return 'INTERNAL_QA';
+            if (upper === 'APROVAÇÃO FINAL') return 'CLIENT_REVIEW_CONTENT';
+            if (upper === 'PRONTO') return 'READY_TO_POST';
+            if (upper === 'PUBLICADO') return 'POSTED';
+            return upper;
+        }
 
         function formatClientTitle(title) {
             if (!title) return { prefix: 'POST', obj: 'Estratégia' };
