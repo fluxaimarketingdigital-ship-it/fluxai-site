@@ -102,6 +102,9 @@ export async function dispatchWebhook(route, payload, token = null) {
         if (finalPayload.status_ia === 'rascunho') finalPayload.status_ia = 'rascunho_ia';
         if (finalPayload.status_ia === 'aguardando_publicacao') finalPayload.status_ia = 'aprovado_interno';
         if (finalPayload.status_ia === 'descartado') finalPayload.status_ia = 'excluido';
+        
+        // Clona a variável para o nome exato da coluna da planilha para o Make não se perder
+        finalPayload.status_geracao = finalPayload.status_geracao || finalPayload.status_ia;
     }
 
     let response;
