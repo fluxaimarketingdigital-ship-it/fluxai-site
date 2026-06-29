@@ -719,7 +719,7 @@
                 const { data: assets, error } = await _supabaseClient.from('content_assets')
                     .select('*')
                     .eq('project_id', projectId)
-                    .in('status', ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT']);
+                    .in('status', ['PLANEJAMENTO', 'DRAFT_PLANNING', 'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT']);
                     
                 const container = document.getElementById('section-pending-approvals');
                 const list = document.getElementById('pending-approvals-list');
