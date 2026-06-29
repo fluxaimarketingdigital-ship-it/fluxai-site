@@ -443,6 +443,12 @@
                 </div>
             </div>
             
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; margin-bottom:-10px;">
+                <button onclick="window.changeClientMonth(-1)" class="btn-nova-demanda" style="padding: 6px 12px; font-size: 0.7rem; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-chevron-left"></i> Mês Anterior</button>
+                <div id="calendar-month-label" style="font-weight:900; font-size:1.1rem; color:#fff; text-transform:uppercase;"></div>
+                <button onclick="window.changeClientMonth(1)" class="btn-nova-demanda" style="padding: 6px 12px; font-size: 0.7rem; background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);">Próximo Mês <i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+
             <div class="calendar-grid" id="client-calendar-grid">
                 <!-- Injetado via JS -->
             </div>
@@ -730,6 +736,10 @@
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            const label = document.getElementById('calendar-month-label');
+            if (label) label.textContent = `${monthNames[month]} ${year}`;
+
             for (let i = 0; i < firstDay; i++) {
                 const div = document.createElement('div');
                 div.className = 'calendar-day';
@@ -770,6 +780,13 @@
                 container.appendChild(dayDiv);
             }
         }
+
+        window.changeClientMonth = (delta) => {
+            currentMonth += delta;
+            if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+            if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+            loadClientCalendar();
+        };
 
         async function renderPendingApprovals() {
             if (!_supabaseClient || !projectId) return;
