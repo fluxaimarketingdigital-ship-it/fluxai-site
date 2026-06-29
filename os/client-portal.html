@@ -443,66 +443,8 @@
                 </div>
             </div>
             
-            <div class="calendar-grid">
-                <!-- Semana 1 -->
-                <div class="calendar-day empty"></div>
-                <div class="calendar-day empty"></div>
-                <div class="calendar-day empty"></div>
-                <div class="calendar-day">
-                    <div class="day-number">1</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Reel Institucional</div>
-                </div>
-                <div class="calendar-day"><div class="day-number">2</div></div>
-                <div class="calendar-day">
-                    <div class="day-number">3</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Bastidores Operacionais</div>
-                </div>
-                <div class="calendar-day">
-                    <div class="day-number">4</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Carrossel Estratégico</div>
-                </div>
-                
-                <!-- Semana 2 -->
-                <div class="calendar-day"><div class="day-number">5</div></div>
-                <div class="calendar-day">
-                    <div class="day-number">6</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#f59e0b"></span> Prova de Estrutura</div>
-                </div>
-                <div class="calendar-day">
-                    <div class="day-number">7</div>
-                    <div class="calendar-event"><span class="event-status" style="background:#10b981"></span> Conteúdo Institucional</div>
-                </div>
-                <div class="calendar-day"><div class="day-number">8</div></div>
-                <div class="calendar-day"><div class="day-number">9</div></div>
-                <div class="calendar-day"><div class="day-number">10</div></div>
-                <div class="calendar-day"><div class="day-number">11</div></div>
-                
-                <!-- Semana 3 -->
-                <div class="calendar-day"><div class="day-number">12</div></div>
-                <div class="calendar-day"><div class="day-number">13</div></div>
-                <div class="calendar-day"><div class="day-number">14</div></div>
-                <div class="calendar-day"><div class="day-number">15</div></div>
-                <div class="calendar-day"><div class="day-number">16</div></div>
-                <div class="calendar-day"><div class="day-number">17</div></div>
-                <div class="calendar-day"><div class="day-number">18</div></div>
-                
-                <!-- Semana 4 -->
-                <div class="calendar-day"><div class="day-number">19</div></div>
-                <div class="calendar-day"><div class="day-number">20</div></div>
-                <div class="calendar-day"><div class="day-number">21</div></div>
-                <div class="calendar-day"><div class="day-number">22</div></div>
-                <div class="calendar-day"><div class="day-number">23</div></div>
-                <div class="calendar-day"><div class="day-number">24</div></div>
-                <div class="calendar-day"><div class="day-number">25</div></div>
-                
-                <!-- Semana 5 -->
-                <div class="calendar-day"><div class="day-number">26</div></div>
-                <div class="calendar-day"><div class="day-number">27</div></div>
-                <div class="calendar-day"><div class="day-number">28</div></div>
-                <div class="calendar-day"><div class="day-number">29</div></div>
-                <div class="calendar-day"><div class="day-number">30</div></div>
-                <div class="calendar-day"><div class="day-number">31</div></div>
-                <div class="calendar-day empty"></div>
+            <div class="calendar-grid" id="client-calendar-grid">
+                <!-- Injetado via JS -->
             </div>
             
             <style>
@@ -619,6 +561,33 @@
             return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(String(value || ""));
         }
 
+        function mapToStandardStatus(status) {
+            const upper = status.toUpperCase();
+            if (upper === 'PLANEJAMENTO') return 'DRAFT_PLANNING';
+            if (upper === 'REVISÃO GESTÃO') return 'INTERNAL_REVIEW';
+            if (upper === 'APROVAÇÃO PLANEJAMENTO') return 'CLIENT_REVIEW_PLANNING';
+            if (upper === 'AJUSTE') return 'CLIENT_REVISION_PLANNING';
+            if (upper === 'PRODUÇÃO') return 'IN_PRODUCTION';
+            if (upper === 'AJUSTE DE PRODUÇÃO') return 'CLIENT_REVISION_CONTENT';
+            if (upper === 'REVISÃO INTERNA FINAL') return 'INTERNAL_QA';
+            if (upper === 'APROVAÇÃO FINAL') return 'CLIENT_REVIEW_CONTENT';
+            if (upper === 'PRONTO') return 'READY_TO_POST';
+            if (upper === 'PUBLICADO') return 'POSTED';
+            return upper;
+        }
+
+        function getStatusBg(status) {
+            const std = mapToStandardStatus(status);
+            if (std.includes('PLANNING') || std.includes('REVIEW')) {
+                if (std.includes('CLIENT')) return 'rgba(59, 130, 246, 0.4)';
+                return 'rgba(139, 92, 246, 0.4)';
+            }
+            if (std.includes('PRODUCTION')) return 'rgba(245, 158, 11, 0.4)';
+            if (std.includes('REVISION')) return 'rgba(239, 68, 68, 0.4)';
+            if (std.includes('APPROVED') || std.includes('POST')) return 'rgba(16, 185, 129, 0.4)';
+            return 'rgba(255, 255, 255, 0.15)';
+        }
+
         async function init() {
             const session = window.FLUXAI_RUNTIME_CONTEXT || {};
             let companyNameStr = 'CLIENTE';
@@ -706,9 +675,100 @@
             document.getElementById('val-leads').innerText = '32';
             document.getElementById('val-roi').innerText = '1.8x';
 
+            await loadClientCalendar();
             await renderPendingApprovals();
             await renderFinanceList();
             await checkFinancialAlerts();
+        }
+
+        async function loadClientCalendar() {
+            if (!_supabaseClient || !projectId) return;
+            
+            try {
+                const { data: assets, error } = await _supabaseClient.from('content_assets')
+                    .select('*')
+                    .eq('project_id', projectId);
+                
+                if (error) throw error;
+                
+                const validAssets = (assets || []).filter(a => {
+                    const std = mapToStandardStatus(a.status);
+                    return std !== 'DESCARTADO';
+                });
+                
+                renderClientCalendar(validAssets);
+                updateCalendarBadges(validAssets);
+            } catch (err) {
+                console.error("Erro ao carregar calendario:", err);
+            }
+        }
+
+        function updateCalendarBadges(assets) {
+            const pendingCount = assets.filter(a => ['PLANEJAMENTO', 'DRAFT_PLANNING', 'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(a.status)).length;
+            const approvedCount = assets.filter(a => {
+                const std = mapToStandardStatus(a.status);
+                return std === 'IN_PRODUCTION' || std === 'INTERNAL_QA' || std === 'READY_TO_POST' || std === 'POSTED';
+            }).length;
+
+            const badgeContainer = document.querySelector('.section-title > div:last-child');
+            if (badgeContainer) {
+                badgeContainer.innerHTML = `
+                    <div class="os-badge" style="background:rgba(245,158,11,0.2); border:1px solid #f59e0b; color:#f59e0b; font-size:0.6rem; padding:4px 8px; border-radius:4px;">${pendingCount} Pendentes</div>
+                    <div class="os-badge" style="background:rgba(16,185,129,0.2); border:1px solid #10b981; color:#10b981; font-size:0.6rem; padding:4px 8px; border-radius:4px;">${approvedCount} Aprovados</div>
+                `;
+            }
+        }
+
+        function renderClientCalendar(contents) {
+            const container = document.getElementById('client-calendar-grid');
+            if (!container) return;
+            
+            container.replaceChildren();
+            
+            const year = currentYear;
+            const month = currentMonth;
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) {
+                const div = document.createElement('div');
+                div.className = 'calendar-day';
+                div.style.opacity = '0.05';
+                container.appendChild(div);
+            }
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
+                
+                const dayDiv = document.createElement('div');
+                dayDiv.className = 'calendar-day';
+                dayDiv.style.minHeight = '100px';
+                
+                const dayNum = document.createElement('div');
+                dayNum.className = 'day-number';
+                dayNum.style.cssText = 'font-size: 0.65rem; font-weight: 800; margin-bottom: 8px;';
+                dayNum.textContent = day;
+                dayDiv.appendChild(dayNum);
+                
+                dayContents.forEach(c => {
+                    const statusColor = getStatusBg(c.status);
+                    
+                    const evtNode = document.createElement('div');
+                    evtNode.className = 'calendar-event';
+                    evtNode.onclick = () => window.open(`/os/approval.html?id=${c.id}`, '_blank');
+                    evtNode.style.cssText = `border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px; cursor: pointer;`;
+                    
+                    const titleNode = document.createElement('div');
+                    titleNode.style.cssText = 'font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;';
+                    titleNode.textContent = c.title ? c.title.substring(0, 15) : 'Pauta';
+                    
+                    evtNode.appendChild(titleNode);
+                    dayDiv.appendChild(evtNode);
+                });
+
+                container.appendChild(dayDiv);
+            }
         }
 
         async function renderPendingApprovals() {
