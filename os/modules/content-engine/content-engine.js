@@ -570,7 +570,8 @@ function renderCalendar(containerId, contents, mode) {
     container.replaceChildren();
     
     const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
-    const label = document.getElementById('calendar-month-label');
+    const labelId = mode === 'STRATEGIC' ? 'calendar-month-label' : 'calendar-month-label-operacional';
+    const label = document.getElementById(labelId);
     if (label) label.textContent = `${monthNames[currentMonth]} ${currentYear}`;
 
     const year = currentYear;

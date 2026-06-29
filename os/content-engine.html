@@ -134,6 +134,15 @@
                 </div>
 
                 <div id="tab-calendario-operacional" style="display: none;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; background:rgba(255,255,255,0.03); padding:10px 20px; border-radius:8px; border:1px solid #333;">
+                        <div style="display:flex; align-items:center; gap:15px;">
+                            <span id="calendar-month-label-operacional" style="font-size:0.75rem; font-weight:800; color:var(--os-primary); text-transform:uppercase; letter-spacing:1px; min-width:120px;">Carregando Ciclo...</span>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <button class="btn-ai" onclick="window.changeMonth(-1)" style="padding:0 12px; background:rgba(255,255,255,0.05); border:1px solid #444; height:30px;"><i class="fa-solid fa-chevron-left"></i></button>
+                            <button class="btn-ai" onclick="window.changeMonth(1)" style="padding:0 12px; background:rgba(255,255,255,0.05); border:1px solid #444; height:30px;"><i class="fa-solid fa-chevron-right"></i></button>
+                        </div>
+                    </div>
                     <div class="calendar-grid" id="calendar-operational-body"></div>
                 </div>
 
