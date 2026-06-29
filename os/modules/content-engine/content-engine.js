@@ -601,6 +601,8 @@ function renderCalendar(containerId, contents, mode) {
         
         dayContents.forEach(c => {
             const std = mapToStandardStatus(c.status);
+            if (std === 'DESCARTADO') return;
+            
             const isStrategic = mode === 'STRATEGIC';
             const statusColor = getStatusBg(c.status);
             
@@ -613,8 +615,8 @@ function renderCalendar(containerId, contents, mode) {
 
             const evtNode = document.createElement('div');
             evtNode.className = 'calendar-event';
-            evtNode.onclick = () => window.openApproval(c.id);
-            evtNode.style.cssText = `border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px;`;
+            evtNode.onclick = () => window.openEditModal(c.id);
+            evtNode.style.cssText = `border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px; cursor: pointer;`;
             
             const titleNode = document.createElement('div');
             titleNode.style.cssText = 'font-weight: 800; color: #fff;';
