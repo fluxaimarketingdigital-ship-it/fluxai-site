@@ -897,9 +897,43 @@
 
                         await executeTransition(c, nextStatus, logicalTarget, feedback);
 
+                        const currentMetadata = c.metadata || {};
+                        const curVer = currentMetadata.version || 'V1';
+                        const versions = currentMetadata.versions || {
+                            'V1': { caption: c.caption || '', locked: false }
+                        };
+
+                        if (versions[curVer]) versions[curVer].locked = true;
+
+                        const nextCycle = (currentMetadata.revision_cycle || 1) + 1;
+                        const nextVer = `V${nextCycle}`;
+
+                        versions[nextVer] = {
+                            caption: versions[curVer].caption || c.caption || '',
+                            locked: false
+                        };
+
+                        const history = currentMetadata.history || [];
+                        history.push({
+                            date: new Date().toISOString(),
+                            type: 'CLIENT',
+                            author: 'Cliente (Portal)',
+                            note: feedback
+                        });
+
+                        const updatedMetadata = {
+                            ...currentMetadata,
+                            version: nextVer,
+                            revision_cycle: nextCycle,
+                            versions: versions,
+                            history: history,
+                            client_approved: false
+                        };
+
                         const { error } = await _supabaseClient.from('content_assets').update({ 
                             status: nextStatus,
-                            internal_notes: feedback 
+                            internal_notes: feedback,
+                            metadata: updatedMetadata
                         }).eq('id', id);
 
                         if (error) throw error;
