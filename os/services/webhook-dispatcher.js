@@ -84,7 +84,7 @@ export async function dispatchWebhook(route, payload, token = null) {
         finalPayload.client_id = legacyClientId;
     }
 
-    // Garante que o ecossistema antigo do Make receba o mes_referencia e tipo_entrega
+    // Garante que o ecossistema antigo do Make receba todos os mapeamentos críticos
     if (finalPayload.action && finalPayload.action.startsWith('IA_GENERATION')) {
         const now = new Date();
         finalPayload.mes_referencia = finalPayload.mes_referencia || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -94,6 +94,14 @@ export async function dispatchWebhook(route, payload, token = null) {
             tipo_entrega = 'carrossel';
         }
         finalPayload.tipo_entrega = finalPayload.tipo_entrega || tipo_entrega;
+        
+        // Assegurar a origem da geração (regra de negócios principal: contrato)
+        finalPayload.origem_geracao = finalPayload.origem_geracao || 'contrato';
+        
+        // Garantir retrocompatibilidade com a nomenclatura exata da planilha (status_geracao)
+        if (finalPayload.status_ia === 'rascunho') finalPayload.status_ia = 'rascunho_ia';
+        if (finalPayload.status_ia === 'aguardando_publicacao') finalPayload.status_ia = 'aprovado_interno';
+        if (finalPayload.status_ia === 'descartado') finalPayload.status_ia = 'excluido';
     }
 
     let response;
