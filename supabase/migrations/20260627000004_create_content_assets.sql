@@ -1,5 +1,11 @@
 -- MIGRATION: 20260627000004_create_content_assets.sql
 
+-- Garantir que a tabela profiles tem as colunas necessárias
+CREATE TABLE IF NOT EXISTS public.profiles (
+    id UUID PRIMARY KEY,
+    role TEXT NOT NULL DEFAULT 'CLIENT'
+);
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS client_id TEXT;
 CREATE TABLE IF NOT EXISTS public.content_assets (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     project_id TEXT NOT NULL,
