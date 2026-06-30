@@ -811,8 +811,19 @@ window.openEditModal = async (id) => {
         gridDiv.appendChild(rightDiv);
         roadmapContainer.appendChild(gridDiv);
         
-        document.getElementById('edit-asset-caption').value = versions[currentVersion]?.caption || c.caption || '';
-        document.getElementById('edit-asset-social-copy').value = versions[currentVersion]?.social_copy || c.metadata?.social_copy || '';
+        let captionVal = versions[currentVersion]?.caption || c.caption || '';
+        let existingSocialCopy = versions[currentVersion]?.social_copy || c.metadata?.social_copy || '';
+        
+        // Auto-extração da legenda da pauta se a legenda final estiver vazia
+        if (!existingSocialCopy && captionVal) {
+            const match = captionVal.match(/📝\s*LEGENDA:[ \n]*([\s\S]*?)(?:\n# HASHTAGS:|\n⏰ HORÁRIO IDEAL:|$)/i);
+            if (match && match[1].trim() && !match[1].includes('[Pendente de Estruturação')) {
+                existingSocialCopy = match[1].trim();
+            }
+        }
+
+        document.getElementById('edit-asset-caption').value = captionVal;
+        document.getElementById('edit-asset-social-copy').value = existingSocialCopy;
 
         // Preencher outros metadados na aba inferior
         const metaGrid = document.getElementById('edit-asset-meta-fields');
