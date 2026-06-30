@@ -740,9 +740,18 @@ window.openEditModal = async (id) => {
         captionLabel.textContent = 'Roteiro Estratégico (Pauta)';
         const captionTextarea = document.createElement('textarea');
         captionTextarea.id = 'edit-asset-caption';
-        captionTextarea.style.cssText = 'width:100%; height:320px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none;';
+        captionTextarea.style.cssText = 'width:100%; height:140px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none; margin-bottom:15px;';
         leftDiv.appendChild(captionLabel);
         leftDiv.appendChild(captionTextarea);
+
+        const socialCopyLabel = document.createElement('label');
+        socialCopyLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;';
+        socialCopyLabel.textContent = 'Legenda Final (Copy da Rede Social)';
+        const socialCopyTextarea = document.createElement('textarea');
+        socialCopyTextarea.id = 'edit-asset-social-copy';
+        socialCopyTextarea.style.cssText = 'width:100%; height:140px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none;';
+        leftDiv.appendChild(socialCopyLabel);
+        leftDiv.appendChild(socialCopyTextarea);
         
         const rightDiv = document.createElement('div');
         const historyLabel = document.createElement('label');
@@ -803,6 +812,7 @@ window.openEditModal = async (id) => {
         roadmapContainer.appendChild(gridDiv);
         
         document.getElementById('edit-asset-caption').value = versions[currentVersion]?.caption || c.caption || '';
+        document.getElementById('edit-asset-social-copy').value = versions[currentVersion]?.social_copy || c.metadata?.social_copy || '';
 
         // Preencher outros metadados na aba inferior
         const metaGrid = document.getElementById('edit-asset-meta-fields');
@@ -927,6 +937,8 @@ window.rejectAndFreezeVersion = async (id) => {
 
         // 1. Travar a versão atual
         if (versions[curVer]) {
+            versions[curVer].caption = document.getElementById('edit-asset-caption').value;
+            versions[curVer].social_copy = document.getElementById('edit-asset-social-copy').value;
             versions[curVer].locked = true;
         }
 
@@ -937,6 +949,7 @@ window.rejectAndFreezeVersion = async (id) => {
         // Injetar no seletor de versões
         versions[nextVer] = {
             caption: versions[curVer].caption, // herda o roteiro para edição
+            social_copy: versions[curVer].social_copy || '', // herda o copy
             locked: false
         };
 
@@ -958,6 +971,7 @@ window.rejectAndFreezeVersion = async (id) => {
             version: nextVer,
             revision_cycle: nextCycle,
             versions: versions,
+            social_copy: versions[nextVer]?.social_copy || '',
             history: history,
             client_approved: false
         };
@@ -1014,6 +1028,7 @@ window.saveAssetEdit = async () => {
 
         const title = document.getElementById('edit-asset-title').value;
         const caption = document.getElementById('edit-asset-caption').value;
+        const socialCopy = document.getElementById('edit-asset-social-copy').value;
         const ref = document.getElementById('edit-asset-ref').value;
         const artFinal = document.getElementById('edit-asset-art-final').value;
         
@@ -1034,12 +1049,14 @@ window.saveAssetEdit = async () => {
         // Atualizar roteiro na versão selecionada (se não estiver travada)
         if (versions[curVer] && !versions[curVer].locked) {
             versions[curVer].caption = caption;
+            versions[curVer].social_copy = socialCopy;
         }
 
         const newMetadata = {
             ...currentAssetData.metadata,
             reference_url: ref,
             final_asset_url: artFinal,
+            social_copy: socialCopy,
             responsible,
             approval_deadline: deadline,
             strategic_approved: strat,
@@ -2024,12 +2041,10 @@ window.openPublishBridge = (id) => {
     document.getElementById('pub-scheduled-time').innerText = scheduled;
 
     // Legenda, hashtags, CTA e caminho do arquivo consolidados
-    const captionText = asset.caption || asset.description || '';
+    const captionText = asset.metadata?.social_copy || '⚠️ A legenda final ainda não foi escrita.\nPara adicionar a legenda da rede social, edite esta pauta na fase de Produção e preencha o campo "Legenda Final (Copy da Rede Social)".';
     const hashtags = asset.metadata?.hashtags || '#fluxai #inteligenciaartificial';
-    const cta = asset.metadata?.cta || 'Acesse o link na bio para saber mais!';
-    const filePath = asset.metadata?.file_path || `Drive: Maria Aparecida/entregas/${asset.title}.mp4`;
 
-    const fullPreview = `📝 LEGENDA:\n${captionText}\n\n🏷️ HASHTAGS:\n${hashtags}`;
+    const fullPreview = `📝 LEGENDA FINAL:\n${captionText}\n\n🏷️ HASHTAGS:\n${hashtags}`;
     document.getElementById('pub-caption-preview').value = fullPreview;
 
     // Links de Canva e Instagram/Plataforma
@@ -2038,7 +2053,7 @@ window.openPublishBridge = (id) => {
 
     if (btnOpenAssets) {
         btnOpenAssets.onclick = () => {
-            const link = asset.metadata?.canva_link || asset.metadata?.drive_link || 'https://canva.com';
+            const link = asset.metadata?.final_asset_url || asset.metadata?.canva_link || asset.metadata?.drive_link || 'https://canva.com';
             window.open(link, '_blank');
         };
     }
