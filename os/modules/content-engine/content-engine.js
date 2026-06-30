@@ -1106,7 +1106,11 @@ window.saveAssetEdit = async () => {
                 status_anterior: currentAssetData.status,
                 status_novo: nextStatus,
                 logical_transition: `${currentLogical}->${targetLogical}`,
-                timestamp: new Date().toISOString()
+                timestamp: new Date().toISOString(),
+                responsavel_operacional: responsible || '',
+                link_referencia: ref || '',
+                link_resultado_drive: artFinal || '',
+                solicitado_por: window.OS_AUTH?.user?.name || window.OS_AUTH?.user?.email || 'operador_fluxai'
             };
 
             const response = await OS_CONFIG.webhooks.send(webhookKey, payload);
@@ -1898,7 +1902,11 @@ async function runAiPlanner() {
             limite_novo: limits.available, // Rascunho doesn't consume yet
             timestamp: now.toISOString(),
             tipo_entrega: tipo_entrega,
-            mes_referencia: mes_referencia
+            mes_referencia: mes_referencia,
+            solicitado_por: window.OS_AUTH?.user?.name || window.OS_AUTH?.user?.email || 'operador_fluxai',
+            responsavel_operacional: 'Design',
+            link_referencia: '',
+            link_resultado_drive: ''
         };
 
         const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
