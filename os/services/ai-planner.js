@@ -31,7 +31,7 @@ export const AIPlanner = {
         },
         'SITE': { 
             name: 'Arquitetura Estratégica Digital (Site)', 
-            external_name: 'website',
+            external_name: 'landing_page',
             platform: 'WEB', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO DO SITE: [OBJ]\n👥 ICP: [IA]\n🗺️ JORNADA DO USUÁRIO: [IA]\n🏗️ ESTRUTURA DE PÁGINAS: [IA]\n🖱️ ARQUITETURA DE NAVEGAÇÃO: [IA]\n🧱 SEÇÕES: [IA]\n📝 COPY ESTRUTURAL: [IA]\n🚀 CTA: [IA]\n📈 CONVERSÃO: [IA]\n🔍 SEO ESTRUTURAL: [IA]' 
         },
@@ -43,55 +43,55 @@ export const AIPlanner = {
         },
         'BRANDING': { 
             name: 'Arquitetura de Posicionamento', 
-            external_name: 'branding',
+            external_name: 'planejamento',
             platform: 'BRAND', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🩺 DIAGNÓSTICO: [IA]\n👁️ PERCEPÇÃO ATUAL: [IA]\n✨ PERCEPÇÃO DESEJADA: [IA]\n👥 ICP: [IA]\n🏆 POSICIONAMENTO: [IA]\n💎 DIFERENCIAÇÃO: [IA]\n🗣️ NARRATIVA: [IA]\n🎨 TOM DE VOZ: [IA]\n👁️‍🗨️ COMPORTAMENTO VISUAL: [IA]' 
         },
         'ID_VISUAL': { 
             name: 'Sistema de Identidade Visual', 
-            external_name: 'identidade_visual',
+            external_name: 'planejamento',
             platform: 'DESIGN', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n✨ PERCEPÇÃO DESEJADA: [IA]\n🎨 DIREÇÃO ESTÉTICA: [IA]\n🌈 PALETA: [IA]\n🔡 TIPOGRAFIA: [IA]\n📐 GRID: [IA]\n👁️‍🗨️ COMPORTAMENTO VISUAL: [IA]\n🖼️ APLICAÇÕES: [IA]\n🔄 CONSISTÊNCIA: [IA]' 
         },
         'TRAFEGO': { 
             name: 'Estratégia de Aquisição (Tráfego)', 
-            external_name: 'gestao_trafego',
+            external_name: 'anuncio',
             platform: 'ADS', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n👥 ICP: [IA]\n🎁 OFERTA: [IA]\n🖼️ CRIATIVO: [IA]\n📝 COPY: [IA]\n🚀 CTA: [IA]\n🎯 SEGMENTAÇÃO: [IA]\n🔬 HIPÓTESE ESTRATÉGICA: [IA]\n📈 CONVERSÃO: [IA]' 
         },
         'CRM': { 
             name: 'Estrutura de Relacionamento (CRM)', 
-            external_name: 'setup_crm',
+            external_name: 'outro',
             platform: 'CRM', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n📥 ENTRADA DO LEAD: [IA]\n🔍 QUALIFICAÇÃO: [IA]\n🔥 TEMPERATURA: [IA]\n📊 HEALTH SCORE: [IA]\n⛓️ PIPELINE: [IA]\n🤖 AUTOMAÇÃO: [IA]\n🔄 ACOMPANHAMENTO: [IA]\n📈 RETENÇÃO: [IA]' 
         },
         'AUTOMACAO': { 
             name: 'Arquitetura Operacional (Automação)', 
-            external_name: 'automacao',
+            external_name: 'outro',
             platform: 'SISTEMA', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n⚙️ FLUXO LÓGICO: [IA]\n⚡ TRIGGERS: [IA]\n🔗 INTEGRAÇÕES: [IA]\n🚀 AÇÕES: [IA]\n⚠️ FALLBACK: [IA]\n📊 MONITORAMENTO: [IA]\n📜 LOGS: [IA]' 
         },
         'DASHBOARD': { 
             name: 'Infraestrutura Analítica', 
-            external_name: 'dashboard',
+            external_name: 'relatorio',
             platform: 'DADOS', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO ANALÍTICO: [OBJ]\n📊 KPIs: [IA]\n📐 HIERARQUIA DE LEITURA: [IA]\n📈 MÉTRICAS PRINCIPAIS: [IA]\n⚠️ ALERTAS: [IA]\n🔍 CONTEXTO OPERACIONAL: [IA]\n🧠 TOMADA DE DECISÃO: [IA]' 
         },
         'APRESENTACAO': { 
             name: 'Estrutura Institucional', 
-            external_name: 'apresentacao',
+            external_name: 'outro',
             platform: 'VENDAS', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n🗣️ NARRATIVA: [IA]\n⚠️ PROBLEMA: [IA]\n✅ SOLUÇÃO: [IA]\n🏆 PROVA: [IA]\n🎨 ESTRUTURA VISUAL: [IA]\n📐 HIERARQUIA: [IA]\n🚀 CTA FINAL: [IA]' 
         },
         'CONSULTORIA': { 
             name: 'Diagnóstico Estratégico', 
-            external_name: 'consultoria',
+            external_name: 'planejamento',
             platform: 'DIAGNÓSTICO', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🩺 DIAGNÓSTICO: [IA]\n⚠️ GARGALOS: [IA]\n💥 IMPACTOS: [IA]\n🚀 OPORTUNIDADES: [IA]\n🎯 PRIORIDADES: [IA]\n🗺️ PLANO ESTRATÉGICO: [IA]\n⚙️ EXECUÇÃO: [IA]' 
         },
         'GOVOS': { 
             name: 'GOVOS™ | Infra Pública Digital', 
-            external_name: 'govos',
+            external_name: 'outro',
             platform: 'GOV', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🩺 DIAGNÓSTICO MUNICIPAL: [IA]\n⚙️ ESTRUTURA OPERACIONAL: [IA]\n⛓️ FLUXOS PÚBLICOS: [IA]\n🌐 SERVIÇOS DIGITAIS: [IA]\n🏛️ GOVERNANÇA: [IA]\n👥 EXPERIÊNCIA DO CIDADÃO: [IA]\n📊 PAINÉIS EXECUTIVOS: [IA]\n🏗️ INFRAESTRUTURA PÚBLICA: [IA]' 
         }
@@ -386,6 +386,7 @@ export const AIPlanner = {
                                     firstPauta.copy_resumida || '',
                                     ``,
                                     `🚀 CTA: ${firstPauta.cta || ''}`,
+                                    firstPauta.legenda_final ? `📌 LEGENDA:\n${firstPauta.legenda_final}\n` : '',
                                     firstPauta.observacoes ? `\n⚠️ ${firstPauta.observacoes}` : ''
                                 ].filter(Boolean).join('\n');
                             } else {

@@ -906,6 +906,14 @@ window.openEditModal = async (id) => {
                 statusSelect.appendChild(opt);
             });
             
+            statusSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'PRONTO') {
+                    document.getElementById('approve-strategic').checked = true;
+                    document.getElementById('approve-operational').checked = true;
+                    document.getElementById('approve-client').checked = true;
+                }
+            });
+
             statusDiv.appendChild(statusLabel);
             statusDiv.appendChild(statusSelect);
             
@@ -1121,7 +1129,7 @@ window.saveAssetEdit = async () => {
                 responsavel_operacional: responsible || '',
                 link_referencia: ref || '',
                 link_resultado_drive: artFinal || '',
-                solicitado_por: window.OS_AUTH?.user?.name || window.OS_AUTH?.user?.email || 'operador_fluxai'
+                solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai'
             };
 
             const response = await OS_CONFIG.webhooks.send(webhookKey, payload);
@@ -1508,7 +1516,8 @@ window.forceReady = async (id) => {
             action: 'IA_GENERATION_APPROVED_INTERNAL',
             limite_anterior: limits.available,
             limite_novo: limits.available,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai'
         };
 
         const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
@@ -1693,7 +1702,8 @@ window.deleteAsset = async (id) => {
             action: 'IA_GENERATION_DISCARDED',
             limite_anterior: clientLimit,
             limite_novo: clientLimit,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai'
         };
 
         const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
@@ -1911,7 +1921,7 @@ async function runAiPlanner() {
             timestamp: now.toISOString(),
             tipo_entrega: tipo_entrega,
             mes_referencia: mes_referencia,
-            solicitado_por: window.OS_AUTH?.user?.name || window.OS_AUTH?.user?.email || 'operador_fluxai',
+            solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai',
             responsavel_operacional: 'Design',
             link_referencia: '',
             link_resultado_drive: ''
@@ -2145,7 +2155,8 @@ document.getElementById('btn-confirm-pub')?.addEventListener('click', async () =
             action: 'IA_GENERATION_PUBLISHED',
             limite_anterior: limits.available,
             limite_novo: limits.available > 0 ? limits.available - 1 : 0,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai'
         };
 
         const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);

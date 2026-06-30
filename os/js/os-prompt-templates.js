@@ -53,6 +53,7 @@ export const PROMPT_TEMPLATES = {
       "plataforma": "INSTAGRAM | LINKEDIN | TIKTOK",
       "gancho": "...",
       "copy_resumida": "...",
+      "legenda_final": "...",
       "cta": "...",
       "prioridade": "ALTA | MÉDIA | BAIXA",
       "dentro_do_contrato": true | false,
