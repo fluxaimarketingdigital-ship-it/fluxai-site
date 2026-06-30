@@ -31,32 +31,36 @@ DROP POLICY IF EXISTS "content_assets_delete_policy" ON public.content_assets;
 
 -- Política de leitura
 CREATE POLICY "content_assets_select_policy" ON public.content_assets
-FOR SELECT
-USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN' 
+FOR SELECT USING (
+  (SELECT role::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid) = 'ADMIN' 
   OR 
-  ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'CLIENT' AND project_id = (SELECT client_id FROM public.profiles WHERE id = auth.uid()))
+  (
+    (SELECT role::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid) = 'CLIENT' 
+    AND 
+    project_id::text = (SELECT client_id::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid)
+  )
 );
 
 -- Política de Inserção (ADMIN e OPERATOR podem inserir)
 CREATE POLICY "content_assets_insert_policy" ON public.content_assets
-FOR INSERT
-WITH CHECK (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'OPERATOR')
+FOR INSERT WITH CHECK (
+  (SELECT role::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid) IN ('ADMIN', 'OPERATOR')
 );
 
 -- Política de Atualização
 CREATE POLICY "content_assets_update_policy" ON public.content_assets
-FOR UPDATE
-USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'OPERATOR')
+FOR UPDATE USING (
+  (SELECT role::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid) IN ('ADMIN', 'OPERATOR')
   OR 
-  ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'CLIENT' AND project_id = (SELECT client_id FROM public.profiles WHERE id = auth.uid()))
+  (
+    (SELECT role::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid) = 'CLIENT' 
+    AND 
+    project_id::text = (SELECT client_id::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid)
+  )
 );
 
 -- Política de Deleção
 CREATE POLICY "content_assets_delete_policy" ON public.content_assets
-FOR DELETE
-USING (
-  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
+FOR DELETE USING (
+  (SELECT role::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid) = 'ADMIN'
 );
