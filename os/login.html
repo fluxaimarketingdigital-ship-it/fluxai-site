@@ -181,9 +181,9 @@
                 // Buscar perfil no banco se não estiver na allowlist
                 try {
                     const { data: profile, error: dbError } = await supabase
-                        .from('profiles')
-                        .select('role, full_name')
-                        .eq('id', data.user.id)
+                        .from('governance_users')
+                        .select('role, name, scoped_project_id')
+                        .eq('email', email)
                         .single();
 
                     if (dbError || !profile) {
@@ -198,9 +198,9 @@
                         }
                     } else {
                         safeRole      = OS_AUTH.normalizeRole(profile.role);
-                        safeName      = profile.full_name;
+                        safeName      = profile.name || profile.full_name || email;
                         safeId        = data.user.id;
-                        safeProjectId = data.user.user_metadata?.client_id || null;
+                        safeProjectId = profile.scoped_project_id || data.user.user_metadata?.client_id || null;
                     }
                 } catch (err) {
                     console.error("[LOGIN_AUTH_ERROR]", err);

@@ -417,9 +417,9 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
         // Tentar buscar perfil no banco de dados se não estiver na allowlist
         try {
             const { data: profile, error: dbError } = await supabase
-                .from('profiles')
-                .select('role, full_name')
-                .eq('id', sessionUser.id)
+                .from('governance_users')
+                .select('role, name, scoped_project_id')
+                .eq('email', email)
                 .single();
             if (dbError || !profile) {
                 if (sessionUser.user_metadata && sessionUser.user_metadata.client_id) {
@@ -435,8 +435,8 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
                 safeRole        = OS_AUTH.normalizeRole(profile.role);
                 safePermissions = OS_AUTH.getPermissionsForRole(safeRole);
                 safeId          = sessionUser.id;
-                safeName        = profile.full_name || email;
-                safeProjectId   = sessionUser.user_metadata?.client_id || null;
+                safeName        = profile.name || profile.full_name || email;
+                safeProjectId   = profile.scoped_project_id || sessionUser.user_metadata?.client_id || null;
             }
         } catch (err) {
             console.error('[RBAC] Bloqueio: Conta sem perfil operacional válido.', err.message);
