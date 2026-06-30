@@ -341,8 +341,15 @@ const FLUXAI_ALLOWED_USERS = Object.freeze({
         permissions: ['*'],
         project_id: 'FLUXAI_LABS_001'
     },
-    'kassia@fluxai.com': {
+    'kassiadgomesf@icloud.com': {
         id: 'ADMIN_003',
+        full_name: 'Kássia Gomes',
+        role: 'ADMIN',
+        permissions: ['*'],
+        project_id: 'FLUXAI_LABS_001'
+    },
+    'kassia@fluxai.com': {
+        id: 'ADMIN_004',
         full_name: 'Kássia Gomes',
         role: 'ADMIN',
         permissions: ['*'],
