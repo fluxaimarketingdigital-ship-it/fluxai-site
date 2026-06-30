@@ -509,9 +509,15 @@
                     </p>
                 </div>
 
-                <div style="margin-top: 5px; display: flex; position: relative; z-index: 1;">
+                <div style="margin-top: 20px; margin-bottom: 15px; position: relative; z-index: 1;">
+                    <select id="portal-extra-service-select" style="width: 100%; max-width: 500px; padding: 12px 15px; background: #111; border: 1px solid #333; color: #fff; border-radius: 6px; font-size: 0.85rem; appearance: none; cursor: pointer; outline: none;">
+                        <option value="">-- Selecione o Serviço Desejado (Opcional) --</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; position: relative; z-index: 1;">
                     <button onclick="solicitarServicoExtraWhatsApp()" style="background: var(--os-primary); color: #050705; border: none; padding: 14px 30px; border-radius: 8px; font-weight: 800; font-size: 0.8rem; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; transition: all 0.3s; box-shadow: 0 4px 15px rgba(142,158,104,0.1);">
-                        <i class="fa-solid fa-paper-plane"></i> Solicitar Serviço Extra
+                        <i class="fa-solid fa-paper-plane"></i> Solicitar Orçamento no WhatsApp
                     </button>
                 </div>
             </div>
@@ -535,8 +541,12 @@
         window.mockCatalogoServicos = mockCatalogoServicos;
 
         window.solicitarServicoExtraWhatsApp = function() {
+            const selectEl = document.getElementById('portal-extra-service-select');
+            const servicoEscolhido = selectEl ? selectEl.options[selectEl.selectedIndex].text : '';
+            const servicoReal = (selectEl && selectEl.value) ? servicoEscolhido : '[Não especificado, preciso de ajuda]';
+            
             const whatsappNumber = "5571981114694";
-            const mensagem = encodeURIComponent('Olá! Gostaria de conversar sobre um serviço adicional ao meu contrato com a FluxAI.\n\nMinha necessidade é:');
+            const mensagem = encodeURIComponent(`Olá! Gostaria de conversar sobre um serviço adicional ao meu contrato com a FluxAI.\n\nMinha necessidade é: *${servicoReal}*`);
             window.open(`https://wa.me/${whatsappNumber}?text=${mensagem}`, '_blank');
         };
 
@@ -597,6 +607,23 @@
         async function init() {
             const session = window.FLUXAI_RUNTIME_CONTEXT || {};
             let companyNameStr = 'CLIENTE';
+
+            // Populate Extra Services Dropdown
+            const extraSelect = document.getElementById('portal-extra-service-select');
+            if (extraSelect && window.mockCatalogoServicos) {
+                // Remove existing options except the first one
+                while (extraSelect.options.length > 1) {
+                    extraSelect.remove(1);
+                }
+                
+                // Add services from catalog
+                window.mockCatalogoServicos.forEach(servico => {
+                    const option = document.createElement('option');
+                    option.value = servico.servico_id;
+                    option.text = servico.nome;
+                    extraSelect.appendChild(option);
+                });
+            }
             
             // CROSS-TENANT SECURITY (IDOR PATCH)
             if (session.role === 'CLIENT') {
