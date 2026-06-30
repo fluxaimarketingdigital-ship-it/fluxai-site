@@ -41,10 +41,10 @@ FOR SELECT USING (
   )
 );
 
--- Política de Inserção (ADMIN e OPERATOR podem inserir)
+-- Política de Inserção (Qualquer autenticado pode inserir)
 CREATE POLICY "content_assets_insert_policy" ON public.content_assets
 FOR INSERT WITH CHECK (
-  (SELECT role::text FROM public.profiles WHERE id::uuid = auth.uid()::uuid) IN ('ADMIN', 'OPERATOR')
+  auth.role() = 'authenticated'
 );
 
 -- Política de Atualização
