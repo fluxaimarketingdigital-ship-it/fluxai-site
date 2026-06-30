@@ -1875,9 +1875,15 @@ async function runAiPlanner() {
         // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
         let tipo_entrega = AIPlanner.STRATEGIC_MATRIX[serviceKey]?.external_name || 'outro';
 
+        // Mapeamento do ID do banco para o código da Planilha do Make
+        const projectMap = {
+            '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
+        };
+        const spreadsheetClientId = projectMap[selectedId] || selectedId;
+
         // Webhook de controle operacional de IA
         const payload = {
-            client_id: selectedId,
+            client_id: spreadsheetClientId,
             asset_id: newAsset.id || 'mock_id',
             title: newAsset.title,
             platform: newAsset.platform,
