@@ -1868,22 +1868,12 @@ async function runAiPlanner() {
         const now = new Date();
         const mes_referencia = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         
-        // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
-        let tipo_entrega = 'outro';
+        // Mapeamento compatível com o ecossistema Make (CONTRATOS_METRICAS)
+        let tipo_entrega = 'conteudo_estrategico';
         const txtToParse = (newAsset.caption || '') + ' ' + (serviceKey || '');
-        const txtLower = txtToParse.toLowerCase();
-
-        if (txtLower.includes('carrossel')) tipo_entrega = 'carrossel';
-        else if (txtLower.includes('reels') || txtLower.includes('vídeo') || txtLower.includes('video')) tipo_entrega = 'reels';
-        else if (txtLower.includes('estático') || txtLower.includes('single')) tipo_entrega = 'post_estatico';
-        else if (txtLower.includes('story') || txtLower.includes('stories')) tipo_entrega = 'story';
-        else if (txtLower.includes('artigo') || txtLower.includes('blog')) tipo_entrega = 'artigo';
-        else if (txtLower.includes('email') || txtLower.includes('e-mail')) tipo_entrega = 'email';
-        else if (txtLower.includes('landing') || txtLower.includes('lp') || txtLower.includes('site')) tipo_entrega = 'landing_page';
-        else if (txtLower.includes('anúncio') || txtLower.includes('ads') || txtLower.includes('tráfego')) tipo_entrega = 'anuncio';
-        else if (txtLower.includes('copy')) tipo_entrega = 'copy';
-        else if (txtLower.includes('relatório')) tipo_entrega = 'relatorio';
-        else if (txtLower.includes('planejamento') || txtLower.includes('branding')) tipo_entrega = 'planejamento';
+        if (txtToParse.toLowerCase().includes('carrossel')) {
+            tipo_entrega = 'carrossel';
+        }
 
         // Webhook de controle operacional de IA
         const payload = {
