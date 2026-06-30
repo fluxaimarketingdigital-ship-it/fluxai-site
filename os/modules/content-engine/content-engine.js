@@ -2029,7 +2029,7 @@ window.openPublishBridge = (id) => {
     const cta = asset.metadata?.cta || 'Acesse o link na bio para saber mais!';
     const filePath = asset.metadata?.file_path || `Drive: Maria Aparecida/entregas/${asset.title}.mp4`;
 
-    const fullPreview = `📝 LEGENDA:\n${captionText}\n\n🏷️ HASHTAGS:\n${hashtags}\n\n🎯 CTA:\n${cta}\n\n📁 CAMINHO DO ARQUIVO:\n${filePath}`;
+    const fullPreview = `📝 LEGENDA:\n${captionText}\n\n🏷️ HASHTAGS:\n${hashtags}`;
     document.getElementById('pub-caption-preview').value = fullPreview;
 
     // Links de Canva e Instagram/Plataforma
