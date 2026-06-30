@@ -7,76 +7,91 @@ export const AIPlanner = {
     STRATEGIC_MATRIX: {
         'REELS': { 
             name: 'Direção Audiovisual (Reels)', 
+            external_name: 'reels',
             platform: 'INSTAGRAM', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n💎 TEMA: [IA]\n🎬 HOOK: [IA]\n⏳ RETENÇÃO: [IA]\n💬 FALAS: [IA]\n🤸 DIREÇÃO CORPORAL: [IA]\n🎵 RITMO E PAUSAS: [IA]\n🎥 CENAS: [IA]\n✨ APOIO VISUAL: [IA]\n🚀 CTA: [IA]\n📝 LEGENDA: [IA]\n# HASHTAGS: [IA]\n⏰ HORÁRIO IDEAL: [IA]' 
         },
         'CARROSSEL': { 
             name: 'Estrutura Narrativa (Carrossel)', 
+            external_name: 'carrossel',
             platform: 'INSTAGRAM', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n💎 TEMA: [IA]\n🔥 TENSÃO INICIAL: [IA]\n🎴 SLIDE 01 (RETENÇÃO): [IA]\n📚 PROGRESSÃO NARRATIVA: [IA]\n⚡ QUEBRA: [IA]\n💡 EXPLICAÇÃO: [IA]\n🔍 APROFUNDAMENTO: [IA]\n🚀 CTA: [IA]\n📝 LEGENDA: [IA]\n⏰ HORÁRIO IDEAL: [IA]' 
         },
         'CARD': { 
             name: 'Direção Estratégica Visual (Card)', 
+            external_name: 'post_estatico',
             platform: 'INSTAGRAM', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n📢 HEADLINE: [IA]\n🎭 INTENÇÃO EMOCIONAL: [IA]\n🎨 DIREÇÃO VISUAL: [IA]\n📐 HIERARQUIA TEXTUAL: [IA]\n🚀 CTA: [IA]\n📝 LEGENDA: [IA]\n⏰ HORÁRIO IDEAL: [IA]' 
         },
         'STORIES': { 
             name: 'Fluxo Estratégico de Stories', 
+            external_name: 'story',
             platform: 'INSTAGRAM', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n📱 SEQUÊNCIA: [IA]\n💬 INTERAÇÃO: [IA]\n📊 ENQUETE: [IA]\n🤝 CONEXÃO: [IA]\n🚀 CTA: [IA]\n📥 RESPOSTA ESPERADA: [IA]' 
         },
         'SITE': { 
             name: 'Arquitetura Estratégica Digital (Site)', 
+            external_name: 'website',
             platform: 'WEB', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO DO SITE: [OBJ]\n👥 ICP: [IA]\n🗺️ JORNADA DO USUÁRIO: [IA]\n🏗️ ESTRUTURA DE PÁGINAS: [IA]\n🖱️ ARQUITETURA DE NAVEGAÇÃO: [IA]\n🧱 SEÇÕES: [IA]\n📝 COPY ESTRUTURAL: [IA]\n🚀 CTA: [IA]\n📈 CONVERSÃO: [IA]\n🔍 SEO ESTRUTURAL: [IA]' 
         },
         'LP': { 
             name: 'Estrutura Estratégica de Conversão (LP)', 
+            external_name: 'landing_page',
             platform: 'WEB', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n🎁 OFERTA: [IA]\n📢 HEADLINE: [IA]\n🛡️ QUEBRA DE OBJEÇÃO: [IA]\n✅ PROVA: [IA]\n🚀 CTA PRINCIPAL: [IA]\n⛓️ FLUXO PERSUASIVO: [IA]\n📈 CONVERSÃO: [IA]' 
         },
         'BRANDING': { 
             name: 'Arquitetura de Posicionamento', 
+            external_name: 'branding',
             platform: 'BRAND', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🩺 DIAGNÓSTICO: [IA]\n👁️ PERCEPÇÃO ATUAL: [IA]\n✨ PERCEPÇÃO DESEJADA: [IA]\n👥 ICP: [IA]\n🏆 POSICIONAMENTO: [IA]\n💎 DIFERENCIAÇÃO: [IA]\n🗣️ NARRATIVA: [IA]\n🎨 TOM DE VOZ: [IA]\n👁️‍🗨️ COMPORTAMENTO VISUAL: [IA]' 
         },
         'ID_VISUAL': { 
             name: 'Sistema de Identidade Visual', 
+            external_name: 'identidade_visual',
             platform: 'DESIGN', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n✨ PERCEPÇÃO DESEJADA: [IA]\n🎨 DIREÇÃO ESTÉTICA: [IA]\n🌈 PALETA: [IA]\n🔡 TIPOGRAFIA: [IA]\n📐 GRID: [IA]\n👁️‍🗨️ COMPORTAMENTO VISUAL: [IA]\n🖼️ APLICAÇÕES: [IA]\n🔄 CONSISTÊNCIA: [IA]' 
         },
         'TRAFEGO': { 
             name: 'Estratégia de Aquisição (Tráfego)', 
+            external_name: 'gestao_trafego',
             platform: 'ADS', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n👥 ICP: [IA]\n🎁 OFERTA: [IA]\n🖼️ CRIATIVO: [IA]\n📝 COPY: [IA]\n🚀 CTA: [IA]\n🎯 SEGMENTAÇÃO: [IA]\n🔬 HIPÓTESE ESTRATÉGICA: [IA]\n📈 CONVERSÃO: [IA]' 
         },
         'CRM': { 
             name: 'Estrutura de Relacionamento (CRM)', 
+            external_name: 'setup_crm',
             platform: 'CRM', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n📥 ENTRADA DO LEAD: [IA]\n🔍 QUALIFICAÇÃO: [IA]\n🔥 TEMPERATURA: [IA]\n📊 HEALTH SCORE: [IA]\n⛓️ PIPELINE: [IA]\n🤖 AUTOMAÇÃO: [IA]\n🔄 ACOMPANHAMENTO: [IA]\n📈 RETENÇÃO: [IA]' 
         },
         'AUTOMACAO': { 
             name: 'Arquitetura Operacional (Automação)', 
+            external_name: 'automacao',
             platform: 'SISTEMA', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n⚙️ FLUXO LÓGICO: [IA]\n⚡ TRIGGERS: [IA]\n🔗 INTEGRAÇÕES: [IA]\n🚀 AÇÕES: [IA]\n⚠️ FALLBACK: [IA]\n📊 MONITORAMENTO: [IA]\n📜 LOGS: [IA]' 
         },
         'DASHBOARD': { 
             name: 'Infraestrutura Analítica', 
+            external_name: 'dashboard',
             platform: 'DADOS', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO ANALÍTICO: [OBJ]\n📊 KPIs: [IA]\n📐 HIERARQUIA DE LEITURA: [IA]\n📈 MÉTRICAS PRINCIPAIS: [IA]\n⚠️ ALERTAS: [IA]\n🔍 CONTEXTO OPERACIONAL: [IA]\n🧠 TOMADA DE DECISÃO: [IA]' 
         },
         'APRESENTACAO': { 
             name: 'Estrutura Institucional', 
+            external_name: 'apresentacao',
             platform: 'VENDAS', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n🗣️ NARRATIVA: [IA]\n⚠️ PROBLEMA: [IA]\n✅ SOLUÇÃO: [IA]\n🏆 PROVA: [IA]\n🎨 ESTRUTURA VISUAL: [IA]\n📐 HIERARQUIA: [IA]\n🚀 CTA FINAL: [IA]' 
         },
         'CONSULTORIA': { 
             name: 'Diagnóstico Estratégico', 
+            external_name: 'consultoria',
             platform: 'DIAGNÓSTICO', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🩺 DIAGNÓSTICO: [IA]\n⚠️ GARGALOS: [IA]\n💥 IMPACTOS: [IA]\n🚀 OPORTUNIDADES: [IA]\n🎯 PRIORIDADES: [IA]\n🗺️ PLANO ESTRATÉGICO: [IA]\n⚙️ EXECUÇÃO: [IA]' 
         },
         'GOVOS': { 
             name: 'GOVOS™ | Infra Pública Digital', 
+            external_name: 'govos',
             platform: 'GOV', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🩺 DIAGNÓSTICO MUNICIPAL: [IA]\n⚙️ ESTRUTURA OPERACIONAL: [IA]\n⛓️ FLUXOS PÚBLICOS: [IA]\n🌐 SERVIÇOS DIGITAIS: [IA]\n🏛️ GOVERNANÇA: [IA]\n👥 EXPERIÊNCIA DO CIDADÃO: [IA]\n📊 PAINÉIS EXECUTIVOS: [IA]\n🏗️ INFRAESTRUTURA PÚBLICA: [IA]' 
         }
