@@ -1873,7 +1873,12 @@ async function runAiPlanner() {
         const mes_referencia = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         
         // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
-        let tipo_entrega = AIPlanner.STRATEGIC_MATRIX[serviceKey]?.external_name || 'outro';
+        let actualServiceKey = serviceKey;
+        if (serviceKey === 'ALL') {
+            const entry = Object.entries(AIPlanner.STRATEGIC_MATRIX).find(([k, v]) => newAsset.title.includes(v.name));
+            if (entry) actualServiceKey = entry[0];
+        }
+        let tipo_entrega = AIPlanner.STRATEGIC_MATRIX[actualServiceKey]?.external_name || 'outro';
 
         // Mapeamento do ID do banco para o código da Planilha do Make
         const projectMap = {
