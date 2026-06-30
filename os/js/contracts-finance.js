@@ -951,44 +951,31 @@ window.saveBaixaPagamento = async () => {
     }
 };
 
-async function loadBankAccounts() {
+window.loadBankAccounts = async () => {
     const list = document.getElementById('bank-accounts-list');
-    const select = document.getElementById('baixa-conta');
+    if(!list) return;
+    list.innerHTML = '';
     
-    list.innerHTML = '<li>Carregando...</li>';
-    if(select) select.innerHTML = '<option value="">Selecione o banco de destino...</option>';
-
     const supabase = getSupabase();
     let accounts = [];
     
     if (supabase) {
         const { data } = await supabase.from('fluxai_bank_accounts').select('*').order('created_at', { ascending: false });
         if (data) accounts = data;
-    } else {
-        accounts = JSON.parse(localStorage.getItem('fluxai_bank_accounts') || '[]');
     }
-
-    list.replaceChildren();
     
-    if (accounts.length === 0) {
-        list.innerHTML = '<li>Nenhuma conta cadastrada. Adicione abaixo.</li>';
-        return;
-    }
+    // Escapar HTML para evitar XSS (CodeQL DOM text reinterpreted as HTML)
+    const escapeHtml = (unsafe) => (unsafe||'').toString().replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
 
-    accounts.forEach(acc => {
-        if (acc.is_active !== false) {
-            if (select) {
-                const opt = document.createElement('option');
-                opt.value = acc.id;
-                opt.textContent = `${acc.bank_name} - Ag: ${acc.agency || '-'} | CC: ${acc.account_number || '-'}`;
-                select.appendChild(opt);
-            }
-            
+    if (accounts.length === 0) {
+        list.innerHTML = '<li style="color:var(--os-text-muted); padding:10px 0;">Nenhuma conta configurada.</li>';
+    } else {
+        accounts.forEach(acc => {
             const li = document.createElement('li');
-            li.style.cssText = "display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid var(--os-border);";
+            li.className = 'bank-account-item';
             
             const info = document.createElement('div');
-            info.innerHTML = `<strong style="color:var(--os-text);">${acc.bank_name}</strong> - ${acc.owner_name}<br/><span style="opacity:0.6;">Ag: ${acc.agency} | Cc: ${acc.account_number} | PIX: ${acc.pix_key || '-'}</span>`;
+            info.innerHTML = `<strong style="color:var(--os-text);">${escapeHtml(acc.bank_name)}</strong> - ${escapeHtml(acc.owner_name)}<br/><span style="opacity:0.6;">Ag: ${escapeHtml(acc.agency)} | Cc: ${escapeHtml(acc.account_number)} | PIX: ${escapeHtml(acc.pix_key) || '-'}</span>`;
             
             const delBtn = document.createElement('button');
             delBtn.className = 'btn-mini';
@@ -998,9 +985,6 @@ async function loadBankAccounts() {
                 if(confirm('Remover esta conta?')) {
                     if (supabase) {
                         await supabase.from('fluxai_bank_accounts').delete().eq('id', acc.id);
-                    } else {
-                        const newAccs = accounts.filter(a => a.id !== acc.id);
-                        localStorage.setItem('fluxai_bank_accounts', JSON.stringify(newAccs));
                     }
                     loadBankAccounts();
                 }
@@ -1009,9 +993,9 @@ async function loadBankAccounts() {
             li.appendChild(info);
             li.appendChild(delBtn);
             list.appendChild(li);
-        }
-    });
-}
+        });
+    }
+};
 
 window.saveBankAccount = async () => {
     const name = document.getElementById('new-bank-name').value;
@@ -1019,7 +1003,12 @@ window.saveBankAccount = async () => {
     const agency = document.getElementById('new-bank-agency').value;
     const account = document.getElementById('new-bank-account').value;
     const pix = document.getElementById('new-bank-pix').value;
-
+    
+    if(!name || !owner || !agency || !account) {
+        alert('Preencha os campos obrigatórios.');
+        return;
+    }
+    
     const payload = {
         id: crypto.randomUUID(),
         bank_name: name,
@@ -1033,10 +1022,6 @@ window.saveBankAccount = async () => {
     const supabase = getSupabase();
     if (supabase) {
         await supabase.from('fluxai_bank_accounts').insert([payload]);
-    } else {
-        const accounts = JSON.parse(localStorage.getItem('fluxai_bank_accounts') || '[]');
-        accounts.push(payload);
-        localStorage.setItem('fluxai_bank_accounts', JSON.stringify(accounts));
     }
     
     document.getElementById('add-bank-form').reset();
