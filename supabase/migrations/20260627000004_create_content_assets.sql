@@ -17,34 +17,40 @@ CREATE TABLE IF NOT EXISTS public.content_assets (
 -- Habilitar RLS
 ALTER TABLE public.content_assets ENABLE ROW LEVEL SECURITY;
 
+-- Limpar políticas antigas se existirem
+DROP POLICY IF EXISTS "content_assets_select_policy" ON public.content_assets;
+DROP POLICY IF EXISTS "content_assets_insert_policy" ON public.content_assets;
+DROP POLICY IF EXISTS "content_assets_update_policy" ON public.content_assets;
+DROP POLICY IF EXISTS "content_assets_delete_policy" ON public.content_assets;
+
 -- Política de leitura
 CREATE POLICY "content_assets_select_policy" ON public.content_assets
 FOR SELECT
 USING (
-  public.current_user_role(auth.uid()) = 'ADMIN' 
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN' 
   OR 
-  (public.current_user_role(auth.uid()) = 'CLIENT' AND project_id = public.current_user_client_id(auth.uid()))
+  ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'CLIENT' AND project_id = (SELECT client_id FROM public.profiles WHERE id = auth.uid()))
 );
 
 -- Política de Inserção (ADMIN e OPERATOR podem inserir)
 CREATE POLICY "content_assets_insert_policy" ON public.content_assets
 FOR INSERT
 WITH CHECK (
-  public.current_user_role(auth.uid()) IN ('ADMIN', 'OPERATOR')
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'OPERATOR')
 );
 
 -- Política de Atualização
 CREATE POLICY "content_assets_update_policy" ON public.content_assets
 FOR UPDATE
 USING (
-  public.current_user_role(auth.uid()) IN ('ADMIN', 'OPERATOR')
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) IN ('ADMIN', 'OPERATOR')
   OR 
-  (public.current_user_role(auth.uid()) = 'CLIENT' AND project_id = public.current_user_client_id(auth.uid()))
+  ((SELECT role FROM public.profiles WHERE id = auth.uid()) = 'CLIENT' AND project_id = (SELECT client_id FROM public.profiles WHERE id = auth.uid()))
 );
 
 -- Política de Deleção
 CREATE POLICY "content_assets_delete_policy" ON public.content_assets
 FOR DELETE
 USING (
-  public.current_user_role(auth.uid()) = 'ADMIN'
+  (SELECT role FROM public.profiles WHERE id = auth.uid()) = 'ADMIN'
 );
