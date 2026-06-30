@@ -449,6 +449,8 @@
 
         let _supabaseClient = null;
 
+        window.escapeHTML = str => str ? str.replace(/[&<>'"]/g, tag => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'}[tag])) : '';
+
         function mapToStandardStatus(status) {
             const upper = status.toUpperCase();
             if (upper === 'PLANEJAMENTO') return 'DRAFT_PLANNING';
