@@ -5,6 +5,8 @@ import { StatusEngine, STATUS_SYSTEM } from '../../config/status-system.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { OS_CONFIG } from '../../config/os-config.js';
 import { AIPlanner } from '../../services/ai-planner.js';
+import { MakeClient } from '../../services/makeClient.js';
+import { ROTAS_OS_MAKE } from '../../services/makeRoutes.js';
 
 let currentProject = null;
 let currentMonth = new Date().getMonth();
@@ -1125,22 +1127,79 @@ window.saveAssetEdit = async () => {
             const client_id_mapped = client_id_raw === '3acae009-6825-4163-9057-cbe99216cc3b' ? 'FLUXAI_LABS_001' : client_id_raw;
             const limite_id_fb = currentAssetData.metadata?.limite_id || `LIM_${client_id_mapped}_${mes_referencia_fb.replace('-', '_')}_${tipo_entrega_fb.toUpperCase()}`;
 
+            const client_name_fb = window.allProjects?.find(p => p.id === client_id_raw)?.name || client_id_mapped;
+
+            // Parser básico da legenda (caption)
+            let parsedObjetivo = '';
+            let parsedFormato = '';
+            let parsedGancho = '';
+            let parsedCta = '';
+            let parsedLegenda = '';
+            
+            try {
+                const cText = currentAssetData.caption || '';
+                const objMatch = cText.match(/🎯 OBJETIVO:\s*(.+)/);
+                if (objMatch) parsedObjetivo = objMatch[1].trim();
+                
+                const formatMatch = cText.match(/💻 FORMATO:\s*(.+)/);
+                if (formatMatch) parsedFormato = formatMatch[1].trim();
+                
+                const ganchoMatch = cText.match(/🔥 GANCHO:\s*(.+)/);
+                if (ganchoMatch) parsedGancho = ganchoMatch[1].trim();
+
+                const ctaMatch = cText.match(/🚀 CTA:\s*(.+)/);
+                if (ctaMatch) parsedCta = ctaMatch[1].trim();
+                
+                const legMatch = cText.match(/📌 LEGENDA:\s*([\s\S]*?)(?:⚠️|$)/);
+                if (legMatch) parsedLegenda = legMatch[1].trim();
+            } catch (e) {
+                console.warn('Erro ao parsear caption', e);
+            }
+
             const payload = {
                 client_id: client_id_mapped,
+                client_name: client_name_fb,
                 asset_id: editingAssetId,
+                planejamento_id: editingAssetId,
+                postagem_id: editingAssetId,
                 title: title,
+                tema: title,
+                canal: currentAssetData.platform || '',
+                formato_conteudo: parsedFormato || tipo_entrega_fb,
+                objetivo_conteudo: parsedObjetivo,
+                pilar_conteudo: '',
+                etapa_funil: '',
+                briefing_resumo: currentAssetData.caption || '',
+                titulo_conteudo: title,
+                legenda: parsedLegenda,
+                cta: parsedCta,
+                status_planejamento: nextStatus,
+                status_postagem: nextStatus,
+                data_agendada: currentAssetData.scheduled_at || '',
+                hora_agendada: currentAssetData.scheduled_at ? new Date(currentAssetData.scheduled_at).toLocaleTimeString('pt-BR') : '',
+                data_prevista: currentAssetData.scheduled_at || '',
+                data_publicacao: '',
+                link_post: '',
+                link_asset_drive: artFinal || '',
                 status_anterior: currentAssetData.status,
                 status_novo: nextStatus,
                 logical_transition: `${currentLogical}->${targetLogical}`,
                 timestamp: now.toISOString(),
+                responsavel_planejamento: responsible || '',
+                responsavel_design: 'Design',
+                responsavel_copy: 'Copywriter',
+                responsavel_publicacao: responsible || '',
                 responsavel_operacional: responsible || '',
                 link_referencia: ref || '',
                 link_resultado_drive: artFinal || '',
                 solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai',
                 limite_id: limite_id_fb,
-                mes_referencia: mes_referencia_fb,
+                mes_referencia: mes_referencia_fb.replace('-', '_'),
+                semana_referencia: '',
                 tipo_entrega: tipo_entrega_fb,
-                geracao_id: currentAssetData.metadata?.geracao_id || currentAssetData.metadata?.mock_id || ''
+                geracao_id: currentAssetData.metadata?.geracao_id || currentAssetData.metadata?.mock_id || '',
+                credito_id: '',
+                observacao: ''
             };
 
             const response = await OS_CONFIG.webhooks.send(webhookKey, payload);
@@ -1922,24 +1981,75 @@ async function runAiPlanner() {
         newAsset.metadata.tipo_entrega = tipo_entrega;
         newAsset.metadata.limite_id = `LIM_${spreadsheetClientId}_${mes_referencia.replace('-', '_')}_${tipo_entrega.toUpperCase()}`;
 
-        // Webhook de controle operacional de IA
-        const payload = {
+        const client_name_fb = window.allProjects?.find(p => p.id === selectedId)?.name || spreadsheetClientId;
+
+        // [NOVO GUARDRAIL OFICIAL - CENÁRIO 13]
+        sLog(`[IA_PLANNER] Validando limites oficiais via Guardrail (Make Cenário 13)...`);
+        const guardrailPayload = {
+            geracao_id: newAsset.id || 'mock_id',
             client_id: spreadsheetClientId,
+            client_name: client_name_fb,
+            limite_id: newAsset.metadata.limite_id,
+            mes_referencia: mes_referencia.replace('-', '_'),
+            tipo_entrega: tipo_entrega,
+            workflow_origem: 'content_engine'
+        };
+        
+        try {
+            const guardrailRes = await MakeClient.sendPost(ROTAS_OS_MAKE['ROTA_OS_13_GUARDRAIL'], guardrailPayload);
+            if (guardrailRes && guardrailRes.data) {
+                const grData = guardrailRes.data;
+                if (grData.pode_gerar === 'nao' || grData.pode_gerar === false) {
+                    // BLOQUEADO!
+                    alert(`Geração Bloqueada pelo Guardrail!\nMotivo: ${grData.message || grData.motivo_bloqueio || 'Sem limite disponível'}`);
+                    OS_LOGS_ENGINE.security(
+                        'SECURITY_WARNING',
+                        { action: 'geracao_bloqueada_guardrail', client_id: selectedId, role: window.FLUXAI_RUNTIME_CONTEXT?.role, details: grData },
+                        'critical'
+                    );
+                    if (btnAi) {
+                        btnAi.textContent = originalText;
+                    }
+                    return; // Aborta! Não joga para o cenário 11!
+                }
+            }
+        } catch (err) {
+            console.error('[IA_PLANNER] Erro ao comunicar com Guardrail', err);
+            // Dependendo da política de restrição, falha no guardrail poderia bloquear (fail-close).
+            // Por enquanto, vamos alertar.
+            alert('Aviso: Falha ao validar limites no Guardrail Oficial. Verifique os logs.');
+        }
+
+        // Webhook de controle operacional de IA (Cenário 11)
+        const payload = {
+            geracao_id: newAsset.id || 'mock_id',
+            client_id: spreadsheetClientId,
+            client_name: client_name_fb,
+            limite_id: newAsset.metadata.limite_id,
+            mes_referencia: mes_referencia.replace('-', '_'),
+            tipo_entrega: tipo_entrega,
+            origem_geracao: 'contrato',
+            solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai',
+            responsavel_operacional: 'Design',
+            status_geracao: 'rascunho_ia',
+            status_anterior: '',
+            ocupa_limite_operacional: 'nao',
+            consumo_definitivo: 'nao',
+            libera_espaco: 'nao',
+            confirmacao_interna_liberacao: '',
+            motivo_alteracao: 'nova_geracao_ia',
+            link_resultado_drive: '',
+            prompt_interno_id: '',
+            observacao: 'Rascunho gerado via FluxAI OS',
             asset_id: newAsset.id || 'mock_id',
             title: newAsset.title,
             platform: newAsset.platform,
             status_ia: 'rascunho_ia',
-            origem_geracao: 'contrato',
             action: 'IA_GENERATION_CREATED',
             limite_anterior: limits.available,
             limite_novo: limits.available, // Rascunho doesn't consume yet
             timestamp: now.toISOString(),
-            tipo_entrega: tipo_entrega,
-            mes_referencia: mes_referencia,
-            solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai',
-            responsavel_operacional: 'Design',
-            link_referencia: '',
-            link_resultado_drive: ''
+            link_referencia: ''
         };
 
         const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);

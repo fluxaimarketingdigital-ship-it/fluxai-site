@@ -24,7 +24,7 @@ export const ROTAS_OS_MAKE = {
     'ROTA_OS_09_ONBOARDING': createRoute('ROTA_OS_09_ONBOARDING', '09_FLUXAI_NOVO_CLIENTE_ONBOARDING_SEGURO', true, 'POST', 'manual', '', '', 'sim'),
     'ROTA_OS_10_SERVICO_EXTRA': createRoute('ROTA_OS_10_SERVICO_EXTRA', '10_FLUXAI_SERVICO_EXTRA_REQUEST', false, 'POST', 'ativo', '06_SERVICOS_EXTRAS_CLIENTES', 'criar_servico_extra', 'nao'),
     'ROTA_OS_11_IA_CREDITOS': createRoute('ROTA_OS_11_IA_CREDITOS', '11_FLUXAI_IA_CREDITOS_CONTROLE_LIMITE_OPERACIONAL', false, 'POST', 'monitorado', '', '', 'sim'),
-    'ROTA_OS_13_GUARDRAIL': createRoute('ROTA_OS_13_GUARDRAIL', '13_FLUXAI_IA_GUARDRAIL_LIMITE_OPERACIONAL', false, 'POST', 'monitorado', '', '', 'sim'),
+    'ROTA_OS_13_GUARDRAIL': createRoute('ROTA_OS_13_GUARDRAIL', '13_FLUXAI_IA_GUARDRAIL_LIMITE_OPERACIONAL', true, 'POST', 'monitorado', '', '', 'sim'),
     'ROTA_OS_14_ARQUIVOS': createRoute('ROTA_OS_14_ARQUIVOS', '14_FLUXAI_CLIENTES_ARQUIVOS_SYNC', true, 'POST', 'ativo', 'CLIENTES_ARQUIVOS', 'registrar_arquivo', 'nao'),
     'ROTA_OS_15_PLANEJAMENTO': createRoute('ROTA_OS_15_PLANEJAMENTO', '15_FLUXAI_PLANEJAMENTO_CONTEUDO', false, 'POST', 'ativo', 'PLANEJAMENTO_CONTEUDO', 'criar_planejamento', 'nao'),
     'ROTA_OS_16_CALENDARIO': createRoute('ROTA_OS_16_CALENDARIO', '16_FLUXAI_CALENDARIO_POSTAGENS', false, 'POST', 'ativo', 'CALENDARIO_POSTAGENS', 'agendar_postagem', 'nao')
