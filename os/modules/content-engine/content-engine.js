@@ -1129,7 +1129,11 @@ window.saveAssetEdit = async () => {
                 responsavel_operacional: responsible || '',
                 link_referencia: ref || '',
                 link_resultado_drive: artFinal || '',
-                solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai'
+                solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai',
+                limite_id: currentAssetData.metadata?.limite_id || '',
+                mes_referencia: currentAssetData.metadata?.mes_referencia || '',
+                tipo_entrega: currentAssetData.metadata?.tipo_entrega || '',
+                geracao_id: currentAssetData.metadata?.geracao_id || currentAssetData.metadata?.mock_id || ''
             };
 
             const response = await OS_CONFIG.webhooks.send(webhookKey, payload);

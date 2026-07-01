@@ -136,7 +136,11 @@ async function executeStateTransition(app, targetStatus, feedback, actionName) {
             type: app.type,
             status: targetStatus,
             feedback: feedback,
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
+            limite_id: app.original_asset?.metadata?.limite_id || '',
+            mes_referencia: app.original_asset?.metadata?.mes_referencia || '',
+            tipo_entrega: app.original_asset?.metadata?.tipo_entrega || '',
+            geracao_id: app.original_asset?.metadata?.geracao_id || app.original_asset?.metadata?.mock_id || ''
         };
         const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);
         if (!response.success && isReal) {
