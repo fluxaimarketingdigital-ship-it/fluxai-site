@@ -1,5 +1,5 @@
 {
-    "name": "10_FLUXAI_SERVICO_EXTRA_REQUEST",
+    "name": "10_FLUXAI_SERVICO_EXTRA_REQUEST_OFICIAL",
     "flow": [
         {
             "id": 1,
@@ -69,7 +69,7 @@
                         },
                         {
                             "a": "{{1.status_servico_extra}}",
-                            "b": "aprovado",
+                            "b": "orcamento_aprovado",
                             "o": "text:equal"
                         }
                     ]
@@ -82,27 +82,22 @@
                     "0": "{{1.servico_extra_id}}",
                     "1": "{{1.client_id}}",
                     "2": "{{1.client_name}}",
-                    "3": "{{1.tipo_servico_extra}}",
+                    "3": "{{1.tipo_servico_ext}}",
                     "4": "{{1.nome_servico}}",
-                    "5": "{{1.descricao_solicitacao}}",
-                    "6": "{{1.origem_solicitacao}}",
-                    "7": "{{1.solicitado_por}}",
+                    "5": "{{1.descricao}}",
+                    "6": "{{1.origem_servico_extra}}",
+                    "7": "{{1.approved_by}}",
                     "8": "{{1.status_servico_extra}}",
                     "9": "{{1.prioridade}}",
-                    "10": "{{1.prazo_solicitado}}",
-                    "11": "{{1.prazo_aprovado}}",
+                    "10": "{{1.prazo}}",
                     "12": "{{1.valor_estimado}}",
                     "13": "{{1.valor_aprovado}}",
                     "14": "{{1.gera_credito_ia}}",
                     "15": "{{1.quantidade_credito_ia}}",
                     "16": "{{1.impacto_planejamento}}",
-                    "17": "{{1.responsavel_fluxai}}",
-                    "18": "{{1.link_briefing_drive}}",
-                    "19": "{{1.link_entrega_drive}}",
-                    "20": "{{1.observacao}}",
+                    "20": "{{1.observacao_operacional}}",
                     "21": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}",
-                    "23": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}",
-                    "25": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}"
+                    "23": "{{formatDate(1.approved_at; \"YYYY-MM-DD HH:mm:ss\")}}"
                 },
                 "sheetId": "06_SERVICOS_EXTRAS_CLIENTES",
                 "spreadsheetId": "/1-MZBzS2KOZ_pSIR9rVX_mkecdvmQjF9j9q8ahMKqxQE",
@@ -1275,6 +1270,286 @@
             ]
         },
         {
+            "id": 24,
+            "module": "supabase:createARow",
+            "version": 1,
+            "parameters": {
+                "__IMTCONN__": 9280896
+            },
+            "filter": null,
+            "mapper": {
+                "table": "content_assets",
+                "title": "[EXTRA] {{1.nome_servico}}",
+                "status": "PLANEJAMENTO",
+                "platform": "{{1.tipo_servico_ext}}",
+                "priority": "{{1.prioridade}}"
+            },
+            "metadata": {
+                "designer": {
+                    "x": 561,
+                    "y": -344
+                },
+                "restore": {
+                    "expect": {
+                        "table": {
+                            "mode": "chose",
+                            "label": "content_assets",
+                            "nested": [
+                                {
+                                    "help": "Defaults to extensions.uuid_generate_v4(). Note:\nThis is a Primary Key.<pk/>",
+                                    "name": "id",
+                                    "type": "text",
+                                    "label": "id",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "Note:\nThis is a Foreign Key to `projects.id`.<fk table='projects' column='id'/>",
+                                    "name": "project_id",
+                                    "type": "text",
+                                    "label": "project_id",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "",
+                                    "name": "title",
+                                    "type": "text",
+                                    "label": "title",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "Defaults to PRODUÇÃO. ",
+                                    "name": "status",
+                                    "type": "text",
+                                    "label": "status",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "Defaults to MÉDIA. ",
+                                    "name": "priority",
+                                    "type": "text",
+                                    "label": "priority",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "Defaults to INSTAGRAM. ",
+                                    "name": "platform",
+                                    "type": "text",
+                                    "label": "platform",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "",
+                                    "name": "caption",
+                                    "type": "text",
+                                    "label": "caption",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "",
+                                    "name": "media_url",
+                                    "type": "text",
+                                    "label": "media_url",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "",
+                                    "name": "external_link",
+                                    "type": "text",
+                                    "label": "external_link",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "",
+                                    "name": "internal_notes",
+                                    "type": "text",
+                                    "label": "internal_notes",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "",
+                                    "name": "scheduled_at",
+                                    "type": "text",
+                                    "label": "scheduled_at",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "Defaults to now(). ",
+                                    "name": "created_at",
+                                    "type": "text",
+                                    "label": "created_at",
+                                    "options": null,
+                                    "required": false
+                                },
+                                {
+                                    "help": "",
+                                    "name": "metadata",
+                                    "type": "text",
+                                    "label": "metadata",
+                                    "options": null,
+                                    "required": false
+                                }
+                            ]
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "supabase"
+                            },
+                            "label": "Supabase FluxAI OS"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:supabase",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "table",
+                        "type": "select",
+                        "label": "Table",
+                        "required": true
+                    },
+                    {
+                        "name": "id",
+                        "type": "text"
+                    },
+                    {
+                        "name": "project_id",
+                        "type": "text"
+                    },
+                    {
+                        "name": "title",
+                        "type": "text"
+                    },
+                    {
+                        "name": "status",
+                        "type": "text"
+                    },
+                    {
+                        "name": "priority",
+                        "type": "text"
+                    },
+                    {
+                        "name": "platform",
+                        "type": "text"
+                    },
+                    {
+                        "name": "caption",
+                        "type": "text"
+                    },
+                    {
+                        "name": "media_url",
+                        "type": "text"
+                    },
+                    {
+                        "name": "external_link",
+                        "type": "text"
+                    },
+                    {
+                        "name": "internal_notes",
+                        "type": "text"
+                    },
+                    {
+                        "name": "scheduled_at",
+                        "type": "text"
+                    },
+                    {
+                        "name": "created_at",
+                        "type": "text"
+                    },
+                    {
+                        "name": "metadata",
+                        "type": "text"
+                    }
+                ],
+                "interface": [
+                    {
+                        "name": "id",
+                        "type": "text",
+                        "label": "id"
+                    },
+                    {
+                        "name": "project_id",
+                        "type": "text",
+                        "label": "project_id"
+                    },
+                    {
+                        "name": "title",
+                        "type": "text",
+                        "label": "title"
+                    },
+                    {
+                        "name": "status",
+                        "type": "text",
+                        "label": "status"
+                    },
+                    {
+                        "name": "priority",
+                        "type": "text",
+                        "label": "priority"
+                    },
+                    {
+                        "name": "platform",
+                        "type": "text",
+                        "label": "platform"
+                    },
+                    {
+                        "name": "caption",
+                        "type": "text",
+                        "label": "caption"
+                    },
+                    {
+                        "name": "media_url",
+                        "type": "text",
+                        "label": "media_url"
+                    },
+                    {
+                        "name": "external_link",
+                        "type": "text",
+                        "label": "external_link"
+                    },
+                    {
+                        "name": "internal_notes",
+                        "type": "text",
+                        "label": "internal_notes"
+                    },
+                    {
+                        "name": "scheduled_at",
+                        "type": "text",
+                        "label": "scheduled_at"
+                    },
+                    {
+                        "name": "created_at",
+                        "type": "text",
+                        "label": "created_at"
+                    },
+                    {
+                        "name": "metadata",
+                        "type": "text",
+                        "label": "metadata"
+                    }
+                ]
+            }
+        },
+        {
             "id": 3,
             "module": "google-sheets:addRow",
             "version": 2,
@@ -1311,7 +1586,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 561,
+                    "x": 861,
                     "y": -344
                 },
                 "restore": {
@@ -1697,7 +1972,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 554,
+                    "x": 854,
                     "y": 6
                 },
                 "restore": {
@@ -2018,8 +2293,8 @@
                     },
                     "metadata": {
                         "designer": {
-                            "x": 812,
-                            "y": -335
+                            "x": 607,
+                            "y": 9
                         },
                         "restore": {},
                         "expect": [
@@ -2124,7 +2399,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 846,
+                    "x": 1146,
                     "y": -5
                 },
                 "restore": {
@@ -2532,7 +2807,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 1156,
+                    "x": 1456,
                     "y": 14
                 },
                 "restore": {
@@ -2979,7 +3254,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 1487,
+                    "x": 1787,
                     "y": -1
                 },
                 "restore": {
@@ -3337,7 +3612,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 1475,
+                    "x": 1775,
                     "y": -344
                 },
                 "restore": {
@@ -3622,8 +3897,8 @@
                     },
                     "metadata": {
                         "designer": {
-                            "x": 1756,
-                            "y": -348
+                            "x": 1515,
+                            "y": -472
                         },
                         "restore": {},
                         "expect": [
@@ -3743,7 +4018,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 1807,
+                    "x": 2107,
                     "y": 0
                 },
                 "restore": {
@@ -4272,7 +4547,7 @@
             },
             "metadata": {
                 "designer": {
-                    "x": 2103,
+                    "x": 2403,
                     "y": -34
                 },
                 "restore": {
@@ -4701,8 +4976,8 @@
                     },
                     "metadata": {
                         "designer": {
-                            "x": 2063,
-                            "y": -369
+                            "x": 2089,
+                            "y": -372
                         },
                         "restore": {},
                         "expect": [

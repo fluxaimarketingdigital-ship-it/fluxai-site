@@ -46,6 +46,59 @@ function mapToStandardStatus(status) {
     return upper;
 }
 
+// Mapeia o Status Lógico (ex: DRAFT_PLANNING) para os exatos valores dos Dropdowns no Excel
+function mapToMakeSpreadsheet(standardStatus, isPostagem = false) {
+    const std = standardStatus.toLowerCase();
+    
+    // Tabela 16: CALENDARIO_POSTAGENS
+    if (isPostagem) {
+        if (std === 'ready_to_post') return 'agendado';
+        if (std === 'posted') return 'publicado';
+        return 'rascunho'; // fallback
+    }
+
+    // Tabela 15: PLANEJAMENTO_CONTEUDO
+    if (std === 'draft_planning' || std === 'internal_revision') return 'rascunho';
+    if (std === 'internal_review') return 'em_revisao_fluxai';
+    if (std === 'client_review_planning' || std === 'client_revision_planning') return 'enviado_cliente';
+    if (std === 'planning_approved') return 'aprovado_cliente';
+    if (std === 'in_production' || std === 'client_revision_content') return 'em_producao';
+    if (std === 'internal_qa') return 'aprovado_interno';
+    if (std === 'client_review_content') return 'enviado_cliente';
+    if (std === 'ready_to_post') return 'agendado';
+    if (std === 'posted') return 'publicado';
+
+    return 'rascunho'; // fallback seguro para o Make não falhar
+}
+
+function mapToSpreadsheetFormat(rawFormat) {
+    if (!rawFormat) return 'outro';
+    const fmt = rawFormat.toLowerCase();
+    if (fmt.includes('reels') || fmt.includes('video')) return 'reels';
+    if (fmt.includes('carrossel')) return 'carrossel';
+    if (fmt.includes('estatico') || fmt.includes('imagem') || fmt.includes('unico')) return 'post_estatico';
+    if (fmt.includes('story') || fmt.includes('stories')) return 'story';
+    if (fmt.includes('artigo') || fmt.includes('blog')) return 'artigo';
+    if (fmt.includes('email')) return 'email';
+    if (fmt.includes('landing') || fmt.includes('site')) return 'landing_page';
+    if (fmt.includes('anuncio') || fmt.includes('ads')) return 'anuncio';
+    return 'outro';
+}
+
+function mapToSpreadsheetChannel(rawChannel) {
+    if (!rawChannel) return 'outro';
+    const ch = rawChannel.toLowerCase();
+    if (ch.includes('instagram')) return 'instagram';
+    if (ch.includes('facebook')) return 'facebook';
+    if (ch.includes('linkedin')) return 'linkedin';
+    if (ch.includes('site')) return 'site';
+    if (ch.includes('blog')) return 'blog';
+    if (ch.includes('email')) return 'email';
+    if (ch.includes('whatsapp')) return 'whatsapp';
+    if (ch.includes('youtube')) return 'youtube';
+    return 'outro';
+}
+
 window.changeMonth = (delta) => {
     currentMonth += delta;
     if (currentMonth > 11) { currentMonth = 0; currentYear++; }
@@ -1164,8 +1217,8 @@ window.saveAssetEdit = async () => {
                 postagem_id: editingAssetId,
                 title: title,
                 tema: title,
-                canal: currentAssetData.platform || '',
-                formato_conteudo: parsedFormato || tipo_entrega_fb,
+                canal: mapToSpreadsheetChannel(currentAssetData.platform),
+                formato_conteudo: mapToSpreadsheetFormat(parsedFormato || tipo_entrega_fb),
                 objetivo_conteudo: parsedObjetivo,
                 pilar_conteudo: '',
                 etapa_funil: '',
@@ -1173,8 +1226,8 @@ window.saveAssetEdit = async () => {
                 titulo_conteudo: title,
                 legenda: parsedLegenda,
                 cta: parsedCta,
-                status_planejamento: nextStatus,
-                status_postagem: nextStatus,
+                status_planejamento: mapToMakeSpreadsheet(targetLogical, false),
+                status_postagem: mapToMakeSpreadsheet(targetLogical, true),
                 data_agendada: currentAssetData.scheduled_at || '',
                 hora_agendada: currentAssetData.scheduled_at ? new Date(currentAssetData.scheduled_at).toLocaleTimeString('pt-BR') : '',
                 data_prevista: currentAssetData.scheduled_at || '',
@@ -1196,7 +1249,7 @@ window.saveAssetEdit = async () => {
                 limite_id: limite_id_fb,
                 mes_referencia: mes_referencia_fb.replace('-', '_'),
                 semana_referencia: '',
-                tipo_entrega: tipo_entrega_fb,
+                tipo_entrega: mapToSpreadsheetFormat(tipo_entrega_fb),
                 geracao_id: currentAssetData.metadata?.geracao_id || currentAssetData.metadata?.mock_id || '',
                 credito_id: '',
                 observacao: ''
@@ -2027,7 +2080,7 @@ async function runAiPlanner() {
             client_name: client_name_fb,
             limite_id: newAsset.metadata.limite_id,
             mes_referencia: mes_referencia.replace('-', '_'),
-            tipo_entrega: tipo_entrega,
+            tipo_entrega: mapToSpreadsheetFormat(tipo_entrega),
             origem_geracao: 'contrato',
             solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai',
             responsavel_operacional: 'Design',

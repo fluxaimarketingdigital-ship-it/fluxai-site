@@ -1,0 +1,592 @@
+{
+    "name": "17_FLUXAI_GPT_GERACOES_LOG_OFICIAL",
+    "flow": [
+        {
+            "id": 1,
+            "module": "gateway:CustomWebHook",
+            "version": 1,
+            "parameters": {
+                "hook": 2372824,
+                "maxResults": 1
+            },
+            "mapper": {},
+            "metadata": {
+                "designer": {
+                    "x": 0,
+                    "y": 0
+                },
+                "restore": {
+                    "parameters": {
+                        "hook": {
+                            "data": {
+                                "editable": "true"
+                            },
+                            "label": "FLUXAI_PROXY_GPT_GERACOES_LOG_2026"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "hook",
+                        "type": "hook:gateway-webhook",
+                        "label": "Webhook",
+                        "required": true
+                    },
+                    {
+                        "name": "maxResults",
+                        "type": "number",
+                        "label": "Maximum number of results"
+                    }
+                ]
+            }
+        },
+        {
+            "id": 2,
+            "module": "google-sheets:addRow",
+            "version": 2,
+            "parameters": {
+                "__IMTCONN__": 8785925
+            },
+            "mapper": {
+                "from": "drive",
+                "mode": "select",
+                "values": {
+                    "log_id": "{{1.log_id}}",
+                    "tipo_log": "execucao_gpt",
+                    "client_id": "{{1.client_id}}",
+                    "geracao_id": "{{1.geracao_id}}",
+                    "modelo_gpt": "{{1.modelo_gpt}}",
+                    "observacao": "{{1.prompt_resumo}}",
+                    "client_name": "{{1.client_name}}",
+                    "data_evento": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}",
+                    "cenario_make": "17_FLUXAI_GPT_GERACOES_LOG",
+                    "data_criacao": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}",
+                    "erro_tecnico": "{{1.erro}}",
+                    "tipo_entrega": "{{1.tipo_geracao}}",
+                    "mes_referencia": "{{1.mes_referencia}}",
+                    "workflow_origem": "17_FLUXAI_GPT_GERACOES_LOG",
+                    "tokens_estimados": "{{1.tokens_estimados}}",
+                    "status_execucao_gpt": "{{1.status_execucao}}",
+                    "responsavel_operacional": "{{1.operador_responsavel}}"
+                },
+                "sheetId": "GPT_GERACOES_LOG",
+                "spreadsheetId": "/1-MZBzS2KOZ_pSIR9rVX_mkecdvmQjF9j9q8ahMKqxQE",
+                "includesHeaders": true,
+                "insertDataOption": "INSERT_ROWS",
+                "useColumnHeaders": true,
+                "valueInputOption": "USER_ENTERED",
+                "insertUnformatted": false
+            },
+            "metadata": {
+                "designer": {
+                    "x": 320,
+                    "y": 0
+                },
+                "restore": {
+                    "expect": {
+                        "from": {
+                            "label": "My Drive"
+                        },
+                        "mode": {
+                            "label": "Search by path"
+                        },
+                        "sheetId": {
+                            "label": "GPT_GERACOES_LOG"
+                        },
+                        "spreadsheetId": {
+                            "path": [
+                                "FluxAI_Intelligence_Base_Ecossistema_Make"
+                            ]
+                        },
+                        "includesHeaders": {
+                            "label": "Yes"
+                        },
+                        "insertDataOption": {
+                            "mode": "chose",
+                            "label": "Insert rows"
+                        },
+                        "useColumnHeaders": {
+                            "label": "Yes",
+                            "nested": [
+                                {
+                                    "name": "values",
+                                    "spec": [
+                                        {
+                                            "name": "log_id",
+                                            "type": "text",
+                                            "label": "log_id (A)"
+                                        },
+                                        {
+                                            "name": "geracao_id",
+                                            "type": "text",
+                                            "label": "geracao_id (B)"
+                                        },
+                                        {
+                                            "name": "client_id",
+                                            "type": "text",
+                                            "label": "client_id (C)"
+                                        },
+                                        {
+                                            "name": "client_name",
+                                            "type": "text",
+                                            "label": "client_name (D)"
+                                        },
+                                        {
+                                            "name": "workflow_origem",
+                                            "type": "text",
+                                            "label": "workflow_origem (E)"
+                                        },
+                                        {
+                                            "name": "cenario_make",
+                                            "type": "text",
+                                            "label": "cenario_make (F)"
+                                        },
+                                        {
+                                            "name": "tipo_log",
+                                            "type": "text",
+                                            "label": "tipo_log (G)"
+                                        },
+                                        {
+                                            "name": "tipo_entrega",
+                                            "type": "text",
+                                            "label": "tipo_entrega (H)"
+                                        },
+                                        {
+                                            "name": "mes_referencia",
+                                            "type": "text",
+                                            "label": "mes_referencia (I)"
+                                        },
+                                        {
+                                            "name": "pode_gerar",
+                                            "type": "text",
+                                            "label": "pode_gerar (J)"
+                                        },
+                                        {
+                                            "name": "status_guardrail",
+                                            "type": "text",
+                                            "label": "status_guardrail (K)"
+                                        },
+                                        {
+                                            "name": "motivo_bloqueio",
+                                            "type": "text",
+                                            "label": "motivo_bloqueio (L)"
+                                        },
+                                        {
+                                            "name": "contrato_ativo",
+                                            "type": "text",
+                                            "label": "contrato_ativo (M)"
+                                        },
+                                        {
+                                            "name": "tipo_entrega_contratado",
+                                            "type": "text",
+                                            "label": "tipo_entrega_contratado (N)"
+                                        },
+                                        {
+                                            "name": "dentro_limite_operacional",
+                                            "type": "text",
+                                            "label": "dentro_limite_operacional (O)"
+                                        },
+                                        {
+                                            "name": "servico_extra_aprovado",
+                                            "type": "text",
+                                            "label": "servico_extra_aprovado (P)"
+                                        },
+                                        {
+                                            "name": "ajuste_manual_autorizado",
+                                            "type": "text",
+                                            "label": "ajuste_manual_autorizado (Q)"
+                                        },
+                                        {
+                                            "name": "risco_operacional",
+                                            "type": "text",
+                                            "label": "risco_operacional (R)"
+                                        },
+                                        {
+                                            "name": "status_execucao_gpt",
+                                            "type": "text",
+                                            "label": "status_execucao_gpt (S)"
+                                        },
+                                        {
+                                            "name": "modelo_gpt",
+                                            "type": "text",
+                                            "label": "modelo_gpt (T)"
+                                        },
+                                        {
+                                            "name": "tokens_estimados",
+                                            "type": "text",
+                                            "label": "tokens_estimados (U)"
+                                        },
+                                        {
+                                            "name": "erro_tecnico",
+                                            "type": "text",
+                                            "label": "erro_tecnico (V)"
+                                        },
+                                        {
+                                            "name": "responsavel_operacional",
+                                            "type": "text",
+                                            "label": "responsavel_operacional (W)"
+                                        },
+                                        {
+                                            "name": "observacao",
+                                            "type": "text",
+                                            "label": "observacao (X)"
+                                        },
+                                        {
+                                            "name": "data_evento",
+                                            "type": "text",
+                                            "label": "data_evento (Y)"
+                                        },
+                                        {
+                                            "name": "data_criacao",
+                                            "type": "text",
+                                            "label": "data_criacao (Z)"
+                                        }
+                                    ],
+                                    "type": "collection",
+                                    "label": "Values in columns",
+                                    "metadata": [
+                                        [
+                                            [
+                                                "log_id",
+                                                "geracao_id",
+                                                "client_id",
+                                                "client_name",
+                                                "workflow_origem",
+                                                "cenario_make",
+                                                "tipo_log",
+                                                "tipo_entrega",
+                                                "mes_referencia",
+                                                "pode_gerar",
+                                                "status_guardrail",
+                                                "motivo_bloqueio",
+                                                "contrato_ativo",
+                                                "tipo_entrega_contratado",
+                                                "dentro_limite_operacional",
+                                                "servico_extra_aprovado",
+                                                "ajuste_manual_autorizado",
+                                                "risco_operacional",
+                                                "status_execucao_gpt",
+                                                "modelo_gpt",
+                                                "tokens_estimados",
+                                                "erro_tecnico",
+                                                "responsavel_operacional",
+                                                "observacao",
+                                                "data_evento",
+                                                "data_criacao"
+                                            ]
+                                        ]
+                                    ]
+                                }
+                            ]
+                        },
+                        "valueInputOption": {
+                            "mode": "chose",
+                            "label": "User entered"
+                        },
+                        "insertUnformatted": {
+                            "mode": "chose"
+                        }
+                    },
+                    "parameters": {
+                        "__IMTCONN__": {
+                            "data": {
+                                "scoped": "true",
+                                "connection": "google"
+                            },
+                            "label": "Meu Google (fluxai.marketingdigital@gmail.com)"
+                        }
+                    }
+                },
+                "parameters": [
+                    {
+                        "name": "__IMTCONN__",
+                        "type": "account:google",
+                        "label": "Connection",
+                        "required": true
+                    }
+                ],
+                "expect": [
+                    {
+                        "name": "mode",
+                        "type": "select",
+                        "label": "Search Method",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "select",
+                                "fromAll",
+                                "map"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "insertUnformatted",
+                        "type": "boolean",
+                        "label": "Unformatted",
+                        "required": true
+                    },
+                    {
+                        "name": "valueInputOption",
+                        "type": "select",
+                        "label": "Value input option",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "USER_ENTERED",
+                                "RAW"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "insertDataOption",
+                        "type": "select",
+                        "label": "Insert data option",
+                        "validate": {
+                            "enum": [
+                                "INSERT_ROWS",
+                                "OVERWRITE"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "from",
+                        "type": "select",
+                        "label": "Drive",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                "drive",
+                                "share",
+                                "team"
+                            ]
+                        }
+                    },
+                    {
+                        "name": "spreadsheetId",
+                        "type": "file",
+                        "label": "Spreadsheet Name",
+                        "required": true
+                    },
+                    {
+                        "name": "sheetId",
+                        "type": "select",
+                        "label": "Sheet Name",
+                        "required": true
+                    },
+                    {
+                        "name": "includesHeaders",
+                        "type": "select",
+                        "label": "Table contains headers",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                true,
+                                false
+                            ]
+                        }
+                    },
+                    {
+                        "name": "useColumnHeaders",
+                        "type": "select",
+                        "label": "Use column headers as IDs of the columns",
+                        "required": true,
+                        "validate": {
+                            "enum": [
+                                true,
+                                false
+                            ]
+                        }
+                    },
+                    {
+                        "name": "values",
+                        "spec": [
+                            {
+                                "name": "log_id",
+                                "type": "text",
+                                "label": "log_id (A)"
+                            },
+                            {
+                                "name": "geracao_id",
+                                "type": "text",
+                                "label": "geracao_id (B)"
+                            },
+                            {
+                                "name": "client_id",
+                                "type": "text",
+                                "label": "client_id (C)"
+                            },
+                            {
+                                "name": "client_name",
+                                "type": "text",
+                                "label": "client_name (D)"
+                            },
+                            {
+                                "name": "workflow_origem",
+                                "type": "text",
+                                "label": "workflow_origem (E)"
+                            },
+                            {
+                                "name": "cenario_make",
+                                "type": "text",
+                                "label": "cenario_make (F)"
+                            },
+                            {
+                                "name": "tipo_log",
+                                "type": "text",
+                                "label": "tipo_log (G)"
+                            },
+                            {
+                                "name": "tipo_entrega",
+                                "type": "text",
+                                "label": "tipo_entrega (H)"
+                            },
+                            {
+                                "name": "mes_referencia",
+                                "type": "text",
+                                "label": "mes_referencia (I)"
+                            },
+                            {
+                                "name": "pode_gerar",
+                                "type": "text",
+                                "label": "pode_gerar (J)"
+                            },
+                            {
+                                "name": "status_guardrail",
+                                "type": "text",
+                                "label": "status_guardrail (K)"
+                            },
+                            {
+                                "name": "motivo_bloqueio",
+                                "type": "text",
+                                "label": "motivo_bloqueio (L)"
+                            },
+                            {
+                                "name": "contrato_ativo",
+                                "type": "text",
+                                "label": "contrato_ativo (M)"
+                            },
+                            {
+                                "name": "tipo_entrega_contratado",
+                                "type": "text",
+                                "label": "tipo_entrega_contratado (N)"
+                            },
+                            {
+                                "name": "dentro_limite_operacional",
+                                "type": "text",
+                                "label": "dentro_limite_operacional (O)"
+                            },
+                            {
+                                "name": "servico_extra_aprovado",
+                                "type": "text",
+                                "label": "servico_extra_aprovado (P)"
+                            },
+                            {
+                                "name": "ajuste_manual_autorizado",
+                                "type": "text",
+                                "label": "ajuste_manual_autorizado (Q)"
+                            },
+                            {
+                                "name": "risco_operacional",
+                                "type": "text",
+                                "label": "risco_operacional (R)"
+                            },
+                            {
+                                "name": "status_execucao_gpt",
+                                "type": "text",
+                                "label": "status_execucao_gpt (S)"
+                            },
+                            {
+                                "name": "modelo_gpt",
+                                "type": "text",
+                                "label": "modelo_gpt (T)"
+                            },
+                            {
+                                "name": "tokens_estimados",
+                                "type": "text",
+                                "label": "tokens_estimados (U)"
+                            },
+                            {
+                                "name": "erro_tecnico",
+                                "type": "text",
+                                "label": "erro_tecnico (V)"
+                            },
+                            {
+                                "name": "responsavel_operacional",
+                                "type": "text",
+                                "label": "responsavel_operacional (W)"
+                            },
+                            {
+                                "name": "observacao",
+                                "type": "text",
+                                "label": "observacao (X)"
+                            },
+                            {
+                                "name": "data_evento",
+                                "type": "text",
+                                "label": "data_evento (Y)"
+                            },
+                            {
+                                "name": "data_criacao",
+                                "type": "text",
+                                "label": "data_criacao (Z)"
+                            }
+                        ],
+                        "type": "collection",
+                        "label": "Values in columns",
+                        "metadata": [
+                            [
+                                [
+                                    "log_id",
+                                    "geracao_id",
+                                    "client_id",
+                                    "client_name",
+                                    "workflow_origem",
+                                    "cenario_make",
+                                    "tipo_log",
+                                    "tipo_entrega",
+                                    "mes_referencia",
+                                    "pode_gerar",
+                                    "status_guardrail",
+                                    "motivo_bloqueio",
+                                    "contrato_ativo",
+                                    "tipo_entrega_contratado",
+                                    "dentro_limite_operacional",
+                                    "servico_extra_aprovado",
+                                    "ajuste_manual_autorizado",
+                                    "risco_operacional",
+                                    "status_execucao_gpt",
+                                    "modelo_gpt",
+                                    "tokens_estimados",
+                                    "erro_tecnico",
+                                    "responsavel_operacional",
+                                    "observacao",
+                                    "data_evento",
+                                    "data_criacao"
+                                ]
+                            ]
+                        ]
+                    }
+                ]
+            }
+        }
+    ],
+    "metadata": {
+        "instant": true,
+        "version": 1,
+        "scenario": {
+            "roundtrips": 1,
+            "maxErrors": 3,
+            "autoCommit": true,
+            "sequential": true,
+            "slots": null,
+            "confidential": false,
+            "dataloss": false,
+            "dlq": false
+        },
+        "designer": {
+            "orphans": []
+        },
+        "zone": "us2.make.com",
+        "notes": []
+    }
+}
