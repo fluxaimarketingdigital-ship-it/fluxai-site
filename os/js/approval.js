@@ -130,16 +130,23 @@ async function executeStateTransition(app, targetStatus, feedback, actionName) {
     }
     const isReal = OS_CONFIG.flags.sendRealWebhooks || (Array.isArray(OS_CONFIG.flags.enabledRealWebhooks) && OS_CONFIG.flags.enabledRealWebhooks.includes(transitionResult.webhook));
     if (transitionResult.webhook) {
+        const now = new Date();
+        const mes_referencia_fb = app.original_asset?.metadata?.mes_referencia || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        const tipo_entrega_fb = app.original_asset?.metadata?.tipo_entrega || 'carrossel'; 
+        const client_id_raw = app.project_id;
+        const client_id_mapped = client_id_raw === '3acae009-6825-4163-9057-cbe99216cc3b' ? 'FLUXAI_LABS_001' : client_id_raw;
+        const limite_id_fb = app.original_asset?.metadata?.limite_id || `LIM_${client_id_mapped}_${mes_referencia_fb.replace('-', '_')}_${tipo_entrega_fb.toUpperCase()}`;
+
         const payload = {
             approval_id: app.id,
-            project_id: app.project_id,
+            project_id: client_id_mapped,
             type: app.type,
             status: targetStatus,
             feedback: feedback,
-            timestamp: new Date().toISOString(),
-            limite_id: app.original_asset?.metadata?.limite_id || '',
-            mes_referencia: app.original_asset?.metadata?.mes_referencia || '',
-            tipo_entrega: app.original_asset?.metadata?.tipo_entrega || '',
+            timestamp: now.toISOString(),
+            limite_id: limite_id_fb,
+            mes_referencia: mes_referencia_fb,
+            tipo_entrega: tipo_entrega_fb,
             geracao_id: app.original_asset?.metadata?.geracao_id || app.original_asset?.metadata?.mock_id || ''
         };
         const response = await OS_CONFIG.webhooks.send(transitionResult.webhook, payload);

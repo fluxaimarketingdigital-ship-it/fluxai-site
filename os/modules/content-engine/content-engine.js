@@ -1118,21 +1118,28 @@ window.saveAssetEdit = async () => {
                                ['draft_planning', 'internal_review', 'internal_revision', 'client_review_planning', 'client_revision_planning', 'planning_approved'].includes(targetLogical);
             const webhookKey = isPlanning ? 'PLANEJAMENTO_CONTEUDO' : 'CALENDARIO_POSTAGENS';
 
+            const now = new Date();
+            const mes_referencia_fb = currentAssetData.metadata?.mes_referencia || `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const tipo_entrega_fb = currentAssetData.metadata?.tipo_entrega || 'carrossel'; // Default to carrossel for old records
+            const client_id_raw = currentAssetData.project_id || currentProject;
+            const client_id_mapped = client_id_raw === '3acae009-6825-4163-9057-cbe99216cc3b' ? 'FLUXAI_LABS_001' : client_id_raw;
+            const limite_id_fb = currentAssetData.metadata?.limite_id || `LIM_${client_id_mapped}_${mes_referencia_fb.replace('-', '_')}_${tipo_entrega_fb.toUpperCase()}`;
+
             const payload = {
-                client_id: currentAssetData.project_id || currentProject,
+                client_id: client_id_mapped,
                 asset_id: editingAssetId,
                 title: title,
                 status_anterior: currentAssetData.status,
                 status_novo: nextStatus,
                 logical_transition: `${currentLogical}->${targetLogical}`,
-                timestamp: new Date().toISOString(),
+                timestamp: now.toISOString(),
                 responsavel_operacional: responsible || '',
                 link_referencia: ref || '',
                 link_resultado_drive: artFinal || '',
                 solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai',
-                limite_id: currentAssetData.metadata?.limite_id || '',
-                mes_referencia: currentAssetData.metadata?.mes_referencia || '',
-                tipo_entrega: currentAssetData.metadata?.tipo_entrega || '',
+                limite_id: limite_id_fb,
+                mes_referencia: mes_referencia_fb,
+                tipo_entrega: tipo_entrega_fb,
                 geracao_id: currentAssetData.metadata?.geracao_id || currentAssetData.metadata?.mock_id || ''
             };
 
@@ -1910,6 +1917,10 @@ async function runAiPlanner() {
             '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
         };
         const spreadsheetClientId = projectMap[selectedId] || selectedId;
+
+        newAsset.metadata.mes_referencia = mes_referencia;
+        newAsset.metadata.tipo_entrega = tipo_entrega;
+        newAsset.metadata.limite_id = `LIM_${spreadsheetClientId}_${mes_referencia.replace('-', '_')}_${tipo_entrega.toUpperCase()}`;
 
         // Webhook de controle operacional de IA
         const payload = {
