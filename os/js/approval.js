@@ -138,12 +138,18 @@ async function executeStateTransition(app, targetStatus, feedback, actionName) {
         const limite_id_fb = app.original_asset?.metadata?.limite_id || `LIM_${client_id_mapped}_${mes_referencia_fb.replace('-', '_')}_${tipo_entrega_fb.toUpperCase()}`;
 
         const payload = {
-            approval_id: app.id,
-            project_id: client_id_mapped,
-            type: app.type,
-            status: targetStatus,
-            feedback: feedback,
+            client_id: client_id_mapped,
+            asset_id: app.id,
+            title: app.original_asset?.title || 'Revisão de Material',
+            status_anterior: app.original_asset?.status || app.status,
+            status_novo: targetStatus,
+            logical_transition: `client_review->${targetStatus}`,
             timestamp: now.toISOString(),
+            responsavel_operacional: app.original_asset?.metadata?.responsavel_operacional || 'Equipe',
+            link_referencia: app.original_asset?.metadata?.reference_url || '',
+            link_resultado_drive: app.original_asset?.metadata?.final_asset_url || '',
+            solicitado_por: 'Cliente (via Portal)',
+            feedback: feedback || '',
             limite_id: limite_id_fb,
             mes_referencia: mes_referencia_fb,
             tipo_entrega: tipo_entrega_fb,
