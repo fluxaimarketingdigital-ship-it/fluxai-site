@@ -234,56 +234,83 @@ window.handleOnboarding = async function(e) {
     const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
     const projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
 
-    // Payload de 7 Camadas (Fase 2A Seguro)
     const webhookPayload = {
-        client_id: projectId,
-        client_name: raw.company_name || "",
-        origem: "onboarding_os",
-        status_cliente: "em_onboarding",
-        camada_identidade: {
-            responsavel: raw.responsible_name || "",
-            segmento: raw.segment || "",
-            objetivo_principal: raw.objective || ""
-        },
-        camada_digital: {
-            instagram: raw.client_instagram_handle || "",
-            website: raw.client_website || "",
-            whatsapp_comercial: raw.whatsapp_comercial || ""
-        },
-        camada_servicos: {
-            status_servico: "inativo",
-            modulos_contratados: Array.from(formData.getAll('modules')).join(", ") || "",
-            servico_extra: raw.finance_extra_services_type || "",
-            valor_servico_extra: raw.finance_extra_services_value || ""
-        },
-        camada_conteudo: {
-            dna_status: "pendente_revisao",
-            proposta_valor: raw.value_proposition || "",
-            diferenciais: raw.differentiators || "",
-            tom_de_voz: raw.voice_tone || "",
-            posicionamento_editorial: raw.editorial_positioning || "",
-            reels_mes: raw.escopo_conteudo_reels_qty || "",
-            carrosseis_mes: raw.escopo_conteudo_carrossel_qty || "",
-            stories_mes: raw.escopo_conteudo_stories_qty || "",
-            frequencia_semanal: raw.escopo_conteudo_weekly_freq || ""
-        },
-        camada_assets: {
-            drive_folder_url: raw.asset_drive_link || ""
-        },
-        camada_operacao: {
-            status_contrato: "rascunho",
-            fee_mensal: raw.monthly_fee || "",
-            dia_vencimento: raw.payment_day || "",
-            metodo_pagamento: raw.finance_payment_method || "",
-            data_inicio: raw.finance_start_date || new Date().toISOString().split('T')[0],
-            ciclo_fidelidade: raw.finance_min_duration || ""
-        },
-        camada_ativacao: {
-            status_acesso: "nao_criado",
-            ia_bloqueada: true,
-            prioridade_30d: raw.priority_30d || "",
-            primeira_entrega: raw.first_delivery || ""
-        }
+        // Identidade
+        client_id:               projectId,
+        client_name:             raw.company_name || "",
+        tipo_cliente:            "agencia",
+        origem:                  "onboarding_os",
+        status_cliente:          "em_onboarding",
+        responsavel:             raw.responsible_name || "",
+        segmento:                raw.segment || "",
+        objetivo_principal:      raw.objective || "",
+        proposta_valor:          raw.value_proposition || "",
+        diferenciais:            raw.differentiators || "",
+        tom_de_voz:              raw.voice_tone || "",
+        posicionamento_editorial: raw.editorial_positioning || "",
+        posicionamento_atual:    raw.positioning_current || "",
+        posicionamento_desejado: raw.positioning_desired || "",
+        publico_alvo:            raw.target_audience || "",
+        persona_principal:       raw.main_persona || "",
+
+        // Digital
+        instagram:               raw.client_instagram_handle || "",
+        website:                 raw.client_website || "",
+        dominio_dns:             raw.domain_dns || "",
+        whatsapp_comercial:      raw.whatsapp_comercial || "",
+        canais_digitais:         Array.from(formData.getAll('digital_channels')).join(", ") || "",
+
+        // Serviços
+        modulos_contratados:     Array.from(formData.getAll('modules')).join(", ") || "",
+        status_servico:          "inativo",
+        servico_extra:           raw.finance_extra_services_type || "",
+        valor_servico_extra:     raw.finance_extra_services_value || "",
+        escopo_extra_desc:       raw.finance_extra_services_desc || "",
+
+        // Conteúdo
+        dna_status:              "pendente_revisao",
+        reels_mes:               raw.escopo_conteudo_reels_qty || "",
+        carrosseis_mes:          raw.escopo_conteudo_carrossel_qty || "",
+        stories_mes:             raw.escopo_conteudo_stories_qty || "",
+        frequencia_semanal:      raw.escopo_conteudo_weekly_freq || "",
+        pilares_editoriais:      raw.editorial_pillars || "",
+        dores_icp:               raw.icp_pains || "",
+        objecoes_comuns:         raw.common_objections || "",
+        cta_padrao:              raw.standard_cta || "",
+        linguagem_permitida:     raw.allowed_language || "",
+        linguagem_proibida:      raw.forbidden_language || "",
+        referencias_visuais:     raw.visual_references || "",
+
+        // Assets
+        drive_folder_url:        raw.asset_drive_link || "",
+        logo_url:                raw.asset_logo_url || "",
+        manual_id_visual_url:    raw.asset_brand_guide || "",
+        videos_brutos_url:       raw.asset_raw_videos || "",
+        banco_fotos_url:         raw.asset_photos || "",
+        docs_extras_url:         raw.asset_documents || "",
+
+        // Operação
+        status_contrato:         "rascunho",
+        aprovador_final:         raw.approval_responsible || "",
+        whatsapp_decisor:        raw.whatsapp_decisor || "",
+        responsavel_comercial:   raw.responsible_comercial || "",
+        responsavel_marketing:   raw.responsible_marketing || "",
+        frequencia_postagem:     raw.post_frequency || "",
+        sla_minutos:             raw.sla_minutes || "",
+        fee_mensal:              raw.monthly_fee || "",
+        dia_vencimento:          raw.payment_day || "",
+        metodo_pagamento:        raw.finance_payment_method || "",
+        contrato_assinado:       raw.finance_contract_signed || "",
+        data_inicio:             raw.finance_start_date || new Date().toISOString().split('T')[0],
+        ciclo_fidelidade:        raw.finance_min_duration || "",
+
+        // Ativação
+        status_acesso:           "nao_criado",
+        ia_bloqueada:            true,
+        risco_operacional:       raw.operational_risk || "",
+        pilar_foco_critico:      raw.priority_30d || "",
+        primeira_entrega:        raw.first_delivery || "",
+        dependencias_acesso:     Array.from(formData.getAll('activation_dependencies')).join(", ") || ""
     };
 
     console.log('ONBOARDING_PAYLOAD_PREVIEW (FASE 2A)', webhookPayload);
