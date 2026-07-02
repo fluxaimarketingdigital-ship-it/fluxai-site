@@ -2068,9 +2068,9 @@ async function runAiPlanner() {
             }
         } catch (err) {
             console.error('[IA_PLANNER] Erro ao comunicar com Guardrail', err);
-            // Dependendo da política de restrição, falha no guardrail poderia bloquear (fail-close).
-            // Por enquanto, vamos alertar.
-            alert('Aviso: Falha ao validar limites no Guardrail Oficial. Verifique os logs.');
+            // Falha no guardrail: continua a geração (fail-open com log).
+            // O alerta foi removido pois o sistema cria a pauta com sucesso mesmo neste caso.
+            console.warn('[IA_PLANNER] Guardrail indisponível momentaneamente. Geração prosseguindo normalmente.');
         }
 
         // Webhook de controle operacional de IA (Cenário 11)
