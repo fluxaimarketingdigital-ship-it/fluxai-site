@@ -9,6 +9,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.106.2/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
     <style>
+        input[type="date"] {
+            color-scheme: dark;
+        }
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(1);
+            cursor: pointer;
+        }
         :root { --os-step-active: var(--os-primary); --os-step-inactive: rgba(255,255,255,0.1); }
         .os-viewport { display: flex; flex-direction: column; align-items: center; justify-content: flex-start; min-height: 100vh; }
         .wizard-container { width: 100%; max-width: 900px; padding-bottom: 120px; }
