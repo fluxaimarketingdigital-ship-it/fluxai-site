@@ -119,8 +119,6 @@
                 <div class="wizard-container">
                     
                                         <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 30px;">
-                        <button type="button" id="btn-save-draft" onclick="window.saveOnboardingDraft()" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid var(--os-border); padding: 8px 15px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s;"><i class="fa-solid fa-floppy-disk"></i> Salvar Rascunho</button>
-                        <button type="button" id="btn-clear-draft" onclick="window.clearOnboardingDraft()" style="background: transparent; color: #ef4444; border: 1px solid #ef4444; padding: 8px 15px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; cursor: pointer; transition: 0.2s;"><i class="fa-solid fa-trash"></i> Limpar Rascunho</button>
                     </div>
                     <div class="step-indicator">
                         <div class="step-item active" data-step="1">
@@ -283,7 +281,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>WhatsApp Comercial</label>
-                                        <input type="text" name="whatsapp_comercial" class="form-control" placeholder="+55 (11) 99999-9999" />
+                                        <input type="text" name="whatsapp_comercial" class="form-control" value="+55 (  )      -    " placeholder="+55 (DDD) 90000-0000" />
                                     </div>
                                 </div>
                             </div>
@@ -463,7 +461,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>WhatsApp do Decisor</label>
-                                        <input type="text" name="whatsapp_decisor" class="form-control" placeholder="+55..." />
+                                        <input type="text" name="whatsapp_decisor" class="form-control" value="+55 (  )      -    " placeholder="+55 (DDD) 90000-0000" />
                                     </div>
                                 </div>
 
