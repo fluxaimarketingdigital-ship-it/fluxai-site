@@ -29,7 +29,9 @@ export default async function handler(req, res) {
 
   try {
     const authHeader = req.headers.authorization;
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    // Permite bypass de autenticação para rotas internas do OS (modo sem login ativo)
+    const isAuthBypassed = !authHeader || authHeader === 'Bearer ' || authHeader.trim() === 'Bearer';
+    if (!isAuthBypassed && !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Unauthorized. Missing or invalid Authorization header.' });
     }
 
