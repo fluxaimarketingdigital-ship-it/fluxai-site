@@ -65,7 +65,7 @@ export const MakeClient = {
         try {
             // Obter JWT dinâmico do usuário atual
             let token = '';
-            if (globalThis.supabase !== undefined) {
+            if (globalThis.supabase !== undefined && typeof globalThis.supabase.auth?.getSession === 'function') {
                 const { data: { session } } = await globalThis.supabase.auth.getSession();
                 if (session?.access_token) {
                     token = session.access_token;
