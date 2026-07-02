@@ -288,7 +288,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>WhatsApp Comercial</label>
-                                        <input type="text" name="whatsapp_comercial" class="form-control" value="+55 (  )      -    " placeholder="+55 (DDD) 90000-0000" />
+                                        <input type="text" name="whatsapp_comercial" class="form-control" placeholder="+55 (DDD) 90000-0000" oninput="maskPhone(event)" />
                                     </div>
                                 </div>
                             </div>
@@ -468,7 +468,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>WhatsApp do Decisor</label>
-                                        <input type="text" name="whatsapp_decisor" class="form-control" value="+55 (  )      -    " placeholder="+55 (DDD) 90000-0000" />
+                                        <input type="text" name="whatsapp_decisor" class="form-control" placeholder="+55 (DDD) 90000-0000" oninput="maskPhone(event)" />
                                     </div>
                                 </div>
 
@@ -728,6 +728,16 @@
             }
 
             window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+    <script>
+        function maskPhone(e) {
+            let v = e.target.value.replace(/\D/g, "");
+            if (v.length === 0) { e.target.value = ""; return; }
+            if (v.length <= 2) { e.target.value = "+" + v; return; }
+            if (v.length <= 4) { e.target.value = "+" + v.substring(0,2) + " (" + v.substring(2); return; }
+            if (v.length <= 9) { e.target.value = "+" + v.substring(0,2) + " (" + v.substring(2,4) + ") " + v.substring(4); return; }
+            e.target.value = "+" + v.substring(0,2) + " (" + v.substring(2,4) + ") " + v.substring(4,9) + "-" + v.substring(9,13);
         }
     </script>
 </body>
