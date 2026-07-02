@@ -234,83 +234,100 @@ window.handleOnboarding = async function(e) {
     const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
     const projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
 
+    // Captura usuário autenticado para responsavel_fluxai
+    const currentSessionUser = await OS_AUTH.check('ADMIN').catch(() => null);
+    const responsavelFluxai = currentSessionUser?.user_metadata?.full_name
+        || currentSessionUser?.email
+        || "FluxAI OS";
+
     const webhookPayload = {
         // Identidade
-        client_id:               projectId,
-        client_name:             raw.company_name || "",
-        tipo_cliente:            "agencia",
-        origem:                  "onboarding_os",
-        status_cliente:          "em_onboarding",
-        responsavel:             raw.responsible_name || "",
-        segmento:                raw.segment || "",
-        objetivo_principal:      raw.objective || "",
-        proposta_valor:          raw.value_proposition || "",
-        diferenciais:            raw.differentiators || "",
-        tom_de_voz:              raw.voice_tone || "",
-        posicionamento_editorial: raw.editorial_positioning || "",
-        posicionamento_atual:    raw.positioning_current || "",
-        posicionamento_desejado: raw.positioning_desired || "",
-        publico_alvo:            raw.target_audience || "",
-        persona_principal:       raw.main_persona || "",
+        client_id:                  projectId,
+        client_name:                raw.company_name || "",
+        tipo_cliente:               "agencia",
+        origem:                     "onboarding_os",
+        status_cliente:             "em_onboarding",
+        responsavel:                raw.responsible_name || "",
+        segmento:                   raw.segment || "",
+        objetivo_90_dias:           raw.objective || "",          // Col O
+        proposta_valor:             raw.value_proposition || "",
+        diferenciais:               raw.differentiators || "",
+        tom_de_voz:                 raw.voice_tone || "",
+        posicionamento_editorial:   raw.editorial_positioning || "",
+        posicionamento_atual:       raw.positioning_current || "",
+        posicionamento_desejado:    raw.positioning_desired || "",
+        publico_alvo:               raw.target_audience || "",
+        persona_principal:          raw.main_persona || "",
+
+        // DNA Narrativo — Colunas K, L, M, N, P, Q, V
+        dor_principal:              raw.pain_points || "",         // Col K
+        desejo_principal:           raw.icp_main_desire || "",    // Col L
+        inimigo_comum:              raw.common_enemy || "",        // Col M
+        nivel_percepcao_premium:    raw.awareness_level || "",     // Col N
+        objetivo_mes_atual:         raw.current_month_goal || "", // Col P
+        prioridade_estrategica:     raw.strategic_priority || "", // Col Q
+        palavras_usar:              raw.desired_language || "",    // Col T
+        palavras_evitar:            raw.forbidden_language || "",  // Col S
+        restricoes_comunicacao:     raw.objections || "",          // Col U
+        observacoes_estrategicas:   raw.strategic_notes || "",     // Col V
+        responsavel_fluxai:         responsavelFluxai,              // Col X (auto)
+
+        // Outros conteúdo
+        cta_padrao:                 raw.ideal_cta || "",
+        referencias_visuais:        raw.references || "",
+        pilares_editoriais:         raw.editorial_pillars || "",
+        dna_status:                 "pendente_revisao",
+
+        // Escopo de conteúdo
+        reels_mes:                  raw.escopo_conteudo_reels_qty || "",
+        carrosseis_mes:             raw.escopo_conteudo_carrossel_qty || "",
+        stories_mes:                raw.escopo_conteudo_stories_qty || "",
+        frequencia_semanal:         raw.escopo_conteudo_weekly_freq || "",
 
         // Digital
-        instagram:               raw.client_instagram_handle || "",
-        website:                 raw.client_website || "",
-        dominio_dns:             raw.domain_dns || "",
-        whatsapp_comercial:      raw.whatsapp_comercial || "",
-        canais_digitais:         Array.from(formData.getAll('digital_channels')).join(", ") || "",
+        instagram:                  raw.client_instagram_handle || "",
+        website:                    raw.client_website || "",
+        dominio_dns:                raw.domain_dns || "",
+        whatsapp_comercial:         raw.whatsapp_comercial || "",
+        canais_digitais:            Array.from(formData.getAll('digital_channels')).join(", ") || "",
 
         // Serviços
-        modulos_contratados:     Array.from(formData.getAll('modules')).join(", ") || "",
-        status_servico:          "inativo",
-        servico_extra:           raw.finance_extra_services_type || "",
-        valor_servico_extra:     raw.finance_extra_services_value || "",
-        escopo_extra_desc:       raw.finance_extra_services_desc || "",
-
-        // Conteúdo
-        dna_status:              "pendente_revisao",
-        reels_mes:               raw.escopo_conteudo_reels_qty || "",
-        carrosseis_mes:          raw.escopo_conteudo_carrossel_qty || "",
-        stories_mes:             raw.escopo_conteudo_stories_qty || "",
-        frequencia_semanal:      raw.escopo_conteudo_weekly_freq || "",
-        pilares_editoriais:      raw.editorial_pillars || "",
-        dores_icp:               raw.icp_pains || "",
-        objecoes_comuns:         raw.common_objections || "",
-        cta_padrao:              raw.standard_cta || "",
-        linguagem_permitida:     raw.allowed_language || "",
-        linguagem_proibida:      raw.forbidden_language || "",
-        referencias_visuais:     raw.visual_references || "",
+        modulos_contratados:        Array.from(formData.getAll('modules')).join(", ") || "",
+        status_servico:             "inativo",
+        servico_extra:              raw.finance_extra_services_type || "",
+        valor_servico_extra:        raw.finance_extra_services_value || "",
+        escopo_extra_desc:          raw.finance_extra_services_desc || "",
 
         // Assets
-        drive_folder_url:        raw.asset_drive_link || "",
-        logo_url:                raw.asset_logo_url || "",
-        manual_id_visual_url:    raw.asset_brand_guide || "",
-        videos_brutos_url:       raw.asset_raw_videos || "",
-        banco_fotos_url:         raw.asset_photos || "",
-        docs_extras_url:         raw.asset_documents || "",
+        drive_folder_url:           raw.asset_drive_link || "",
+        logo_url:                   raw.asset_logos || "",
+        manual_id_visual_url:       raw.asset_brand_guidelines || "",
+        videos_brutos_url:          raw.asset_videos || "",
+        banco_fotos_url:            raw.asset_photos || "",
+        docs_extras_url:            raw.asset_documents || "",
 
         // Operação
-        status_contrato:         "rascunho",
-        aprovador_final:         raw.approval_responsible || "",
-        whatsapp_decisor:        raw.whatsapp_decisor || "",
-        responsavel_comercial:   raw.responsible_comercial || "",
-        responsavel_marketing:   raw.responsible_marketing || "",
-        frequencia_postagem:     raw.post_frequency || "",
-        sla_minutos:             raw.sla_minutes || "",
-        fee_mensal:              raw.monthly_fee || "",
-        dia_vencimento:          raw.payment_day || "",
-        metodo_pagamento:        raw.finance_payment_method || "",
-        contrato_assinado:       raw.finance_contract_signed || "",
-        data_inicio:             raw.finance_start_date || new Date().toISOString().split('T')[0],
-        ciclo_fidelidade:        raw.finance_min_duration || "",
+        status_contrato:            "rascunho",
+        aprovador_final:            raw.approval_responsible || "",
+        whatsapp_decisor:           raw.whatsapp_decisor || "",
+        responsavel_comercial:      raw.responsible_comercial || "",
+        responsavel_marketing:      raw.responsible_marketing || "",
+        frequencia_postagem:        raw.post_frequency || "",
+        sla_minutos:                raw.sla_minutes || "",
+        fee_mensal:                 raw.monthly_fee || "",
+        dia_vencimento:             raw.payment_day || "",
+        metodo_pagamento:           raw.finance_payment_method || "",
+        contrato_assinado:          raw.finance_contract_signed || "",
+        data_inicio:                raw.finance_start_date || new Date().toISOString().split('T')[0],
+        ciclo_fidelidade:           raw.finance_min_duration || "",
 
         // Ativação
-        status_acesso:           "nao_criado",
-        ia_bloqueada:            true,
-        risco_operacional:       raw.operational_risk || "",
-        pilar_foco_critico:      raw.priority_30d || "",
-        primeira_entrega:        raw.first_delivery || "",
-        dependencias_acesso:     Array.from(formData.getAll('activation_dependencies')).join(", ") || ""
+        status_acesso:              "nao_criado",
+        ia_bloqueada:               true,
+        risco_operacional:          raw.operational_risk || "",
+        pilar_foco_critico:         raw.priority_30d || "",
+        primeira_entrega:           raw.first_delivery || "",
+        dependencias_acesso:        Array.from(formData.getAll('activation_dependencies')).join(", ") || ""
     };
 
     console.log('ONBOARDING_PAYLOAD_PREVIEW (FASE 2A)', webhookPayload);
