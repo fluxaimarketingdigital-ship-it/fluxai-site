@@ -308,6 +308,8 @@ window.handleOnboarding = async function(e) {
 
         // Operação
         status_contrato:            "rascunho",
+        tipo_contrato:              raw.tipo_contrato || "",
+        plano_cliente:              raw.plano_cliente || "",
         aprovador_final:            raw.approval_responsible || "",
         whatsapp_decisor:           raw.whatsapp_decisor || "",
         responsavel_comercial:      raw.responsible_comercial || "",
@@ -315,11 +317,18 @@ window.handleOnboarding = async function(e) {
         frequencia_postagem:        raw.post_frequency || "",
         sla_minutos:                raw.sla_minutes || "",
         fee_mensal:                 raw.monthly_fee || "",
+        valor_setup:                raw.valor_setup || "",
+        escopo_setup:               raw.finance_extra_services_desc || "",
+        creditos_ia_base_mes:       raw.creditos_ia_base_mes || "",
         dia_vencimento:             raw.payment_day || "",
         metodo_pagamento:           raw.finance_payment_method || "",
         contrato_assinado:          raw.finance_contract_signed || "",
         data_inicio:                raw.finance_start_date || new Date().toISOString().split('T')[0],
+        data_fim:                   raw.data_fim || "",
         ciclo_fidelidade:           raw.finance_min_duration || "",
+        link_contrato_drive:        raw.link_contrato_drive || "",
+        link_proposta_drive:        raw.link_proposta_drive || "",
+        observacao_contrato:        raw.observacao_contrato || "",
 
         // Ativação
         status_acesso:              "nao_criado",
