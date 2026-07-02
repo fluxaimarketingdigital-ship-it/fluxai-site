@@ -244,7 +244,7 @@ window.handleOnboarding = async function(e) {
         // Identidade
         client_id:                  projectId,
         client_name:                raw.company_name || "",
-        tipo_cliente:               "agencia",
+        tipo_cliente:               "cliente_pago",
         origem:                     "onboarding_os",
         status_cliente:             "em_onboarding",
         responsavel:                raw.responsible_name || "",
@@ -265,7 +265,7 @@ window.handleOnboarding = async function(e) {
         inimigo_comum:              raw.common_enemy || "",        // Col M
         nivel_percepcao_premium:    raw.awareness_level || "",     // Col N
         objetivo_mes_atual:         raw.current_month_goal || "", // Col P
-        prioridade_estrategica:     raw.strategic_priority || "", // Col Q
+        prioridade_estrategica:     "alta",
         palavras_usar:              raw.desired_language || "",    // Col T
         palavras_evitar:            raw.forbidden_language || "",  // Col S
         restricoes_comunicacao:     raw.objections || "",          // Col U
