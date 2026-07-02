@@ -307,6 +307,7 @@ window.handleOnboarding = async function(e) {
         docs_extras_url:            raw.asset_documents || "",
 
         // Operação
+        contrato_id:                "CONTRATO_" + session.client_id,
         status_contrato:            "rascunho",
         tipo_contrato:              raw.tipo_contrato || "",
         plano_cliente:              raw.plano_cliente || "",
