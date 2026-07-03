@@ -515,7 +515,7 @@ function renderClientsTable() {
         <tbody>`;
 
     mapped.forEach(c => {
-        const tokenClass = c.tokenStatus === 'ok' ? 'ativo' : 'inativo';
+        const tokenClass = String(c.tokenStatus).toLowerCase() === 'ok' ? 'ativo' : 'inativo';
         const iaClass = c.iaBlocked ? 'inativo' : 'ativo';
         const iaText = c.iaBlocked ? 'BLOQUEADO' : 'ATIVO';
 
