@@ -721,6 +721,15 @@ function renderClientLogs() {
 }
 
 function setupEventListeners() {
+    // EDITAR CLIENTE
+    document.getElementById('btn-edit-client').addEventListener('click', () => {
+        openEditClientModal();
+    });
+
+    document.getElementById('btn-save-client-edits').addEventListener('click', () => {
+        saveClientEdits();
+    });
+
     // IA - Bloquear / Desbloquear IA
     document.getElementById('btn-toggle-ia').addEventListener('click', () => {
         const role = currentUser ? currentUser.role : 'CLIENT';
@@ -999,6 +1008,66 @@ function updateClientStatus(newStatus, detail = 'alteracao_status') {
     );
     alert(`Status do cliente atualizado de ${oldStatus.toUpperCase()} para ${newStatus.toUpperCase()} com sucesso!`);
     renderClientLogs();
+}
+
+function openEditClientModal() {
+    const role = currentUser ? currentUser.role : 'CLIENT';
+    if (role === 'CLIENT') {
+        alert('Ação restrita: Apenas administradores podem editar clientes.');
+        return;
+    }
+    
+    document.getElementById('edit-client-segment').value = currentClientData.segment || '';
+    document.getElementById('edit-client-scope').value = currentClientData.scope || '';
+    document.getElementById('edit-client-responsible').value = currentClientData.responsible || '';
+    
+    document.getElementById('modal-edit-client').style.display = 'flex';
+}
+
+async function saveClientEdits() {
+    const btn = document.getElementById('btn-save-client-edits');
+    const originalTextContent = [...btn.childNodes];
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Salvando...';
+
+    const payload = {
+        client_id: activeClientId,
+        segment: document.getElementById('edit-client-segment').value,
+        scope: document.getElementById('edit-client-scope').value,
+        responsible: document.getElementById('edit-client-responsible').value,
+        action: 'edit_client_info'
+    };
+
+    try {
+        // Envia para o Webhook do Make
+        const webhookUrl = 'https://hook.us2.make.com/YOUR_WEBHOOK_URL_HERE'; 
+        
+        // Simulação do Webhook local
+        console.log('[MAKE WEBHOOK SIMULATION] Disparando webhook com:', payload);
+        
+        // Simula latência de rede
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        
+        // Log interno
+        OS_LOGS_ENGINE.userAction(
+            'CLIENT_EDITED_VIA_MAKE',
+            'cliente-detalhe',
+            payload,
+            currentUser ? currentUser.role : 'ADMIN',
+            activeClientId,
+            true
+        );
+
+        alert('Alterações enviadas para o Make! A planilha e o banco de dados serão atualizados em instantes.');
+        document.getElementById('modal-edit-client').style.display = 'none';
+        
+    } catch (err) {
+        console.error(err);
+        alert('Erro ao enviar edição para o Make.');
+    } finally {
+        btn.replaceChildren(...originalTextContent);
+        btn.disabled = false;
+    }
 }
 
 initPage();

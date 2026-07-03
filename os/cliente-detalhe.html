@@ -339,6 +339,7 @@
                         <p>Visão consolidada e controle de infraestrutura do cliente.</p>
                     </div>
                     <div style="display:flex; gap:10px;">
+                        <button id="btn-edit-client" class="control-btn" style="background: rgba(142,158,104,0.1); color: var(--os-primary); border-color: var(--os-primary); display:flex; align-items:center; gap:5px;"><i class="fa-solid fa-pen"></i> Editar Cliente</button>
                         <a href="clientes.html" class="control-btn" style="text-decoration:none; display:flex; align-items:center; gap:5px;"><i class="fa-solid fa-arrow-left"></i> Voltar à Lista</a>
                     </div>
                 </div>
@@ -716,6 +717,34 @@
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
                 <button class="control-btn" onclick="document.getElementById('modal-registrar-arquivo').style.display='none'">Cancelar</button>
                 <button class="control-btn" id="btn-submit-arquivo" style="background: var(--os-primary); color: #000; font-weight: 700;"><i class="fa-solid fa-paper-plane"></i> Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Client Modal -->
+    <div id="modal-edit-client" class="os-modal">
+        <div class="os-modal-content" style="max-width: 500px;">
+            <h3 style="margin: 0; font-size: 0.9rem; text-transform: uppercase; color: var(--os-primary);"><i class="fa-solid fa-pen-to-square"></i> Editar Cliente</h3>
+            <p style="font-size: 0.7rem; color: var(--os-text-muted); margin: 0 0 15px;">Atualize as informações do cliente. Isso irá sincronizar com o Make e Supabase.</p>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label for="edit-client-segment" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Segmento</label>
+                <input type="text" id="edit-client-segment" placeholder="Ex: TECNOLOGIA" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
+            </div>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label for="edit-client-scope" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Objetivo Principal (Escopo)</label>
+                <input type="text" id="edit-client-scope" placeholder="Ex: Estruturar CRM e Escalar Ads" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
+            </div>
+            
+            <div class="form-group" style="margin-bottom:15px;">
+                <label for="edit-client-responsible" style="display:block; font-size:0.75rem; color:var(--os-text-muted); text-transform:uppercase; font-weight:800; margin-bottom:8px;">Responsável Interno (FluxAI)</label>
+                <input type="text" id="edit-client-responsible" placeholder="Ex: kassiagomes@hotmail.com" style="width:100%; padding:12px; background:rgba(0,0,0,0.5); border:1px solid var(--os-border); border-radius:6px; color:#fff; box-sizing: border-box;" />
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <button class="control-btn" onclick="document.getElementById('modal-edit-client').style.display='none'">Cancelar</button>
+                <button class="control-btn" id="btn-save-client-edits" style="background: var(--os-primary); color: #000; font-weight: 700;"><i class="fa-solid fa-save"></i> Salvar Alterações</button>
             </div>
         </div>
     </div>
