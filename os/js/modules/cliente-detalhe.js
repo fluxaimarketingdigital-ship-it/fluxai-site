@@ -237,9 +237,12 @@ async function loadClientData() {
 
         console.log('[Cockpit] carregando limites IA');
         try {
-            const { data } = await authedClient.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', '2026-06').eq('status_limite', 'ativo');
+            const today = new Date();
+            const currentMesReferencia = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
+            
+            const { data } = await authedClient.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', currentMesReferencia).eq('status_limite', 'ativo');
             creditos = data;
-            console.log(`[Cockpit-DIAG] IA_CREDITOS_CLIENTE: qtd=${data?.length || 0}`, data && data.length > 0 ? data[0] : null);
+            console.log(`[Cockpit-DIAG] IA_CREDITOS_CLIENTE: qtd=${data?.length || 0} para ${currentMesReferencia}`, data && data.length > 0 ? data[0] : null);
         } catch(e) { console.error('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
 
         if (creditos && creditos.length > 0) {
