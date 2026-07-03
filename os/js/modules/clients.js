@@ -390,12 +390,42 @@ function setupEventListeners() {
     }
 }
 
+import { getSupabase } from '../../services/supabase-client.js';
+
 async function loadClients() {
     const container = document.getElementById('clients-table-container');
-    container.innerHTML = '<div style="opacity: 0.5;">Sincronizando com Google Sheets via Make...</div>';
+    container.innerHTML = '<div style="opacity: 0.5;">Sincronizando com Supabase...</div>';
 
     try {
-        const clients = await SheetsService.fetchClients();
+        const supabase = getSupabase();
+        let clients = [];
+        
+        if (supabase) {
+            // Buscar dados reais do Supabase
+            const { data: estrategiaData, error: errEstr } = await supabase.from('CLIENTES_ESTRATEGIA').select('*');
+            const { data: contratosData, error: errCont } = await supabase.from('CONTRATOS_CLIENTES').select('*');
+            
+            if (estrategiaData && !errEstr) {
+                clients = estrategiaData.map(row => {
+                    const contrato = (contratosData || []).find(c => c.client_id === row.client_id) || {};
+                    return {
+                        id: row.client_id,
+                        name: row.cliente_nome || row.client_id,
+                        status: contrato.status_contrato || 'rascunho',
+                        instagram: contrato.observacao || '@pendente', // Usando observacao temporariamente como fallback se instagram não existir
+                        segment: row.segmento || 'Não Definido',
+                        tokenStatus: 'OK',
+                        createdAt: row.data_criacao || new Date().toISOString()
+                    };
+                });
+            } else {
+                console.error("Erro ao carregar CLIENTES_ESTRATEGIA:", errEstr);
+                clients = [];
+            }
+        } else {
+            console.warn("Supabase não configurado. Retornando array vazio.");
+        }
+
         localClients = clients;
         
         // Carregar do catálogo de extras os seletores do modal
