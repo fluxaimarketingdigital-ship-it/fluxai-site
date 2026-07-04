@@ -2026,13 +2026,15 @@ async function runAiPlanner() {
 
         // Mapeamento do ID do banco para o código da Planilha do Make
         const projectMap = {
-            '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
+            '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_2026_07_643'
         };
         const spreadsheetClientId = projectMap[selectedId] || selectedId;
 
         newAsset.metadata.mes_referencia = mes_referencia;
         newAsset.metadata.tipo_entrega = tipo_entrega;
-        newAsset.metadata.limite_id = `LIM_${spreadsheetClientId}_${mes_referencia.replace('-', '_')}_${tipo_entrega.toUpperCase()}`;
+        // O formato na planilha está como IA_CLIENT_ID (ex: IA_FLUXAI_LABS_2026_07_643)
+        // Para casar exatamente com a planilha 10_IA_CREDITOS_CLIENTE:
+        newAsset.metadata.limite_id = `IA_${spreadsheetClientId}`;
 
         const client_name_fb = window.allProjects?.find(p => p.id === selectedId)?.name || spreadsheetClientId;
 
