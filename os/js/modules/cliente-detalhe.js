@@ -625,28 +625,8 @@ function updateIAMetricsDisplay() {
     if (!currentClientData) return;
 
     if (activeClientId !== 'FLUXAI_LABS_001') {
-        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-        const clientAssets = mockAssets.filter(a => a && (a.project_id === activeClientId || a.clientId === activeClientId));
-
-        let countReview = 0;
-        let countApproved = 0;
-        let countPublished = 0;
-
-        clientAssets.forEach(asset => {
-            const gia = mapAssetStatusToGia(asset.status);
-            if (gia === 'rascunho') {
-            } else if (gia === 'em_revisao') {
-                countReview++;
-            } else if (gia === 'aprovado' || gia === 'aguardando_publicacao') {
-                countApproved++;
-            } else if (gia === 'publicado') {
-                countPublished++;
-            }
-        });
-
-        currentClientData.iaMetrics.review = countReview;
-        currentClientData.iaMetrics.approved = countApproved;
-        currentClientData.iaMetrics.published = countPublished;
+        // IA Metrics are now fetched directly from Supabase (IA_CREDITOS_CLIENTE) in fetchClientData.
+        // We do not override them with mock data anymore.
     }
 
     const limit = currentClientData.iaMetrics.limit !== undefined ? currentClientData.iaMetrics.limit : 'Pendente';
