@@ -299,8 +299,10 @@ function setupModeToggle() {
                         } else {
                             const input = inputs[0];
                             if (input.type === 'checkbox' || input.type === 'radio') {
+                                // Se o valor for uma string separada por vírgula (ex: "conteudo, trafego"), transforma em array para comparar
+                                const valArray = typeof val === 'string' ? val.split(',').map(s => s.trim()) : [val];
                                 inputs.forEach(i => {
-                                    if (i.value === val) {
+                                    if (valArray.includes(i.value)) {
                                         i.checked = true;
                                     }
                                 });
