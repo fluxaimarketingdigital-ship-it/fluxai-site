@@ -2,6 +2,10 @@ import { OS_UI, OS_AUTH } from './os-core.js';
 import { SERVICES_CATALOG } from './config/services-catalog.js';
 import { MakeClient } from '../services/makeClient.js';
 import { ROTAS_OS_MAKE } from '../services/makeRoutes.js';
+import { getSupabase } from '../services/supabase-client.js';
+
+window.ONBOARDING_MODE = 'new';
+window.ONBOARDING_CLIENT_ID = null;
 
 let currentStep = 1;
 const totalSteps = 7;
@@ -61,6 +65,8 @@ async function initOnboarding() {
             }
         });
     }
+
+    setupModeToggle();
 }
 
 window.moveStep = function(delta) {
@@ -204,6 +210,87 @@ function validateOnboardingBeforeSubmit(raw) {
     return errors;
 }
 
+function setupModeToggle() {
+    const btnNew = document.getElementById('btn-mode-new');
+    const btnEdit = document.getElementById('btn-mode-edit');
+    const searchContainer = document.getElementById('search-client-container');
+    const loadBtn = document.getElementById('btn-load-client');
+    const select = document.getElementById('client-search-select');
+
+    btnNew.addEventListener('click', () => {
+        window.ONBOARDING_MODE = 'new';
+        window.ONBOARDING_CLIENT_ID = null;
+        btnNew.style.background = 'var(--os-primary)';
+        btnNew.style.color = '#000';
+        btnEdit.style.background = 'rgba(255,255,255,0.05)';
+        btnEdit.style.color = '#fff';
+        searchContainer.style.display = 'none';
+        document.getElementById('onboardingForm').reset();
+    });
+
+    btnEdit.addEventListener('click', async () => {
+        window.ONBOARDING_MODE = 'edit';
+        btnEdit.style.background = 'var(--os-primary)';
+        btnEdit.style.color = '#000';
+        btnNew.style.background = 'rgba(255,255,255,0.05)';
+        btnNew.style.color = '#fff';
+        searchContainer.style.display = 'block';
+
+        const supabase = getSupabase();
+        if (!supabase) return;
+        
+        try {
+            const { data, error } = await supabase.from('CLIENTES_ESTRATEGIA').select('client_id, cliente_nome');
+            if (data) {
+                select.innerHTML = '<option value="">Selecione o cliente...</option>';
+                data.forEach(c => {
+                    select.innerHTML += `<option value="${c.client_id}">${c.cliente_nome}</option>`;
+                });
+            }
+        } catch (e) {
+            console.error(e);
+        }
+    });
+
+    loadBtn.addEventListener('click', async () => {
+        const clientId = select.value;
+        if (!clientId) {
+            alert('Selecione um cliente primeiro.');
+            return;
+        }
+
+        window.ONBOARDING_CLIENT_ID = clientId;
+        const supabase = getSupabase();
+        
+        try {
+            loadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+            loadBtn.disabled = true;
+
+            // Fetch basic strategy data
+            const { data: estData } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', clientId).single();
+            if (estData) {
+                const form = document.getElementById('onboardingForm');
+                const setVal = (name, val) => { const el = form.querySelector(`[name="${name}"]`); if(el) el.value = val || ''; };
+                
+                setVal('company_name', estData.cliente_nome);
+                setVal('segment', estData.segmento);
+                setVal('objective', estData.objetivo_principal);
+                setVal('responsible_name', estData.responsavel_fluxai);
+            }
+            
+            // In a complete enterprise wizard, you would fetch from CONTRATOS_CLIENTES and DNA_CLIENTE_GPT 
+            // and map to all 7 steps here.
+            
+            alert('Dados pré-carregados com sucesso. Você pode navegar pelas etapas e atualizar o que for necessário.');
+        } catch(e) {
+            console.error(e);
+        } finally {
+            loadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Carregar';
+            loadBtn.disabled = false;
+        }
+    });
+}
+
 window.handleOnboarding = async function(e) {
     e.preventDefault();
     const btn = document.getElementById('btn-disparar-infraestrutura');
@@ -224,15 +311,19 @@ window.handleOnboarding = async function(e) {
         btn.disabled = true;
     }
 
-    // Geração rigorosa de client_id (NOME_CLIENTE_YYYY_MM_XXX)
-    const date = new Date();
-    const yyyy = date.getFullYear();
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const cryptoArray = new Uint32Array(1);
-    globalThis.crypto.getRandomValues(cryptoArray);
-    const randomStr = String(cryptoArray[0] % 1000).padStart(3, '0');
-    const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
-    const projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
+    let projectId = window.ONBOARDING_CLIENT_ID;
+
+    if (window.ONBOARDING_MODE === 'new' || !projectId) {
+        // Geração rigorosa de client_id (NOME_CLIENTE_YYYY_MM_XXX)
+        const date = new Date();
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const cryptoArray = new Uint32Array(1);
+        globalThis.crypto.getRandomValues(cryptoArray);
+        const randomStr = String(cryptoArray[0] % 1000).padStart(3, '0');
+        const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
+        projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
+    }
 
     // Captura usuário autenticado para responsavel_fluxai
     const currentSessionUser = await OS_AUTH.check('ADMIN').catch(() => null);
@@ -241,6 +332,8 @@ window.handleOnboarding = async function(e) {
         || "FluxAI OS";
 
     const webhookPayload = {
+        // Controle de Modo (Novo ou Update)
+        action: window.ONBOARDING_MODE === 'edit' ? 'update_client' : 'create_client',
         // Identidade
         client_id:                  projectId,
         client_name:                raw.company_name || "",

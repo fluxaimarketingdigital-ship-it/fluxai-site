@@ -125,7 +125,20 @@
             <main class="os-viewport">
                 <div class="wizard-container">
                     
-                                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 30px;">
+                    <div style="display: flex; flex-direction: column; gap: 15px; margin-bottom: 40px; background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px; border: 1px solid var(--os-border);">
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button type="button" id="btn-mode-new" class="btn-wizard" style="background: var(--os-primary); color: #000;"><i class="fa-solid fa-plus"></i> Novo Cliente</button>
+                            <button type="button" id="btn-mode-edit" class="btn-wizard" style="background: rgba(255,255,255,0.05); color: #fff; border: 1px solid rgba(255,255,255,0.1);"><i class="fa-solid fa-search"></i> Editar Existente</button>
+                        </div>
+                        <div id="search-client-container" style="display: none; margin-top: 15px;">
+                            <label style="display:block; font-size:0.7rem; text-transform:uppercase; color:var(--os-primary); margin-bottom:10px; font-weight:800; text-align: center;">Buscar Cliente para Edição</label>
+                            <div style="display: flex; max-width: 500px; margin: 0 auto; gap: 10px;">
+                                <select id="client-search-select" class="form-control" style="flex: 1;">
+                                    <option value="">Carregando clientes...</option>
+                                </select>
+                                <button type="button" id="btn-load-client" class="btn-wizard" style="background: var(--os-surface); color: #fff; border: 1px solid var(--os-border);"><i class="fa-solid fa-download"></i> Carregar</button>
+                            </div>
+                        </div>
                     </div>
                     <div class="step-indicator">
                         <div class="step-item active" data-step="1">
