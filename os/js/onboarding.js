@@ -471,6 +471,7 @@ window.handleOnboarding = async function(e) {
         observacao_contrato:        raw.observacao_contrato || "",
 
         // Ativação
+        // Ativação
         status_acesso:              "nao_criado",
         ia_bloqueada:               true,
         risco_operacional:          raw.operational_risk || "",
@@ -478,6 +479,48 @@ window.handleOnboarding = async function(e) {
         primeira_entrega:           raw.first_delivery || "",
         dependencias_acesso:        Array.from(formData.getAll('activation_dependencies')).join(", ") || ""
     };
+
+    // --- ENGENHARIA DO ARRAY DE SERVIÇOS (PARA ITERATOR DO MAKE) ---
+    const lista_servicos_para_planilha = [];
+    
+    // 1. Serviços de Conteúdo Recorrente
+    if (raw.escopo_conteudo_reels_qty && Number(raw.escopo_conteudo_reels_qty) > 0) {
+        lista_servicos_para_planilha.push({
+            tipo_entrega: 'reels',
+            limite_mensal: Number(raw.escopo_conteudo_reels_qty)
+        });
+    }
+    if (raw.escopo_conteudo_carrossel_qty && Number(raw.escopo_conteudo_carrossel_qty) > 0) {
+        lista_servicos_para_planilha.push({
+            tipo_entrega: 'carrossel',
+            limite_mensal: Number(raw.escopo_conteudo_carrossel_qty)
+        });
+    }
+    if (raw.escopo_conteudo_stories_qty && Number(raw.escopo_conteudo_stories_qty) > 0) {
+        lista_servicos_para_planilha.push({
+            tipo_entrega: 'story',
+            limite_mensal: Number(raw.escopo_conteudo_stories_qty)
+        });
+    }
+    
+    // 2. Serviço Extra / Setup (Se houver)
+    if (raw.finance_extra_services_type && raw.finance_extra_services_type !== 'Nenhum Serviço Extra') {
+        let tipoExtra = 'outro'; // Padrão
+        if (raw.finance_extra_services_type.toLowerCase().includes('landing page')) {
+            tipoExtra = 'landing_page';
+        } else if (raw.finance_extra_services_type.toLowerCase().includes('branding')) {
+            tipoExtra = 'outro'; // Mantendo 'outro' para alinhar com o STRATEGIC_MATRIX
+        }
+        
+        lista_servicos_para_planilha.push({
+            tipo_entrega: tipoExtra,
+            limite_mensal: 1 // Serviço extra de setup normalmente é 1 entrega única
+        });
+    }
+
+    // Injeta a lista pronta no payload que vai pro Make
+    webhookPayload.lista_servicos_para_planilha = lista_servicos_para_planilha;
+    // -----------------------------------------------------------------
 
     console.log('ONBOARDING_PAYLOAD_PREVIEW (FASE 2A)', webhookPayload);
 
