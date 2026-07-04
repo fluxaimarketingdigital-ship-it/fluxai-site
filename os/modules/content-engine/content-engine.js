@@ -2026,7 +2026,7 @@ async function runAiPlanner() {
 
         // Mapeamento do ID do banco para o código da Planilha do Make
         const projectMap = {
-            '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_2026_07_643'
+            '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
         };
         const spreadsheetClientId = projectMap[selectedId] || selectedId;
 
