@@ -430,7 +430,7 @@ window.handleOnboarding = async function(e) {
         website:                    raw.client_website || "",
         dominio_dns:                raw.domain_dns || "",
         whatsapp_comercial:         raw.whatsapp_comercial || "",
-        canais_digitais:            Array.from(formData.getAll('digital_channels')).join(", ") || "",
+        canais_digitais:            Array.from(formData.getAll('infra_active_platforms')).join(", ") || "",
 
         // Serviços
         modulos_contratados:        Array.from(formData.getAll('modules')).join(", ") || "",
