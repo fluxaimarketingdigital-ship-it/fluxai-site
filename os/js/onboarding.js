@@ -279,9 +279,11 @@ function setupModeToggle() {
                 setVal('responsible_name', estData.responsavel_fluxai);
 
                 // 2. Magic JSON Auto-fill: If the Make webhook saved the massive payload to setup_completo
-                if (estData.setup_completo && Object.keys(estData.setup_completo).length > 0) {
-                    const setup = estData.setup_completo;
-                    
+                let setup = estData.setup_completo;
+                if (typeof setup === 'string') {
+                    try { setup = JSON.parse(setup); } catch(e) {}
+                }
+                if (setup && Object.keys(setup).length > 0) {
                     Object.keys(setup).forEach(key => {
                         const val = setup[key];
                         const inputs = form.querySelectorAll(`[name="${key}"]`);
