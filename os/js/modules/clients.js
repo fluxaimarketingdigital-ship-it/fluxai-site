@@ -467,14 +467,14 @@ function renderClientsTable() {
 
     // 2. Mapear clientes e injetar configurações dinâmicas locais
     let mapped = localClients.map(c => {
-        const conf = configs[c.id] || { status: c.status, iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Outros' };
+        const conf = configs[c.id] || { status: c.status, iaBlocked: false, automationsPaused: false, iaLimit: 10 };
         return {
             ...c,
-            status: conf.status,
+            status: conf.status || c.status,
             iaBlocked: conf.iaBlocked,
             automationsPaused: conf.automationsPaused,
             iaLimit: conf.iaLimit,
-            segment: conf.segment || 'Outros'
+            segment: c.segment || 'Outros'
         };
     });
 
