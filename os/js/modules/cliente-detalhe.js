@@ -218,10 +218,18 @@ async function loadClientData() {
             console.log('[Cockpit-DIAG] CLIENTES_ESTRATEGIA fetching:', data);
         } catch(e) { console.warn('[COCKPIT] Erro em CLIENTES_ESTRATEGIA', e); }
 
+        let tagsHTML = '';
+
         if (estrategia) {
             client.name = estrategia.cliente_nome || activeClientId;
             client.segment = estrategia.segmento || 'Dado pendente de sincronização';
             client.scope = estrategia.objetivo_principal || 'Dado pendente de sincronização';
+            client.operationType = estrategia.tipo_cliente === 'cliente_pago' ? 'Operação Integral (Pago)' : 'Parceiro / Outro';
+            
+            // Build Tags
+            if (estrategia.nivel_percepcao_premium === 'alto' || estrategia.nivel_percepcao_premium === 'premium') {
+                tagsHTML += '<span class="tag-badge">High-Ticket</span>';
+            }
         }
 
         if (contratos) {
@@ -229,9 +237,19 @@ async function loadClientData() {
             client.contractType = contratos.escopo_contratado || 'Dado pendente de sincronização';
             client.responsible = contratos.responsavel_comercial || (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
             if (contratos.status_contrato) client.status = contratos.status_contrato;
+            
+            if (contratos.tipo_contrato) {
+                client.operationType = contratos.tipo_contrato.toUpperCase();
+            }
+
+            if ((contratos.escopo_contratado || '').includes('trafego')) {
+                tagsHTML += '<span class="tag-badge">Meta Ads Scale</span>';
+            }
         } else {
             client.responsible = (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
         }
+        
+        client.tagsHTML = tagsHTML;
 
         console.log(`[Cockpit-DIAG] activeClientId = ${activeClientId}`);
 
@@ -260,6 +278,14 @@ async function loadClientData() {
             client.iaMetrics.approved = sumOcup; 
             client.iaMetrics.review = sumDisp; 
             client.iaMetrics.published = sumPub;
+
+            if (sumLimit > 0) {
+                client.tagsHTML += '<span class="tag-badge">Camada GPT Ativa</span>';
+            }
+        }
+        
+        if (!client.tagsHTML) {
+            client.tagsHTML = '<span style="color:var(--os-text-muted); font-size: 0.65rem;">Sem tags dinâmicas ativas</span>';
         }
 
         try {
@@ -325,6 +351,8 @@ async function loadClientData() {
     document.getElementById('info-segment').innerText = client.segment;
     document.getElementById('info-start-date').innerText = client.startDate;
     document.getElementById('info-contract-type').innerText = client.contractType;
+    document.getElementById('info-operation-type').innerText = client.operationType || '—';
+    document.getElementById('info-tags').innerHTML = client.tagsHTML || '<span style="color:var(--os-text-muted); font-size: 0.65rem;">Dado pendente de sincronização</span>';
     
     const respEl = document.getElementById('info-responsible');
     if (respEl) respEl.innerText = client.responsible || 'Dado pendente de sincronização';
