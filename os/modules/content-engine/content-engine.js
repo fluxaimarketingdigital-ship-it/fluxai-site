@@ -460,10 +460,10 @@ async function loadContent() {
 
     try {
         const supabase = getSupabase();
-        let query = supabase.from('content_assets').select('*');
-        if (currentProject) query = query.eq('project_id', currentProject);
+        let query = supabase.from('PLANEJAMENTO_CONTEUDO').select('*');
+        if (currentProject) query = query.eq('client_id', currentProject);
 
-        const { data: contents, error } = await query.order('scheduled_at', { ascending: true });
+        const { data: contents, error } = await query.order('data_prevista', { ascending: true });
         if (error) throw error;
 
         window.loadedContents = contents || [];
@@ -526,9 +526,9 @@ function renderContentTable(contents) {
  
     body.replaceChildren();
     contents.forEach(c => { 
-        const scheduled = c.scheduled_at ? new Date(c.scheduled_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Pendente'; 
-        const stdStatus = mapToStandardStatus(c.status); 
-        const statusLabel = STATUS_LABELS[stdStatus] || c.status; 
+        const scheduled = c.data_prevista ? new Date(c.data_prevista).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Pendente'; 
+        const stdStatus = mapToStandardStatus(c.status_planejamento || 'PLANEJAMENTO'); 
+        const statusLabel = STATUS_LABELS[stdStatus] || (c.status_planejamento || 'Rascunho'); 
         const revCount = c.metadata?.revision_cycle || 1; 
         const versionLabel = `V${revCount}`; 
          
@@ -575,8 +575,8 @@ function renderContentTable(contents) {
                 </td>  
         `;  
         
-        tr.querySelector('.safe-title').textContent = c.title; 
-        tr.querySelector('.safe-resp').textContent = c.metadata?.responsible || 'Design'; 
+        tr.querySelector('.safe-title').textContent = c.tema || c.objetivo_conteudo || `Pauta #${(c.planejamento_id || '').substring(0,6)}`; 
+        tr.querySelector('.safe-resp').textContent = c.responsavel_planejamento || c.responsavel_design || 'Design'; 
         
         const versionSpan = tr.querySelector('.safe-version');
         versionSpan.textContent = versionLabel;
@@ -586,10 +586,10 @@ function renderContentTable(contents) {
         
         const statusSpan = tr.querySelector('.safe-status');
         statusSpan.textContent = statusLabel;
-        statusSpan.style.background = getStatusBg(c.status);
+        statusSpan.style.background = getStatusBg(c.status_planejamento);
         
-        tr.querySelector('.safe-priority').textContent = c.priority || 'MÉDIA';
-        tr.querySelector('.safe-platform').textContent = c.platform;
+        tr.querySelector('.safe-priority').textContent = c.prioridade || 'MÉDIA';
+        tr.querySelector('.safe-platform').textContent = c.canal || 'INSTAGRAM';
         
         const approvalsDiv = tr.querySelector('.safe-approvals');
         const spanStrat = document.createElement('span'); spanStrat.textContent = `EST: ${strat}`;
