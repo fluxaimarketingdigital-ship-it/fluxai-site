@@ -197,7 +197,8 @@ async function loadClientData() {
         metrics: [],
         integrations: [],
         folders: { root: '#', brand: '#', contracts: '#', assets: '#' },
-        responsible: 'Dado pendente de sincronização'
+        responsible: 'Dado pendente de sincronização',
+        planejamento: []
     };
 
     if (authedClient) {
@@ -288,6 +289,15 @@ async function loadClientData() {
             creditos = data;
             console.log(`[Cockpit-DIAG] IA_CREDITOS_CLIENTE: qtd=${data?.length || 0} para ${currentMesReferencia}`, data && data.length > 0 ? data[0] : null);
         } catch(e) { console.error('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
+
+        console.log('[Cockpit] carregando planejamento de conteudo');
+        try {
+            const { data: pautas } = await authedClient.from('PLANEJAMENTO_CONTEUDO').select('*').eq('client_id', activeClientId).order('data_prevista', { ascending: true });
+            if (pautas) {
+                client.planejamento = pautas;
+                console.log(`[Cockpit-DIAG] PLANEJAMENTO_CONTEUDO fetching:`, pautas);
+            }
+        } catch(e) { console.warn('[COCKPIT] Erro em PLANEJAMENTO_CONTEUDO', e); }
 
         if (creditos && creditos.length > 0) {
             let sumLimit = 0;
@@ -651,22 +661,35 @@ function updateIAMetricsDisplay() {
     }
 }
 function renderProductionList() {
-    // Lista mockada de conteúdos na Mesa Editorial desse cliente
-    const prodMocks = [
-        { title: "Pauta #1019 - Estratégia de Conteúdo Orgânico", type: "Carrossel", status: "Em Revisão", color: "#3b82f6" },
-        { title: "Pauta #1020 - Storytelling e Retenção", type: "Reels", status: "Aprovado", color: "#f59e0b" },
-        { title: "Pauta #1021 - Análise Prática de Escala", type: "Carrossel", status: "Publicado", color: "#8e9e68" }
-    ];
-
     const prodContainer = document.getElementById('production-list');
     if (!prodContainer) return;
 
-    prodContainer.innerHTML = prodMocks.map(p => `
-        <div class="prod-item">
-            <span style="font-weight: 500; color: #fff;">${p.title} <span style="font-size:0.6rem; color:var(--os-text-muted);">(${p.type})</span></span>
-            <span class="prod-status" style="background:${p.color}15; color:${p.color}; border: 1px solid ${p.color}40;">${p.status}</span>
-        </div>
-    `).join('');
+    if (!currentClientData.planejamento || currentClientData.planejamento.length === 0) {
+        prodContainer.innerHTML = `
+            <div style="text-align: center; color: var(--os-text-muted); padding: 20px;">
+                <i class="fa-solid fa-folder-open" style="margin-bottom:8px;"></i><br>
+                Nenhuma pauta planejada para este cliente no Cockpit ainda.
+            </div>`;
+    } else {
+        prodContainer.innerHTML = currentClientData.planejamento.map(p => {
+            let color = "#3b82f6"; // default blue
+            const st = (p.status_planejamento || '').toLowerCase();
+            if (st.includes('aprovad')) color = "#8e9e68"; // green
+            else if (st.includes('revis')) color = "#f59e0b"; // yellow
+            else if (st.includes('rascunho')) color = "#64748b"; // gray
+
+            const title = p.tema || p.objetivo_conteudo || `Pauta #${p.planejamento_id?.substring(0,6) || 'Sem Título'}`;
+            const type = p.formato_conteudo || 'Formato Indefinido';
+            const status = p.status_planejamento || 'Planejado';
+
+            return `
+                <div class="prod-item">
+                    <span style="font-weight: 500; color: #fff;">${escapeHTML(title)} <span style="font-size:0.6rem; color:var(--os-text-muted);">(${escapeHTML(type)})</span></span>
+                    <span class="prod-status" style="background:${color}15; color:${color}; border: 1px solid ${color}40;">${escapeHTML(status)}</span>
+                </div>
+            `;
+        }).join('');
+    }
 
     const badgeAuto = document.getElementById('badge-automation-status');
     if (automationsPaused) {
