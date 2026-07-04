@@ -779,16 +779,24 @@ function renderClientLogs() {
 
 function setupEventListeners() {
     // EDITAR CLIENTE
-    document.getElementById('btn-edit-client').addEventListener('click', () => {
-        openEditClientModal();
-    });
+    const btnEditClient = document.getElementById('btn-edit-client');
+    if (btnEditClient) {
+        btnEditClient.addEventListener('click', () => {
+            openEditClientModal();
+        });
+    }
 
-    document.getElementById('btn-save-client-edits').addEventListener('click', () => {
-        saveClientEdits();
-    });
+    const btnSaveClientEdits = document.getElementById('btn-save-client-edits');
+    if (btnSaveClientEdits) {
+        btnSaveClientEdits.addEventListener('click', () => {
+            saveClientEdits();
+        });
+    }
 
     // IA - Bloquear / Desbloquear IA
-    document.getElementById('btn-toggle-ia').addEventListener('click', () => {
+    const btnToggleIa = document.getElementById('btn-toggle-ia');
+    if (btnToggleIa) {
+        btnToggleIa.addEventListener('click', () => {
         const role = currentUser ? currentUser.role : 'CLIENT';
         if (role === 'CLIENT') {
             alert('Ação restrita: Apenas administradores e operadores podem gerenciar acesso à IA.');
