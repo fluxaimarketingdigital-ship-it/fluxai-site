@@ -224,9 +224,8 @@ async function loadClientData() {
             client.name = estrategia.cliente_nome || activeClientId;
             client.segment = estrategia.segmento || 'Dado pendente de sincronização';
             client.scope = estrategia.objetivo_principal || 'Dado pendente de sincronização';
-            client.operationType = estrategia.tipo_cliente === 'cliente_pago' ? 'Operação Integral (Pago)' : 'Parceiro / Outro';
             
-            // Build Tags
+            // Build Tags from fallback fields if they exist
             if (estrategia.nivel_percepcao_premium === 'alto' || estrategia.nivel_percepcao_premium === 'premium') {
                 tagsHTML += '<span class="tag-badge">High-Ticket</span>';
             }
@@ -234,12 +233,22 @@ async function loadClientData() {
 
         if (contratos) {
             client.startDate = contratos.data_inicio || contratos.data_criacao || 'Dado pendente de sincronização';
-            client.contractType = contratos.escopo_contratado || 'Dado pendente de sincronização';
+            client.contractType = contratos.escopo_contratado || 'Dado pendente de sincronização'; // fallback text for 'Contrato Ativo'
             client.responsible = contratos.responsavel_comercial || (estrategia ? estrategia.responsavel_fluxai : null) || 'Dado pendente de sincronização';
             if (contratos.status_contrato) client.status = contratos.status_contrato;
             
+            // TIPO DE OPERACAO: Infer based on escopo or use tipo_contrato if it exists
             if (contratos.tipo_contrato) {
                 client.operationType = contratos.tipo_contrato.toUpperCase();
+            } else if ((contratos.escopo_contratado || '').includes('trafego') && (contratos.escopo_contratado || '').includes('conteudo')) {
+                client.operationType = 'OPERAÇÃO INTEGRAL';
+            } else {
+                client.operationType = 'OPERAÇÃO CUSTOMIZADA';
+            }
+
+            // SERVICOS ATIVOS: Split from escopo_contratado (comma separated string)
+            if (contratos.escopo_contratado) {
+                client.services = contratos.escopo_contratado.split(',').map(s => s.trim().toUpperCase()).filter(s => s);
             }
 
             if ((contratos.escopo_contratado || '').includes('trafego')) {
