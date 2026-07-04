@@ -2081,7 +2081,7 @@ async function runAiPlanner() {
             client_id: spreadsheetClientId,
             client_name: client_name_fb,
             limite_id: newAsset.metadata.limite_id,
-            mes_referencia: mes_referencia.replace('-', '_'),
+            mes_referencia: mes_referencia,
             tipo_entrega: mapToSpreadsheetFormat(tipo_entrega),
             origem_geracao: 'contrato',
             solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || window.FLUXAI_RUNTIME_CONTEXT?.email || 'operador_fluxai',
