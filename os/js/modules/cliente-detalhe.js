@@ -222,8 +222,25 @@ async function loadClientData() {
 
         if (estrategia) {
             client.name = estrategia.cliente_nome || activeClientId;
-            client.segment = estrategia.segmento || 'Dado pendente de sincronização';
-            client.scope = estrategia.objetivo_principal || 'Dado pendente de sincronização';
+            const segmentMap = {
+                'SAUDE': 'Saúde / Médicos / Especializados',
+                'DIREITO': 'Advocacia / Jurídico de Elite',
+                'FINANCAS': 'Finanças / Wealth Advisors',
+                'TECNOLOGIA': 'Tecnologia / B2B / SaaS',
+                'CONSULTORIA': 'Consultoria Corporativa',
+                'ESTETICA': 'Estética / Clínicas Premium',
+                'OUTRO': 'Outro Segmento High-Ticket'
+            };
+            const rawSeg = estrategia.segmento || 'Dado pendente de sincronização';
+            client.segment = segmentMap[rawSeg] || rawSeg;
+            const scopeMap = {
+                'AUTHORITY': 'Posicionamento de Autoridade Absoluta',
+                'LEADS': 'Geração de Leads Qualificados (Inbound)',
+                'ACQUISITION': 'Aquisição Direta & High-Ticket',
+                'REBRANDING': 'Reposicionamento / Rebranding Digital'
+            };
+            const rawScope = estrategia.objetivo_principal || 'Dado pendente de sincronização';
+            client.scope = scopeMap[rawScope] || rawScope;
             
             // Build Tags from fallback fields if they exist
             if (estrategia.nivel_percepcao_premium === 'alto' || estrategia.nivel_percepcao_premium === 'premium') {
