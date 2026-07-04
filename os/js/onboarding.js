@@ -374,6 +374,8 @@ window.handleOnboarding = async function(e) {
         || "FluxAI OS";
 
     const webhookPayload = {
+        // Payload bruto para salvar inteiro no JSON (Magia do Cockpit)
+        raw_payload_json: JSON.stringify(raw),
         // Controle de Modo (Novo ou Update)
         action: window.ONBOARDING_MODE === 'edit' ? 'update_client' : 'create_client',
         // Identidade
