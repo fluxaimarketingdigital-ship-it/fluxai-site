@@ -266,20 +266,62 @@ function setupModeToggle() {
             loadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             loadBtn.disabled = true;
 
-            // Fetch basic strategy data
+            // Fetch basic strategy data and the massive JSON payload
             const { data: estData } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', clientId).single();
             if (estData) {
                 const form = document.getElementById('onboardingForm');
-                const setVal = (name, val) => { const el = form.querySelector(`[name="${name}"]`); if(el) el.value = val || ''; };
                 
+                // 1. Set the basic fields directly from the columns
+                const setVal = (name, val) => { const el = form.querySelector(`[name="${name}"]`); if(el) el.value = val || ''; };
                 setVal('company_name', estData.cliente_nome);
                 setVal('segment', estData.segmento);
                 setVal('objective', estData.objetivo_principal);
                 setVal('responsible_name', estData.responsavel_fluxai);
+
+                // 2. Magic JSON Auto-fill: If the Make webhook saved the massive payload to setup_completo
+                if (estData.setup_completo && Object.keys(estData.setup_completo).length > 0) {
+                    const setup = estData.setup_completo;
+                    
+                    Object.keys(setup).forEach(key => {
+                        const val = setup[key];
+                        const inputs = form.querySelectorAll(`[name="${key}"]`);
+                        if (!inputs.length) return;
+                        
+                        if (Array.isArray(val)) {
+                            // Handing checkbox arrays (like modules, infra_active_platforms)
+                            inputs.forEach(input => {
+                                if ((input.type === 'checkbox' || input.type === 'radio') && val.includes(input.value)) {
+                                    input.checked = true;
+                                }
+                            });
+                        } else {
+                            const input = inputs[0];
+                            if (input.type === 'checkbox' || input.type === 'radio') {
+                                inputs.forEach(i => {
+                                    if (i.value === val) {
+                                        i.checked = true;
+                                    }
+                                });
+                            } else {
+                                // Standard input/textarea/select
+                                input.value = val;
+                            }
+                        }
+                    });
+                    
+                    // Se o form tem renderização dinâmica (módulos), chama a função para exibir
+                    if (typeof renderDynamicFields === 'function') {
+                        renderDynamicFields();
+                        // Refill dynamic fields after rendering
+                        Object.keys(setup).forEach(key => {
+                            if (key.startsWith('escopo_')) {
+                                const el = form.querySelector(`[name="${key}"]`);
+                                if (el) el.value = setup[key];
+                            }
+                        });
+                    }
+                }
             }
-            
-            // In a complete enterprise wizard, you would fetch from CONTRATOS_CLIENTES and DNA_CLIENTE_GPT 
-            // and map to all 7 steps here.
             
             alert('Dados pré-carregados com sucesso. Você pode navegar pelas etapas e atualizar o que for necessário.');
         } catch(e) {
