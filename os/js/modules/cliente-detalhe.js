@@ -820,7 +820,8 @@ function setupEventListeners() {
         );
         alert(iaBlocked ? 'Serviços de IA suspensos para o cliente.' : 'Acesso à Camada GPT restabelecido.');
         renderClientLogs();
-    });
+        });
+    }
 
     // IA - Liberar limite operacional manual
     document.getElementById('btn-adjust-limit').addEventListener('click', () => {
