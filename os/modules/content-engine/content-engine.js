@@ -2014,12 +2014,20 @@ async function runAiPlanner() {
             throw new Error('Nenhuma pauta pôde ser gerada para o escopo selecionado.');
         }
 
-        const newAsset = generated[0];
-        newAsset.metadata = newAsset.metadata || {};
-        newAsset.metadata.ai_generated = true; // Flag for credits computation
-        
-        const now = new Date();
-        const mes_referencia = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+        // Loop por todas as pautas geradas (caso seja CONTRATO, serão várias)
+        for (let i = 0; i < generated.length; i++) {
+            const newAsset = generated[i];
+            
+            // Garantir um ID real antes de chamar webhooks e supabase
+            if (!newAsset.id) {
+                newAsset.id = crypto.randomUUID();
+            }
+
+            newAsset.metadata = newAsset.metadata || {};
+            newAsset.metadata.ai_generated = true; // Flag for credits computation
+            
+            const now = new Date();
+            const mes_referencia = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}`;
         
         // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
         let actualServiceKey = serviceKey;
@@ -2043,14 +2051,31 @@ async function runAiPlanner() {
 
         const client_name_fb = window.allProjects?.find(p => p.id === selectedId)?.name || spreadsheetClientId;
 
+        // Inserir primeiro no Supabase para garantir persistência!
+        const supabase = getSupabase();
+        let dbError = null;
+        try {
+            const { error: err } = await supabase.from('content_assets').insert(newAsset);
+            dbError = err;
+        } catch (e) {
+            dbError = e;
+        }
+
+        if (dbError) {
+            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
+            mockAssets.unshift(newAsset);
+            localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
+            console.warn('[IA_PLANNER] Erro Supabase, fallback local utilizado.', dbError);
+        }
+
         // [NOVO GUARDRAIL OFICIAL - CENÁRIO 13]
         sLog(`[IA_PLANNER] Validando limites oficiais via Guardrail (Make Cenário 13)...`);
         const guardrailPayload = {
-            geracao_id: newAsset.id || 'mock_id',
+            geracao_id: newAsset.id,
             client_id: spreadsheetClientId,
             client_name: client_name_fb,
             limite_id: newAsset.metadata.limite_id,
-            mes_referencia: mes_referencia.replace('-', '_'),
+            mes_referencia: mes_referencia,
             tipo_entrega: tipo_entrega,
             workflow_origem: 'content_engine'
         };
@@ -2081,8 +2106,8 @@ async function runAiPlanner() {
         }
 
         // Webhook de controle operacional de IA (Cenário 11)
-        const payload = {
-            geracao_id: newAsset.id || 'mock_id',
+        const payload11 = {
+            geracao_id: newAsset.id,
             client_id: spreadsheetClientId,
             client_name: client_name_fb,
             limite_id: newAsset.metadata.limite_id,
@@ -2093,7 +2118,7 @@ async function runAiPlanner() {
             responsavel_operacional: 'Design',
             status_geracao: 'rascunho_ia',
             status_anterior: '',
-            ocupa_limite_operacional: 'nao',
+            ocupa_limite_operacional: 'sim',
             consumo_definitivo: 'nao',
             libera_espaco: 'nao',
             confirmacao_interna_liberacao: '',
@@ -2101,100 +2126,90 @@ async function runAiPlanner() {
             link_resultado_drive: '',
             prompt_interno_id: '',
             observacao: 'Rascunho gerado via FluxAI OS',
-            asset_id: newAsset.id || 'mock_id',
+            asset_id: newAsset.id,
             title: newAsset.title,
             platform: newAsset.platform,
             status_ia: 'rascunho_ia',
             action: 'IA_GENERATION_CREATED',
             limite_anterior: limits.available,
-            limite_novo: limits.available, // Rascunho doesn't consume yet
+            limite_novo: limits.available - 1,
             timestamp: now.toISOString(),
             link_referencia: ''
         };
 
-        const response = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload);
-
-        if (!response.success) {
-            // WEBHOOK_REAL_FAILED
-            OS_LOGS_ENGINE.userAction(
-                'WEBHOOK_REAL_FAILED',
-                'content-engine',
-                { webhook: 'AI_OPERATIONAL_CONTROL', error: response.error || 'Erro Desconhecido', status: response.status || 0 },
-                userRole,
-                selectedId,
-                false
-            );
-
-            // GOVERNANCE_ABORTED
-            OS_LOGS_ENGINE.userAction(
-                'GOVERNANCE_ABORTED',
-                'content-engine',
-                { action: 'geracao_ia_rascunho', reason: 'Falha no webhook real de integração', client_id: selectedId },
-                userRole,
-                selectedId,
-                false
-            );
-
-            // SECURITY_WARNING
-            OS_LOGS_ENGINE.security(
-                'SECURITY_WARNING',
-                { 
-                    action: 'geracao_ia_rascunho_cancelada_erro_conexao', 
-                    client_id: selectedId, 
-                    role: userRole, 
-                    error: response.error,
-                    timestamp: new Date().toISOString()
-                },
-                'critical'
-            );
-
-            // ROLLBACK_STARTED
-            OS_LOGS_ENGINE.userAction(
-                'ROLLBACK_STARTED',
-                'content-engine',
-                { 
-                    reason: 'Falha na resposta do webhook de criação de IA',
-                    client_id: selectedId, 
-                    preserved_status: 'none'
-                },
-                userRole,
-                selectedId,
-                false
-            );
-
-            // ROLLBACK_COMPLETED
-            OS_LOGS_ENGINE.userAction(
-                'ROLLBACK_COMPLETED',
-                'content-engine',
-                { 
-                    client_id: selectedId, 
-                    restored_status: 'none',
-                    local_db_status: 'CONSISTENT_UNMODIFIED'
-                },
-                userRole,
-                selectedId,
-                false
-            );
-
-            alert('Erro de conexão com o Make/Webhook. Geração abortada e estado anterior mantido.');
-            return;
+        const response11 = await OS_CONFIG.webhooks.send('AI_OPERATIONAL_CONTROL', payload11);
+        if (!response11.success) {
+            console.error('[IA_PLANNER] Falha Cenário 11', response11);
         }
 
-        const supabase = getSupabase();
-        let error = null;
-        try {
-            const { error: dbError } = await supabase.from('content_assets').insert(newAsset);
-            error = dbError;
-        } catch (e) {
-            error = e;
-        }
+        // Webhook PLANEJAMENTO_CONTEUDO (Cenário 15)
+        const payload15 = {
+            client_id: spreadsheetClientId,
+            client_name: client_name_fb,
+            asset_id: newAsset.id,
+            planejamento_id: newAsset.id,
+            postagem_id: newAsset.id,
+            title: newAsset.title,
+            tema: newAsset.title,
+            canal: mapToSpreadsheetChannel(newAsset.platform),
+            formato_conteudo: mapToSpreadsheetFormat(tipo_entrega),
+            objetivo_conteudo: '', // O parser fica no update de status, mas podemos passar em branco por enquanto
+            pilar_conteudo: '',
+            etapa_funil: '',
+            briefing_resumo: newAsset.caption || '',
+            titulo_conteudo: newAsset.title,
+            legenda: '',
+            cta: '',
+            status_planejamento: 'DRAFT_PLANNING',
+            status_postagem: 'DRAFT_PLANNING',
+            data_agendada: newAsset.scheduled_at || '',
+            hora_agendada: newAsset.scheduled_at ? new Date(newAsset.scheduled_at).toLocaleTimeString('pt-BR') : '',
+            data_prevista: newAsset.scheduled_at || '',
+            data_publicacao: '',
+            link_post: '',
+            link_asset_drive: '',
+            status_anterior: '',
+            status_novo: 'PLANEJAMENTO',
+            logical_transition: `none->draft_planning`,
+            timestamp: now.toISOString(),
+            responsavel_planejamento: 'IA',
+            responsavel_design: 'Design',
+            responsavel_copy: 'Copywriter',
+            responsavel_publicacao: '',
+            responsavel_operacional: '',
+            link_referencia: '',
+            link_resultado_drive: '',
+            solicitado_por: window.FLUXAI_RUNTIME_CONTEXT?.full_name || 'IA',
+            limite_id: newAsset.metadata.limite_id,
+            mes_referencia: mes_referencia,
+            semana_referencia: '',
+            tipo_entrega: mapToSpreadsheetFormat(tipo_entrega),
+            geracao_id: newAsset.id,
+            credito_id: '',
+            observacao: 'Gerado via IA'
+        };
 
-        if (error) {
-            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-            newAsset.id = 'asset_mock_' + Date.now();
-            mockAssets.unshift(newAsset);
-            localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
-        }
+        const response15 = await OS_CONFIG.webhooks.send('PLANEJAMENTO_CONTEUDO', payload15);
+        if (!response15.success) console.error('[IA_PLANNER] Falha Cenário 15', response15);
+
+        // Webhook GPT_GERACOES_LOG (Cenário 17)
+        const payload17 = {
+            geracao_id: newAsset.id,
+            client_id: spreadsheetClientId,
+            client_name: client_name_fb,
+            responsavel_geracao: window.FLUXAI_RUNTIME_CONTEXT?.full_name || 'operador_fluxai',
+            asset_id: newAsset.id,
+            title: newAsset.title,
+            platform: newAsset.platform,
+            prompt_input: 'Gerador OS IA Planner - ' + serviceKey,
+            prompt_output: newAsset.caption || '',
+            model_used: 'gpt-4o',
+            timestamp: now.toISOString()
+        };
+        const response17 = await OS_CONFIG.webhooks.send('GPT_GERACOES_LOG', payload17);
+        if (!response17.success) console.error('[IA_PLANNER] Falha Cenário 17', response17);
+
+        } // Fim do for loop de items gerados
 
         // Registrar logs de sucesso
         OS_LOGS_ENGINE.userAction(
