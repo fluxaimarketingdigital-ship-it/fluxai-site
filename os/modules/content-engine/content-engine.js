@@ -2215,7 +2215,7 @@ async function runAiPlanner() {
         OS_LOGS_ENGINE.userAction(
             'IA_GENERATION_STATUS',
             'content-engine',
-            { action: 'generate_draft', service: serviceKey, client_id: selectedId, asset_id: newAsset.id },
+            { action: 'generate_draft_batch', service: serviceKey, client_id: selectedId, count: generated.length },
             userRole,
             selectedId,
             !OS_CONFIG.flags.sendRealWebhooks
@@ -2224,7 +2224,7 @@ async function runAiPlanner() {
         OS_LOGS_ENGINE.userAction(
             'WEBHOOK_REAL_SUCCESS',
             'content-engine',
-            { webhook: 'AI_OPERATIONAL_CONTROL', status: response.status || 200 },
+            { webhook: 'AI_OPERATIONAL_CONTROL_BATCH', status: 200 },
             userRole,
             selectedId,
             !OS_CONFIG.flags.sendRealWebhooks
