@@ -476,19 +476,17 @@ async function loadContent() {
 
     try {
         const supabase = getSupabase();
-        // TESTE TEMPORÁRIO: Lendo da content_assets antiga para ver se o Make 15 está salvando nela!
-        let query = supabase.from('content_assets').select('*');
+        // Consultando a tabela oficial de Pautas!
+        let query = supabase.from('PLANEJAMENTO_CONTEUDO').select('*');
         if (currentProject) {
             const projectMap = {
                 '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
             };
             const mappedProjectId = projectMap[currentProject] || currentProject;
-            // A consulta no Supabase agora aceita ambos os formatos por retrocompatibilidade, 
-            // já que o Make pode inserir com o ID antigo, mas registros novos podem ter o ID novo.
-            query = query.or(`project_id.eq.${currentProject},project_id.eq.${mappedProjectId}`);
+            query = query.or(`client_id.eq.${currentProject},client_id.eq.${mappedProjectId}`);
         }
 
-        const { data: contents, error } = await query.order('scheduled_at', { ascending: true });
+        const { data: contents, error } = await query.order('data_prevista', { ascending: true });
         if (error) throw error;
 
         window.loadedContents = contents || [];
