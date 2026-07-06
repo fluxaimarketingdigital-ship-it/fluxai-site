@@ -2054,8 +2054,11 @@ async function runAiPlanner() {
             const mes_referencia = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}`;
         
         // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
+        // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
         let actualServiceKey = serviceKey;
-        if (serviceKey === 'ALL') {
+        // Se for ALL ou CONTRACT, o tipo de entrega de cada ativo gerado pode ser diferente!
+        // Portanto, extraímos a key correta baseando-se no título do ativo gerado (que contém o nome do serviço).
+        if (serviceKey === 'ALL' || serviceKey === 'CONTRACT') {
             const entry = Object.entries(AIPlanner.STRATEGIC_MATRIX).find(([k, v]) => newAsset.title.includes(v.name));
             if (entry) actualServiceKey = entry[0];
         }
