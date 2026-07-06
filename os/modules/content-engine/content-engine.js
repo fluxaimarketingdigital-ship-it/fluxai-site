@@ -461,7 +461,15 @@ async function loadContent() {
     try {
         const supabase = getSupabase();
         let query = supabase.from('PLANEJAMENTO_CONTEUDO').select('*');
-        if (currentProject) query = query.eq('client_id', currentProject);
+        if (currentProject) {
+            const projectMap = {
+                '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
+            };
+            const mappedProjectId = projectMap[currentProject] || currentProject;
+            // A consulta no Supabase agora aceita ambos os formatos por retrocompatibilidade, 
+            // já que o Make pode inserir com o ID antigo, mas registros novos podem ter o ID novo.
+            query = query.or(`client_id.eq.${currentProject},client_id.eq.${mappedProjectId}`);
+        }
 
         const { data: contents, error } = await query.order('data_prevista', { ascending: true });
         if (error) throw error;
