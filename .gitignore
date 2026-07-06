@@ -55,3 +55,5 @@ os/docs/treinamento/videos/temp/
 *.ai
 # Exceção para a proposta PDF comercial final
 !PROPOSTA_COMERCIAL_GIAAS_SCALE_REVISAVEL.pdf
+
+.env*

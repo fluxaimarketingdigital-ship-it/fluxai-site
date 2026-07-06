@@ -38,13 +38,21 @@ async function initFinance() {
             const val = selectExtra.value;
             const extraValField = document.getElementById('edit-extra-value');
             const extraDescField = document.getElementById('edit-extra-desc');
-
-            if (val && SERVICES_CATALOG[val]) {
-                extraValField.value = SERVICES_CATALOG[val].value;
-                extraDescField.value = SERVICES_CATALOG[val].desc;
-            } else {
+            const customContainer = document.getElementById('edit-extra-custom-container');
+            
+            if (val === 'Outro Serviço Avulso') {
+                customContainer.style.display = 'block';
                 extraValField.value = '';
                 extraDescField.value = '';
+            } else {
+                customContainer.style.display = 'none';
+                if (val && SERVICES_CATALOG[val]) {
+                    extraValField.value = '';
+                    extraDescField.value = SERVICES_CATALOG[val].desc;
+                } else {
+                    extraValField.value = '';
+                    extraDescField.value = '';
+                }
             }
         });
     }
@@ -739,7 +747,12 @@ window.saveContractEdit = async () => {
         };
         
         // Verifica se há serviço extra preenchido
-        const extraType = document.getElementById('edit-extra-type').value;
+        let extraType = document.getElementById('edit-extra-type').value;
+        if (extraType === 'Outro Serviço Avulso') {
+            const customName = document.getElementById('edit-extra-custom-name').value;
+            if (customName) extraType = customName;
+        }
+
         let extraServicePayload = null;
         if (extraType && extraType !== "") {
             extraServicePayload = {

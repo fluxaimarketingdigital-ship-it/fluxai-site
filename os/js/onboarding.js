@@ -153,13 +153,29 @@ function renderDynamicFields() {
     const templates = {
         'conteudo': `
             <div class="sub-fields" style="display:block; background:rgba(0,0,0,0.2); border:1px solid var(--os-border); padding:20px; border-radius:10px; margin-top:15px;">
-                <label style="color:var(--os-primary); font-size:0.75rem; font-weight:900; letter-spacing:1px;"><i class="fa-solid fa-pen-nib"></i> ENGENHARIA DE CONTEÚDO</label>
+                <label style="color:var(--os-primary); font-size:0.75rem; font-weight:900; letter-spacing:1px;"><i class="fa-solid fa-pen-nib"></i> ENGENHARIA DE CONTEÚDO E ENTREGÁVEIS</label>
                 <div class="grid-2" style="margin-top:15px">
                     <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Reels/Mês</label><input type="number" name="escopo_conteudo_reels_qty" class="form-control" placeholder="12" value="12"></div>
                     <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Carrosséis/Mês</label><input type="number" name="escopo_conteudo_carrossel_qty" class="form-control" placeholder="8" value="8"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Stories/Mês (Artes)</label><input type="number" name="escopo_conteudo_stories_qty" class="form-control" placeholder="20" value="20"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Stories/Mês (Artes)</label><input type="number" name="escopo_conteudo_story_qty" class="form-control" placeholder="20" value="20"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Posts Estáticos/Mês</label><input type="number" name="escopo_conteudo_post_estatico_qty" class="form-control" placeholder="0" value="0"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Artigos/Mês</label><input type="number" name="escopo_conteudo_artigo_qty" class="form-control" placeholder="0" value="0"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. E-mails (Campanhas)/Mês</label><input type="number" name="escopo_conteudo_email_qty" class="form-control" placeholder="0" value="0"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Landing Pages/Mês</label><input type="number" name="escopo_conteudo_landing_page_qty" class="form-control" placeholder="0" value="0"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Anúncios (Criativos)/Mês</label><input type="number" name="escopo_conteudo_anuncio_qty" class="form-control" placeholder="0" value="0"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Relatórios/Mês</label><input type="number" name="escopo_conteudo_relatorio_qty" class="form-control" placeholder="0" value="0"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Planejamento/Mês</label><input type="number" name="escopo_conteudo_planejamento_qty" class="form-control" placeholder="0" value="0"></div>
+                </div>
+                <div class="grid-2">
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Copy/Mês</label><input type="number" name="escopo_conteudo_copy_qty" class="form-control" placeholder="0" value="0"></div>
                     <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Frequência Semanal</label><input type="text" name="escopo_conteudo_weekly_freq" class="form-control" placeholder="Ex: 5x na semana" value="5x na semana"></div>
                 </div>
             </div>`,
@@ -485,25 +501,18 @@ window.handleOnboarding = async function(e) {
     // --- ENGENHARIA DO ARRAY DE SERVIÇOS (PARA ITERATOR DO MAKE) ---
     const lista_servicos_para_planilha = [];
     
-    // 1. Serviços de Conteúdo Recorrente
-    if (raw.escopo_conteudo_reels_qty && Number(raw.escopo_conteudo_reels_qty) > 0) {
-        lista_servicos_para_planilha.push({
-            tipo_entrega: 'reels',
-            limite_mensal: Number(raw.escopo_conteudo_reels_qty)
-        });
-    }
-    if (raw.escopo_conteudo_carrossel_qty && Number(raw.escopo_conteudo_carrossel_qty) > 0) {
-        lista_servicos_para_planilha.push({
-            tipo_entrega: 'carrossel',
-            limite_mensal: Number(raw.escopo_conteudo_carrossel_qty)
-        });
-    }
-    if (raw.escopo_conteudo_stories_qty && Number(raw.escopo_conteudo_stories_qty) > 0) {
-        lista_servicos_para_planilha.push({
-            tipo_entrega: 'story',
-            limite_mensal: Number(raw.escopo_conteudo_stories_qty)
-        });
-    }
+    // 1. Serviços de Conteúdo Recorrente e Entregáveis
+    const entregaveisFields = ['reels', 'carrossel', 'story', 'post_estatico', 'artigo', 'email', 'landing_page', 'anuncio', 'relatorio', 'planejamento', 'copy'];
+    
+    entregaveisFields.forEach(field => {
+        const fieldName = `escopo_conteudo_${field}_qty`;
+        if (raw[fieldName] && Number(raw[fieldName]) > 0) {
+            lista_servicos_para_planilha.push({
+                tipo_entrega: field,
+                limite_mensal: Number(raw[fieldName])
+            });
+        }
+    });
     
     // 2. Serviço Extra / Setup (Se houver)
     if (raw.finance_extra_services_type && raw.finance_extra_services_type !== 'Nenhum Serviço Extra') {

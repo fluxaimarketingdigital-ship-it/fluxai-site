@@ -80,11 +80,13 @@ function setupEventListeners() {
             const extraDriveLink = document.getElementById('extra-drive-link').value;
 
             // Encontrar nome do serviço e categoria
-            let serviceName = "Serviço Personalizado";
+            let serviceName = catalogId;
             let addLimit = 0;
             let categoryName = "outros";
-            if (catalogId === 'SRV_EXTRA_CUSTOM') {
-                serviceName = obs ? obs.substring(0, 40) : "Serviço Personalizado Extra";
+            
+            if (catalogId === 'Outro Serviço Avulso') {
+                const customName = document.getElementById('extra-custom-name').value;
+                if (customName) serviceName = customName;
             } else {
                 const srv = catalogServices.find(s => s.servico_id === catalogId);
                 if (srv) {
@@ -440,12 +442,21 @@ async function loadClients() {
                 const val = catalogSelect.value;
                 const extraValField = document.getElementById('extra-valor-est');
                 const extraDescField = document.getElementById('extra-obs');
-                if (val && SERVICES_CATALOG[val]) {
-                    extraValField.value = SERVICES_CATALOG[val].value;
-                    extraDescField.value = SERVICES_CATALOG[val].desc;
-                } else {
+                const customContainer = document.getElementById('extra-custom-container');
+
+                if (val === 'Outro Serviço Avulso') {
+                    if(customContainer) customContainer.style.display = 'block';
                     extraValField.value = '';
                     extraDescField.value = '';
+                } else {
+                    if(customContainer) customContainer.style.display = 'none';
+                    if (val && SERVICES_CATALOG[val]) {
+                        extraValField.value = '';
+                        extraDescField.value = SERVICES_CATALOG[val].desc;
+                    } else {
+                        extraValField.value = '';
+                        extraDescField.value = '';
+                    }
                 }
             });
         }
