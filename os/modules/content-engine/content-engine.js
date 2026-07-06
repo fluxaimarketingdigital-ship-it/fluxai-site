@@ -499,10 +499,11 @@ async function loadContent() {
         
         if(window.updateIAGovDashboard) await window.updateIAGovDashboard();
     } catch (e) {
+        console.error('[LOAD_CONTENT] Erro fatal ao carregar do Supabase:', e);
         const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
         let projectAssets = mockAssets;
         if (currentProject) {
-            projectAssets = mockAssets.filter(item => item && item.project_id === currentProject);
+            projectAssets = mockAssets.filter(item => item && (item.project_id === currentProject || item.client_id === currentProject));
         }
         
         window.loadedContents = projectAssets;
