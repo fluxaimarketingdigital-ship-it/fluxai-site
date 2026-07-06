@@ -286,43 +286,59 @@ window.calculateIACredits = async (clientId) => {
     let baseLimit = 0;
     let extraLimit = 0;
     let manualLimit = 0;
+    let occupied = 0; 
+    let consumed = 0; 
 
-    const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-    const contract = mockContracts.find(c => c.client_id === clientId);
-    if (contract) {
-        baseLimit = parseInt(contract.ia_credits || 0, 10);
-        const extras = contract.extras || [];
-        extras.forEach(ext => {
-            if (ext.status === 'aprovado' && ext.ai_credits) {
-                extraLimit += parseInt(ext.ai_credits, 10);
-            }
-        });
+    const supabase = getSupabase();
+    const projectMap = {
+        '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
+    };
+    const mappedClientId = projectMap[clientId] || clientId;
+
+    try {
+        const { data, error } = await supabase.from('IA_CREDITOS_CLIENTE')
+            .select('limite_operacional_mensal, limite_ocupado, limite_publicado')
+            .or(`client_id.eq.${clientId},client_id.eq.${mappedClientId}`)
+            .eq('status_limite', 'ativo');
+            
+        if (!error && data && data.length > 0) {
+            data.forEach(row => {
+                baseLimit += Number(row.limite_operacional_mensal) || 0;
+                occupied += Number(row.limite_ocupado) || 0;
+                consumed += Number(row.limite_publicado) || 0;
+            });
+        }
+    } catch (e) {
+        console.warn('Erro ao buscar IA_CREDITOS_CLIENTE', e);
     }
 
-    const manualAdjustments = JSON.parse(localStorage.getItem('fluxai_ia_manual_adjustments') || '{}');
-    manualLimit = parseInt(manualAdjustments[clientId] || 0, 10);
+    // Fallback caso a tabela ainda não tenha sido sincronizada pelo Make
+    if (baseLimit === 0) {
+        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+        const contract = mockContracts.find(c => c.client_id === clientId);
+        if (contract) {
+            baseLimit = parseInt(contract.ia_credits || 0, 10);
+        } else {
+            baseLimit = 20; 
+        }
 
-    // Fallback de teste para evitar bloqueio caso a tabela IA_CREDITOS_CLIENTE ainda não tenha dados
-    if (baseLimit === 0 && extraLimit === 0 && manualLimit === 0) {
-        baseLimit = 20; 
+        try {
+            // Conta a partir da tabela de pautas
+            const { data: pautas } = await supabase.from('PLANEJAMENTO_CONTEUDO')
+                .select('status_planejamento')
+                .or(`client_id.eq.${clientId},client_id.eq.${mappedClientId}`);
+                
+            if (pautas) {
+                pautas.forEach(p => {
+                    const std = mapToStandardStatus(p.status_planejamento);
+                    if (['REVIEW', 'READY_TO_POST', 'IN_PRODUCTION'].includes(std) || p.status_planejamento === 'DRAFT_PLANNING') occupied++;
+                    if (['POSTED'].includes(std)) consumed++;
+                });
+            }
+        } catch (e) {}
     }
 
     const totalLimit = baseLimit + extraLimit + manualLimit;
-
-    let occupied = 0; 
-    let consumed = 0; 
-    const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-    const clientAssets = mockAssets.filter(a => a.project_id === clientId && a.metadata?.ai_generated);
-
-    clientAssets.forEach(asset => {
-        const status = asset.status;
-        const stdStatus = mapToStandardStatus(status);
-        if (['aprovado_interno', 'em_revisao_fluxai', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(status) || ['REVIEW', 'READY_TO_POST'].includes(stdStatus)) {
-            occupied++;
-        } else if (['publicado', 'POSTED'].includes(stdStatus) || status === 'publicado') {
-            consumed++;
-        }
-    });
 
     return { total: totalLimit, occupied, consumed, available: totalLimit - (occupied + consumed), base: baseLimit, extra: extraLimit, manual: manualLimit };
 };
@@ -2515,7 +2531,7 @@ async function setupRealtime() {
     if (realtimeChannel) { 
         supabase.removeChannel(realtimeChannel); 
     } 
-    realtimeChannel = supabase.channel('content-updates').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'content_assets' }, (payload) => { 
+    realtimeChannel = supabase.channel('content-updates').on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'PLANEJAMENTO_CONTEUDO' }, (payload) => { 
         sLog('Sincronização Realtime: Alteração detectada.'); 
         loadContent(); 
     }).subscribe(); 

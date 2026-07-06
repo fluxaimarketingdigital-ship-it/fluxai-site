@@ -503,13 +503,14 @@ window.handleOnboarding = async function(e) {
     
     // 1. Serviços de Conteúdo Recorrente e Entregáveis
     const entregaveisFields = ['reels', 'carrossel', 'story', 'post_estatico', 'artigo', 'email', 'landing_page', 'anuncio', 'relatorio', 'planejamento', 'copy'];
-    
     entregaveisFields.forEach(field => {
         const fieldName = `escopo_conteudo_${field}_qty`;
         if (raw[fieldName] && Number(raw[fieldName]) > 0) {
             lista_servicos_para_planilha.push({
                 tipo_entrega: field,
-                limite_mensal: Number(raw[fieldName])
+                limite_mensal: Number(raw[fieldName]),
+                status_limite: 'ativo',
+                origem_limite: 'contrato'
             });
         }
     });
@@ -525,7 +526,9 @@ window.handleOnboarding = async function(e) {
         
         lista_servicos_para_planilha.push({
             tipo_entrega: tipoExtra,
-            limite_mensal: 1 // Serviço extra de setup normalmente é 1 entrega única
+            limite_mensal: 1, // Serviço extra de setup normalmente é 1 entrega única
+            status_limite: 'ativo',
+            origem_limite: 'contrato'
         });
     }
 
