@@ -32,7 +32,16 @@ const STATUS_LABELS = {
 };
 
 function mapToStandardStatus(status) {
+    if (!status) return 'DRAFT_PLANNING';
     const upper = status.toUpperCase();
+    // Status da tabela PLANEJAMENTO_CONTEUDO (Make / OS)
+    if (upper === 'RASCUNHO_IA') return 'DRAFT_PLANNING';
+    if (upper === 'PENDENTE_REVISAO') return 'INTERNAL_REVIEW';
+    if (upper === 'APROVADO_INTERNO') return 'CLIENT_REVIEW_PLANNING';
+    if (upper === 'APROVADO_CLIENTE') return 'PLANNING_APPROVED';
+    if (upper === 'REPROVADO') return 'CLIENT_REVISION_PLANNING';
+    if (upper === 'PUBLICADO') return 'POSTED';
+    // Status legados da tabela content_assets
     if (upper === 'PLANEJAMENTO') return 'DRAFT_PLANNING';
     if (upper === 'REVISÃO GESTÃO') return 'INTERNAL_REVIEW';
     if (upper === 'APROVAÇÃO PLANEJAMENTO') return 'CLIENT_REVIEW_PLANNING';
@@ -42,7 +51,6 @@ function mapToStandardStatus(status) {
     if (upper === 'REVISÃO INTERNA FINAL') return 'INTERNAL_QA';
     if (upper === 'APROVAÇÃO FINAL') return 'CLIENT_REVIEW_CONTENT';
     if (upper === 'PRONTO') return 'READY_TO_POST';
-    if (upper === 'PUBLICADO') return 'POSTED';
     return upper;
 }
 
@@ -550,9 +558,13 @@ function renderContentTable(contents) {
  
     body.replaceChildren();
     contents.forEach(c => { 
-        const scheduled = c.data_prevista ? new Date(c.data_prevista).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Pendente'; 
-        const stdStatus = mapToStandardStatus(c.status_planejamento || 'PLANEJAMENTO'); 
-        const statusLabel = STATUS_LABELS[stdStatus] || (c.status_planejamento || 'Rascunho'); 
+        // Suporta tanto 'data_prevista' (PLANEJAMENTO_CONTEUDO) quanto 'scheduled_at' (content_assets legado)
+        const dateValue = c.data_prevista || c.scheduled_at;
+        const scheduled = dateValue ? new Date(dateValue).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : 'Pendente'; 
+        // Suporta tanto 'status_planejamento' (PLANEJAMENTO_CONTEUDO) quanto 'status' (content_assets legado)
+        const statusValue = c.status_planejamento || c.status || 'PLANEJAMENTO';
+        const stdStatus = mapToStandardStatus(statusValue); 
+        const statusLabel = STATUS_LABELS[stdStatus] || statusValue; 
         const revCount = c.metadata?.revision_cycle || 1; 
         const versionLabel = `V${revCount}`; 
          
@@ -2051,7 +2063,7 @@ async function runAiPlanner() {
             newAsset.metadata.ai_generated = true; // Flag for credits computation
             
             const now = new Date();
-            const mes_referencia = `${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const mes_referencia = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         
         // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
         // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
@@ -2078,21 +2090,47 @@ async function runAiPlanner() {
 
         const client_name_fb = window.allProjects?.find(p => p.id === selectedId)?.name || spreadsheetClientId;
 
-        // Inserir primeiro no Supabase para garantir persistência!
+        // === INSERÇÃO NA TABELA OFICIAL PLANEJAMENTO_CONTEUDO ===
+        // Os campos aqui devem casar EXATAMENTE com a migration 20260627000001_planejamento_conteudo.sql
         const supabase = getSupabase();
         let dbError = null;
+        const planejamentoRecord = {
+            planejamento_id: newAsset.id,
+            client_id: spreadsheetClientId,           // ex: 'FLUXAI_LABS_001'
+            client_name: client_name_fb,
+            mes_referencia: mes_referencia,            // ex: '2026-07'
+            canal: newAsset.platform || 'INSTAGRAM',
+            formato_conteudo: tipo_entrega,            // ex: 'reels', 'carrossel'
+            tema: newAsset.title || '',
+            briefing_resumo: newAsset.caption || '',
+            status_planejamento: 'rascunho_ia',
+            geracao_id: newAsset.metadata?.geracao_id || newAsset.id,
+            responsavel_planejamento: window.FLUXAI_RUNTIME_CONTEXT?.full_name || 'FluxAI OS',
+            responsavel_design: 'Design',
+            data_prevista: newAsset.scheduled_at || new Date().toISOString(),
+            observacao: 'Rascunho gerado via FluxAI OS',
+            data_criacao: new Date().toISOString(),
+            data_atualizacao: new Date().toISOString()
+        };
+        
         try {
-            const { error: err } = await supabase.from('content_assets').insert(newAsset);
+            const { error: err } = await supabase.from('PLANEJAMENTO_CONTEUDO').insert(planejamentoRecord);
             dbError = err;
+            if (err) {
+                console.warn('[IA_PLANNER] Erro ao inserir em PLANEJAMENTO_CONTEUDO:', err);
+            } else {
+                console.log('[IA_PLANNER] ✅ Pauta salva em PLANEJAMENTO_CONTEUDO com ID:', planejamentoRecord.planejamento_id);
+            }
         } catch (e) {
             dbError = e;
         }
 
         if (dbError) {
+            // Fallback: salva localmente para não perder o rascunho
             const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-            mockAssets.unshift(newAsset);
+            mockAssets.unshift({ ...planejamentoRecord, id: planejamentoRecord.planejamento_id });
             localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
-            console.warn('[IA_PLANNER] Erro Supabase, fallback local utilizado.', dbError);
+            console.warn('[IA_PLANNER] Fallback localStorage ativado. Erro:', dbError);
         }
 
         // [NOVO GUARDRAIL OFICIAL - CENÁRIO 13]
