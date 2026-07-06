@@ -2003,8 +2003,13 @@ async function runAiPlanner() {
             );
             return;
         }
+        
+        let maxToGenerate = 1;
+        if (serviceKey === 'CONTRACT') {
+            maxToGenerate = 99; // Tells AIPlanner to generate based on contract
+        }
 
-        const generated = await AIPlanner.generatePlan(selectedId, serviceKey, 1);
+        const generated = await AIPlanner.generatePlan(selectedId, serviceKey, maxToGenerate);
         if (!generated || generated.length === 0) {
             throw new Error('Nenhuma pauta pôde ser gerada para o escopo selecionado.');
         }

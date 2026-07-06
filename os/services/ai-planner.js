@@ -269,7 +269,44 @@ export const AIPlanner = {
         let servicesToGenerate = [];
         const availableKeys = Object.keys(AIPlanner.STRATEGIC_MATRIX);
         
-        if (specificService === 'ALL') {
+        if (specificService === 'CONTRACT') {
+            const entregaveisFields = {
+                'reels': 'REELS',
+                'carrossel': 'CARROSSEL',
+                'story': 'STORIES',
+                'post_estatico': 'CARD',
+                'artigo': 'SITE',
+                'email': 'CRM',
+                'landing_page': 'LP',
+                'anuncio': 'TRAFEGO',
+                'relatorio': 'DASHBOARD',
+                'planejamento': 'BRANDING',
+                'copy': 'CARD'
+            };
+
+            Object.entries(entregaveisFields).forEach(([field, matrixKey]) => {
+                const rawFieldStr = onboarding[`escopo_conteudo_${field}_qty`];
+                let limit = 0;
+                
+                if (rawFieldStr !== undefined) {
+                     limit = Number(rawFieldStr);
+                } else {
+                     // Fallback para campos salvos pelo webhook
+                     if (field === 'reels') limit = Number(onboarding.reels_mes || 0);
+                     if (field === 'carrossel') limit = Number(onboarding.carrosseis_mes || 0);
+                     if (field === 'story') limit = Number(onboarding.stories_mes || 0);
+                }
+                
+                for(let i=0; i<limit; i++) {
+                    servicesToGenerate.push(matrixKey);
+                }
+            });
+
+            if (servicesToGenerate.length === 0) {
+                // Default if contract is empty or not mapped
+                servicesToGenerate = ['REELS', 'CARROSSEL', 'STORIES']; 
+            }
+        } else if (specificService === 'ALL') {
             let i = 0;
             while (servicesToGenerate.length < maxToGenerate) {
                 servicesToGenerate.push(availableKeys[i % availableKeys.length]);
