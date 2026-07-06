@@ -284,6 +284,7 @@ export const AIPlanner = {
                 'copy': 'CARD'
             };
 
+            let totalContractLimit = 0;
             Object.entries(entregaveisFields).forEach(([field, matrixKey]) => {
                 const rawFieldStr = onboarding[`escopo_conteudo_${field}_qty`];
                 let limit = 0;
@@ -296,6 +297,7 @@ export const AIPlanner = {
                      if (field === 'carrossel') limit = Number(onboarding.carrosseis_mes || 0);
                      if (field === 'story') limit = Number(onboarding.stories_mes || 0);
                 }
+                totalContractLimit += limit;
                 
                 const matrixDef = AIPlanner.STRATEGIC_MATRIX[matrixKey];
                 const currentMonth = now.getMonth();
@@ -318,7 +320,12 @@ export const AIPlanner = {
             });
 
             if (servicesToGenerate.length === 0) {
-                throw new Error('Cota contratual deste mês já está 100% preenchida! Para gerar mais, exclua itens do pipeline atual.');
+                if (totalContractLimit === 0) {
+                     // Default if contract is empty or not mapped
+                     servicesToGenerate = ['REELS', 'CARROSSEL', 'STORIES']; 
+                } else {
+                     throw new Error('Cota contratual deste mês já está 100% preenchida! Para gerar mais, exclua itens do pipeline atual.');
+                }
             }
         } else if (specificService === 'ALL') {
             let i = 0;
