@@ -226,7 +226,7 @@ export const AIPlanner = {
                 isDbOnline = true;
                 
                 const { data: dbExisting, error: existingErr } = await supabase.from('content_assets')
-                    .select('scheduled_at')
+                    .select('scheduled_at, title, status')
                     .eq('project_id', projectId);
                 if (!existingErr) {
                     existing = dbExisting || [];
@@ -297,14 +297,28 @@ export const AIPlanner = {
                      if (field === 'story') limit = Number(onboarding.stories_mes || 0);
                 }
                 
-                for(let i=0; i<limit; i++) {
+                const matrixDef = AIPlanner.STRATEGIC_MATRIX[matrixKey];
+                const currentMonth = now.getMonth();
+                const currentYear = now.getFullYear();
+                
+                const countExisting = (existing || []).filter(e => {
+                    if (!e.title || !e.scheduled_at) return false;
+                    // Ignora itens com status cancelado/lixeira se existirem (aqui assumimos que existing são os ativos da pipeline)
+                    const d = new Date(e.scheduled_at);
+                    if (d.getMonth() !== currentMonth || d.getFullYear() !== currentYear) return false;
+                    return e.title.includes(matrixDef.name);
+                }).length;
+                
+                const remainingLimit = limit - countExisting;
+                const toGenerate = remainingLimit > 0 ? remainingLimit : 0;
+                
+                for(let i=0; i<toGenerate; i++) {
                     servicesToGenerate.push(matrixKey);
                 }
             });
 
             if (servicesToGenerate.length === 0) {
-                // Default if contract is empty or not mapped
-                servicesToGenerate = ['REELS', 'CARROSSEL', 'STORIES']; 
+                throw new Error('Cota contratual deste mês já está 100% preenchida! Para gerar mais, exclua itens do pipeline atual.');
             }
         } else if (specificService === 'ALL') {
             let i = 0;
