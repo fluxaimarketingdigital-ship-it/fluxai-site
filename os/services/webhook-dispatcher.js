@@ -110,10 +110,26 @@ export async function dispatchWebhook(route, payload, token = null) {
     let response;
     try {
         const endpoint = getProxyEndpoint();
+
+        // Mapeia rotas antigas do frontend para as chaves oficiais aceitas pela Edge Function
+        const routeMap = {
+            'ROTA_OS_01_PORTAL_DEMANDAS': 'DEMAND_SUBMISSION',
+            'ROTA_OS_02_LEADS_SITE': 'LEAD_CAPTURE',
+            'ROTA_OS_09_ONBOARDING': 'CLIENT_ONBOARDING',
+            'ROTA_OS_10_SERVICO_EXTRA': 'SERVICE_EXTRA_REQUEST',
+            'ROTA_OS_11_IA_CREDITOS': 'IA_CREDITOS_CONTROLE',
+            'ROTA_OS_13_GUARDRAIL': 'IA_GUARDRAIL',
+            'ROTA_OS_15_PLANEJAMENTO': 'PLANEJAMENTO_CONTEUDO',
+            'ROTA_OS_16_CALENDARIO': 'CALENDARIO_POSTAGENS',
+            'AI_OPERATIONAL_CONTROL': 'AI_OPERATIONAL_CONTROL',
+            'GPT_GERACOES_LOG': 'GPT_GERACOES_LOG'
+        };
+        const mappedRoute = routeMap[route] || route;
+
         response = await fetch(endpoint, {
             method: 'POST',
             headers,
-            body: JSON.stringify({ route, payload: finalPayload }),
+            body: JSON.stringify({ route: mappedRoute, payload: finalPayload }),
         });
     } catch (networkError) {
         console.warn(`[DISPATCHER] Falha de rede ao chamar make-proxy para ${route}:`, networkError?.message);
