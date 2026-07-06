@@ -245,7 +245,17 @@ export const AIPlanner = {
             existing = mockAssets.filter(item => item && item.project_id === projectId);
         }
         
-        const onboarding = project?.metadata?.onboarding || project?.onboarding || {};
+        let onboarding = project?.metadata?.onboarding || project?.onboarding || {};
+        if (typeof onboarding === 'string') {
+            try { onboarding = JSON.parse(onboarding); } catch(e) {}
+        }
+        if (project?.metadata?.raw_payload_json) {
+            try {
+                const rawData = typeof project.metadata.raw_payload_json === 'string' ? JSON.parse(project.metadata.raw_payload_json) : project.metadata.raw_payload_json;
+                onboarding = { ...onboarding, ...rawData };
+            } catch(e) {}
+        }
+
         const opsActivation = project?.metadata?.operational_activation || project?.operational_activation || {};
         
         const icp = onboarding.icp || "Público High-Ticket, busca exclusividade";
