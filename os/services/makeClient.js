@@ -47,57 +47,27 @@ export const MakeClient = {
      * Dispara requisição POST real para o Webhook homologado
      */
     sendPost: async (routeConfig, payload) => {
-        // 5. makeClient.js deve enviar: { routeId, payload }
-        // 4. O frontend deve chamar apenas: /api/make-proxy
-        let targetUrl = '/api/make-proxy';
-        let finalBody = JSON.stringify({
-            routeId: routeConfig.rota_id,
-            payload: payload
-        });
-
         // [STG-04] Bloqueio preventivo de Bypass. 
-        // O frontend em staging (e futuramente produção) NUNCA disparará fetch direto para hook.make.com
         if (routeConfig.use_proxy === false) {
             console.warn(`[STG-BLOCKED] Tentativa de bypass do proxy bloqueada para rota ${routeConfig.rota_id}`);
             throw new Error(`A rota ${routeConfig.rota_id} solicita conexão direta (use_proxy=false). Isso é proibido pela política de segurança.`);
         }
 
         try {
-            // Obter JWT dinâmico do usuário atual
-            let token = '';
-            if (globalThis.supabase !== undefined && typeof globalThis.supabase.auth?.getSession === 'function') {
-                const { data: { session } } = await globalThis.supabase.auth.getSession();
-                if (session?.access_token) {
-                    token = session.access_token;
-                }
-            }
-
-            const idempotencyKey = crypto.randomUUID();
-
-            const response = await fetch(targetUrl, {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json; charset=utf-8',
-                    'Accept': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : '',
-                    'Idempotency-Key': idempotencyKey
-                },
-                body: finalBody
-            });
-
-            // Make.com tipicamente retorna "Accepted" (texto) ou um JSON (para rotas com Webhook Response)
-            let responseData = {};
-            const textRaw = await response.text();
+            // Usa o dispatcher unificado (Edge Function)
+            const { dispatchWebhook } = await import('./webhook-dispatcher.js');
+            const result = await dispatchWebhook(routeConfig.rota_id, payload);
             
-            try {
-                responseData = JSON.parse(textRaw);
-            } catch (e) {
-                // Se não for JSON (ex: "Accepted")
-                responseData = { text: textRaw, ok: response.ok };
+            if (!result.ok) {
+                return { success: false, data: result.data || {}, status: result.status };
             }
 
-            if (!response.ok) {
-                return { success: false, data: responseData, status: response.status };
+            return { success: true, data: result.data, status: result.status };
+        } catch (err) {
+            console.error(`[MakeClient] Erro crítico ao enviar POST via dispatcher (Rota: ${routeConfig.rota_id}):`, err);
+            return { success: false, error: err.message };
+        }
+    }
             }
 
             // O Make.com customizado pela FluxAI retorna ok: false em lógicas de bloqueio
