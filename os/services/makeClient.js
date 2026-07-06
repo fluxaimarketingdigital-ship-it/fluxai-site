@@ -68,18 +68,4 @@ export const MakeClient = {
             return { success: false, error: err.message };
         }
     }
-            }
-
-            // O Make.com customizado pela FluxAI retorna ok: false em lógicas de bloqueio
-            if (responseData.ok === false) {
-                return { success: false, data: responseData, status: response.status };
-            }
-
-            return { success: true, data: responseData, status: response.status };
-
-        } catch (networkError) {
-            console.error('[MakeClient] Falha de rede no disparo do webhook:', networkError); // nosonar
-            throw new Error('Não foi possível enviar para o Make. Verifique sua conexão ou a rota em ROTAS_OS_MAKE.');
-        }
-    }
 };
