@@ -376,19 +376,14 @@ window.handleOnboarding = async function(e) {
     let projectId = window.ONBOARDING_CLIENT_ID;
 
     if (window.ONBOARDING_MODE === 'new' || !projectId) {
-        // Geração rigorosa de client_id (NOME_CLIENTE_YYYY_MM_XXX)
-        const date = new Date();
-        const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0');
-        const cryptoArray = new Uint32Array(1);
-        globalThis.crypto.getRandomValues(cryptoArray);
-        const randomStr = String(cryptoArray[0] % 1000).padStart(3, '0');
+        // Geração rigorosa de client_id (NOME_CLIENTE_001)
         const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
         
-        if (safeName === 'FLUXAI_LABS' || safeName === 'FLUXAILABS' || safeName === 'FLUXAI') {
+        if (safeName === 'FLUXAI_LABS' || safeName === 'FLUXAI') {
             projectId = 'FLUXAI_LABS_001';
         } else {
-            projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
+            // Cliente Pagante: Nome + Padrão 001
+            projectId = safeName + '_001';
         }
     }
 
