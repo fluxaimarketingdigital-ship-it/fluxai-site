@@ -537,7 +537,7 @@
             try {
                 _supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
 
-                const { data: c, error } = await _supabaseClient.from('content_assets').select('*').eq('id', id).single();
+                const { data: c, error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO').select('*').eq('planejamento_id', id).single();
                 
                 if (error || !c) throw new Error('Conteúdo não encontrado.');
 
@@ -841,7 +841,7 @@
                             updateData.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
                         }
 
-                        const { error } = await _supabaseClient.from('content_assets').update(updateData).eq('id', id);
+                        const { error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO').update(updateData).eq('planejamento_id', id);
                         if (error) throw error;
                         
                         showFinalSuccess(nextStatus === 'PRONTO' ? 'Conteúdo Finalizado!' : 'Planejamento Aprovado!', 'A pauta seguiu para a próxima etapa.');
@@ -932,11 +932,11 @@
                             client_approved: false
                         };
 
-                        const { error } = await _supabaseClient.from('content_assets').update({ 
-                            status: nextStatus,
+                        const { error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO').update({ 
+                            status_planejamento: nextStatus,
                             internal_notes: feedback,
                             metadata: updatedMetadata
-                        }).eq('id', id);
+                        }).eq('planejamento_id', id);
 
                         if (error) throw error;
                         showFinalSuccess('Ajuste Solicitado', 'Seus apontamentos foram enviados para nossa equipe técnica. O item está sendo ajustado conforme suas diretrizes.');

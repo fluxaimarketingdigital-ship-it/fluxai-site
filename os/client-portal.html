@@ -880,7 +880,7 @@
                     btn.className = 'btn-nova-demanda';
                     btn.style.cssText = 'padding: 12px 24px; font-size: 0.8rem; background: var(--os-primary); color: #000; flex-shrink: 0;';
                     btn.innerHTML = '<i class="fa-solid fa-eye"></i> Revisar Conteúdo';
-                    btn.onclick = () => window.open(`/os/approval.html?id=${asset.id}`, '_blank');
+                    btn.onclick = () => window.location.href = `/os/approval.html?id=${asset.id}`;
                     
                     div.appendChild(info);
                     div.appendChild(btn);
