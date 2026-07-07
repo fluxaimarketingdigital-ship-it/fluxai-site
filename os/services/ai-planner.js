@@ -523,7 +523,7 @@ ${auditSummary}`;
 
             const priorityValue = (sKey === 'TRAFEGO' || sKey === 'LP' || sKey === 'SITE' || sKey === 'BRANDING' || sKey === 'REELS' || sKey === 'CARROSSEL') ? 'ALTA' : 'MÉDIA';
 
-            contents.push({
+            console.log([DEBUG_CAPTION_TEXT], captionText); contents.push({
                 project_id: projectId,
                 title: `${service.name} • Estratégico`,
                 status: 'PLANEJAMENTO',
