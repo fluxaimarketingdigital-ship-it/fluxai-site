@@ -2123,7 +2123,7 @@ async function runAiPlanner() {
             data_prevista: newAsset.scheduled_at || new Date().toISOString(),
             observacao: 'Rascunho gerado via FluxAI OS',
             data_criacao: new Date().toISOString(),
-            data_atualizacao: new Date().toISOString()
+            data_atualizacao: new Date().toISOString(), metadata: newAsset.metadata
         };
         
         try {
