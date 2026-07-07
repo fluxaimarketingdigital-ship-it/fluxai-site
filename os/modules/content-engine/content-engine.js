@@ -913,7 +913,7 @@ window.openEditModal = async (id) => {
         
         gridDiv.appendChild(leftDiv);
         gridDiv.appendChild(rightDiv);
-        roadmapContainer.appendChild(gridDiv);
+        roadmapContainer.appendChild(gridDiv); socialCopyLabel.style.marginTop = '15px'; roadmapContainer.appendChild(socialCopyLabel); roadmapContainer.appendChild(socialCopyTextarea);
         
         let captionVal = versions[currentVersion]?.caption || c.briefing_resumo || c.caption || '';
         let existingSocialCopy = versions[currentVersion]?.social_copy || c.metadata?.social_copy || '';

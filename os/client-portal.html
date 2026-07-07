@@ -744,7 +744,7 @@
         }
 
         function updateCalendarBadges(assets) {
-            const pendingCount = assets.filter(a => ['PLANEJAMENTO', 'DRAFT_PLANNING', 'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(a.status)).length;
+            const pendingCount = assets.filter(a => ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(a.status)).length;
             const approvedCount = assets.filter(a => {
                 const std = mapToStandardStatus(a.status);
                 return std === 'IN_PRODUCTION' || std === 'INTERNAL_QA' || std === 'READY_TO_POST' || std === 'POSTED';
@@ -830,7 +830,7 @@
                 const { data: assetsRaw, error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO')
                     .select('*')
                     .eq('client_id', projectId)
-                    .in('status_planejamento', ['PLANEJAMENTO', 'DRAFT_PLANNING', 'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT', 'CLIENT_REVISION_PLANNING', 'CLIENT_REVISION_CONTENT']);
+                    .in('status_planejamento', ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT', 'CLIENT_REVISION_PLANNING', 'CLIENT_REVISION_CONTENT']);
                     
                 const assets = (assetsRaw || []).map(a => ({
                     ...a,
