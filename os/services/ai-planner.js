@@ -107,7 +107,7 @@ export const AIPlanner = {
      * Realiza uma auditoria operacional completa baseada na Infraestrutura Digital do cliente
      */
     auditInfrastructure: (project) => {
-        const infra = project.digital_infrastructure || project.metadata?.digital_infrastructure;
+        const infra = project?.digital_infrastructure || project?.metadata?.digital_infrastructure;
         if (!infra) {
             return `[ANÁLISE ECOSSISTEMA FLUXAI OS™]
 - Canais Ativos: Instagram, Site institucional.
@@ -226,17 +226,42 @@ export const AIPlanner = {
         let isDbOnline = false;
 
         try {
-            const { data, error } = await supabase.from('projects').select('*, contracts(*)').eq('id', projectId).single();
-            if (!error && data) {
-                project = data;
+            const { data: dbExisting, error: existingErr } = await supabase.from('PLANEJAMENTO_CONTEUDO')
+                .select('data_prevista, tema, status_planejamento')
+                .eq('client_id', projectId);
+            if (!existingErr) {
+                existing = dbExisting || [];
+            }
+            
+            // Construir mock de project com base nas tabelas novas
+            project = { id: projectId, metadata: { onboarding: {}, operational_activation: {} } };
+            
+            // Buscar limites da IA_CREDITOS_CLIENTE
+            const nowMonth = new Date();
+            const mesRef = `${nowMonth.getFullYear()}-${String(nowMonth.getMonth() + 1).padStart(2, '0')}`;
+            const { data: creditosData } = await supabase.from('IA_CREDITOS_CLIENTE').select('tipo_entrega, limite_operacional_mensal').eq('client_id', projectId).eq('mes_referencia', '2026-07');
+            
+            if (creditosData && creditosData.length > 0) {
+                creditosData.forEach(c => {
+                    const limit = c.limite_operacional_mensal || 0;
+                    project.metadata.onboarding[`escopo_conteudo_${c.tipo_entrega}_qty`] = limit;
+                    if (c.tipo_entrega === 'reels') project.metadata.onboarding.reels_mes = limit;
+                    if (c.tipo_entrega === 'carrossel') project.metadata.onboarding.carrosseis_mes = limit;
+                    if (c.tipo_entrega === 'story') project.metadata.onboarding.stories_mes = limit;
+                });
                 isDbOnline = true;
-                
-                const { data: dbExisting, error: existingErr } = await supabase.from('PLANEJAMENTO_CONTEUDO')
-                    .select('data_prevista, tema, status_planejamento')
-                    .eq('client_id', projectId);
-                if (!existingErr) {
-                    existing = dbExisting || [];
-                }
+            }
+            
+            // Buscar DNA do Cliente
+            const { data: dnaData } = await supabase.from('DNA_CLIENTE_GPT').select('*').eq('client_id', projectId).single();
+            if (dnaData) {
+                project.metadata.onboarding.icp = dnaData.publico_alvo;
+                project.metadata.onboarding.voice_tone = dnaData.tom_de_voz;
+                project.metadata.onboarding.primary_pain = dnaData.desafios_cliente;
+                project.metadata.operational_activation.dna = {
+                    desired_patterns: dnaData.referencias_conteudo,
+                    anti_patterns: dnaData.temas_proibidos
+                };
             }
         } catch (e) {
             console.warn('Erro ao acessar o banco de dados no planejador IA, buscando mocks locais...', e);
