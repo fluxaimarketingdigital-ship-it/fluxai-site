@@ -771,14 +771,14 @@ window.openEditModal = async (id) => {
         currentAssetData = c;
         const std = mapToStandardStatus(c.status);
         
-        // 1. Configurar título
-        document.getElementById('edit-asset-title').value = c.title;
-        document.getElementById('edit-asset-ref').value = c.metadata?.reference_url || '';
-        document.getElementById('edit-asset-art-final').value = c.metadata?.final_asset_url || '';
+        // 1. Configurar título (compatível com nova tabela PLANEJAMENTO_CONTEUDO)
+        document.getElementById('edit-asset-title').value = c.tema || c.title || '';
+        document.getElementById('edit-asset-ref').value = c.link_briefing_drive || c.metadata?.reference_url || '';
+        document.getElementById('edit-asset-art-final').value = c.link_entrega_drive || c.metadata?.final_asset_url || '';
         
         // 2. Tratar Versões e Histórico
         const versions = c.metadata?.versions || {
-            'V1': { caption: c.caption || '', locked: false }
+            'V1': { caption: c.briefing_resumo || c.caption || '', locked: false }
         };
         
         const currentVersion = c.metadata?.version || 'V1';
@@ -1198,12 +1198,14 @@ window.saveAssetEdit = async () => {
             nextStatus = 'APROVAÇÃO FINAL';
         }
 
+        const finalCaption = versions[currentAssetData.metadata?.version || 'V1']?.caption || caption;
         let updatePayload = {
-            title,
-            caption: versions[currentAssetData.metadata?.version || 'V1']?.caption || caption,
-            priority,
-            metadata: newMetadata,
-            status_planejamento: nextStatus
+            tema: title,
+            briefing_resumo: finalCaption,
+            status_planejamento: nextStatus,
+            link_briefing_drive: ref,
+            link_entrega_drive: artFinal,
+            observacao: socialCopy
         };
 
         const currentLogical = mapToStandardStatus(currentAssetData.status).toLowerCase();
