@@ -260,10 +260,17 @@ function switchTab(tab) {
 async function loadProjects() {
     try {
         const supabase = getSupabase();
-        const { data: projects, error } = await supabase.from('projects').select('*').eq('status', 'ATIVO');
+        // Updated to use CLIENTES_ESTRATEGIA (new architecture)
+        const { data: projects, error } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('status', 'ATIVO');
         if (error) throw error;
 
-        window.allProjects = projects || [];
+        // Map the new fields to the expected format
+        window.allProjects = (projects || []).map(p => ({
+            id: p.client_id,
+            name: p.cliente_nome || p.client_id,
+            company_name: p.cliente_nome || p.client_id,
+            status: p.status
+        }));
         localStorage.setItem('fluxai_supabase_projects', JSON.stringify(window.allProjects));
 
         const select = document.getElementById('project-filter');
