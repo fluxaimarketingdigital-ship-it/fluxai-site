@@ -26,6 +26,34 @@
         #loading-overlay { position: fixed; inset: 0; background: #000; z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; }
         .spinner { width: 30px; height: 30px; border: 2px solid rgba(107, 122, 69, 0.1); border-top-color: var(--os-primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
+        
+        /* Checkbox Personalizado da Governança */
+        .flux-checkbox {
+            width: 24px;
+            height: 24px;
+            appearance: none;
+            -webkit-appearance: none;
+            background: rgba(0,0,0,0.5);
+            border: 2px solid #333;
+            border-radius: 6px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+        .flux-checkbox:checked {
+            background: var(--os-primary);
+            border-color: var(--os-primary);
+        }
+        .flux-checkbox:checked::after {
+            content: '✔';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #000;
+            font-size: 14px;
+            font-weight: 900;
+        }
     </style>
 
     <!-- Favicon -->
@@ -312,15 +340,15 @@
                     <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
                         <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
                             <label style="font-size:0.55rem; color:var(--os-text-muted); font-weight:800; letter-spacing:0.5px; margin:0;">1. ESTRATÉGICA (NARRATIVA)</label>
-                            <input type="checkbox" id="approve-strategic" style="width:18px; height:18px; accent-color:var(--os-primary); margin:0; cursor:pointer;">
+                            <input type="checkbox" id="approve-strategic" class="flux-checkbox">
                         </div>
                         <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
                             <label style="font-size:0.55rem; color:var(--os-text-muted); font-weight:800; letter-spacing:0.5px; margin:0;">2. OPERACIONAL (TÉCNICA)</label>
-                            <input type="checkbox" id="approve-operational" style="width:18px; height:18px; accent-color:var(--os-primary); margin:0; cursor:pointer;">
+                            <input type="checkbox" id="approve-operational" class="flux-checkbox">
                         </div>
                         <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
                             <label style="font-size:0.55rem; color:var(--os-text-muted); font-weight:800; letter-spacing:0.5px; margin:0;">3. CLIENTE (FINAL)</label>
-                            <input type="checkbox" id="approve-client" style="width:18px; height:18px; accent-color:var(--os-primary); margin:0; cursor:pointer;">
+                            <input type="checkbox" id="approve-client" class="flux-checkbox">
                         </div>
                     </div>
                 </div>
