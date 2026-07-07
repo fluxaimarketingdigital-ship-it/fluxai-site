@@ -768,6 +768,7 @@ window.openEditModal = async (id) => {
     }
 
     if (c) {
+        console.log('[DEBUG] Dados carregados do banco/local:', c);
         currentAssetData = c;
         const std = mapToStandardStatus(c.status);
         
@@ -915,7 +916,7 @@ window.openEditModal = async (id) => {
         roadmapContainer.appendChild(gridDiv);
         
         let captionVal = versions[currentVersion]?.caption || c.briefing_resumo || c.caption || '';
-        let existingSocialCopy = versions[currentVersion]?.social_copy || c.observacao || c.metadata?.social_copy || '';
+        let existingSocialCopy = versions[currentVersion]?.social_copy || c.metadata?.social_copy || '';
         
         // Auto-extração da legenda da pauta se a legenda final estiver vazia
         if (!existingSocialCopy && captionVal) {
