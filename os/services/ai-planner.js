@@ -94,6 +94,12 @@ export const AIPlanner = {
             external_name: 'outro',
             platform: 'GOV', 
             template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🩺 DIAGNÓSTICO MUNICIPAL: [IA]\n⚙️ ESTRUTURA OPERACIONAL: [IA]\n⛓️ FLUXOS PÚBLICOS: [IA]\n🌐 SERVIÇOS DIGITAIS: [IA]\n🏛️ GOVERNANÇA: [IA]\n👥 EXPERIÊNCIA DO CIDADÃO: [IA]\n📊 PAINÉIS EXECUTIVOS: [IA]\n🏗️ INFRAESTRUTURA PÚBLICA: [IA]' 
+        },
+        'LINKEDIN': { 
+            name: 'Publicação Estratégica B2B (LinkedIn)', 
+            external_name: 'post_linkedin',
+            platform: 'LINKEDIN', 
+            template: '📍 DIREÇÃO ESTRATÉGICA: [OBJ]\n🎯 OBJETIVO: [OBJ]\n📢 HEADLINE DE IMPACTO: [IA]\n📊 INSIGHT/MÉTRICA CHAVE: [IA]\n📝 TEXTO COMPACTO (B2B): [IA]\n💡 LIÇÃO OPERACIONAL: [IA]\n🚀 CTA E NETWORKING: [IA]\n# HASHTAGS B2B: [IA]' 
         }
     },
 
@@ -225,9 +231,9 @@ export const AIPlanner = {
                 project = data;
                 isDbOnline = true;
                 
-                const { data: dbExisting, error: existingErr } = await supabase.from('content_assets')
-                    .select('scheduled_at, title, status')
-                    .eq('project_id', projectId);
+                const { data: dbExisting, error: existingErr } = await supabase.from('PLANEJAMENTO_CONTEUDO')
+                    .select('data_prevista, tema, status_planejamento')
+                    .eq('client_id', projectId);
                 if (!existingErr) {
                     existing = dbExisting || [];
                 }
@@ -267,7 +273,7 @@ export const AIPlanner = {
         const dnaAnti = opsActivation.dna?.anti_patterns ? (Array.isArray(opsActivation.dna.anti_patterns) ? opsActivation.dna.anti_patterns.join(', ') : opsActivation.dna.anti_patterns) : "Amadorismo";
 
         const occupiedDates = (existing || []).map(e => {
-            const d = new Date(e.scheduled_at);
+            const d = new Date(e.scheduled_at || e.data_prevista);
             return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
         });
 
@@ -291,7 +297,8 @@ export const AIPlanner = {
                 'anuncio': 'TRAFEGO',
                 'relatorio': 'DASHBOARD',
                 'planejamento': 'BRANDING',
-                'copy': 'CARD'
+                'copy': 'CARD',
+                'linkedin': 'LINKEDIN'
             };
 
             let totalContractLimit = 0;

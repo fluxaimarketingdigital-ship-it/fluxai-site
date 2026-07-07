@@ -497,7 +497,12 @@ async function loadContent() {
         const { data: contents, error } = await query.order('data_prevista', { ascending: true });
         if (error) throw error;
 
-        window.loadedContents = contents || [];
+        // Normalização: Garante que os componentes do sistema acessem as chaves .id e .status sem quebrar
+        window.loadedContents = (contents || []).map(c => ({
+            ...c,
+            id: c.planejamento_id || c.id,
+            status: c.status_planejamento || c.status
+        }));
         renderMetrics(window.loadedContents);
         renderContentTable(window.loadedContents);
         
@@ -748,7 +753,7 @@ window.openEditModal = async (id) => {
     
     let c = null;
     try {
-        const res = await supabase.from('content_assets').select('*').eq('id', id).single();
+        const res = await supabase.from('PLANEJAMENTO_CONTEUDO').select('*').eq('planejamento_id', id).single();
         c = res.data;
     } catch (e) {
         const local = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
@@ -1087,7 +1092,7 @@ window.rejectAndFreezeVersion = async (id) => {
         };
 
         const updatePayload = {
-            status: nextStatus,
+            status_planejamento: nextStatus,
             metadata: updatedMetadata
         };
 
@@ -1097,7 +1102,7 @@ window.rejectAndFreezeVersion = async (id) => {
         const supabase = getSupabase();
         let error = null;
         try {
-            const res = await supabase.from('content_assets').update(updatePayload).eq('id', id);
+            const res = await supabase.from('PLANEJAMENTO_CONTEUDO').update(updatePayload).eq('planejamento_id', id);
             error = res.error;
         } catch (e) {
             error = e;
@@ -1191,7 +1196,7 @@ window.saveAssetEdit = async () => {
             caption: versions[currentAssetData.metadata?.version || 'V1']?.caption || caption,
             priority,
             metadata: newMetadata,
-            status: nextStatus
+            status_planejamento: nextStatus
         };
 
         const currentLogical = mapToStandardStatus(currentAssetData.status).toLowerCase();
@@ -1438,7 +1443,7 @@ window.saveAssetEdit = async () => {
         const supabase = getSupabase();
         let error = null;
         try {
-            const res = await supabase.from('content_assets').update(updatePayload).eq('id', editingAssetId);
+            const res = await supabase.from('PLANEJAMENTO_CONTEUDO').update(updatePayload).eq('planejamento_id', editingAssetId);
             error = res.error;
         } catch (e) {
             error = e;
@@ -1753,7 +1758,7 @@ window.forceReady = async (id) => {
         const supabase = getSupabase();
         let error = null;
         try {
-            const res = await supabase.from('content_assets').update({ status: 'READY_TO_POST' }).eq('id', id);
+            const res = await supabase.from('PLANEJAMENTO_CONTEUDO').update({ status_planejamento: 'READY_TO_POST' }).eq('planejamento_id', id);
             error = res.error;
         } catch (e) {
             error = e;
@@ -1939,7 +1944,7 @@ window.deleteAsset = async (id) => {
         const supabase = getSupabase();
         let error = null;
         try {
-            const res = await supabase.from('content_assets').update({ status: 'DESCARTADO' }).eq('id', id);
+            const res = await supabase.from('PLANEJAMENTO_CONTEUDO').update({ status_planejamento: 'DESCARTADO' }).eq('planejamento_id', id);
             error = res.error;
         } catch (e) {
             error = e;
@@ -2498,7 +2503,7 @@ document.getElementById('btn-confirm-pub')?.addEventListener('click', async () =
         const supabase = getSupabase();
         let error = null;
         try {
-            const res = await supabase.from('content_assets').update({ status: 'posted' }).eq('id', id);
+            const res = await supabase.from('PLANEJAMENTO_CONTEUDO').update({ status_planejamento: 'posted' }).eq('planejamento_id', id);
             error = res.error;
         } catch (e) {
             error = e;

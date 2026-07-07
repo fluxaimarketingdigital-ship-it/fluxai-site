@@ -175,8 +175,12 @@ function renderDynamicFields() {
                     <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Planejamento/Mês</label><input type="number" name="escopo_conteudo_planejamento_qty" class="form-control" placeholder="0" value="0"></div>
                 </div>
                 <div class="grid-2">
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. LinkedIn/Mês</label><input type="number" name="escopo_conteudo_linkedin_qty" class="form-control" placeholder="0" value="0"></div>
                     <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Copy/Mês</label><input type="number" name="escopo_conteudo_copy_qty" class="form-control" placeholder="0" value="0"></div>
+                </div>
+                <div class="grid-2">
                     <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Frequência Semanal</label><input type="text" name="escopo_conteudo_weekly_freq" class="form-control" placeholder="Ex: 5x na semana" value="5x na semana"></div>
+                    <div class="form-group"></div>
                 </div>
             </div>`,
         'trafego': `
@@ -441,6 +445,7 @@ window.handleOnboarding = async function(e) {
         reels_mes:                  raw.escopo_conteudo_reels_qty || "",
         carrosseis_mes:             raw.escopo_conteudo_carrossel_qty || "",
         stories_mes:                raw.escopo_conteudo_stories_qty || "",
+        linkedin_mes:               raw.escopo_conteudo_linkedin_qty || "",
         frequencia_semanal:         raw.escopo_conteudo_weekly_freq || "",
 
         // Digital
@@ -504,7 +509,7 @@ window.handleOnboarding = async function(e) {
     const lista_servicos_para_planilha = [];
     
     // 1. Serviços de Conteúdo Recorrente e Entregáveis
-    const entregaveisFields = ['reels', 'carrossel', 'story', 'post_estatico', 'artigo', 'email', 'landing_page', 'anuncio', 'relatorio', 'planejamento', 'copy'];
+    const entregaveisFields = ['reels', 'carrossel', 'story', 'post_estatico', 'artigo', 'email', 'landing_page', 'anuncio', 'relatorio', 'planejamento', 'copy', 'linkedin'];
     entregaveisFields.forEach(field => {
         const fieldName = `escopo_conteudo_${field}_qty`;
         if (raw[fieldName] && Number(raw[fieldName]) > 0) {

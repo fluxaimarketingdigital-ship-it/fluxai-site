@@ -718,13 +718,20 @@
             if (!_supabaseClient || !projectId) return;
             
             try {
-                const { data: assets, error } = await _supabaseClient.from('content_assets')
+                const { data: assetsRaw, error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO')
                     .select('*')
-                    .eq('project_id', projectId);
+                    .eq('client_id', projectId);
                 
                 if (error) throw error;
                 
-                const validAssets = (assets || []).filter(a => {
+                const assets = (assetsRaw || []).map(a => ({
+                    ...a,
+                    id: a.planejamento_id || a.id,
+                    status: a.status_planejamento || a.status,
+                    scheduled_at: a.data_prevista || a.scheduled_at
+                }));
+                
+                const validAssets = assets.filter(a => {
                     const std = mapToStandardStatus(a.status);
                     return std !== 'DESCARTADO';
                 });
@@ -820,10 +827,17 @@
             
             try {
                 // Buscamos apenas os status que requerem ação do cliente
-                const { data: assets, error } = await _supabaseClient.from('content_assets')
+                const { data: assetsRaw, error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO')
                     .select('*')
-                    .eq('project_id', projectId)
-                    .in('status', ['PLANEJAMENTO', 'DRAFT_PLANNING', 'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT']);
+                    .eq('client_id', projectId)
+                    .in('status_planejamento', ['PLANEJAMENTO', 'DRAFT_PLANNING', 'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT', 'CLIENT_REVISION_PLANNING', 'CLIENT_REVISION_CONTENT']);
+                    
+                const assets = (assetsRaw || []).map(a => ({
+                    ...a,
+                    id: a.planejamento_id || a.id,
+                    status: a.status_planejamento || a.status,
+                    scheduled_at: a.data_prevista || a.scheduled_at
+                }));
                     
                 const container = document.getElementById('section-pending-approvals');
                 const list = document.getElementById('pending-approvals-list');
