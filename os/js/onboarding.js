@@ -384,8 +384,15 @@ window.handleOnboarding = async function(e) {
         globalThis.crypto.getRandomValues(cryptoArray);
         const randomStr = String(cryptoArray[0] % 1000).padStart(3, '0');
         const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
-        projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
+        
+        if (safeName === 'FLUXAI_LABS' || safeName === 'FLUXAILABS' || safeName === 'FLUXAI') {
+            projectId = 'FLUXAI_LABS_001';
+        } else {
+            projectId = `${safeName}_${yyyy}_${mm}_${randomStr}`;
+        }
     }
+
+    const isOwner = projectId === 'FLUXAI_LABS_001';
 
     // Captura usuário autenticado para responsavel_fluxai
     const currentSessionUser = await OS_AUTH.check('ADMIN').catch(() => null);
@@ -401,9 +408,9 @@ window.handleOnboarding = async function(e) {
         // Identidade
         client_id:                  projectId,
         client_name:                raw.company_name || "",
-        tipo_cliente:               "cliente_pago",
+        tipo_cliente:               isOwner ? "owner" : "cliente_pago",
         origem:                     "onboarding_os",
-        status_cliente:             "em_onboarding",
+        status_cliente:             isOwner ? "ativo" : "em_onboarding",
         responsavel:                raw.responsible_name || "",
         segmento:                   raw.segment || "",
         objetivo_90_dias:           raw.objective || "",          // Col O
@@ -465,7 +472,7 @@ window.handleOnboarding = async function(e) {
 
         // Operação
         contrato_id:                "CONTRATO_" + projectId,
-        status_contrato:            "rascunho",
+        status_contrato:            isOwner ? "ativo" : "rascunho",
         tipo_contrato:              raw.tipo_contrato || "",
         plano_cliente:              raw.plano_cliente || "",
         aprovador_final:            raw.approval_responsible || "",
@@ -490,8 +497,8 @@ window.handleOnboarding = async function(e) {
 
         // Ativação
         // Ativação
-        status_acesso:              "nao_criado",
-        ia_bloqueada:               true,
+        status_acesso:              isOwner ? "criado" : "nao_criado",
+        ia_bloqueada:               !isOwner,
         risco_operacional:          raw.operational_risk || "",
         pilar_foco_critico:         raw.priority_30d || "",
         primeira_entrega:           raw.first_delivery || "",
