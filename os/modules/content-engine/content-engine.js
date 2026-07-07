@@ -844,7 +844,7 @@ window.openEditModal = async (id) => {
         captionLabel.textContent = 'Roteiro Estratégico (Pauta)';
         const captionTextarea = document.createElement('textarea');
         captionTextarea.id = 'edit-asset-caption';
-        captionTextarea.style.cssText = 'width:100%; height:140px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none; margin-bottom:15px;';
+        captionTextarea.style.cssText = 'width:100%; height:320px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none; resize:none; box-sizing: border-box;';
         leftDiv.appendChild(captionLabel);
         leftDiv.appendChild(captionTextarea);
 
@@ -853,9 +853,7 @@ window.openEditModal = async (id) => {
         socialCopyLabel.textContent = 'Legenda Final (Copy da Rede Social)';
         const socialCopyTextarea = document.createElement('textarea');
         socialCopyTextarea.id = 'edit-asset-social-copy';
-        socialCopyTextarea.style.cssText = 'width:100%; height:140px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none;';
-        leftDiv.appendChild(socialCopyLabel);
-        leftDiv.appendChild(socialCopyTextarea);
+        socialCopyTextarea.style.cssText = 'width:100%; height:140px; background:#0a0a0a; border:1px solid #222; color:#fff; padding:15px; border-radius:8px; font-family:inherit; font-size:0.9rem; line-height:1.6; outline:none; box-sizing: border-box;';
         
         const rightDiv = document.createElement('div');
         const historyLabel = document.createElement('label');
@@ -863,7 +861,7 @@ window.openEditModal = async (id) => {
         historyLabel.textContent = 'Histórico de Feedbacks';
         const historyContainer = document.createElement('div');
         historyContainer.id = 'edit-asset-history';
-        historyContainer.style.cssText = 'height:320px; background:#050505; border:1px solid #222; border-radius:8px; overflow-y:auto; padding: 5px;';
+        historyContainer.style.cssText = 'height:320px; width:100%; box-sizing: border-box; background:#050505; border:1px solid #222; border-radius:8px; overflow-y:auto; padding: 5px;';
         
         const history = c.metadata?.history || [];
         if (history.length > 0) {
