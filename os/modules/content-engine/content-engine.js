@@ -2148,6 +2148,7 @@ async function runAiPlanner() {
         // [NOVO GUARDRAIL OFICIAL - CENÁRIO 13]
         sLog(`[IA_PLANNER] Validando limites oficiais via Guardrail (Make Cenário 13)...`);
         const guardrailPayload = {
+            log_id: crypto.randomUUID(),
             geracao_id: newAsset.id,
             client_id: spreadsheetClientId,
             client_name: client_name_fb,
@@ -2271,6 +2272,7 @@ async function runAiPlanner() {
 
         // Webhook GPT_GERACOES_LOG (Cenário 17)
         const payload17 = {
+            log_id: crypto.randomUUID(),
             geracao_id: newAsset.id,
             client_id: spreadsheetClientId,
             client_name: client_name_fb,
