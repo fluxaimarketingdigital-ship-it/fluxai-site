@@ -2064,13 +2064,20 @@ async function runAiPlanner() {
             throw new Error('Nenhuma pauta pôde ser gerada para o escopo selecionado.');
         }
 
+        // Mapeamento do ID do banco para o código da Planilha do Make
+        const projectMap = {
+            '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
+        };
+        const spreadsheetClientId = projectMap[selectedId] || selectedId;
+
         // Loop por todas as pautas geradas (caso seja CONTRATO, serão várias)
         for (let i = 0; i < generated.length; i++) {
             const newAsset = generated[i];
             
             // Garantir um ID real antes de chamar webhooks e supabase
             if (!newAsset.id) {
-                newAsset.id = crypto.randomUUID();
+                const shortUuid = crypto.randomUUID().substring(0, 8);
+                newAsset.id = `${spreadsheetClientId}-${shortUuid}`;
             }
 
             newAsset.metadata = newAsset.metadata || {};
@@ -2080,21 +2087,12 @@ async function runAiPlanner() {
             const mes_referencia = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
         
         // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
-        // Mapeamento inteligente para os valores exatos da pasta suspensa da Planilha
         let actualServiceKey = serviceKey;
-        // Se for ALL ou CONTRACT, o tipo de entrega de cada ativo gerado pode ser diferente!
-        // Portanto, extraímos a key correta baseando-se no título do ativo gerado (que contém o nome do serviço).
         if (serviceKey === 'ALL' || serviceKey === 'CONTRACT') {
             const entry = Object.entries(AIPlanner.STRATEGIC_MATRIX).find(([k, v]) => newAsset.title.includes(v.name));
             if (entry) actualServiceKey = entry[0];
         }
         let tipo_entrega = AIPlanner.STRATEGIC_MATRIX[actualServiceKey]?.external_name || 'outro';
-
-        // Mapeamento do ID do banco para o código da Planilha do Make
-        const projectMap = {
-            '3acae009-6825-4163-9057-cbe99216cc3b': 'FLUXAI_LABS_001'
-        };
-        const spreadsheetClientId = projectMap[selectedId] || selectedId;
 
         newAsset.metadata.mes_referencia = mes_referencia;
         newAsset.metadata.tipo_entrega = tipo_entrega;
