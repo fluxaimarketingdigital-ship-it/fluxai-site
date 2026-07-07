@@ -914,8 +914,8 @@ window.openEditModal = async (id) => {
         gridDiv.appendChild(rightDiv);
         roadmapContainer.appendChild(gridDiv);
         
-        let captionVal = versions[currentVersion]?.caption || c.caption || '';
-        let existingSocialCopy = versions[currentVersion]?.social_copy || c.metadata?.social_copy || '';
+        let captionVal = versions[currentVersion]?.caption || c.briefing_resumo || c.caption || '';
+        let existingSocialCopy = versions[currentVersion]?.social_copy || c.observacao || c.metadata?.social_copy || '';
         
         // Auto-extração da legenda da pauta se a legenda final estiver vazia
         if (!existingSocialCopy && captionVal) {
@@ -1054,7 +1054,7 @@ window.rejectAndFreezeVersion = async (id) => {
     try {
         const curVer = currentAssetData.metadata?.version || 'V1';
         const versions = currentAssetData.metadata?.versions || {
-            'V1': { caption: currentAssetData.caption || '', locked: false }
+            'V1': { caption: currentAssetData.briefing_resumo || currentAssetData.caption || '', locked: false }
         };
 
         // 1. Travar a versão atual
@@ -1165,7 +1165,7 @@ window.saveAssetEdit = async () => {
 
         const curVer = document.getElementById('edit-asset-version-selector').value;
         const versions = currentAssetData.metadata?.versions || {
-            'V1': { caption: currentAssetData.caption || '', locked: false }
+            'V1': { caption: currentAssetData.briefing_resumo || currentAssetData.caption || '', locked: false }
         };
 
         // Atualizar roteiro na versão selecionada (se não estiver travada)
