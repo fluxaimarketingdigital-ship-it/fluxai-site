@@ -261,7 +261,7 @@ async function loadProjects() {
     try {
         const supabase = getSupabase();
         // Updated to use CLIENTES_ESTRATEGIA (new architecture)
-        const { data: projects, error } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('status', 'ATIVO');
+        const { data: projects, error } = await supabase.from('CLIENTES_ESTRATEGIA').select('*');
         if (error) throw error;
 
         // Map the new fields to the expected format
