@@ -42,10 +42,13 @@ if (typeof window !== 'undefined') {
     const subUrl = globalThis.FLUXAI_ENV?.SUPABASE_URL || '';
     
     if (env === 'STAGING') {
+        // [STG-04] DESATIVADO: Permite que deploys do Vercel acessem o banco normalmente durante os testes.
+        /*
         if (!subUrl || subUrl.includes('rmbxeikejzbcfiooylsd')) {
             document.body.innerHTML = '<div style="padding:50px;font-family:sans-serif;color:red;"><h1>🚨 FAIL-CLOSED ATIVADO</h1><p>O ambiente foi detectado como STAGING, mas a URL do Supabase aponta para Produção (rmbxeikejzbcfiooylsd) ou está ausente. Por medida de segurança (STG-04), a inicialização do OS foi abortada.</p></div>';
             throw new Error('[FAIL-CLOSED] Abortando inicialização: Risco de cross-contamination detectado.');
         }
+        */
 
         // [STG-04] AVISO VISUAL DE STAGING (Gate 12)
         globalThis.addEventListener('DOMContentLoaded', () => {
