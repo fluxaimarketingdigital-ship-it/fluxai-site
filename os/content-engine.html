@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -301,14 +301,14 @@
             <!-- Corpo com scroll -->
             <div style="flex:1; overflow-y:auto; padding:25px 30px;">
 
-                <div class="grid-2" style="margin-bottom: 15px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom: 20px;">
                     <div>
-                        <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800; text-transform:uppercase;">Título do Ativo</label>
-                        <input type="text" id="edit-asset-title" style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+                        <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;">Título do Ativo</label>
+                        <input type="text" id="edit-asset-title" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                     </div>
                     <div>
-                        <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800; text-transform:uppercase;">Seletor de Versões (Histórico)</label>
-                        <select id="edit-asset-version-selector" class="form-control" style="padding:8px 10px; background:#111; color:#fff; border-radius:4px; font-family:'JetBrains Mono', monospace; font-size:0.75rem;">
+                        <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;">Seletor de Versões (Histórico)</label>
+                        <select id="edit-asset-version-selector" class="form-control" style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; font-family:'JetBrains Mono', monospace;">
                             <!-- Injetado via JS -->
                         </select>
                     </div>
@@ -322,32 +322,32 @@
                     <!-- Preenchido via JS (Roteiro + Histórico) -->
                 </div>
 
-                <div class="grid-2" style="margin-bottom: 15px;">
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; margin-bottom: 20px;">
                     <div>
-                        <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800; text-transform:uppercase;">Link de Referência</label>
-                        <input type="url" id="edit-asset-ref" placeholder="https://..." style="width:100%; padding:10px; background:#111; border:1px solid #333; color:#fff; border-radius:4px;">
+                        <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;">Link de Referência</label>
+                        <input type="url" id="edit-asset-ref" placeholder="https://..." style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                     </div>
                     <div>
-                        <label style="display:block; font-size:0.7rem; color:var(--os-text-muted); margin-bottom:5px; font-weight:800; text-transform:uppercase;">LINK DO ENTREGÁVEL / ARTE FINAL</label>
-                        <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive..." style="width:100%; padding:10px; background:#000; border:1px solid var(--os-primary); color:#fff; border-radius:4px;">
+                        <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;">LINK DO ENTREGÁVEL / ARTE FINAL</label>
+                        <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive..." style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
                     </div>
                 </div>
 
                 <!-- Painel de Governança Trilateral -->
-                <div style="background:rgba(255,255,255,0.02); border:1px solid var(--os-border); padding:20px; border-radius:8px; margin-bottom:15px;">
-                    <h4 style="margin:0 0 15px 0; color:var(--os-primary); font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-shield-halved"></i> Matriz de Governança (Aprovações Trilaterais)</h4>
+                <div style="background:var(--os-primary); border:1px solid var(--os-primary); padding:20px; border-radius:8px; margin-bottom:15px;">
+                    <h4 style="margin:0 0 15px 0; color:#fff; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-shield-halved"></i> Matriz de Governança (Aprovações Trilaterais)</h4>
                     
                     <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
-                        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
-                            <label style="font-size:0.55rem; color:var(--os-text-muted); font-weight:800; letter-spacing:0.5px; margin:0;">1. ESTRATÉGICA (NARRATIVA)</label>
+                        <div style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.2); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
+                            <label style="font-size:0.55rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">1. ESTRATÉGICA (NARRATIVA)</label>
                             <input type="checkbox" id="approve-strategic" class="flux-checkbox">
                         </div>
-                        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
-                            <label style="font-size:0.55rem; color:var(--os-text-muted); font-weight:800; letter-spacing:0.5px; margin:0;">2. OPERACIONAL (TÉCNICA)</label>
+                        <div style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.2); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
+                            <label style="font-size:0.55rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">2. OPERACIONAL (TÉCNICA)</label>
                             <input type="checkbox" id="approve-operational" class="flux-checkbox">
                         </div>
-                        <div style="background:rgba(0,0,0,0.3); border:1px solid var(--os-border); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
-                            <label style="font-size:0.55rem; color:var(--os-text-muted); font-weight:800; letter-spacing:0.5px; margin:0;">3. CLIENTE (FINAL)</label>
+                        <div style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.2); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
+                            <label style="font-size:0.55rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">3. CLIENTE (FINAL)</label>
                             <input type="checkbox" id="approve-client" class="flux-checkbox">
                         </div>
                     </div>
