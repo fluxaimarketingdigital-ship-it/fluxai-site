@@ -934,47 +934,51 @@ window.openEditModal = async (id) => {
             metaGrid.replaceChildren();
 
             const respDiv = document.createElement('div');
+            respDiv.style.cssText = 'display:flex; flex-direction:column; justify-content:flex-end;';
             const respLabel = document.createElement('label');
-            respLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;';
+            respLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;';
             respLabel.textContent = 'RESPONSÁVEL';
             const respSel = document.createElement('select');
             respSel.id = 'edit-asset-responsible';
-            respSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;';
+            respSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px;';
             ['Design', 'Audiovisual', 'Estrategista', 'Gestor de Tráfego'].forEach(optTxt => {
                 const opt = document.createElement('option'); opt.value = optTxt; opt.textContent = optTxt; respSel.appendChild(opt);
             });
             respDiv.appendChild(respLabel); respDiv.appendChild(respSel);
             
             const deadlineDiv = document.createElement('div');
+            deadlineDiv.style.cssText = 'display:flex; flex-direction:column; justify-content:flex-end;';
             const deadlineLabel = document.createElement('label');
-            deadlineLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;';
-            deadlineLabel.textContent = 'PRAZO DE APROVAÇÃO';
+            deadlineLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;';
+            deadlineLabel.textContent = 'PRAZO LIMITE';
             const deadlineInput = document.createElement('input');
             deadlineInput.type = 'datetime-local';
             deadlineInput.id = 'edit-asset-deadline';
-            deadlineInput.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;';
+            deadlineInput.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px;';
             deadlineDiv.appendChild(deadlineLabel); deadlineDiv.appendChild(deadlineInput);
             
             const priorityDiv = document.createElement('div');
+            priorityDiv.style.cssText = 'display:flex; flex-direction:column; justify-content:flex-end;';
             const prioLabel = document.createElement('label');
-            prioLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;';
+            prioLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;';
             prioLabel.textContent = 'PRIORIDADE';
             const prioSel = document.createElement('select');
             prioSel.id = 'edit-asset-priority';
-            prioSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;';
+            prioSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px;';
             ['BAIXA', 'MÉDIA', 'ALTA'].forEach(optTxt => {
                 const opt = document.createElement('option'); opt.value = optTxt; opt.textContent = optTxt; prioSel.appendChild(opt);
             });
             priorityDiv.appendChild(prioLabel); priorityDiv.appendChild(prioSel);
             
             const statusDiv = document.createElement('div');
+            statusDiv.style.cssText = 'display:flex; flex-direction:column; justify-content:flex-end;';
             const statusLabel = document.createElement('label');
-            statusLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800;';
-            statusLabel.textContent = 'STATUS OPERACIONAL (GOVERNANÇA)';
+            statusLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;';
+            statusLabel.textContent = 'STATUS (GOVERNANÇA)';
             
             const statusSelect = document.createElement('select');
             statusSelect.id = 'edit-asset-status-selector';
-            statusSelect.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;';
+            statusSelect.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px;';
             
             const currentOpt = document.createElement('option');
             currentOpt.value = c.status;
