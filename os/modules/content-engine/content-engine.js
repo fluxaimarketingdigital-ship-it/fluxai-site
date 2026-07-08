@@ -924,7 +924,7 @@ window.openEditModal = async (id) => {
         const metaGrid = document.getElementById('edit-asset-meta-fields');
         if (metaGrid) {
             metaGrid.style.display = 'grid';
-            metaGrid.style.gridTemplateColumns = 'repeat(5, 1fr)';
+            metaGrid.style.gridTemplateColumns = 'repeat(3, 1fr)';
             metaGrid.style.gap = '20px';
 
             const currentLogical = mapToStandardStatus(c.status).toLowerCase(); 
@@ -1044,10 +1044,10 @@ window.openEditModal = async (id) => {
             scheduledDiv.appendChild(scheduledLabel); scheduledDiv.appendChild(scheduledInput);
             
             metaGrid.appendChild(respDiv);
-            metaGrid.appendChild(scheduledDiv);
-            metaGrid.appendChild(deadlineDiv);
             metaGrid.appendChild(priorityDiv);
             metaGrid.appendChild(statusDiv);
+            metaGrid.appendChild(deadlineDiv);
+            metaGrid.appendChild(scheduledDiv);
 
             document.getElementById('edit-asset-responsible').value = c.metadata?.responsible || 'Design';
             document.getElementById('edit-asset-priority').value = c.priority || 'MÉDIA';
