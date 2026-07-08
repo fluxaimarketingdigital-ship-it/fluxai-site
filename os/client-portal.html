@@ -76,6 +76,12 @@
 
         .nav-btn:hover { background: var(--os-primary); color: #000; transform: scale(1.1); border-color: var(--os-primary); }
 
+        @keyframes pulse-alert {
+            0% { opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+            50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
+            100% { opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+        }
+
         #current-month-display { 
             font-size: 0.75rem; 
             font-weight: 900; 
@@ -823,7 +829,12 @@
                     const evtNode = document.createElement('div');
                     evtNode.className = 'calendar-event';
                     evtNode.onclick = () => window.open(`/os/approval.html?id=${c.id}`, '_blank');
-                    evtNode.style.cssText = `border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px; cursor: pointer;`;
+                    
+                    const stdStatus = mapToStandardStatus(c.status);
+                    const requiresClientAction = ['CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(stdStatus);
+                    const animStyle = requiresClientAction ? 'animation: pulse-alert 2s infinite;' : '';
+                    
+                    evtNode.style.cssText = `border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px; cursor: pointer; ${animStyle}`;
                     
                     const titleNode = document.createElement('div');
                     titleNode.style.cssText = 'font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;';

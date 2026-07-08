@@ -855,7 +855,7 @@
                     const btnReturn = document.createElement('button');
                     btnReturn.className = 'btn-return';
                     btnReturn.innerText = 'VOLTAR AO CALENDÁRIO';
-                    btnReturn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.project_id); };
+                    btnReturn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.client_id); };
                     actionsContainer.appendChild(btnReturn);
                     
                     document.getElementById('success-ui').style.display = 'block';
@@ -1306,7 +1306,7 @@
                     const btnReturn = document.createElement('button');
                     btnReturn.className = 'btn-return';
                     btnReturn.textContent = 'VOLTAR AO CALENDÁRIO';
-                    btnReturn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.project_id); };
+                    btnReturn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.client_id); };
                     actionsContainer.appendChild(btnReturn);
                     
                     document.getElementById('success-ui').style.display = 'block';
