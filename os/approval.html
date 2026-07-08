@@ -880,7 +880,7 @@
                         
                         await executeTransition(c, nextStatus, logicalTarget);
 
-                        const updateData = { status: nextStatus };
+                        const updateData = { status_planejamento: nextStatus };
                         if (nextStatus === 'PRODUÇÃO') {
                             updateData.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
                         }
@@ -978,7 +978,6 @@
 
                         const { error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO').update({ 
                             status_planejamento: nextStatus,
-                            internal_notes: feedback,
                             metadata: updatedMetadata
                         }).eq('planejamento_id', id);
 
