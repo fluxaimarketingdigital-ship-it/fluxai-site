@@ -885,7 +885,7 @@
                     
                     const title = document.createElement('div');
                     title.style.cssText = 'font-weight: 800; font-size: 1.1rem; color: #fff; margin-bottom: 8px;';
-                    title.textContent = asset.title || 'Ativo Sem Título';
+                    title.textContent = asset.tema || asset.title || 'Ativo Sem Título';
                     
                     const meta = document.createElement('div');
                     meta.style.cssText = 'font-size: 0.8rem; color: var(--os-text-muted); display: flex; gap: 20px; flex-wrap: wrap;';

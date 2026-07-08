@@ -760,6 +760,7 @@ window.openEditModal = async (id) => {
     }
 
     if (c) {
+        c.status = c.status_planejamento || c.status;
         console.log('[DEBUG] Dados carregados do banco/local:', c);
         currentAssetData = c;
         const std = mapToStandardStatus(c.status);

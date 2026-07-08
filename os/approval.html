@@ -696,11 +696,17 @@
                     deadlineEl.innerText = 'S/ Prazo';
                 }
 
-                const pubDate = new Date(c.scheduled_at);
-                const pubFormatted = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + pubDate.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
-                document.getElementById('meta-time').innerText = pubFormatted;
+                let rawDate = c.data_publicacao || c.data_prevista || c.scheduled_at;
+                if (rawDate) {
+                    const pubDate = new Date(rawDate);
+                    const pubFormatted = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + pubDate.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
+                    document.getElementById('meta-time').innerText = pubFormatted;
+                } else {
+                    document.getElementById('meta-time').innerText = 'Sem data';
+                }
                 
-                let roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
+                let rawCaption = c.briefing_resumo || c.caption || '';
+                let roadmap = rawCaption ? rawCaption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
                 const captionEl = document.getElementById('asset-caption');
                 captionEl.replaceChildren();
 
@@ -1116,11 +1122,17 @@
                     deadlineEl.innerText = 'S/ Prazo';
                 }
 
-                const pubDate = new Date(c.scheduled_at);
-                const pubFormatted = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + pubDate.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
-                document.getElementById('meta-time').innerText = pubFormatted;
+                let rawDate2 = c.data_publicacao || c.data_prevista || c.scheduled_at;
+                if (rawDate2) {
+                    const pubDate = new Date(rawDate2);
+                    const pubFormatted = pubDate.toLocaleString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' às ' + pubDate.toLocaleString('pt-BR', { hour: '2-digit', minute: '2-digit' }) + 'h';
+                    document.getElementById('meta-time').innerText = pubFormatted;
+                } else {
+                    document.getElementById('meta-time').innerText = 'Sem data';
+                }
                 
-                let roadmap = c.caption ? c.caption.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
+                let rawCaption2 = c.briefing_resumo || c.caption || '';
+                let roadmap = rawCaption2 ? rawCaption2.split('📝 LEGENDA:')[0].trim() : 'Diretriz estratégica em definição.';
                 roadmap = roadmap
                     .replace(/🎯 OBJETIVO:/g, '<b style="color:var(--os-primary);">🎯 OBJETIVO:</b>')
                     .replace(/🎬 HOOK:/g, '<br><b style="color:var(--os-primary);">🎬 HOOK:</b>')
