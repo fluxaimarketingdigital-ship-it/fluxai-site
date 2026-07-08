@@ -77,9 +77,9 @@
         .nav-btn:hover { background: var(--os-primary); color: #000; transform: scale(1.1); border-color: var(--os-primary); }
 
         @keyframes pulse-alert {
-            0% { opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
-            50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(245, 158, 11, 0); }
-            100% { opacity: 1; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+            0% { transform: scale(1); box-shadow: 0 0 10px rgba(245, 158, 11, 0.6); background: rgba(255,255,255,0.02); border-color: rgba(245, 158, 11, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 25px rgba(245, 158, 11, 1); background: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 1); }
+            100% { transform: scale(1); box-shadow: 0 0 10px rgba(245, 158, 11, 0.6); background: rgba(255,255,255,0.02); border-color: rgba(245, 158, 11, 0.4); }
         }
 
         #current-month-display { 
@@ -366,13 +366,6 @@
             </div>
         </div>
 
-        <!-- APROVAÇÕES PENDENTES -->
-        <div class="portal-section" id="section-pending-approvals" style="display: none;">
-            <div class="section-title"><i class="fa-solid fa-clipboard-check"></i> Aguardando Sua Aprovação</div>
-            <div id="pending-approvals-list" style="display: flex; flex-direction: column; gap: 15px;">
-                <!-- Itens injetados via JS -->
-            </div>
-        </div>
 
         <!-- MODAL NOVA DEMANDA -->
         <div id="modal-demanda" class="os-modal">
@@ -439,15 +432,6 @@
             </div>
         </div>
 
-        <!-- APROVAÇÕES PENDENTES -->
-        <div class="portal-section" id="section-pending-approvals" style="display: none; border: 1px solid rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.05); border-radius: 8px; padding: 20px;">
-            <div class="section-title" style="color: #f59e0b; margin-bottom: 15px;">
-                <i class="fa-solid fa-triangle-exclamation"></i> Aguardando Sua Aprovação
-            </div>
-            <div id="pending-approvals-list" style="display: flex; flex-direction: column; gap: 10px;">
-                <!-- Injetado via JS -->
-            </div>
-        </div>
 
         <!-- WORKSPACE ESTRATÉGICO (CALENDÁRIO MENSAL) -->
         <div class="portal-section">
@@ -828,7 +812,7 @@
                     
                     const evtNode = document.createElement('div');
                     evtNode.className = 'calendar-event';
-                    evtNode.onclick = () => window.open(`/os/approval.html?id=${c.id}`, '_blank');
+                    evtNode.onclick = () => window.location.href = `/os/approval.html?id=${c.id}`;
                     
                     const stdStatus = mapToStandardStatus(c.status);
                     const requiresClientAction = ['CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(stdStatus);
@@ -1333,6 +1317,13 @@
         window.copyPixKey = copyPixKey;
 
         init();
+
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+                console.log('Returned via back button, refreshing data...');
+                loadData();
+            }
+        });
     </script>
 
     <!-- MODAL PIX PREMIUM -->

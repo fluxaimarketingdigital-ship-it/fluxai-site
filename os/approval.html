@@ -230,13 +230,16 @@
 <body>
 
     <div class="approval-container" id="main-ui" style="display:none;">
-        <div class="header">
-            <div>
-                <h1>FluxAI <span>OS™</span></h1>
-                <p style="font-size:0.7rem; opacity:0.5; margin:5px 0 0 0;" id="portal-subtitle">APROVAÇÃO DE PLANEJAMENTO</p>
-            </div>
-            <div id="status-badge-container">
-                <!-- Status Badge Injected -->
+        <div class="header" style="display:flex; flex-direction:column; align-items:flex-start; gap:10px;">
+            <button onclick="window.history.back()" style="background: transparent; border: 1px solid var(--os-border); color: var(--os-text-muted); padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; cursor: pointer; transition: 0.2s;"><i class="fa-solid fa-arrow-left"></i> VOLTAR AO CALENDÁRIO</button>
+            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
+                <div>
+                    <h1 style="margin:0;">FluxAI <span>OS™</span></h1>
+                    <p style="font-size:0.7rem; opacity:0.5; margin:5px 0 0 0;" id="portal-subtitle">APROVAÇÃO DE PLANEJAMENTO</p>
+                </div>
+                <div id="status-badge-container">
+                    <!-- Status Badge Injected -->
+                </div>
             </div>
         </div>
 
