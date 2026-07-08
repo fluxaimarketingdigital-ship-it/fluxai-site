@@ -322,38 +322,38 @@
                     <!-- Preenchido via JS (Roteiro + Histórico) -->
                 </div>
 
-                <div style="display:flex; flex-direction:column; gap:20px; margin-bottom: 20px;">
-                    <div>
-                        <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;">Link de Referência</label>
-                        <input type="url" id="edit-asset-ref" placeholder="https://..." style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
+                <div style="display:flex; flex-direction:column; gap:15px; margin-bottom: 25px;">
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid var(--os-border);">
+                        <label style="display:flex; align-items:center; gap:8px; font-size:0.65rem; color:var(--os-text-muted); margin-bottom:10px; letter-spacing:1px; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-link" style="color:var(--os-primary);"></i> Link de Referência</label>
+                        <input type="url" id="edit-asset-ref" placeholder="https://..." style="width:100%; padding:12px; background:#0b0b0b; border:1px solid #222; color:#fff; font-size:0.8rem; border-radius:6px; transition: border-color 0.2s;">
                     </div>
-                    <div>
-                        <label style="display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; text-transform:uppercase;">LINK DO ENTREGÁVEL / ARTE FINAL</label>
-                        <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive..." style="width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px;">
+                    <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; border: 1px solid var(--os-border);">
+                        <label style="display:flex; align-items:center; gap:8px; font-size:0.65rem; color:var(--os-text-muted); margin-bottom:10px; letter-spacing:1px; font-weight:800; text-transform:uppercase;"><i class="fa-solid fa-folder-open" style="color:var(--os-primary);"></i> LINK DO ENTREGÁVEL / ARTE FINAL</label>
+                        <input type="url" id="edit-asset-art-final" placeholder="Link do Canva / Drive..." style="width:100%; padding:12px; background:#0b0b0b; border:1px solid #222; color:#fff; font-size:0.8rem; border-radius:6px; transition: border-color 0.2s;">
                     </div>
                 </div>
 
                 <!-- Painel de Governança Trilateral -->
-                <div style="background:var(--os-primary); border:1px solid var(--os-primary); padding:20px; border-radius:8px; margin-bottom:15px;">
-                    <h4 style="margin:0 0 15px 0; color:#fff; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-shield-halved"></i> Matriz de Governança (Aprovações Trilaterais)</h4>
+                <div style="background:linear-gradient(145deg, rgba(142, 158, 104, 0.1), rgba(0,0,0,0.3)); border:1px solid var(--os-primary); padding:20px; border-radius:8px; margin-bottom:20px;">
+                    <h4 style="margin:0 0 15px 0; color:var(--os-primary); font-size:0.75rem; font-weight:900; text-transform:uppercase; letter-spacing:1px;"><i class="fa-solid fa-shield-halved"></i> Matriz de Governança (Aprovações Trilaterais)</h4>
                     
                     <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:15px;">
-                        <div style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.2); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
-                            <label style="font-size:0.55rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">1. ESTRATÉGICA (NARRATIVA)</label>
-                            <input type="checkbox" id="approve-strategic" class="flux-checkbox">
+                        <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(142, 158, 104, 0.3); padding:15px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; transition: all 0.2s;">
+                            <label style="font-size:0.6rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">1. ESTRATÉGICA (NARRATIVA)</label>
+                            <input type="checkbox" id="approve-strategic" class="flux-checkbox" style="transform: scale(1.2);">
                         </div>
-                        <div style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.2); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
-                            <label style="font-size:0.55rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">2. OPERACIONAL (TÉCNICA)</label>
-                            <input type="checkbox" id="approve-operational" class="flux-checkbox">
+                        <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(142, 158, 104, 0.3); padding:15px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; transition: all 0.2s;">
+                            <label style="font-size:0.6rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">2. OPERACIONAL (TÉCNICA)</label>
+                            <input type="checkbox" id="approve-operational" class="flux-checkbox" style="transform: scale(1.2);">
                         </div>
-                        <div style="background:rgba(0,0,0,0.2); border:1px solid rgba(255,255,255,0.2); padding:12px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
-                            <label style="font-size:0.55rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">3. CLIENTE (FINAL)</label>
-                            <input type="checkbox" id="approve-client" class="flux-checkbox">
+                        <div style="background:rgba(0,0,0,0.4); border:1px solid rgba(142, 158, 104, 0.3); padding:15px; border-radius:6px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; transition: all 0.2s;">
+                            <label style="font-size:0.6rem; color:#fff; font-weight:800; letter-spacing:0.5px; margin:0;">3. CLIENTE (FINAL)</label>
+                            <input type="checkbox" id="approve-client" class="flux-checkbox" style="transform: scale(1.2);">
                         </div>
                     </div>
                 </div>
 
-                <div id="edit-asset-meta-fields" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:5px;">
+                <div id="edit-asset-meta-fields" style="display:grid; grid-template-columns: repeat(4, 1fr); gap:15px; margin-bottom:10px;">
                     <!-- Preenchido via JS -->
                 </div>
 
