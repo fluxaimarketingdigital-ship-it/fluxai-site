@@ -940,7 +940,7 @@ window.openEditModal = async (id) => {
             respLabel.textContent = 'RESPONSÁVEL';
             const respSel = document.createElement('select');
             respSel.id = 'edit-asset-responsible';
-            respSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px;';
+            respSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px; box-sizing: border-box;';
             ['Design', 'Audiovisual', 'Estrategista', 'Gestor de Tráfego'].forEach(optTxt => {
                 const opt = document.createElement('option'); opt.value = optTxt; opt.textContent = optTxt; respSel.appendChild(opt);
             });
@@ -954,7 +954,7 @@ window.openEditModal = async (id) => {
             const deadlineInput = document.createElement('input');
             deadlineInput.type = 'datetime-local';
             deadlineInput.id = 'edit-asset-deadline';
-            deadlineInput.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px;';
+            deadlineInput.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px; box-sizing: border-box;';
             deadlineDiv.appendChild(deadlineLabel); deadlineDiv.appendChild(deadlineInput);
             
             const priorityDiv = document.createElement('div');
@@ -964,7 +964,7 @@ window.openEditModal = async (id) => {
             prioLabel.textContent = 'PRIORIDADE';
             const prioSel = document.createElement('select');
             prioSel.id = 'edit-asset-priority';
-            prioSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px;';
+            prioSel.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px; box-sizing: border-box;';
             ['BAIXA', 'MÉDIA', 'ALTA'].forEach(optTxt => {
                 const opt = document.createElement('option'); opt.value = optTxt; opt.textContent = optTxt; prioSel.appendChild(opt);
             });
@@ -978,7 +978,7 @@ window.openEditModal = async (id) => {
             
             const statusSelect = document.createElement('select');
             statusSelect.id = 'edit-asset-status-selector';
-            statusSelect.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px;';
+            statusSelect.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px; box-sizing: border-box;';
             
             const currentOpt = document.createElement('option');
             currentOpt.value = c.status;
