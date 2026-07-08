@@ -717,7 +717,6 @@
             document.getElementById('val-roi').innerText = '1.8x';
 
             await loadClientCalendar();
-            await renderPendingApprovals();
             await renderFinanceList();
             await checkFinancialAlerts();
         }
@@ -735,6 +734,7 @@
                 const assets = (assetsRaw || []).map(a => ({
                     ...a,
                     id: a.planejamento_id || a.id,
+                    title: a.tema || a.title,
                     status: a.status_planejamento || a.status,
                     scheduled_at: a.data_prevista || a.scheduled_at
                 }));
@@ -822,7 +822,7 @@
                     
                     const titleNode = document.createElement('div');
                     titleNode.style.cssText = 'font-weight: 800; color: #fff; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;';
-                    titleNode.textContent = c.title ? c.title.substring(0, 15) : 'Pauta';
+                    titleNode.textContent = c.tema ? c.tema.substring(0, 15) : (c.title ? c.title.substring(0, 15) : 'Pauta');
                     
                     evtNode.appendChild(titleNode);
                     dayDiv.appendChild(evtNode);
@@ -838,83 +838,6 @@
             if (currentMonth < 0) { currentMonth = 11; currentYear--; }
             loadClientCalendar();
         };
-
-        async function renderPendingApprovals() {
-            if (!_supabaseClient || !projectId) return;
-            
-            try {
-                // Buscamos apenas os status que requerem ação do cliente
-                const { data: assetsRaw, error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO')
-                    .select('*')
-                    .eq('client_id', projectId)
-                    .in('status_planejamento', [
-                        'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT', 'CLIENT_REVISION_PLANNING', 'CLIENT_REVISION_CONTENT',
-                        'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'AJUSTE', 'AJUSTE DE PRODUÇÃO',
-                        'ENVIADO_CLIENTE', 'APROVADO_INTERNO'
-                    ]);
-                    
-                const assets = (assetsRaw || []).map(a => ({
-                    ...a,
-                    id: a.planejamento_id || a.id,
-                    status: a.status_planejamento || a.status,
-                    scheduled_at: a.data_prevista || a.scheduled_at
-                }));
-                    
-                const container = document.getElementById('section-pending-approvals');
-                const list = document.getElementById('pending-approvals-list');
-                
-                if (error || !assets || assets.length === 0) {
-                    container.style.display = 'none';
-                    return;
-                }
-                
-                container.style.display = 'block';
-                list.replaceChildren();
-                
-                assets.forEach(asset => {
-                    const div = document.createElement('div');
-                    div.style.cssText = 'background: rgba(255,255,255,0.02); border: 1px solid var(--os-border); border-left: 4px solid var(--os-primary); padding: 20px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; gap: 20px; flex-wrap: wrap;';
-                    
-                    const info = document.createElement('div');
-                    info.style.cssText = 'flex: 1; min-width: 200px;';
-                    
-                    const title = document.createElement('div');
-                    title.style.cssText = 'font-weight: 800; font-size: 1.1rem; color: #fff; margin-bottom: 8px;';
-                    title.textContent = asset.tema || asset.title || 'Ativo Sem Título';
-                    
-                    const meta = document.createElement('div');
-                    meta.style.cssText = 'font-size: 0.8rem; color: var(--os-text-muted); display: flex; gap: 20px; flex-wrap: wrap;';
-                    
-                    const stdStatus = mapToStandardStatus(asset.status).toLowerCase();
-                    const statusObj = StatusEngine.resolve('conteudos', stdStatus) || { label: asset.status, color: '#f59e0b' };
-                    
-                    const statusSpan = document.createElement('span');
-                    statusSpan.innerHTML = `<i class="fa-solid fa-clock" style="color: ${statusObj.color};"></i> <strong style="color:#fff;">${statusObj.label}</strong>`;
-                    
-                    const dateSpan = document.createElement('span');
-                    const pubDate = asset.scheduled_at ? new Date(asset.scheduled_at).toLocaleDateString('pt-BR') : 'Sem data';
-                    dateSpan.innerHTML = `<i class="fa-solid fa-calendar"></i> Publicação: ${pubDate}`;
-                    
-                    meta.appendChild(statusSpan);
-                    meta.appendChild(dateSpan);
-                    info.appendChild(title);
-                    info.appendChild(meta);
-                    
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-nova-demanda';
-                    btn.style.cssText = 'padding: 12px 24px; font-size: 0.8rem; background: var(--os-primary); color: #000; flex-shrink: 0;';
-                    btn.innerHTML = '<i class="fa-solid fa-eye"></i> Revisar Conteúdo';
-                    btn.onclick = () => window.location.href = `/os/approval.html?id=${asset.id}`;
-                    
-                    div.appendChild(info);
-                    div.appendChild(btn);
-                    list.appendChild(div);
-                });
-            } catch (err) {
-                console.error("Erro ao renderizar aprovações pendentes:", err);
-            }
-        }
-        
 
         function openDemandaModal() {
             const select = document.getElementById('demanda-tipo');

@@ -493,12 +493,14 @@
         }
 
         async function executeTransition(asset, targetDbStatus, targetLogicalStatus, customFeedback = null) {
-            const currentLogical = mapToStandardStatus(asset.status).toLowerCase();
+            const rawStatus = asset.status_planejamento || asset.status || '';
+            const currentLogical = mapToStandardStatus(rawStatus).toLowerCase();
             const targetLogical = targetLogicalStatus.toLowerCase();
+            const assetId = asset.planejamento_id || asset.id;
             
             const transitionResult = await StatusEngine.transition(
                 'conteudos',
-                asset.id,
+                assetId,
                 currentLogical,
                 targetLogical,
                 { role: 'OPERATOR' }
@@ -531,10 +533,10 @@
             
             const webhookKey = transitionResult.webhook || 'DELIVERY_APPROVAL';
             const payload = {
-                asset_id: asset.id,
-                project_id: asset.project_id,
-                title: asset.title,
-                current_status: asset.status,
+                asset_id: assetId,
+                project_id: asset.project_id || asset.client_id,
+                title: asset.tema || asset.title,
+                current_status: rawStatus,
                 target_status: targetDbStatus,
                 logical_transition: `${currentLogical} -> ${targetLogical}`,
                 feedback: customFeedback,
