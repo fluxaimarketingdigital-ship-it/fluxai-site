@@ -1197,7 +1197,8 @@ window.saveAssetEdit = async () => {
             status_planejamento: nextStatus,
             link_briefing_drive: ref,
             link_entrega_drive: artFinal,
-            observacao: socialCopy
+            observacao: socialCopy,
+            metadata: newMetadata
         };
 
         const currentLogical = mapToStandardStatus(currentAssetData.status).toLowerCase();
