@@ -1422,13 +1422,12 @@
                                                 "data_prevista": "{{1.data_prevista}}",
                                                 "mes_referencia": "{{1.mes_referencia}}",
                                                 "pilar_conteudo": "{{1.pilar_conteudo}}",
-                                                "briefing_resumo": "{{1.legenda}}",
                                                 "data_publicacao": "{{1.data_publicacao}}",
                                                 "planejamento_id": "{{1.planejamento_id}}",
                                                 "data_atualizacao": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}",
                                                 "formato_conteudo": "{{1.formato_conteudo}}",
                                                 "responsavel_copy": "{{1.responsavel_copy}}",
-                                                "objetivo_conteudo": "{{1.briefing_resumo}}",
+                                                "objetivo_conteudo": "{{1.objetivo_conteudo}}",
                                                 "semana_referencia": "{{1.semana_referencia}}",
                                                 "link_entrega_drive": "{{1.link_resultado_drive}}",
                                                 "responsavel_design": "{{1.responsavel_design}}",
@@ -1901,6 +1900,16 @@
                                                         "name": "data_atualizacao",
                                                         "type": "text",
                                                         "label": "data_atualizacao"
+                                                    },
+                                                    {
+                                                        "name": "metadata",
+                                                        "type": "text",
+                                                        "label": "metadata"
+                                                    },
+                                                    {
+                                                        "name": "prioridade",
+                                                        "type": "text",
+                                                        "label": "prioridade"
                                                     }
                                                 ]
                                             }

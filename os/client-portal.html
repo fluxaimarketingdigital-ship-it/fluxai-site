@@ -588,17 +588,25 @@
         }
 
         function mapToStandardStatus(status) {
-            const upper = status.toUpperCase();
+            if (!status) return 'DRAFT_PLANNING';
+            const upper = status.toUpperCase().trim();
+            // Status Make / DB novos
+            if (upper === 'RASCUNHO' || upper === 'RASCUNHO_IA') return 'DRAFT_PLANNING';
+            if (upper === 'EM_REVISAO_FLUXAI' || upper === 'PENDENTE_REVISAO') return 'INTERNAL_REVIEW';
+            if (upper === 'ENVIADO_CLIENTE' || upper === 'APROVADO_INTERNO' || upper === 'APROVAÇÃO PLANEJAMENTO') return 'CLIENT_REVIEW_PLANNING';
+            if (upper === 'APROVADO_CLIENTE') return 'PLANNING_APPROVED';
+            if (upper === 'EM_PRODUCAO') return 'IN_PRODUCTION';
+            if (upper === 'AGENDADO') return 'READY_TO_POST';
+            if (upper === 'PUBLICADO') return 'POSTED';
+            // Status legados
             if (upper === 'PLANEJAMENTO') return 'DRAFT_PLANNING';
             if (upper === 'REVISÃO GESTÃO') return 'INTERNAL_REVIEW';
-            if (upper === 'APROVAÇÃO PLANEJAMENTO') return 'CLIENT_REVIEW_PLANNING';
             if (upper === 'AJUSTE') return 'CLIENT_REVISION_PLANNING';
             if (upper === 'PRODUÇÃO') return 'IN_PRODUCTION';
             if (upper === 'AJUSTE DE PRODUÇÃO') return 'CLIENT_REVISION_CONTENT';
             if (upper === 'REVISÃO INTERNA FINAL') return 'INTERNAL_QA';
             if (upper === 'APROVAÇÃO FINAL') return 'CLIENT_REVIEW_CONTENT';
             if (upper === 'PRONTO') return 'READY_TO_POST';
-            if (upper === 'PUBLICADO') return 'POSTED';
             return upper;
         }
 
@@ -754,7 +762,11 @@
         }
 
         function updateCalendarBadges(assets) {
-            const pendingCount = assets.filter(a => ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'].includes(a.status)).length;
+            const pendingCount = assets.filter(a => {
+                const std = mapToStandardStatus(a.status);
+                return std === 'CLIENT_REVIEW_PLANNING' || std === 'CLIENT_REVIEW_CONTENT';
+            }).length;
+            
             const approvedCount = assets.filter(a => {
                 const std = mapToStandardStatus(a.status);
                 return std === 'IN_PRODUCTION' || std === 'INTERNAL_QA' || std === 'READY_TO_POST' || std === 'POSTED';
@@ -840,7 +852,11 @@
                 const { data: assetsRaw, error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO')
                     .select('*')
                     .eq('client_id', projectId)
-                    .in('status_planejamento', ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT', 'CLIENT_REVISION_PLANNING', 'CLIENT_REVISION_CONTENT']);
+                    .in('status_planejamento', [
+                        'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT', 'CLIENT_REVISION_PLANNING', 'CLIENT_REVISION_CONTENT',
+                        'APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'AJUSTE', 'AJUSTE DE PRODUÇÃO',
+                        'ENVIADO_CLIENTE', 'APROVADO_INTERNO'
+                    ]);
                     
                 const assets = (assetsRaw || []).map(a => ({
                     ...a,
@@ -874,8 +890,11 @@
                     const meta = document.createElement('div');
                     meta.style.cssText = 'font-size: 0.8rem; color: var(--os-text-muted); display: flex; gap: 20px; flex-wrap: wrap;';
                     
+                    const stdStatus = mapToStandardStatus(asset.status).toLowerCase();
+                    const statusObj = StatusEngine.resolve('conteudos', stdStatus) || { label: asset.status, color: '#f59e0b' };
+                    
                     const statusSpan = document.createElement('span');
-                    statusSpan.innerHTML = `<i class="fa-solid fa-clock" style="color: #f59e0b;"></i> <strong style="color:#fff;">${asset.status}</strong>`;
+                    statusSpan.innerHTML = `<i class="fa-solid fa-clock" style="color: ${statusObj.color};"></i> <strong style="color:#fff;">${statusObj.label}</strong>`;
                     
                     const dateSpan = document.createElement('span');
                     const pubDate = asset.scheduled_at ? new Date(asset.scheduled_at).toLocaleDateString('pt-BR') : 'Sem data';

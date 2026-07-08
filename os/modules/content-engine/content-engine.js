@@ -33,50 +33,42 @@ const STATUS_LABELS = {
 
 function mapToStandardStatus(status) {
     if (!status) return 'DRAFT_PLANNING';
-    const upper = status.toUpperCase();
-    // Status da tabela PLANEJAMENTO_CONTEUDO (Make / OS)
-    if (upper === 'RASCUNHO_IA') return 'DRAFT_PLANNING';
-    if (upper === 'PENDENTE_REVISAO') return 'INTERNAL_REVIEW';
-    if (upper === 'APROVADO_INTERNO') return 'CLIENT_REVIEW_PLANNING';
+    const upper = status.toUpperCase().trim();
+    // Status Make / DB novos
+    if (upper === 'RASCUNHO' || upper === 'RASCUNHO_IA') return 'DRAFT_PLANNING';
+    if (upper === 'EM_REVISAO_FLUXAI' || upper === 'PENDENTE_REVISAO') return 'INTERNAL_REVIEW';
+    if (upper === 'ENVIADO_CLIENTE' || upper === 'APROVADO_INTERNO' || upper === 'APROVAÇÃO PLANEJAMENTO') return 'CLIENT_REVIEW_PLANNING';
     if (upper === 'APROVADO_CLIENTE') return 'PLANNING_APPROVED';
-    if (upper === 'REPROVADO') return 'CLIENT_REVISION_PLANNING';
+    if (upper === 'EM_PRODUCAO') return 'IN_PRODUCTION';
+    if (upper === 'AGENDADO') return 'READY_TO_POST';
     if (upper === 'PUBLICADO') return 'POSTED';
     // Status legados da tabela content_assets
     if (upper === 'PLANEJAMENTO') return 'DRAFT_PLANNING';
     if (upper === 'REVISÃO GESTÃO') return 'INTERNAL_REVIEW';
-    if (upper === 'APROVAÇÃO PLANEJAMENTO') return 'CLIENT_REVIEW_PLANNING';
     if (upper === 'AJUSTE') return 'CLIENT_REVISION_PLANNING';
     if (upper === 'PRODUÇÃO') return 'IN_PRODUCTION';
     if (upper === 'AJUSTE DE PRODUÇÃO') return 'CLIENT_REVISION_CONTENT';
     if (upper === 'REVISÃO INTERNA FINAL') return 'INTERNAL_QA';
     if (upper === 'APROVAÇÃO FINAL') return 'CLIENT_REVIEW_CONTENT';
     if (upper === 'PRONTO') return 'READY_TO_POST';
+    // Padrão do sistema
     return upper;
 }
 
-// Mapeia o Status Lógico (ex: DRAFT_PLANNING) para os exatos valores dos Dropdowns no Excel
+// Mapeia o Status Lógico para os Planilhas/DB
+// Agora passamos o status lógico exato para manter a integridade dos dados entre Supabase e Planilha.
 function mapToMakeSpreadsheet(standardStatus, isPostagem = false) {
     const std = standardStatus.toLowerCase();
     
     // Tabela 16: CALENDARIO_POSTAGENS
     if (isPostagem) {
-        if (std === 'ready_to_post') return 'agendado';
-        if (std === 'posted') return 'publicado';
-        return 'rascunho'; // fallback
+        if (std === 'ready_to_post') return 'AGENDADO';
+        if (std === 'posted') return 'PUBLICADO';
+        return 'DRAFT_POST'; // fallback
     }
 
     // Tabela 15: PLANEJAMENTO_CONTEUDO
-    if (std === 'draft_planning' || std === 'internal_revision') return 'rascunho';
-    if (std === 'internal_review') return 'em_revisao_fluxai';
-    if (std === 'client_review_planning' || std === 'client_revision_planning') return 'enviado_cliente';
-    if (std === 'planning_approved') return 'aprovado_cliente';
-    if (std === 'in_production' || std === 'client_revision_content') return 'em_producao';
-    if (std === 'internal_qa') return 'aprovado_interno';
-    if (std === 'client_review_content') return 'enviado_cliente';
-    if (std === 'ready_to_post') return 'agendado';
-    if (std === 'posted') return 'publicado';
-
-    return 'rascunho'; // fallback seguro para o Make não falhar
+    return standardStatus.toUpperCase();
 }
 
 function mapToSpreadsheetFormat(rawFormat) {
