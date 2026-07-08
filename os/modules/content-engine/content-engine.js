@@ -924,7 +924,7 @@ window.openEditModal = async (id) => {
         const metaGrid = document.getElementById('edit-asset-meta-fields');
         if (metaGrid) {
             metaGrid.style.display = 'grid';
-            metaGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+            metaGrid.style.gridTemplateColumns = 'repeat(5, 1fr)';
             metaGrid.style.gap = '20px';
 
             const currentLogical = mapToStandardStatus(c.status).toLowerCase(); 
@@ -985,7 +985,13 @@ window.openEditModal = async (id) => {
             currentOpt.textContent = `${currentStatusObj.label} (Atual)`;
             statusSelect.appendChild(currentOpt);
             
-            allowedTransitions.forEach(target => {
+            const userRoleForDropdown = OS_AUTH.user?.role || 'OPERATOR';
+            let statusesToShow = allowedTransitions;
+            if (userRoleForDropdown === 'ADMIN') {
+                statusesToShow = Object.keys(STATUS_SYSTEM.conteudos);
+            }
+            
+            statusesToShow.forEach(target => {
                 const targetRes = StatusEngine.resolve('conteudos', target); 
                 let dbStatusVal = target.toUpperCase(); 
                 if (target === 'draft_planning') dbStatusVal = 'PLANEJAMENTO'; 
@@ -1016,7 +1022,29 @@ window.openEditModal = async (id) => {
             statusDiv.appendChild(statusLabel);
             statusDiv.appendChild(statusSelect);
             
+            const scheduledDiv = document.createElement('div');
+            scheduledDiv.style.cssText = 'display:flex; flex-direction:column; justify-content:flex-end;';
+            const scheduledLabel = document.createElement('label');
+            scheduledLabel.style.cssText = 'display:block; font-size:0.6rem; color:var(--os-text-muted); margin-bottom:8px; letter-spacing:1px; font-weight:800; white-space:nowrap; text-overflow:ellipsis; overflow:hidden;';
+            scheduledLabel.textContent = 'DATA PREVISTA';
+            const scheduledInput = document.createElement('input');
+            scheduledInput.type = 'datetime-local';
+            scheduledInput.id = 'edit-asset-scheduled';
+            scheduledInput.style.cssText = 'width:100%; padding:10px; background:#000; border:1px solid #333; color:#fff; font-size:0.8rem; border-radius:4px; height: 42px; box-sizing: border-box;';
+            
+            // Format existing data_prevista or scheduled_at for the input
+            const existingDate = c.data_prevista || c.scheduled_at;
+            if (existingDate) {
+                try {
+                    const d = new Date(existingDate);
+                    // Format to YYYY-MM-DDThh:mm
+                    scheduledInput.value = new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+                } catch(e) {}
+            }
+            scheduledDiv.appendChild(scheduledLabel); scheduledDiv.appendChild(scheduledInput);
+            
             metaGrid.appendChild(respDiv);
+            metaGrid.appendChild(scheduledDiv);
             metaGrid.appendChild(deadlineDiv);
             metaGrid.appendChild(priorityDiv);
             metaGrid.appendChild(statusDiv);
@@ -1153,6 +1181,7 @@ window.saveAssetEdit = async () => {
         const responsible = document.getElementById('edit-asset-responsible').value;
         const priority = document.getElementById('edit-asset-priority').value;
         const deadline = document.getElementById('edit-asset-deadline').value;
+        const scheduledAt = document.getElementById('edit-asset-scheduled')?.value || null;
 
         // Carregar checkboxes de aprovação trilateral
         const strat = document.getElementById('approve-strategic').checked;
@@ -1204,6 +1233,10 @@ window.saveAssetEdit = async () => {
             observacao: socialCopy,
             metadata: newMetadata
         };
+        
+        if (scheduledAt) {
+            updatePayload.data_prevista = new Date(scheduledAt).toISOString();
+        }
 
         const currentLogical = mapToStandardStatus(currentAssetData.status).toLowerCase();
         const targetLogical = mapToStandardStatus(nextStatus).toLowerCase();
