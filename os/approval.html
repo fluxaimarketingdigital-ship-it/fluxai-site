@@ -1309,7 +1309,7 @@
                     const btnReturn = document.createElement('button');
                     btnReturn.className = 'btn-return';
                     btnReturn.textContent = 'VOLTAR AO CALENDÁRIO';
-                    btnReturn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.client_id); };
+                    btnReturn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.project_id || c.client_id || ''); };
                     actionsContainer.appendChild(btnReturn);
                     
                     document.getElementById('success-ui').style.display = 'block';
@@ -1327,7 +1327,7 @@
                     try {
                         let nextStatus = 'PRODUÇÃO';
                         let logicalTarget = 'planning_approved';
-                        if (currentStatus === 'APROVAÇÃO FINAL') {
+                        if (currentStatus === 'CLIENT_REVIEW_CONTENT' || currentStatus === 'APROVAÇÃO FINAL') {
                             nextStatus = 'PRONTO';
                             logicalTarget = 'content_approved';
                         }
