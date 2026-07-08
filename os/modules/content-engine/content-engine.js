@@ -2275,7 +2275,9 @@ async function runAiPlanner() {
             prompt_input: 'Gerador OS IA Planner - ' + serviceKey,
             prompt_output: newAsset.caption || '',
             model_used: 'gpt-4o',
-            timestamp: now.toISOString()
+            timestamp: now.toISOString(),
+            tipo_geracao: mapToSpreadsheetFormat(tipo_entrega),
+            mes_referencia: mes_referencia
         };
         const response17 = await OS_CONFIG.webhooks.send('GPT_GERACOES_LOG', payload17);
         if (!response17.success) console.error('[IA_PLANNER] Falha Cenário 17', response17);
