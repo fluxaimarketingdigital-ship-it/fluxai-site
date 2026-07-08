@@ -10,28 +10,7 @@ let currentUser = null;
 
 let localClients = [];
 let currentStatusFilter = 'ALL';
-
-// Configuração persistente em memória e localStorage para simular o banco real do FluxAI OS™
-const DEFAULT_CLIENT_CONFIGS = {
-    'FLUXAI_LABS_001': { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 20, segment: 'Tecnologia & IA' },
-    'CLI_002': { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Indústria High-Ticket' },
-    'CLI_003': { status: 'inativo', iaBlocked: true, automationsPaused: true, iaLimit: 0, segment: 'Finanças & Gestão' }
-};
-
 let catalogServices = [];
-
-function getClientConfigs() {
-    let configs = localStorage.getItem('fluxai_client_configs');
-    if (!configs) {
-        localStorage.setItem('fluxai_client_configs', JSON.stringify(DEFAULT_CLIENT_CONFIGS));
-        return DEFAULT_CLIENT_CONFIGS;
-    }
-    return JSON.parse(configs);
-}
-
-function saveClientConfigs(configs) {
-    localStorage.setItem('fluxai_client_configs', JSON.stringify(configs));
-}
 
 async function initPage() {
     const user = await OS_AUTH.check('OPERATOR');
@@ -272,50 +251,54 @@ function setupEventListeners() {
                 }
 
                 // Se chegamos aqui, o webhook teve sucesso (ou foi simulado/mock).
-                // Agora atualizamos os dados locais.
-                const configs = getClientConfigs();
-                if (!configs[clientId]) {
-                    configs[clientId] = { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Outros', extras: [] };
-                }
-                if (!configs[clientId].extras) {
-                    configs[clientId].extras = [];
-                }
-
-                // Adicionar ao extras
-                const extraLabel = `${serviceName} (${status.replace(/_/g, ' ').toUpperCase()})`;
-                configs[clientId].extras.push(extraLabel);
-
-                // Incremento do limite operacional contratado
+                // Atualizar dados de limite no Supabase se houver addLimit
                 let limitMsg = "";
                 const isRealWebhookSuccess = response.success && !response.simulated;
                 
                 if (addLimit > 0 && (status === 'aprovado' || status === 'em_producao' || status === 'entregue' || impact === 'sim')) {
-                    const oldLimit = configs[clientId].iaLimit;
-                    configs[clientId].iaLimit += addLimit;
-                    limitMsg = ` Limite operacional contratado incrementado em +${addLimit} (Total: ${configs[clientId].iaLimit}).`;
-                    
-                    // Gravar log de governança sobre a alteração de permissão/limites
-                    OS_LOGS_ENGINE.userAction(
-                        'SECURITY_PERMISSIONS_CHANGED',
-                        'clients-list',
-                        { action: 'liberacao_limite_ia_via_servico_extra', servico: serviceName, limite_anterior: oldLimit, limite_adicionado: addLimit, limite_novo: configs[clientId].iaLimit },
-                        role,
-                        clientId,
-                        !isRealWebhookSuccess
-                    );
+                    const supabase = getSupabase();
+                    let currentMetadata = {};
+                    try {
+                        const { data } = await supabase.from('projects').select('metadata').eq('id', clientId).single();
+                        if (data && data.metadata) currentMetadata = data.metadata;
+                    } catch(e) {}
 
-                    // LIMIT_UPDATE_CONFIRMED
-                    OS_LOGS_ENGINE.userAction(
-                        'LIMIT_UPDATE_CONFIRMED',
-                        'clients-list',
-                        { action: 'incremento_limite_operacional_contratado', limite_anterior: oldLimit, limite_adicionado: addLimit, limite_novo: configs[clientId].iaLimit },
-                        role,
-                        clientId,
-                        !isRealWebhookSuccess
-                    );
+                    const oldLimit = currentMetadata.iaLimit !== undefined ? currentMetadata.iaLimit : 10;
+                    const newLimit = oldLimit + addLimit;
+                    currentMetadata.iaLimit = newLimit;
+
+                    try {
+                        await supabase.from('projects').update({ metadata: currentMetadata }).eq('id', clientId);
+                        limitMsg = ` Limite operacional contratado incrementado em +${addLimit} (Total: ${newLimit}).`;
+                        
+                        // Atualiza estado local da UI
+                        const cIdx = localClients.findIndex(c => c.id === clientId);
+                        if (cIdx !== -1) localClients[cIdx].iaLimit = newLimit;
+
+                        // Gravar log de governança sobre a alteração de permissão/limites
+                        OS_LOGS_ENGINE.userAction(
+                            'SECURITY_PERMISSIONS_CHANGED',
+                            'clients-list',
+                            { action: 'liberacao_limite_ia_via_servico_extra', servico: serviceName, limite_anterior: oldLimit, limite_adicionado: addLimit, limite_novo: newLimit },
+                            role,
+                            clientId,
+                            !isRealWebhookSuccess
+                        );
+
+                        // LIMIT_UPDATE_CONFIRMED
+                        OS_LOGS_ENGINE.userAction(
+                            'LIMIT_UPDATE_CONFIRMED',
+                            'clients-list',
+                            { action: 'incremento_limite_operacional_contratado', limite_anterior: oldLimit, limite_adicionado: addLimit, limite_novo: newLimit },
+                            role,
+                            clientId,
+                            !isRealWebhookSuccess
+                        );
+                    } catch (metaErr) {
+                        console.error('Erro ao salvar novo limite no Supabase metadata:', metaErr);
+                    }
                 }
 
-                saveClientConfigs(configs);
                 renderClientsTable();
 
                 // Logs adicionais exigidos
@@ -403,25 +386,34 @@ async function loadClients() {
         let clients = [];
         
         if (supabase) {
-            // Buscar dados reais do Supabase
-            const { data: estrategiaData, error: errEstr } = await supabase.from('CLIENTES_ESTRATEGIA').select('*');
-            const { data: contratosData, error: errCont } = await supabase.from('CONTRATOS_CLIENTES').select('*');
+            // Buscar dados da tabela projects (nova estrutura central)
+            const { data: projectsData, error: errProj } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
             
-            if (estrategiaData && !errEstr) {
-                clients = estrategiaData.map(row => {
-                    const contrato = (contratosData || []).find(c => c.client_id === row.client_id) || {};
+            // Fallbacks (para enriquecimento)
+            const { data: estrategiaData } = await supabase.from('CLIENTES_ESTRATEGIA').select('*');
+            const { data: contratosData } = await supabase.from('CONTRATOS_CLIENTES').select('*');
+            
+            if (projectsData && !errProj) {
+                clients = projectsData.map(row => {
+                    const strategy = (estrategiaData || []).find(s => s.client_id === row.id) || {};
+                    const contrato = (contratosData || []).find(c => c.client_id === row.id) || {};
+                    const meta = row.metadata || {};
+                    
                     return {
-                        id: row.client_id,
-                        name: row.cliente_nome || row.client_id,
-                        status: contrato.status_contrato || 'rascunho',
-                        instagram: contrato.observacao || '@pendente', // Usando observacao temporariamente como fallback se instagram não existir
-                        segment: row.segmento || 'Não Definido',
-                        tokenStatus: 'OK',
-                        createdAt: row.data_criacao || new Date().toISOString()
+                        id: row.id,
+                        name: row.company_name || row.id,
+                        status: row.status || 'rascunho',
+                        instagram: strategy.instagram || contrato.observacao || '@pendente',
+                        segment: row.segment || strategy.segmento || 'Não Definido',
+                        tokenStatus: meta.tokenStatus || 'OK',
+                        iaBlocked: !!meta.iaBlocked,
+                        automationsPaused: !!meta.automationsPaused,
+                        iaLimit: meta.iaLimit !== undefined ? meta.iaLimit : 10,
+                        createdAt: row.created_at
                     };
                 });
             } else {
-                console.error("Erro ao carregar CLIENTES_ESTRATEGIA:", errEstr);
+                console.error("Erro ao carregar projects:", errProj);
                 clients = [];
             }
         } else {
@@ -471,23 +463,12 @@ async function loadClients() {
 function renderClientsTable() {
     const container = document.getElementById('clients-table-container');
     const searchVal = document.getElementById('client-search').value.toLowerCase().trim();
-    const configs = getClientConfigs();
 
     // 1. Atualizar contadores
-    updateCounts(configs);
+    updateCounts();
 
-    // 2. Mapear clientes e injetar configurações dinâmicas locais
-    let mapped = localClients.map(c => {
-        const conf = configs[c.id] || { status: c.status, iaBlocked: false, automationsPaused: false, iaLimit: 10 };
-        return {
-            ...c,
-            status: conf.status || c.status,
-            iaBlocked: conf.iaBlocked,
-            automationsPaused: conf.automationsPaused,
-            iaLimit: conf.iaLimit,
-            segment: c.segment || 'Outros'
-        };
-    });
+    // 2. Usar dados reais do localClients (já enriquecidos com metadata)
+    let mapped = [...localClients];
 
     // 3. Filtrar por Tab de Status
     if (currentStatusFilter !== 'ALL') {
@@ -581,12 +562,12 @@ function renderClientsTable() {
     container.innerHTML = html;
 }
 
-function updateCounts(configs) {
+function updateCounts() {
     let all = localClients.length;
     let ativo = 0, pausado = 0, inativo = 0, onboarding = 0;
 
     localClients.forEach(c => {
-        const status = configs[c.id] ? configs[c.id].status : c.status;
+        const status = c.status;
         if (status === 'ativo') ativo++;
         else if (status === 'pausado') pausado++;
         else if (status === 'inativo') inativo++;
@@ -600,115 +581,121 @@ function updateCounts(configs) {
     document.getElementById('count-onboarding').innerText = onboarding;
 }
 
-window.mutateClient = (clientId, property, value) => {
-    const configs = getClientConfigs();
-    if (!configs[clientId]) {
-        configs[clientId] = { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Outros' };
-    }
-
-    const clientName = localClients.find(c => c.id === clientId)?.name || clientId;
+window.mutateClient = async (clientId, property, value) => {
+    const clientIndex = localClients.findIndex(c => c.id === clientId);
+    if (clientIndex === -1) return;
+    
+    const client = localClients[clientIndex];
+    const clientName = client.name;
     let logType = 'STATUS_CHANGED';
     let logPayload = { client: clientId, property, old_value: null, new_value: value };
     const role = currentUser ? currentUser.role : 'CLIENT';
 
+    const updatePayload = {};
+    const supabase = getSupabase();
+
     if (property === 'status') {
-        const oldStatus = configs[clientId].status;
+        const oldStatus = client.status;
         
-        // Validar transição via central STATUS_SYSTEM
         const validation = StatusEngine.validateTransition('clientes', oldStatus, value, role);
         if (!validation.valid) {
             alert(`Erro de Governança: Transição proibida de '${oldStatus.toUpperCase()}' para '${value.toUpperCase()}' para o perfil '${role}'.\nMotivo: ${validation.reason}`);
             
-            // Log de SECURITY_WARNING
             OS_LOGS_ENGINE.security(
                 'SECURITY_WARNING',
-                { 
-                    action: 'tentativa_negada_mudanca_status', 
-                    client_id: clientId, 
-                    role: role, 
-                    status_atual: oldStatus, 
-                    status_solicitado: value, 
-                    reason: validation.reason,
-                    origem_acao: 'clients-list',
-                    timestamp: new Date().toISOString()
-                },
+                { action: 'tentativa_negada_mudanca_status', client_id: clientId, role: role, status_atual: oldStatus, status_solicitado: value, reason: validation.reason, origem_acao: 'clients-list', timestamp: new Date().toISOString() },
                 'critical'
             );
             return;
         }
 
         logPayload.old_value = oldStatus;
-        configs[clientId].status = value;
+        updatePayload.status = value;
         
-        const actionText = value === 'ativo' ? 'ativado' : (value === 'pausado' ? 'pausado' : 'arquivado');
-        alert(`Cliente ${clientName} foi ${actionText} com sucesso!`);
     } else if (property === 'ia') {
         if (role === 'CLIENT') {
             alert('Ação restrita: Apenas administradores e operadores podem alterar status de IA.');
             return;
         }
-        logPayload.old_value = configs[clientId].iaBlocked;
-        configs[clientId].iaBlocked = value;
+        logPayload.old_value = client.iaBlocked;
+        let currentMetadata = {};
+        try {
+            const { data } = await supabase.from('projects').select('metadata').eq('id', clientId).single();
+            if (data && data.metadata) currentMetadata = data.metadata;
+        } catch(e) {}
+        
+        currentMetadata.iaBlocked = value;
+        updatePayload.metadata = currentMetadata;
         logType = 'SECURITY_PERMISSIONS_CHANGED';
         
-        alert(value ? `IA suspensa para ${clientName}.` : `IA reativada para ${clientName}.`);
     } else if (property === 'auto') {
         if (role === 'CLIENT') {
             alert('Ação restrita: Apenas administradores e operadores podem alterar automações.');
             return;
         }
-        logPayload.old_value = configs[clientId].automationsPaused;
-        configs[clientId].automationsPaused = value;
+        logPayload.old_value = client.automationsPaused;
+        let currentMetadata = {};
+        try {
+            const { data } = await supabase.from('projects').select('metadata').eq('id', clientId).single();
+            if (data && data.metadata) currentMetadata = data.metadata;
+        } catch(e) {}
         
-        alert(value ? `Automações pausadas para ${clientName}.` : `Automações reativadas para ${clientName}.`);
+        currentMetadata.automationsPaused = value;
+        updatePayload.metadata = currentMetadata;
     }
 
-    saveClientConfigs(configs);
-    renderClientsTable();
+    try {
+        const { error } = await supabase.from('projects').update(updatePayload).eq('id', clientId);
+        if (error) throw error;
+        
+        if (property === 'status') {
+            client.status = value;
+            const actionText = value === 'ativo' ? 'ativado' : (value === 'pausado' ? 'pausado' : 'arquivado');
+            alert(`Cliente ${clientName} foi ${actionText} com sucesso!`);
+        } else if (property === 'ia') {
+            client.iaBlocked = value;
+            alert(value ? `IA suspensa para ${clientName}.` : `IA reativada para ${clientName}.`);
+        } else if (property === 'auto') {
+            client.automationsPaused = value;
+            alert(value ? `Automações pausadas para ${clientName}.` : `Automações reativadas para ${clientName}.`);
+        }
 
-    // Log para auditoria
-    if (logType === 'SECURITY_PERMISSIONS_CHANGED') {
-        OS_LOGS_ENGINE.security(
-            'SECURITY_PERMISSIONS_CHANGED',
-            { action: logPayload.old_value ? 'ia_ativada' : 'ia_bloqueada', client: clientId },
-            'critical'
-        );
-    } else {
-        const payloadData = property === 'status' ? {
-            ...logPayload,
-            role: role,
-            status_atual: logPayload.old_value,
-            status_solicitado: value,
-            status_tentativa: 'valida',
-            origem_acao: 'clients-list',
-            timestamp: new Date().toISOString()
-        } : logPayload;
+        renderClientsTable();
 
-        OS_LOGS_ENGINE.userAction(
-            logType,
-            'clients-list',
-            payloadData,
-            role,
-            clientId,
-            !OS_CONFIG.flags.sendRealWebhooks
-        );
+        if (logType === 'SECURITY_PERMISSIONS_CHANGED') {
+            OS_LOGS_ENGINE.security(
+                'SECURITY_PERMISSIONS_CHANGED',
+                { action: logPayload.old_value ? 'ia_ativada' : 'ia_bloqueada', client: clientId },
+                'critical'
+            );
+        } else {
+            const payloadData = property === 'status' ? {
+                ...logPayload, role: role, status_atual: logPayload.old_value, status_solicitado: value, status_tentativa: 'valida', origem_acao: 'clients-list', timestamp: new Date().toISOString()
+            } : logPayload;
+
+            OS_LOGS_ENGINE.userAction(
+                logType, 'clients-list', payloadData, role, clientId, false
+            );
+        }
+    } catch(err) {
+        console.error("Erro ao atualizar Supabase:", err);
+        alert(`Falha ao gravar no Supabase: ${err.message || 'Erro desconhecido'}`);
     }
 };
 
-window.mutateClientLimit = (clientId) => {
+window.mutateClientLimit = async (clientId) => {
     const role = currentUser ? currentUser.role : 'CLIENT';
     if (role === 'CLIENT') {
         alert('Ação restrita: Apenas administradores e operadores podem ajustar limites de IA.');
         return;
     }
 
-    const configs = getClientConfigs();
-    if (!configs[clientId]) {
-        configs[clientId] = { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, segment: 'Outros' };
-    }
-
-    const currentLimit = configs[clientId].iaLimit;
-    const increment = prompt(`Informe a quantidade de limite operacional contratado (número de pautas/gerações) a somar ao limite atual de ${currentLimit}:`, "5");
+    const clientIndex = localClients.findIndex(c => c.id === clientId);
+    if (clientIndex === -1) return;
+    
+    const client = localClients[clientIndex];
+    const currentLimit = client.iaLimit !== undefined ? client.iaLimit : 10;
+    const increment = prompt(`Informe a quantidade de limite operacional contratado a somar ao limite atual de ${currentLimit}:`, "5");
     
     if (increment === null) return;
     const add = parseInt(increment, 10);
@@ -719,20 +706,37 @@ window.mutateClientLimit = (clientId) => {
     }
 
     const newLimit = currentLimit + add;
-    configs[clientId].iaLimit = newLimit;
-    saveClientConfigs(configs);
-    renderClientsTable();
+    const supabase = getSupabase();
+    
+    let currentMetadata = {};
+    try {
+        const { data } = await supabase.from('projects').select('metadata').eq('id', clientId).single();
+        if (data && data.metadata) currentMetadata = data.metadata;
+    } catch(e) {}
+    
+    currentMetadata.iaLimit = newLimit;
 
-    // Log
-    OS_LOGS_ENGINE.userAction(
-        'SECURITY_PERMISSIONS_CHANGED',
-        'clients-list',
-        { action: 'liberacao_manual_limite_ia', limite_anterior: currentLimit, limite_adicionado: add, limite_novo: newLimit },
-        currentUser ? currentUser.role : 'CLIENT',
-        clientId,
-        !OS_CONFIG.flags.sendRealWebhooks
-    );
-    alert(`Limite operacional contratado do cliente incrementado com sucesso! Novo Limite: ${newLimit}.`);
+    try {
+        const { error } = await supabase.from('projects').update({ metadata: currentMetadata }).eq('id', clientId);
+        if (error) throw error;
+        
+        client.iaLimit = newLimit;
+        renderClientsTable();
+
+        OS_LOGS_ENGINE.userAction(
+            'SECURITY_PERMISSIONS_CHANGED',
+            'clients-list',
+            { action: 'liberacao_manual_limite_ia', limite_anterior: currentLimit, limite_adicionado: add, limite_novo: newLimit },
+            role,
+            clientId,
+            false
+        );
+        alert(`Limite operacional contratado do cliente incrementado com sucesso! Novo Limite: ${newLimit}.`);
+
+    } catch(err) {
+        console.error("Erro ao atualizar Supabase limite:", err);
+        alert(`Falha ao gravar no Supabase: ${err.message || 'Erro desconhecido'}`);
+    }
 };
 
 initPage();

@@ -1,9 +1,8 @@
 import { OS_UI, OS_AUTH } from '../os-core.js';
-import { SheetsService } from '../../services/sheets-service.js';
 import { getSupabase } from '../../services/supabase-client.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { OS_CONFIG } from '../../config/os-config.js';
-import { populateProjectFilter, processEntityAction } from '../utils/ui-helpers.js';
+import { populateProjectFilter } from '../utils/ui-helpers.js';
 
 let currentProject = null;
 window.loadedDemands = [];
@@ -58,24 +57,32 @@ async function loadDemands() {
     container.textContent = '';
     const msgSync = document.createElement('div');
     msgSync.style.cssText = "opacity: 0.5; padding:20px;";
-    msgSync.textContent = "Sincronizando com Google Sheets via Make...";
+    msgSync.textContent = "Sincronizando com Supabase...";
     container.appendChild(msgSync);
 
     try {
-        let demands = await SheetsService.fetchDemands();
-        
-        // Simular banco estendido no mock
-        const localDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands_ext') || '[]');
-        demands = [...demands, ...localDemands];
-        
-        // Aplicar filtro de tenant obrigatoriamente
-        demands = demands.filter(d => d.clientId === currentProject || d.project_id === currentProject || (!d.project_id && d.id)); // fallback for mock
-        
-        // Strict filtering:
-        demands = demands.filter(d => d.clientId === currentProject || d.project_id === currentProject);
+        const supabase = getSupabase();
+        if (!supabase) throw new Error("Supabase não configurado.");
 
-        // Remover arquivados
-        demands = demands.filter(d => d.status !== 'arquivado');
+        const { data: dbDemands, error } = await supabase
+            .from('DEMANDAS_CLIENTES')
+            .select('*')
+            .eq('client_id', currentProject)
+            .neq('status_demanda', 'arquivado')
+            .order('data_criacao', { ascending: false });
+
+        if (error) throw error;
+
+        // Converter para o formato esperado pela UI original para manter layout intacto
+        let demands = (dbDemands || []).map(d => ({
+            id: d.demanda_id,
+            clientId: d.client_id,
+            title: d.titulo_demanda || 'Sem título',
+            priority: d.prioridade || 'media',
+            deadline: d.prazo || 'A definir',
+            status: d.status_demanda || 'pendente',
+            date: (d.data_criacao || '').split('T')[0] || new Date().toISOString().split('T')[0]
+        }));
 
         window.loadedDemands = demands;
 
@@ -218,32 +225,44 @@ async function submitNewDemand() {
     btn.appendChild(icn);
     btn.appendChild(document.createTextNode(" CRIANDO..."));
 
-    const demandId = 'dem_' + Date.now();
-    const newDemand = {
-        id: demandId,
-        project_id: currentProject,
-        clientId: currentProject,
-        title,
-        priority,
-        deadline,
-        status: 'em_andamento',
-        date: new Date().toISOString().split('T')[0]
+    const demandId = 'DEMANDA_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5).toUpperCase();
+    const nowISO = new Date().toISOString();
+    const userRole = OS_AUTH.user?.role || 'OPERATOR';
+    const userName = OS_AUTH.user?.email || 'Operador';
+    const clientName = document.querySelector('#project-filter option:checked')?.text || currentProject;
+
+    const newDemandDB = {
+        demanda_id: demandId,
+        client_id: currentProject,
+        client_name: clientName,
+        origem_demanda: 'FluxAI OS',
+        titulo_demanda: title,
+        descricao_demanda: title,
+        status_demanda: 'em_andamento',
+        prioridade: priority,
+        responsavel: userName,
+        prazo: deadline,
+        data_criacao: nowISO,
+        data_atualizacao: nowISO
     };
 
-    const userRole = OS_AUTH.user?.role || 'OPERATOR';
-
     try {
-        const localDemands = JSON.parse(localStorage.getItem('fluxai_mock_demands_ext') || '[]');
-        localDemands.push(newDemand);
-        localStorage.setItem('fluxai_mock_demands_ext', JSON.stringify(localDemands));
+        const supabase = getSupabase();
+        const { error } = await supabase.from('DEMANDAS_CLIENTES').insert([newDemandDB]);
+        
+        if (error) throw error;
 
+        // Disparo acessório de notificação pro Make (não trava a execução e não desfaz se falhar)
         const payload = {
             action: 'CREATE_DEMAND',
             demand_id: demandId,
             project_id: currentProject,
-            demand_data: newDemand
+            demand_data: newDemandDB
         };
-        const response = await OS_CONFIG.webhooks.send('CRM_UPDATE', payload);
+        
+        OS_CONFIG.webhooks.send('CRM_UPDATE', payload).catch(err => {
+            console.warn("Erro no webhook do Make, mas a demanda foi salva no Supabase:", err);
+        });
 
         OS_LOGS_ENGINE.userAction(
             'DEMAND_CREATED',
@@ -251,20 +270,8 @@ async function submitNewDemand() {
             { demand_id: demandId, title },
             userRole,
             currentProject,
-            !response.success
+            false
         );
-
-        if (!response.success) {
-            alert('Demanda salva localmente como rascunho (Falha de sincronização com o Make).');
-            OS_LOGS_ENGINE.userAction(
-                'DEMAND_UPDATE_FAILED',
-                'demandas',
-                { demand_id: demandId, error: response.error },
-                userRole,
-                currentProject,
-                true
-            );
-        }
 
         document.getElementById('modal-new-demand').style.display = 'none';
         document.getElementById('new-demand-title').value = '';
@@ -272,7 +279,7 @@ async function submitNewDemand() {
         loadDemands();
 
     } catch (e) {
-        alert('Erro fatal ao criar demanda: ' + e.message);
+        alert('Erro fatal ao criar demanda no banco de dados: ' + e.message);
     } finally {
         btn.disabled = false;
         btn.textContent = 'CRIAR DEMANDA';
@@ -287,30 +294,94 @@ window.advanceDemandStatus = async (id) => {
     if (cIdx === -1 || cIdx === seq.length - 1) return;
     const newStatus = seq[cIdx + 1];
     
-    await processEntityAction('advance', 'demanda', demand, currentProject, 
-        `Avançar a demanda "${demand.title}" de [${demand.status}] para [${newStatus}]?`,
-        { action: 'UPDATE_DEMAND_STATUS', demand_id: id, project_id: currentProject, old_status: demand.status, new_status: newStatus },
-        'fluxai_mock_demands_ext',
-        { newStatus: newStatus },
-        { failType: 'PORTAL_DEMANDAS_UPDATE_FAILED', context: 'demandas', failPayload: (err) => ({ action: 'advance_status', demand_id: id, error: err }),
-          successType: 'PORTAL_DEMANDAS_STATUS_UPDATED', successPayload: { demand_id: id, from: demand.status, to: newStatus } },
-        loadDemands
-    );
+    if (!confirm(`Avançar a demanda "${demand.title}" de [${demand.status}] para [${newStatus}]?`)) {
+        return;
+    }
+
+    try {
+        const supabase = getSupabase();
+        const { error } = await supabase.from('DEMANDAS_CLIENTES')
+            .update({ 
+                status_demanda: newStatus, 
+                data_atualizacao: new Date().toISOString() 
+            })
+            .eq('demanda_id', id);
+
+        if (error) throw error;
+
+        // Webhook acessório
+        OS_CONFIG.webhooks.send('CRM_UPDATE', {
+            action: 'UPDATE_DEMAND_STATUS', demand_id: id, project_id: currentProject, old_status: demand.status, new_status: newStatus
+        }).catch(console.error);
+
+        OS_LOGS_ENGINE.userAction(
+            'PORTAL_DEMANDAS_STATUS_UPDATED',
+            'demandas',
+            { demand_id: id, from: demand.status, to: newStatus },
+            OS_AUTH.user?.role || 'OPERATOR',
+            currentProject,
+            false
+        );
+
+        loadDemands();
+
+    } catch(err) {
+        alert(`Falha ao avançar status: ${err.message}`);
+        OS_LOGS_ENGINE.userAction(
+            'PORTAL_DEMANDAS_UPDATE_FAILED',
+            'demandas',
+            { action: 'advance_status', demand_id: id, error: err.message },
+            OS_AUTH.user?.role || 'OPERATOR',
+            currentProject,
+            true
+        );
+    }
 };
 
 window.archiveDemand = async (id) => {
     const demand = window.loadedDemands.find(d => d.id === id);
     if (!demand) return;
     
-    await processEntityAction('archive', 'demanda', demand, currentProject, 
-        `Tem certeza que deseja ARQUIVAR a demanda "${demand.title}"?`,
-        { action: 'ARCHIVE_DEMAND', demand_id: id, project_id: currentProject },
-        'fluxai_mock_demands_ext',
-        { newStatus: 'arquivado' },
-        { failType: 'PORTAL_DEMANDAS_UPDATE_FAILED', context: 'demandas', failPayload: (err) => ({ action: 'archive', demand_id: id, error: err }),
-          successType: 'PORTAL_DEMANDAS_ARCHIVED', successPayload: { demand_id: id, title: demand.title } },
-        loadDemands
-    );
+    if (!confirm(`Tem certeza que deseja ARQUIVAR a demanda "${demand.title}"?`)) {
+        return;
+    }
+
+    try {
+        const supabase = getSupabase();
+        const { error } = await supabase.from('DEMANDAS_CLIENTES')
+            .update({ 
+                status_demanda: 'arquivado', 
+                data_atualizacao: new Date().toISOString() 
+            })
+            .eq('demanda_id', id);
+
+        if (error) throw error;
+
+        // Webhook acessório
+        OS_CONFIG.webhooks.send('CRM_UPDATE', { action: 'ARCHIVE_DEMAND', demand_id: id, project_id: currentProject }).catch(console.error);
+
+        OS_LOGS_ENGINE.userAction(
+            'PORTAL_DEMANDAS_ARCHIVED',
+            'demandas',
+            { demand_id: id, title: demand.title },
+            OS_AUTH.user?.role || 'OPERATOR',
+            currentProject,
+            false
+        );
+
+        loadDemands();
+
+    } catch(err) {
+        alert(`Falha ao arquivar demanda: ${err.message}`);
+        OS_LOGS_ENGINE.userAction(
+            'PORTAL_DEMANDAS_UPDATE_FAILED',
+            'demandas',
+            { action: 'archive', demand_id: id, error: err.message },
+            OS_AUTH.user?.role || 'OPERATOR',
+            currentProject,
+            true
+        );
+    }
 };
 
 initPage();

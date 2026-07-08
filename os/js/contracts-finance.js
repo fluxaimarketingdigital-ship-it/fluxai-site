@@ -61,180 +61,98 @@ async function initFinance() {
 async function loadFinanceData() {
     const supabase = getSupabase();
     
-    if (supabase) {
-        try {
-            const { data: contracts, error: cErr } = await supabase.from('contracts').select('*, projects(is_billing_exempt)').order('created_at', { ascending: false });
-            const { data: payments, error: pErr } = await supabase.from('payments_ledger').select('*, contracts(client_name, company_name, project_id, projects(is_billing_exempt))').order('due_date', { ascending: true });
-            const { data: extras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*');
+    if (!supabase) {
+        console.error('[FINANCE] Supabase não inicializado.');
+        document.getElementById('total-expected').innerText = 'ERRO';
+        return;
+    }
 
-            if (cErr || pErr) throw cErr || pErr;
+    try {
+        const { data: contratosRaw, error: cErr } = await supabase.from('CONTRATOS_CLIENTES').select('*');
+        const { data: financeiroRaw, error: pErr } = await supabase.from('FINANCEIRO_CLIENTES').select('*');
+        const { data: extrasRaw } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*');
 
-            // Filtra removendo os projetos isentos (ex: FluxAI Labs)
-            const activeContracts = (contracts || []).filter(c => !c.projects?.is_billing_exempt);
-            const activePayments = (payments || []).filter(p => !p.contracts?.projects?.is_billing_exempt);
+        if (cErr || pErr) throw cErr || pErr;
 
-            // Mapeia os serviços extras para o formato de pagamentos e injeta na lista
-            const extraPayments = (extras || []).map(ex => ({
+        // Mapear CONTRATOS_CLIENTES para DTO da UI
+        const activeContracts = (contratosRaw || []).map(c => ({
+            id: c.contrato_id || c.client_id, // fallback para client_id se id falhar
+            project_id: c.client_id,
+            client_name: c.cliente_nome || c.client_id,
+            company_name: c.cliente_nome || c.client_id,
+            contract_value: c.valor_mensal || 0,
+            due_day: parseInt(c.dia_vencimento || '5', 10),
+            status: c.status_contrato || 'ATIVO',
+            created_at: c.data_inicio || c.data_criacao || new Date().toISOString(),
+            deliverables: c.escopo_contratado || 'N/A',
+            projects: { is_billing_exempt: false }
+        }));
+
+        // Mapear FINANCEIRO_CLIENTES para DTO da UI
+        const activePayments = (financeiroRaw || []).map(f => {
+            const contract = activeContracts.find(c => c.project_id === f.client_id) || {
+                client_name: f.client_name || f.client_id,
+                company_name: f.client_name || f.client_id,
+                project_id: f.client_id,
+                projects: { is_billing_exempt: false }
+            };
+            const isPaid = (f.status_pagamento || '').toLowerCase() === 'pago';
+            return {
+                id: f.financeiro_id,
+                contract_id: contract.id,
+                amount_due: f.valor || 0,
+                amount_paid: isPaid ? (f.valor || 0) : 0,
+                due_date: f.data_vencimento || f.data_criacao || new Date().toISOString(),
+                status: isPaid ? 'PAGO' : ((f.status_pagamento || '').toUpperCase()),
+                payment_method: f.forma_pagamento || '-',
+                contracts: contract,
+                is_extra: false
+            };
+        });
+
+        // Mapear SERVICOS_EXTRAS_CLIENTES
+        const extraPayments = (extrasRaw || []).map(ex => {
+            const isPaid = (ex.status_servico_extra || '').toLowerCase() === 'pago';
+            return {
                 id: ex.servico_extra_id,
-                amount_due: ex.valor_aprovado,
-                amount_paid: 0,
-                due_date: ex.data_vencimento || ex.data_solicitacao || ex.created_at || new Date().toISOString(),
-                status: 'PENDENTE', // Extras nascem pendentes
+                amount_due: ex.valor_aprovado || 0,
+                amount_paid: isPaid ? (ex.valor_aprovado || 0) : 0,
+                due_date: ex.data_vencimento || ex.data_solicitacao || ex.data_criacao || new Date().toISOString(),
+                status: isPaid ? 'PAGO' : 'PENDENTE',
                 payment_method: 'Serviço Extra',
                 is_extra: true,
                 contracts: {
-                    client_name: ex.client_name,
-                    company_name: ex.client_name + ' [EXTRA]',
-                    project_id: ex.client_id
+                    client_name: ex.client_name || ex.client_id,
+                    company_name: (ex.client_name || ex.client_id) + ' [EXTRA]',
+                    project_id: ex.client_id,
+                    projects: { is_billing_exempt: false }
                 }
-            }));
+            };
+        });
 
-            const allPayments = [...activePayments, ...extraPayments];
+        const allPayments = [...activePayments, ...extraPayments];
 
-            window.__FINANCE_CONTRACTS = activeContracts; // Salva na memória global para os modais
-            window.__FINANCE_PAYMENTS = allPayments;
+        window.__FINANCE_CONTRACTS = activeContracts;
+        window.__FINANCE_PAYMENTS = allPayments;
 
-            renderStats(activeContracts, allPayments);
-            renderPayments(allPayments);
-            renderContracts(activeContracts);
-            renderContractHealth(activeContracts, allPayments);
-            renderOperationalAlerts(activeContracts, allPayments);
-            return;
-        } catch (error) {
-            console.warn('[FINANCE] Erro na API do Supabase. Carregando Dados Simulados Premium.', error);
-        }
+        renderStats(activeContracts, allPayments);
+        renderPayments(allPayments);
+        renderContracts(activeContracts);
+        renderContractHealth(activeContracts, allPayments);
+        renderOperationalAlerts(activeContracts, allPayments);
+
+    } catch (error) {
+        console.error('[FINANCE] Erro crítico na API do Supabase.', error);
+        alert('Falha ao carregar dados financeiros. Verifique a conexão com o servidor.');
+        document.getElementById('total-expected').innerText = 'ERRO';
+        document.getElementById('total-paid').innerText = 'ERRO';
+        document.getElementById('total-pending').innerText = 'ERRO';
+        
+        const bodyContracts = document.getElementById('contracts-body');
+        if (bodyContracts) bodyContracts.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--os-danger);">Servidor Indisponível</td></tr>';
+        const bodyPayments = document.getElementById('payments-body');
+        if (bodyPayments) bodyPayments.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--os-danger);">Servidor Indisponível</td></tr>';
     }
-
-    // SUPABASE OFFLINE OU RETORNOU ERRO -> USAR DADOS SIMULADOS DO LOCALSTORAGE PARA FIDELIDADE PREMIUM
-    const now = new Date();
-    const nextWeek = new Date(now); nextWeek.setDate(now.getDate() + 5);
-    
-    let mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects'));
-    if (!mockProjects || !mockProjects[0] || !mockProjects[0].metadata || !mockProjects[0].metadata.dna || mockProjects.find(p => p.id === 'p_c1')) {
-        mockProjects = [
-            { 
-                id: "p_c2", 
-                company_name: "Alves Odonto Premium",
-                segment: "Odontologia de Alta Performance",
-                digital_infrastructure: {
-                    operational_links: {
-                        instagram: "https://www.instagram.com/alves.odonto",
-                        website: "https://alvesodontologia.com.br",
-                        canva: "https://drive.google.com/drive/folders/1K__Y4QTCfJ_4cnr54iocJyhFEDsPa5iZ?usp=drive_link",
-                        drive: "https://drive.google.com/drive/folders/14stjSxP6piUM2w0gFmRS-v9H2zjFIE0P?usp=drive_link",
-                        whatsapp: "5582993051282"
-                    }
-                },
-                metadata: {
-                    dna: {
-                        desired_patterns: ["Estética Natural", "Alta Performance Oral", "Tecnologia 3D", "Confiança Premium", "Atendimento Humanizado de Alta Performance"],
-                        anti_patterns: ["Amadorismo Comercial", "Preços Populares Populistas", "Promessas Indevidas de Indolor", "Venda Agressiva Irresponsável", "Exposição de Pacientes Fora das Normas CRO"],
-                        forbidden_themes: "Propaganda de tratamento indolor sem base científica, promessas de resultados estéticos milagrosos imediatos, fotos antes e depois depreciativas, descontos agressivos na saúde, mercantilização odontológica"
-                    },
-                    tone_of_voice: "Altamente profissional, sofisticado, elite, acolhedor, limpo, científico, preciso e de alta credibilidade",
-                    strategic_roadmap: {
-                        semana_1: "organização estratégica, alinhamento da marca premium, análise das diretrizes CRO locais, definição dos pilares de tecnologia, alinhamento visual de excelência clínica",
-                        semana_2: "primeiros conteúdos de bastidores, construção de autoridade clínica, depoimentos qualificados, humanização da equipe médica, início da percepção de valor elite",
-                        semana_3: "fortalecimento regional de credibilidade, demonstração prática da tecnologia 3D, conteúdo educativo preventivo premium, consolidação de diferenciais estéticos",
-                        semana_4: "análise detalhada de performance, ajustes estratégicos de captação de pacientes, melhoria do agendamento direto, evolução da percepção de alta performance"
-                    },
-                    cfn_rules: "Respeito ético estrito às diretrizes do CRO (Conselho Regional de Odontologia), sem sensacionalismo ou mercantilização da saúde bucal, valorização da ciência, diagnósticos reais e integridade profissional."
-                }
-            },
-            { 
-                id: "p_c3", 
-                company_name: "Apex Educacional",
-                segment: "Educação Executiva de Elite",
-                digital_infrastructure: {
-                    operational_links: {
-                        instagram: "https://www.instagram.com/instituto.apex",
-                        website: "https://apexeducacional.com.br",
-                        canva: "https://drive.google.com/drive/folders/1K__Y4QTCfJ_4cnr54iocJyhFEDsPa5iZ?usp=drive_link",
-                        drive: "https://drive.google.com/drive/folders/14stjSxP6piUM2w0gFmRS-v9H2zjFIE0P?usp=drive_link",
-                        whatsapp: "5582993051282"
-                    }
-                },
-                metadata: {
-                    dna: {
-                        desired_patterns: ["Educação Executiva Avançada", "Networking Corporativo de Elite", "Escala de Times e Liderança", "Alta LTV e Retenção Corporativa"],
-                        anti_patterns: ["Linguagem de Cursos Baratos Promocionais", "Fórmulas Mágicas de Enriquecimento Rápido", "Amadorismo Pedagógico", "Gatilhos Mentais Enganosos e Agressivos"],
-                        forbidden_themes: "Esquemas de enriquecimento rápido, hacks genéricos de carreira, promessas irreais de faturamento empresarial sem embasamento sólido, gírias excessivas e informais"
-                    },
-                    tone_of_voice: "Executivo, altamente qualificado, afiado, autoritário com embasamento, educativo de excelência, analítico, inspirador e confiável",
-                    strategic_roadmap: {
-                        semana_1: "organização estratégica e alinhamento de posicionamento de elite, mapeamento de dores executivas, definição de paleta visual sóbria corporativa",
-                        semana_2: "primeiros conteúdos estratégicos de gestão, construção de autoridade institucional, demonstração de depoimentos e cases corporativos de alto impacto",
-                        semana_3: "fortalecimento de networking e ecossistema, publicação de estudos de caso reais de grandes corporações, conteúdo avançado de tomada de decisão executiva",
-                        semana_4: "análise de métricas corporativas, otimização de conversão de turmas de alta LTV, captação estratégica B2B, consolidação do posicionamento de referência nacional"
-                    },
-                    cfn_rules: "Integridade educacional avançada, conformidade absoluta com as melhores práticas de ensino corporativo nacional, respeito ao desenvolvimento ético de lideranças empresariais."
-                }
-            }
-        ];
-        localStorage.setItem('fluxai_mock_projects', JSON.stringify(mockProjects));
-    }
-
-    // Inicializar mockContracts no localStorage para persistência interativa
-    let mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts'));
-    if (!mockContracts || mockContracts.find(c => c.id === 'c1')) {
-        mockContracts = [
-            { id: "c2", project_id: "p_c2", client_name: "Dr. Roberto Alves", company_name: "Alves Odonto Premium", deliverables: "Gestão de Tráfego + CRM", contract_value: 5000, status: "ATIVO", created_at: "2025-03-15T00:00:00Z", due_day: 15 },
-            { id: "c3", project_id: "p_c3", client_name: "Instituto Apex", company_name: "Apex Educacional", deliverables: "Governança Full-Stack", contract_value: 8500, status: "ATIVO", created_at: "2024-11-20T00:00:00Z", due_day: 10 }
-        ];
-        localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
-    }
-
-    let mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments'));
-    if (!mockPayments || mockPayments.find(p => p.id === 'p1')) {
-        mockPayments = [
-            { id: "p2", contract_id: "c2", amount_due: 5000, due_date: nextWeek.toISOString(), status: "PENDENTE", payment_method: "Boleto" },
-            { id: "p3", contract_id: "c3", amount_due: 8500, amount_paid: 8500, due_date: "2026-05-10T00:00:00Z", status: "PAGO", payment_method: "Pix" }
-        ];
-        localStorage.setItem('fluxai_mock_payments', JSON.stringify(mockPayments));
-    }
-
-    // Vincular referências
-    mockPayments.forEach(p => {
-        p.contracts = mockContracts.find(c => c.id === p.contract_id);
-        if (p.contracts) {
-            p.contracts.projects = mockProjects.find(pr => pr.id === p.contracts.project_id);
-        }
-    });
-
-    // Tenta puxar os serviços extras reais do banco, mesmo no modo de simulação
-    let extraPayments = [];
-    if (supabase) {
-        try {
-            const { data: extras } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*');
-            if (extras) {
-                extraPayments = extras.map(ex => ({
-                    id: ex.servico_extra_id,
-                    amount_due: ex.valor_aprovado,
-                    amount_paid: 0,
-                    due_date: ex.data_vencimento || ex.data_solicitacao || ex.created_at || new Date().toISOString(),
-                    status: 'PENDENTE',
-                    payment_method: 'Serviço Extra',
-                    is_extra: true,
-                    contracts: {
-                        client_name: ex.client_name,
-                        company_name: ex.client_name + ' [EXTRA]',
-                        project_id: ex.client_id
-                    }
-                }));
-            }
-        } catch(e) { }
-    }
-
-    const allPayments = [...mockPayments, ...extraPayments];
-
-    window.__FINANCE_CONTRACTS = window.__FINANCE_CONTRACTS || mockContracts; // Salva na memória global
-    window.__FINANCE_PAYMENTS = window.__FINANCE_PAYMENTS || allPayments;
-
-    renderStats(mockContracts, allPayments);
-    renderPayments(allPayments);
-    renderContracts(mockContracts);
-    renderContractHealth(mockContracts, allPayments);
-    renderOperationalAlerts(mockContracts, allPayments);
 }
 
 function renderStats(contracts, payments) {
@@ -690,7 +608,7 @@ window.closeEditContractModal = () => {
 };
 
 window.editContract = (contractId) => {
-    const contractsList = window.__FINANCE_CONTRACTS || JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
+    const contractsList = window.__FINANCE_CONTRACTS || [];
     const contract = contractsList.find(c => c.id === contractId);
     if (!contract) {
         alert('Erro: Contrato não encontrado na base de dados ativa.');
@@ -703,18 +621,14 @@ window.editContract = (contractId) => {
     document.getElementById('edit-payment-day').value = contract.due_day || 5;
     document.getElementById('edit-contract-deliverables').value = contract.deliverables || '';
     
-    // Cadastro da marca (mock projects array)
-    const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-    const project = mockProjects.find(p => p.id === contract.project_id);
-    if (project) {
-        document.getElementById('edit-brand-name').value = project.company_name || '';
-        document.getElementById('edit-brand-segment').value = project.segment || '';
-        document.getElementById('edit-link-instagram').value = project.digital_infrastructure?.operational_links?.instagram || '';
-        document.getElementById('edit-link-whatsapp').value = project.digital_infrastructure?.operational_links?.whatsapp || '';
-        document.getElementById('edit-link-drive').value = project.digital_infrastructure?.operational_links?.drive || '';
-        document.getElementById('edit-link-canva').value = project.digital_infrastructure?.operational_links?.canva || '';
-        document.getElementById('edit-link-website').value = project.digital_infrastructure?.operational_links?.website || '';
-    }
+    // Fallbacks para campos que antes vinham de mocks do localStorage
+    document.getElementById('edit-brand-name').value = contract.company_name || '';
+    document.getElementById('edit-brand-segment').value = '';
+    document.getElementById('edit-link-instagram').value = '';
+    document.getElementById('edit-link-whatsapp').value = '';
+    document.getElementById('edit-link-drive').value = '';
+    document.getElementById('edit-link-canva').value = '';
+    document.getElementById('edit-link-website').value = '';
     
     document.getElementById('edit-contract-modal').style.display = 'flex';
     window.switchTab('contrato'); // Ensure first tab is active
@@ -738,12 +652,12 @@ window.saveContractEdit = async () => {
     btnSubmit.appendChild(document.createTextNode(' Salvando...'));
 
     try {
+        // Mapeando DTO inverso para a fonte da verdade oficial: CONTRATOS_CLIENTES
         const payload = {
-            id: contractId,
-            contract_value: parseFloat(document.getElementById('edit-monthly-fee').value),
-            due_day: parseInt(document.getElementById('edit-payment-day').value, 10),
-            deliverables: document.getElementById('edit-contract-deliverables').value,
-            updated_at: new Date().toISOString()
+            valor_mensal: parseFloat(document.getElementById('edit-monthly-fee').value),
+            dia_vencimento: document.getElementById('edit-payment-day').value,
+            escopo_contratado: document.getElementById('edit-contract-deliverables').value,
+            data_atualizacao: new Date().toISOString()
         };
         
         // Verifica se há serviço extra preenchido
@@ -778,12 +692,9 @@ window.saveContractEdit = async () => {
         // Tentativa de update no Supabase se existir
         if (supabase) {
             try {
-                // Update contrato base
-                const { error: errUpdate } = await supabase.from('contracts').update(payload).eq('id', contractId);
+                // Update contrato base apontando para a tabela real PT-BR (CONTRATOS_CLIENTES)
+                const { error: errUpdate } = await supabase.from('CONTRATOS_CLIENTES').update(payload).eq('contrato_id', contractId);
                 
-                // Se houver serviço extra, a arquitetura futura será a tabela SERVICOS_EXTRAS_CLIENTES.
-                // Como isso é MVP, nós não vamos forçar query complexa aqui, simularemos que o webhook resolve
-                // a injeção ou salvamos em local_storage.
                 if (!errUpdate) remoteSuccess = true;
             } catch (e) {
                 console.warn('[FINANCE_UPDATE] Erro remoto ao atualizar.', e);
@@ -793,44 +704,28 @@ window.saveContractEdit = async () => {
         // Simulação do Webhook Engine
         let webhookSuccess = false;
         try {
-            const webhookPayload = { event: 'FINANCE_UPDATE', payload, extra_service: extraServicePayload };
+            const webhookPayload = { event: 'FINANCE_UPDATE', payload: { id: contractId, ...payload }, extra_service: extraServicePayload };
             if (window.OS_CONFIG && window.OS_CONFIG.webhooks) {
                 const res = await window.OS_CONFIG.webhooks.send('FINANCE_UPDATE', webhookPayload);
                 webhookSuccess = res && res.success;
             } else {
-                // Mock success
                 webhookSuccess = true;
             }
         } catch (e) {
             console.warn('[FINANCE_WEBHOOK] Falha.', e);
         }
 
-        // UPDATE LOCAL STORAGE (MOCK)
-        let mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-        const idx = mockContracts.findIndex(c => c.id === contractId);
-        if (idx !== -1) {
-            mockContracts[idx] = { ...mockContracts[idx], ...payload };
-            if (extraServicePayload) {
-                if (!mockContracts[idx].extras) mockContracts[idx].extras = [];
-                mockContracts[idx].extras.push(extraServicePayload);
-            }
-            localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
-        }
-
-        // Fail-Safe / Fallback UI & Logs
-        if (!remoteSuccess || !webhookSuccess) {
-            alert("⚠️ MODO OFFLINE / FALLBACK: O contrato foi atualizado localmente como rascunho, mas a automação falhou ou o banco não confirmou.");
+        // Sem localStorage fallback. Erros são reais.
+        if (!remoteSuccess) {
+            alert("⚠️ ERRO CRÍTICO: Não foi possível gravar na tabela oficial (CONTRATOS_CLIENTES).");
             if (window.OS_LOGS_ENGINE) {
-                window.OS_LOGS_ENGINE.userAction('CONTRACT_UPDATE_FAILED', 'Falha na confirmação de webhooks ou banco - salvo localmente.');
+                window.OS_LOGS_ENGINE.userAction('CONTRACT_UPDATE_FAILED', 'Falha ao atualizar CONTRATOS_CLIENTES no Supabase.');
             }
         } else {
             if (window.OS_LOGS_ENGINE) {
-                window.OS_LOGS_ENGINE.userAction('CONTRACT_UPDATED', `Contrato ${contractId} modificado.`);
+                window.OS_LOGS_ENGINE.userAction('CONTRACT_UPDATED', `Contrato ${contractId} modificado na tabela oficial.`);
                 if (extraServicePayload) {
-                    window.OS_LOGS_ENGINE.userAction('SERVICE_EXTRA_ADDED', `Serviço ${extraType} no status ${extraServicePayload.status}`);
-                    if (extraServicePayload.status === 'aprovado') {
-                         window.OS_LOGS_ENGINE.userAction('SERVICE_EXTRA_APPROVED', `Serviço Extra aprovado com valor de R$ ${extraServicePayload.approved_value}`);
-                    }
+                    window.OS_LOGS_ENGINE.userAction('SERVICE_EXTRA_ADDED', `Serviço ${extraType} acionado`);
                 }
             }
         }

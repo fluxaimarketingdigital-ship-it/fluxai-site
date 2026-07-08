@@ -511,18 +511,13 @@ async function loadContent() {
         if(window.updateIAGovDashboard) await window.updateIAGovDashboard();
     } catch (e) {
         console.error('[LOAD_CONTENT] Erro fatal ao carregar do Supabase:', e);
-        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-        let projectAssets = mockAssets;
-        if (currentProject) {
-            projectAssets = mockAssets.filter(item => item && (item.project_id === currentProject || item.client_id === currentProject));
-        }
+        alert('Falha na comunicação com o banco de dados. Tentando novamente ou verifique a conexão.');
+        window.loadedContents = [];
+        renderMetrics([]);
+        renderContentTable([]);
         
-        window.loadedContents = projectAssets;
-        renderMetrics(projectAssets);
-        renderContentTable(projectAssets);
-        
-        renderCalendar('calendar-strategic-body', projectAssets, 'STRATEGIC');
-        renderCalendar('calendar-operational-body', projectAssets, 'OPERATIONAL');
+        renderCalendar('calendar-strategic-body', [], 'STRATEGIC');
+        renderCalendar('calendar-operational-body', [], 'OPERATIONAL');
         
         if(window.updateIAGovDashboard) await window.updateIAGovDashboard();
     }
@@ -683,7 +678,10 @@ function renderCalendar(containerId, contents, mode) {
 
     for (let day = 1; day <= daysInMonth; day++) {
         const dayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        const dayContents = contents.filter(c => c.scheduled_at && c.scheduled_at.startsWith(dayStr));
+        const dayContents = contents.filter(c => {
+            const dateVal = c.data_prevista || c.scheduled_at;
+            return dateVal && String(dateVal).startsWith(dayStr);
+        });
         
         const dayDiv = document.createElement('div');
         dayDiv.className = 'calendar-day';
@@ -1140,14 +1138,8 @@ window.rejectAndFreezeVersion = async (id) => {
         }
 
         if (error) {
-            // Fallback mock
-            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-            const idx = mockAssets.findIndex(item => item.id === id);
-            if (idx >= 0) {
-                mockAssets[idx].status = nextStatus;
-                mockAssets[idx].metadata = updatedMetadata;
-                localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
-            }
+            console.error('[REJECT] Erro ao gravar Supabase:', error);
+            throw new Error('Falha ao gravar no banco. Ação revertida visualmente.');
         }
 
         closeEditModal();
@@ -1308,9 +1300,9 @@ window.saveAssetEdit = async () => {
                 cta: parsedCta,
                 status_planejamento: mapToMakeSpreadsheet(targetLogical, false),
                 status_postagem: mapToMakeSpreadsheet(targetLogical, true),
-                data_agendada: currentAssetData.scheduled_at || '',
-                hora_agendada: currentAssetData.scheduled_at ? new Date(currentAssetData.scheduled_at).toLocaleTimeString('pt-BR') : '',
-                data_prevista: currentAssetData.scheduled_at || '',
+                data_agendada: currentAssetData.data_prevista || currentAssetData.scheduled_at || '',
+                hora_agendada: (currentAssetData.data_prevista || currentAssetData.scheduled_at) ? new Date(currentAssetData.data_prevista || currentAssetData.scheduled_at).toLocaleTimeString('pt-BR') : '',
+                data_prevista: currentAssetData.data_prevista || currentAssetData.scheduled_at || '',
                 data_publicacao: '',
                 link_post: '',
                 link_asset_drive: artFinal || '',
@@ -1489,16 +1481,8 @@ window.saveAssetEdit = async () => {
         }
 
         if (error) {
-            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-            const idx = mockAssets.findIndex(item => item.id === editingAssetId);
-            if (idx >= 0) {
-                mockAssets[idx].title = title;
-                mockAssets[idx].caption = updatePayload.caption;
-                mockAssets[idx].priority = priority;
-                mockAssets[idx].metadata = newMetadata;
-                mockAssets[idx].status = nextStatus;
-                localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
-            }
+            console.error('[SAVE_EDIT] Erro ao gravar Supabase:', error);
+            throw new Error('Falha ao atualizar no banco de dados. Operação abortada.');
         }
 
         // Timeline log
@@ -2168,11 +2152,8 @@ async function runAiPlanner() {
         }
 
         if (dbError) {
-            // Fallback: salva localmente para não perder o rascunho
-            const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-            mockAssets.unshift({ ...planejamentoRecord, id: planejamentoRecord.planejamento_id });
-            localStorage.setItem('fluxai_mock_assets', JSON.stringify(mockAssets));
-            console.warn('[IA_PLANNER] Fallback localStorage ativado. Erro:', dbError);
+            console.error('[IA_PLANNER] Erro fatal ao gravar Supabase:', dbError);
+            throw new Error('Falha ao inserir pauta no banco de dados. Geração abortada.');
         }
 
         // [NOVO GUARDRAIL OFICIAL - CENÁRIO 13]

@@ -333,27 +333,6 @@ const FLUXAI_ALLOWED_USERS = Object.freeze({
         role: 'ADMIN',
         permissions: ['*'],
         project_id: 'FLUXAI_LABS_001'
-    },
-    'admin@fluxai.com': {
-        id: 'ADMIN_002',
-        full_name: 'Admin FluxAI',
-        role: 'ADMIN',
-        permissions: ['*'],
-        project_id: 'FLUXAI_LABS_001'
-    },
-    'kassiadgomesf@icloud.com': {
-        id: 'ADMIN_003',
-        full_name: 'Kássia Gomes',
-        role: 'ADMIN',
-        permissions: ['*'],
-        project_id: 'FLUXAI_LABS_001'
-    },
-    'kassia@fluxai.com': {
-        id: 'ADMIN_004',
-        full_name: 'Kássia Gomes',
-        role: 'ADMIN',
-        permissions: ['*'],
-        project_id: 'FLUXAI_LABS_001'
     }
 });
 
@@ -392,7 +371,8 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
     }
 
     const email = sessionUser ? String(sessionUser.email || '').toLowerCase().trim() : null;
-    const knownProfile = email ? (FLUXAI_ALLOWED_USERS[email] || null) : null;
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const knownProfile = (email && isLocalhost) ? (FLUXAI_ALLOWED_USERS[email] || null) : null;
 
     console.log("[AUTH_BOOTSTRAP]", {
         route: window.location.pathname,
@@ -447,8 +427,11 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
             }
         } catch (err) {
             console.error('[RBAC] Bloqueio: Conta sem perfil operacional válido.', err.message);
-            alert('Falha de Acesso: Sua conta não possui um perfil operacional válido. Contate o administrador.');
-            await OS_AUTH.logout();
+            if (supabase) await supabase.auth.signOut();
+            window.FLUXAI_RUNTIME_CONTEXT = null;
+            localStorage.removeItem('fluxai_current_project_id');
+            const hasExt = window.location.pathname.endsWith('.html');
+            window.location.replace((hasExt ? 'login.html' : 'login') + '?error=no_profile');
             return null;
         }
     }

@@ -380,14 +380,34 @@ window.handleOnboarding = async function(e) {
     let projectId = window.ONBOARDING_CLIENT_ID;
 
     if (window.ONBOARDING_MODE === 'new' || !projectId) {
-        // Geração rigorosa de client_id (NOME_CLIENTE_001)
+        // Geração rigorosa de client_id com verificação anti-duplicidade
         const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
         
         if (safeName === 'FLUXAI_LABS' || safeName === 'FLUXAI') {
             projectId = 'FLUXAI_LABS_001';
         } else {
-            // Cliente Pagante: Nome + Padrão 001
-            projectId = safeName + '_001';
+            // Anti-Duplicidade: Verifica no Supabase
+            const supabase = getSupabase();
+            let baseId = safeName;
+            let counter = 1;
+            let finalId = `${baseId}_${String(counter).padStart(3, '0')}`;
+            
+            if (supabase) {
+                while (true) {
+                    try {
+                        const { data } = await supabase.from('projects').select('id').eq('id', finalId).limit(1);
+                        if (data && data.length > 0) {
+                            counter++;
+                            finalId = `${baseId}_${String(counter).padStart(3, '0')}`;
+                        } else {
+                            break;
+                        }
+                    } catch (e) {
+                        break;
+                    }
+                }
+            }
+            projectId = finalId;
         }
     }
 
@@ -601,11 +621,14 @@ window.handleOnboarding = async function(e) {
             btn.style.background = '#ef4444';
             btn.disabled = false;
             
+            const overlay = document.getElementById('deploy-overlay');
+            if (overlay) overlay.style.display = 'none';
+            
             const alertHtml = `
                 <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 8px; margin-top: 20px; color: #fca5a5;">
                     <strong>🚨 ERRO DE VALIDAÇÃO NO MAKE</strong><br/>
                     O Make bloqueou o registro ou não respondeu. Detalhe: ${makeRes.data?.status || 'Erro interno'}.<br/>
-                    Verifique se o cliente já existe ou revise o histórico do webhook 09.
+                    Verifique o histórico do webhook 09 para mais detalhes.
                 </div>
             `;
             alertContainer.insertAdjacentHTML('beforeend', alertHtml);
@@ -620,153 +643,20 @@ window.handleOnboarding = async function(e) {
         btn.style.background = '#ef4444';
         btn.disabled = false;
         
+        const overlay = document.getElementById('deploy-overlay');
+        if (overlay) overlay.style.display = 'none';
+        
         const alertHtml = `
             <div style="background: rgba(239, 68, 68, 0.1); border: 1px solid #ef4444; padding: 20px; border-radius: 8px; margin-top: 20px; color: #fca5a5;">
                 <strong>🚨 FALHA NA CONEXÃO COM O PROXY</strong><br/>
-                Erro de rede ou proxy inacessível. O onboarding não prosseguiu.
+                Erro de rede ou proxy inacessível. O onboarding não prosseguiu. (${err.message || 'Timeout'})
             </div>
         `;
         alertContainer.insertAdjacentHTML('beforeend', alertHtml);
     }
 }
 
-function generatePautasTemplates(projId, raw) {
-    const segmentLabel = raw.segment || "SAUDE";
-    const painPoints = raw.pain_points ? raw.pain_points.split('\n')[0] : "concorrentes tradicionais";
-    const voiceTone = raw.voice_tone || "Soberano e Técnico";
-    
-    return [
-        {
-            project_id: projId,
-            title: "Direção Audiovisual: Posicionamento no segmento " + segmentLabel,
-            status: "DRAFT_PLANNING",
-            priority: "ALTA",
-            platform: "REELS",
-            scheduled_at: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-            caption: `🎯 OBJETIVO: Afirmação de autoridade e combate direto à dor de '${painPoints}'.\n\n🎬 HOOK: "A maioria das empresas em ${segmentLabel} foca em volume, quando o verdadeiro segredo para escalar é a arquitetura estratégica."\n\n💡 NARRATIVA: Desenvolver raciocínio fundamentado com tom de voz ${voiceTone}. Sem diquinhas rápidas.\n\n✨ CTA: ${raw.ideal_cta || 'Toque no link da bio para entender.'}`,
-            metadata: { responsible: "Audiovisual", version: "V1", revision_cycle: 1, version_active: true, strategic_approved: false, operational_approved: false, client_approved: false }
-        },
-        {
-            project_id: projId,
-            title: "Estrutura Narrativa: Diferenciais de Posicionamento e Proposta de Valor",
-            status: "DRAFT_PLANNING",
-            priority: "MÉDIA",
-            platform: "CARROSSEL",
-            scheduled_at: new Date(Date.now() + 8 * 24 * 60 * 60 * 1000).toISOString(),
-            caption: `🎯 OBJETIVO: Apresentar a Proposta de Valor única: '${raw.value_proposition || 'Alta performance corporativa'}'.\n\nSlide 1: O custo invisível de não possuir diferenciação.\nSlide 2: Por que a maioria foca no operacional em vez de focar no posicionamento.\nSlide 3: Nossa metodologia foca exatamente em: ${raw.differentiators || 'Processos refinados'}.\n\n✨ CTA: ${raw.ideal_cta || 'Envie uma DM para diagnóstico.'}`,
-            metadata: { responsible: "Design", version: "V1", revision_cycle: 1, version_active: true, strategic_approved: false, operational_approved: false, client_approved: false }
-        },
-        {
-            project_id: projId,
-            title: "Direção Estratégica: Combate às Objeções Comuns do ICP",
-            status: "DRAFT_PLANNING",
-            priority: "ALTA",
-            platform: "INSTAGRAM",
-            scheduled_at: new Date(Date.now() + 12 * 24 * 60 * 60 * 1000).toISOString(),
-            caption: `🎯 OBJETIVO: Quebrar objeções frequentes, especificamente: '${raw.objections || 'Orçamento ou tempo'}'.\n\n💡 CONCEITO: Mostrar que o verdadeiro risco está em manter o status quo. Aplicar a diretriz: ${raw.desired_language || 'Arquitetura de crescimento'}.\n\n✨ CTA: Salve este conteúdo para consultar ao planejar seu próximo trimestre.`,
-            metadata: { responsible: "Estrategista", version: "V1", revision_cycle: 1, version_active: true, strategic_approved: false, operational_approved: false, client_approved: false }
-        }
-    ];
-}
 
-function registerLocalMockProjectAndUser(projectId, projectData, raw, email) {
-    try {
-        const contractId = "c_" + Date.now();
-        const userId = "u_" + Date.now();
-
-        // 1. Salvar no localStorage de Projetos
-        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-        const existingProjIdx = mockProjects.findIndex(p => p.company_name === raw.company_name);
-        
-        const finalProj = {
-            id: projectId,
-            ...projectData
-        };
-
-        if (existingProjIdx >= 0) {
-            mockProjects[existingProjIdx] = finalProj;
-        } else {
-            mockProjects.push(finalProj);
-        }
-        localStorage.setItem('fluxai_mock_projects', JSON.stringify(mockProjects));
-
-        // 2. Salvar Contrato
-        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-        const extraValue = Number(raw.finance_extra_services_value) || 0;
-        let finalDeliverables = `Módulos: ${Array.from(new FormData(document.getElementById('onboardingForm')).getAll('modules')).join(', ')}`;
-        if (extraValue > 0) {
-            finalDeliverables += `\n[EXTRA]: ${raw.finance_extra_services_type} - ${raw.finance_extra_services_desc}`;
-        }
-
-        mockContracts.push({
-            id: contractId,
-            project_id: projectId,
-            client_name: raw.responsible_name,
-            company_name: raw.company_name,
-            deliverables: finalDeliverables,
-            contract_value: Number(raw.monthly_fee) || 0,
-            status: 'ATIVO',
-            created_at: new Date().toISOString(),
-            due_day: Number(raw.payment_day) || 5
-        });
-        localStorage.setItem('fluxai_mock_contracts', JSON.stringify(mockContracts));
-
-        // 3. Salvar Usuário
-        const mockUsers = JSON.parse(localStorage.getItem('fluxai_mock_users') || '[]');
-        mockUsers.push({
-            id: userId,
-            project_id: projectId,
-            full_name: raw.responsible_name,
-            email: email,
-            password: "TEMP_" + Date.now().toString(),
-            role: "CLIENT",
-            permissions: ["client-portal"],
-            needsPasswordChange: true
-        });
-        localStorage.setItem('fluxai_mock_users', JSON.stringify(mockUsers));
-
-        // 4. Inserir as 3 Pautas Iniciais de Conteúdo Mocks
-        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-        const pautas = generatePautasTemplates(projectId, raw);
-        localStorage.setItem('fluxai_mock_assets', JSON.stringify([...mockAssets, ...pautas]));
-
-        // 5. Injetar Logs de Ativação na Timeline Geral
-        const mockTimeline = JSON.parse(localStorage.getItem('fluxai_mock_timeline') || '[]');
-        const logs = [
-            {
-                id: "log_" + Date.now() + "_1",
-                project_id: projectId,
-                type: 'SISTEMA',
-                title: 'Deploy de Workspace Concluído',
-                description: `Infraestrutura operacional de '${raw.company_name}' provisionada com sucesso no tenant_id: tenant_${projectId}.`,
-                date: new Date().toISOString(),
-                author: 'System Provisioning Engine'
-            },
-            {
-                id: "log_" + Date.now() + "_2",
-                project_id: projectId,
-                type: 'IA_ENGINE',
-                title: 'Consolidação de Memória Estratégica',
-                description: `Linguagem permitida calçada sob tom '${raw.voice_tone || 'Soberano'}'. Foco de 30 dias direcionado para '${raw.priority_30d}'.`,
-                date: new Date().toISOString(),
-                author: 'FluxAI Memory Core'
-            },
-            {
-                id: "log_" + Date.now() + "_3",
-                project_id: projectId,
-                type: 'OPERACIONAL',
-                title: 'SLA & Matriz de Governança Sincronizados',
-                description: `Acordo de nível de serviço definido para ${raw.sla_minutes} min. Responsável de aprovação final atribuído a '${raw.approval_responsible}'.`,
-                date: new Date().toISOString(),
-                author: 'Workflow Manager'
-            }
-        ];
-        localStorage.setItem('fluxai_mock_timeline', JSON.stringify([...mockTimeline, ...logs]));
-
-    } catch (e) {
-        console.error('[ONBOARDING] Erro ao gravar local mock:', e);
-    }
-}
 
 initOnboarding();
 
