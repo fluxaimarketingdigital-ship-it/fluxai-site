@@ -650,11 +650,13 @@
                     document.getElementById('asset-body-title').innerText = 'Aprovação de Planejamento';
                 }
 
-                let prefix = 'POST', obj = 'Estratégia';
+                let prefix = c.formato_conteudo || 'POST', obj = c.objetivo_conteudo || 'Estratégia';
                 try {
-                    const titleParts = formatClientTitle(c.title);
-                    prefix = titleParts.prefix;
-                    obj = titleParts.obj;
+                    if (c.title && !c.formato_conteudo) {
+                        const titleParts = formatClientTitle(c.title);
+                        prefix = titleParts.prefix;
+                        obj = titleParts.obj;
+                    }
                 } catch (e) {}
 
                 document.getElementById('meta-obj').innerText = obj;
@@ -1072,11 +1074,13 @@
                     document.getElementById('asset-body-title').innerText = 'Aprovação de Planejamento';
                 }
 
-                let prefix = 'POST', obj = 'Estratégia';
+                let prefix = c.formato_conteudo || 'POST', obj = c.objetivo_conteudo || 'Estratégia';
                 try {
-                    const titleParts = formatClientTitle(c.title);
-                    prefix = titleParts.prefix;
-                    obj = titleParts.obj;
+                    if (c.title && !c.formato_conteudo) {
+                        const titleParts = formatClientTitle(c.title);
+                        prefix = titleParts.prefix;
+                        obj = titleParts.obj;
+                    }
                 } catch (e) {}
 
                 document.getElementById('meta-obj').innerText = obj;
