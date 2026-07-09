@@ -671,6 +671,35 @@
                 _supabaseClient = getSupabase() || window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
             }
 
+            const PROJECT_IDENTITY_MAP = {
+              FLUXAI_LABS_001: {
+                project_uuid: '3acae009-6825-4163-9057-cbe99216cc3b',
+                legacy_client_id: 'FLUXAI_LABS_001'
+              }
+            };
+
+            function resolveProjectIdentity(inputId) {
+              if (!inputId) return null;
+
+              const mapped = PROJECT_IDENTITY_MAP[inputId];
+
+              if (mapped) {
+                return {
+                  input_id: inputId,
+                  project_uuid: mapped.project_uuid,
+                  legacy_client_id: mapped.legacy_client_id,
+                  is_legacy: true
+                };
+              }
+
+              return {
+                input_id: inputId,
+                project_uuid: inputId,
+                legacy_client_id: inputId,
+                is_legacy: false
+              };
+            }
+
             try {
                 const isMockProject =
                   !projectId ||
@@ -683,8 +712,11 @@
                     console.warn('[CLIENT_PORTAL] project_id local/mock detectado. Supabase query ignorada e fallback local ativado.', { projectId });
                     throw new Error('project_id local/mock detectado');
                 }
-                // 1. Dados do Projeto
-                const { data: proj, error } = await _supabaseClient.from('projects').select('*').eq('id', projectId).single();
+
+                const identity = resolveProjectIdentity(projectId);
+
+                // 1. Dados do Projeto (SEMPRE USAR UUID REAL)
+                const { data: proj, error } = await _supabaseClient.from('projects').select('*').eq('id', identity.project_uuid).single();
                 if (error) throw error;
                 if (proj) {
                     document.getElementById('dual-client-name').innerText = (proj.name || proj.company_name).split(' ')[0].toUpperCase();
