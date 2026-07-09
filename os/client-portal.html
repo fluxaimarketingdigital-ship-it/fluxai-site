@@ -718,29 +718,27 @@
 
                 const identity = resolveProjectIdentity(projectId);
 
-                // 1. Dados do Projeto (Busca resiliente com fallbacks)
-                let { data: proj, error } = await _supabaseClient.from('projects').select('*').eq('id', identity.project_uuid).maybeSingle();
-                
+                // 1. Dados do Projeto — apenas por UUID real (a tabela projects não possui client_id nem project_id)
+                const { data: proj } = await _supabaseClient.from('projects').select('*').eq('id', identity.project_uuid).maybeSingle();
+
+                const projData = proj || {
+                    id: identity.project_uuid,
+                    name: identity.legacy_client_id || projectId,
+                    company_name: identity.legacy_client_id || projectId,
+                    metadata: {
+                        legacy_client_id: identity.legacy_client_id,
+                        source: 'identity_fallback'
+                    }
+                };
+
                 if (!proj) {
-                    const { data: fallbackProj1 } = await _supabaseClient.from('projects').select('*').eq('client_id', identity.legacy_client_id).maybeSingle();
-                    proj = fallbackProj1;
-                }
-                
-                if (!proj) {
-                    const { data: fallbackProj2 } = await _supabaseClient.from('projects').select('*').eq('project_id', identity.legacy_client_id).maybeSingle();
-                    proj = fallbackProj2;
+                    console.info('[CLIENT_PORTAL] Projeto não encontrado no Supabase. Usando identity fallback local.', { projectId, identity });
                 }
 
-                if (proj) {
-                    document.getElementById('dual-client-name').innerText = (proj.name || proj.company_name).split(' ')[0].toUpperCase();
-                    window.currentClientDriveLink = proj.metadata?.onboarding?.asset_drive_link || proj.metadata?.asset_drive_link || '#';
-                    const profession = proj.metadata?.onboarding?.profession || 'Estratégia Institucional';
-                    document.getElementById('client-profession').innerText = profession.toUpperCase();
-                } else {
-                    console.warn('[CLIENT_PORTAL] Projeto não encontrado no banco de dados. Usando dados da URL (legacy_client_id).');
-                    document.getElementById('dual-client-name').innerText = identity.legacy_client_id.toUpperCase();
-                    document.getElementById('client-profession').innerText = 'PROJETO LEGADO';
-                }
+                document.getElementById('dual-client-name').innerText = (projData.name || projData.company_name || projectId).split(' ')[0].toUpperCase();
+                window.currentClientDriveLink = projData.metadata?.onboarding?.asset_drive_link || projData.metadata?.asset_drive_link || '#';
+                const profession = projData.metadata?.onboarding?.profession || 'Estratégia Institucional';
+                document.getElementById('client-profession').innerText = profession.toUpperCase();
 
             } catch (err) {
                 console.warn('[PORTAL] Dados do projeto não carregados do Supabase. Continuando com dados da URL.', err?.message || err);
