@@ -647,8 +647,7 @@
 
                     return;
                 }
-
-                const isFinalArt = currentStatus === 'APROVAÇÃO FINAL' || currentStatus === 'CLIENT_REVIEW_CONTENT';
+                const isFinalArt = currentStatus === 'CLIENT_REVIEW_CONTENT';
                 document.getElementById('main-ui').style.display = 'block';
 
                 if (isFinalArt) {
@@ -878,7 +877,7 @@
                     try {
                         let nextStatus = 'PRODUÇÃO';
                         let logicalTarget = 'planning_approved';
-                        if (currentStatus === 'APROVAÇÃO FINAL') {
+                        if (currentStatus === 'CLIENT_REVIEW_CONTENT') {
                             nextStatus = 'PRONTO';
                             logicalTarget = 'content_approved';
                         }
@@ -1010,8 +1009,9 @@
                 const companyNameUpper = activeProject.company_name.toUpperCase();
                 document.getElementById('portal-subtitle').innerText = `PORTAL DE APROVAÇÃO: ${companyNameUpper}`;
                 
-                const currentStatus = (c.status || '').toUpperCase();
-                const allowedStatus = ['APROVAÇÃO PLANEJAMENTO', 'APROVAÇÃO FINAL', 'CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'];
+                const rawStatus = c.status_planejamento || c.status || '';
+                const currentStatus = mapToStandardStatus(rawStatus);
+                const allowedStatus = ['CLIENT_REVIEW_PLANNING', 'CLIENT_REVIEW_CONTENT'];
                 
                 if (!allowedStatus.includes(currentStatus)) {
                     document.getElementById('loading-state').style.display = 'none';
@@ -1071,7 +1071,7 @@
                     return;
                 }
 
-                const isFinalArt = currentStatus === 'APROVAÇÃO FINAL' || currentStatus === 'CLIENT_REVIEW_CONTENT';
+                const isFinalArt = currentStatus === 'CLIENT_REVIEW_CONTENT';
                 document.getElementById('main-ui').style.display = 'block';
 
                 if (isFinalArt) {
@@ -1329,7 +1329,7 @@
                     try {
                         let nextStatus = 'PRODUÇÃO';
                         let logicalTarget = 'planning_approved';
-                        if (currentStatus === 'CLIENT_REVIEW_CONTENT' || currentStatus === 'APROVAÇÃO FINAL') {
+                        if (currentStatus === 'CLIENT_REVIEW_CONTENT') {
                             nextStatus = 'PRONTO';
                             logicalTarget = 'content_approved';
                         }
