@@ -672,7 +672,14 @@
             }
 
             try {
-                if (!isUUID(projectId)) {
+                const isMockProject =
+                  !projectId ||
+                  projectId === 'undefined' ||
+                  projectId === 'null' ||
+                  projectId.startsWith('mock_') ||
+                  projectId.startsWith('demo_');
+
+                if (isMockProject) {
                     console.warn('[CLIENT_PORTAL] project_id local/mock detectado. Supabase query ignorada e fallback local ativado.', { projectId });
                     throw new Error('project_id local/mock detectado');
                 }
