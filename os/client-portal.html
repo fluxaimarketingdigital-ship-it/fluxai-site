@@ -718,14 +718,28 @@
 
                 const identity = resolveProjectIdentity(projectId);
 
-                // 1. Dados do Projeto (SEMPRE USAR UUID REAL)
-                const { data: proj, error } = await _supabaseClient.from('projects').select('*').eq('id', identity.project_uuid).single();
-                if (error) throw error;
+                // 1. Dados do Projeto (Busca resiliente com fallbacks)
+                let { data: proj, error } = await _supabaseClient.from('projects').select('*').eq('id', identity.project_uuid).maybeSingle();
+                
+                if (!proj) {
+                    const { data: fallbackProj1 } = await _supabaseClient.from('projects').select('*').eq('client_id', identity.legacy_client_id).maybeSingle();
+                    proj = fallbackProj1;
+                }
+                
+                if (!proj) {
+                    const { data: fallbackProj2 } = await _supabaseClient.from('projects').select('*').eq('project_id', identity.legacy_client_id).maybeSingle();
+                    proj = fallbackProj2;
+                }
+
                 if (proj) {
                     document.getElementById('dual-client-name').innerText = (proj.name || proj.company_name).split(' ')[0].toUpperCase();
                     window.currentClientDriveLink = proj.metadata?.onboarding?.asset_drive_link || proj.metadata?.asset_drive_link || '#';
                     const profession = proj.metadata?.onboarding?.profession || 'Estratégia Institucional';
                     document.getElementById('client-profession').innerText = profession.toUpperCase();
+                } else {
+                    console.warn('[CLIENT_PORTAL] Projeto não encontrado no banco de dados. Usando dados da URL (legacy_client_id).');
+                    document.getElementById('dual-client-name').innerText = identity.legacy_client_id.toUpperCase();
+                    document.getElementById('client-profession').innerText = 'PROJETO LEGADO';
                 }
 
             } catch (err) {
