@@ -888,7 +888,19 @@
 
                         const updateData = { status_planejamento: nextStatus };
                         if (nextStatus === 'PRODUÇÃO') {
-                            updateData.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
+                            updateData.metadata = { 
+                                ...c.metadata, 
+                                revision_cycle: c.metadata?.revision_cycle ?? 1, 
+                                version: c.metadata?.version ?? 'V1',
+                                client_approved: true
+                            };
+                        }
+                        if (nextStatus === 'PRONTO') {
+                            updateData.metadata = {
+                                ...c.metadata,
+                                client_approved: true,
+                                content_approved_at: new Date().toISOString()
+                            };
                         }
 
                         const { error } = await _supabaseClient.from('PLANEJAMENTO_CONTEUDO').update(updateData).eq('planejamento_id', id);
@@ -1340,7 +1352,10 @@
                         
                         await executeTransition(c, nextStatus, logicalTarget);
 
-                        // Atualizar no localStorage
+                        // LEGACY FLOW
+                        // Compatibilidade.
+                        // Não utilizado pelo fluxo oficial Supabase.
+                        // Não remover nesta fase.
                         c.status = nextStatus;
                         if (nextStatus === 'PRODUÇÃO') {
                             c.metadata = { ...c.metadata, revision_cycle: 1, version: 'V1' };
