@@ -743,10 +743,13 @@
                 }
 
             } catch (err) {
-                console.error('[PORTAL] Erro fatal de comunicação com servidor:', err);
-                alert('Servidor indisponível ou projeto não encontrado. Verifique sua conexão.');
-                document.getElementById('dual-client-name').innerText = 'ERRO DE SERVIDOR';
-                return;
+                console.warn('[PORTAL] Dados do projeto não carregados do Supabase. Continuando com dados da URL.', err?.message || err);
+                // Não bloquear o portal — continuar renderizando com dados mínimos
+                const fallbackId = projectId || 'PORTAL';
+                const nameEl = document.getElementById('dual-client-name');
+                if (nameEl && nameEl.innerText === '') nameEl.innerText = fallbackId.toUpperCase();
+                const profEl = document.getElementById('client-profession');
+                if (profEl && profEl.innerText === '') profEl.innerText = 'PORTAL DO CLIENTE';
             }
             
             if (session.role === 'CLIENT' && session.full_name) {
