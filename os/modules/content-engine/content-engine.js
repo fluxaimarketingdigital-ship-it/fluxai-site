@@ -704,12 +704,14 @@ function renderCalendar(containerId, contents, mode) {
 
             const evtNode = document.createElement('div');
             evtNode.className = 'calendar-event';
-            evtNode.onclick = () => window.openEditModal(c.id);
+           const safeId = c.id || c.planejamento_id;
+        evtNode.onclick = () => window.openEditModal(safeId);
             evtNode.style.cssText = `border-left-color: ${statusColor}; background: rgba(255,255,255,0.02); font-size: 0.6rem; padding: 4px 8px; margin-bottom: 4px; border-radius: 2px; cursor: pointer;`;
             
             const titleNode = document.createElement('div');
             titleNode.style.cssText = 'font-weight: 800; color: #fff;';
-            titleNode.textContent = c.title.substring(0, 15);
+            const safeTitle = c.title || c.tema || c.nome_ativo || c.planejamento_id || 'Sem título';
+titleNode.textContent = safeTitle.substring(0, 15);
             
             const verNode = document.createElement('div');
             verNode.style.cssText = 'font-size: 0.55rem; color: #fff; font-weight: 700; opacity: 0.7;';
