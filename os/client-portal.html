@@ -556,7 +556,10 @@
         let currentMonth = new Date().getMonth();
 
         const params = new URLSearchParams(window.location.search);
-        let projectId = params.get('project_id') || params.get('project') || localStorage.getItem('fluxai_current_project_id') || 'p_c1';
+        let projectId = params.get('project_id') || params.get('project') || localStorage.getItem('fluxai_current_project_id');
+        if (!projectId || projectId === 'undefined' || projectId === 'null' || String(projectId).trim() === '') {
+            projectId = 'FLUXAI_LABS_001';
+        }
 
         function isValidSupabaseUrl(url) {
             try {

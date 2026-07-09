@@ -638,10 +638,11 @@
                     const actionsContainer = document.getElementById('success-actions'); 
                     if (actionsContainer && !document.getElementById('btn-return-portal')) { 
                         const btn = document.createElement('button'); 
+                        const returnProjectId = c.project_id || c.client_id || c.metadata?.project_id || c.metadata?.client_id || 'FLUXAI_LABS_001';
                         btn.id = 'btn-return-portal'; 
                         btn.className = 'btn-return'; 
                         btn.textContent = 'VOLTAR AO CALENDÁRIO'; 
-                        btn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.project_id); }; 
+                        btn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${encodeURIComponent(returnProjectId)}`; }; 
                         actionsContainer.appendChild(btn); 
                     }
 
@@ -859,7 +860,8 @@
                     const btnReturn = document.createElement('button');
                     btnReturn.className = 'btn-return';
                     btnReturn.innerText = 'VOLTAR AO CALENDÁRIO';
-                    btnReturn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.client_id); };
+                    const returnProjectId = c.project_id || c.client_id || c.metadata?.project_id || c.metadata?.client_id || 'FLUXAI_LABS_001';
+                    btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${encodeURIComponent(returnProjectId)}`; };
                     actionsContainer.appendChild(btnReturn);
                     
                     document.getElementById('success-ui').style.display = 'block';
@@ -1065,7 +1067,8 @@
                         btn.id = 'btn-return-portal';
                         btn.className = 'btn-return';
                         btn.textContent = 'VOLTAR AO CALENDÁRIO';
-                        btn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.project_id); };
+                        const returnProjectId = c.project_id || c.client_id || c.metadata?.project_id || c.metadata?.client_id || 'FLUXAI_LABS_001';
+                        btn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${encodeURIComponent(returnProjectId)}`; };
                         actionsContainer.appendChild(btn);
                     }
                     return;
@@ -1311,7 +1314,8 @@
                     const btnReturn = document.createElement('button');
                     btnReturn.className = 'btn-return';
                     btnReturn.textContent = 'VOLTAR AO CALENDÁRIO';
-                    btnReturn.onclick = () => { window.location.href = '/os/client-portal.html?project_id=' + encodeURIComponent(c.project_id || c.client_id || ''); };
+                    const returnProjectId = c.project_id || c.client_id || c.metadata?.project_id || c.metadata?.client_id || 'FLUXAI_LABS_001';
+                    btnReturn.onclick = () => { window.location.href = `/os/client-portal.html?project_id=${encodeURIComponent(returnProjectId)}`; };
                     actionsContainer.appendChild(btnReturn);
                     
                     document.getElementById('success-ui').style.display = 'block';
