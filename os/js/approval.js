@@ -87,7 +87,7 @@ async function initApproval() {
             let isLegacy = false;
             let { data, error } = await supabase
                 .from('PLANEJAMENTO_CONTEUDO')
-                .select('*')
+                .select('id, title, platform, status, copy_text, media_urls, scheduled_at, metadata, project_id')
                 .eq('planejamento_id', assetId)
                 .single();
             
@@ -95,7 +95,7 @@ async function initApproval() {
                 // Fallback legado content_assets
                 const legacy = await supabase
                     .from('content_assets')
-                    .select('*')
+                    .select('id, title, platform, status, copy_text, media_urls, scheduled_at, metadata, project_id')
                     .eq('id', assetId)
                     .single();
                 

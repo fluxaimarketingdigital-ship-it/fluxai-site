@@ -2,6 +2,7 @@ import { getSupabase } from '../../services/supabase-client.js';
 import { OS_CONFIG } from '../../config/os-config.js';
 import { OS_LOGS_ENGINE } from '../../services/logs-engine.js';
 import { OS_AUTH } from '../os-core.js';
+import { OSState } from '../os-state.js';
 
 export async function processEntityAction(actionType, entityType, entity, currentProject, confirmMsg, payload, mockStorageKey, statusConfigs, logEvents, loadCallback) {
     if (!confirm(confirmMsg)) return;
@@ -50,7 +51,7 @@ export async function populateProjectFilter(selectId, onSelectCallback, currentP
     
     filter.onchange = async (e) => {
         const newProj = e.target.value;
-        localStorage.setItem('fluxai_current_project_id', newProj);
+        OSState.set('activeProjectId', newProj);
         if (onSelectCallback) {
             await onSelectCallback(newProj);
         }
@@ -61,7 +62,7 @@ export async function populateProjectFilter(selectId, onSelectCallback, currentP
         let projects = cached ? JSON.parse(cached) : [];
         if (!projects || projects.length === 0) {
             const supabase = getSupabase();
-            const { data } = await supabase.from('projects').select('*').eq('status', 'ATIVO');
+            const { data } = await supabase.from('projects').select('id, company_name, name').eq('status', 'ATIVO');
             projects = data || [];
         }
 

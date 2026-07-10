@@ -66,7 +66,7 @@ async function loadDemands() {
 
         const { data: dbDemands, error } = await supabase
             .from('DEMANDAS_CLIENTES')
-            .select('*')
+            .select('demanda_id, client_id, titulo_demanda, prioridade, prazo, status_demanda, data_criacao')
             .eq('client_id', currentProject)
             .neq('status_demanda', 'arquivado')
             .order('data_criacao', { ascending: false });

@@ -287,7 +287,7 @@ function setupModeToggle() {
             loadBtn.disabled = true;
 
             // Fetch basic strategy data and the massive JSON payload
-            const { data: estData } = await supabase.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', clientId).single();
+            const { data: estData } = await supabase.from('CLIENTES_ESTRATEGIA').select('cliente_nome, segmento, objetivo_principal, responsavel_fluxai, setup_completo').eq('client_id', clientId).single();
             if (estData) {
                 const form = document.getElementById('onboardingForm');
                 
@@ -384,7 +384,7 @@ window.handleOnboarding = async function(e) {
         const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
         
         if (safeName === 'FLUXAI_LABS' || safeName === 'FLUXAI') {
-            projectId = 'FLUXAI_LABS_001';
+            projectId = 'FLUXAI_LABS_001'; // ID legado protegido do workspace interno
         } else {
             // Anti-Duplicidade: Verifica no Supabase
             const supabase = getSupabase();
@@ -411,7 +411,7 @@ window.handleOnboarding = async function(e) {
         }
     }
 
-    const isOwner = projectId === 'FLUXAI_LABS_001';
+    const isOwner = projectId === 'FLUXAI_LABS_001'; // workspace interno da FluxAI
 
     // Captura usuário autenticado para responsavel_fluxai
     const currentSessionUser = await OS_AUTH.check('ADMIN').catch(() => null);
@@ -665,7 +665,8 @@ initOnboarding();
 
 
 
-const DRAFT_KEY = "fluxai_onboarding_draft_FLUXAI_LABS_001";
+// Chave de rascunho de formulário (cache de UI, não-crítico)
+const DRAFT_KEY = 'fluxai_onboarding_draft';
 
 window.saveOnboardingDraft = function(isAuto = false) {
     const form = document.getElementById('onboardingForm');

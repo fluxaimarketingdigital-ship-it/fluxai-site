@@ -94,9 +94,9 @@ async function _fetchClientKnowledge(projectId) {
     if (supabase && projectId && projectId !== 'proj_fluxai_labs_master') {
         try {
             const [projRes, contractRes, extrasRes, assetsRes, eventsRes] = await Promise.all([
-                supabase.from('projects').select('*').eq('id', projectId).single(),
-                supabase.from('contracts').select('*').eq('project_id', projectId).eq('status', 'ATIVO').single(),
-                supabase.from('extra_services_contracts').select('*').eq('project_id', projectId).neq('workflow_status', 'CONCLUIDO'),
+                supabase.from('projects').select('company_name, segment, workspace_type, is_billing_exempt, tone, operational_activation, objectives, digital_infrastructure, metadata').eq('id', projectId).single(),
+                supabase.from('contracts').select('deliverables, contract_value, due_day, status, start_date').eq('project_id', projectId).eq('status', 'ATIVO').single(),
+                supabase.from('extra_services_contracts').select('service_type, workflow_status, service_value, deadline, responsible').eq('project_id', projectId).neq('workflow_status', 'CONCLUIDO'),
                 supabase.from('content_assets').select('id,title,status,platform,scheduled_at,metadata').eq('project_id', projectId).order('created_at', { ascending: false }).limit(8),
                 supabase.from('operational_events').select('event_type,responsible,context,created_at').eq('project_id', projectId).order('created_at', { ascending: false }).limit(6)
             ]);
@@ -110,17 +110,7 @@ async function _fetchClientKnowledge(projectId) {
         }
     }
 
-    // Fallback localStorage
-    if (!project) {
-        const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
-        project = mockProjects.find(p => p.id === projectId) || null;
-        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-        contract = mockContracts.find(c => c.project_id === projectId) || null;
-        const mockExtras = JSON.parse(localStorage.getItem('fluxai_mock_extras') || '[]');
-        extras = mockExtras.filter(e => e.project_id === projectId);
-        const mockAssets = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-        recentAssets = mockAssets.filter(a => a.project_id === projectId).slice(0, 8);
-    }
+    // Removido fallback localStorage de mocks legados (Macrobloco 13.2)
 
     const knowledge = {
         _fetchedAt: Date.now(),

@@ -62,7 +62,7 @@ export async function getProjectEvents(project_id, limit = 20) {
         try {
             const { data } = await supabase
                 .from('operational_events')
-                .select('*')
+                .select('id, event_type, responsible, context, created_at, project_id')
                 .eq('project_id', project_id)
                 .order('created_at', { ascending: false })
                 .limit(limit);
@@ -121,16 +121,11 @@ export async function createPayment({ contract_id, due_date, amount_due, payment
             await dispatchEvent('FATURA_GERADA', 'Sistema', `Fatura de R$ ${amount_due} gerada (${payment_type})`, payload, project_id);
             return data;
         } catch (err) {
-            console.warn('[FINANCE] Fallback local para pagamentos.', err);
+            console.warn('[FINANCE] Falha ao registrar pagamento no Supabase.', err);
         }
     }
 
-    // Fallback localStorage
-    const mock = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
-    const newPayment = { id: 'pay_' + Date.now(), ...payload, created_at: new Date().toISOString() };
-    mock.push(newPayment);
-    localStorage.setItem('fluxai_mock_payments', JSON.stringify(mock));
-    return newPayment;
+    return null; // Fallback mock removido (Macrobloco 13.2)
 }
 
 // ─────────────────────────────────────────────────────────────────
@@ -179,14 +174,11 @@ export async function activateExtraService({ project_id, contract_id, service_ty
             const { data } = await supabase.from('extra_services_contracts').insert([servicePayload]).select().single();
             serviceRecord = data;
         } catch (err) {
-            console.warn('[EXTRAS] Fallback local.', err);
+            console.warn('[EXTRAS] Falha ao registrar serviço extra no Supabase.', err);
         }
     }
     if (!serviceRecord) {
-        const mock = JSON.parse(localStorage.getItem('fluxai_mock_extras') || '[]');
-        serviceRecord = { id: 'ext_' + Date.now(), ...servicePayload, created_at: new Date().toISOString() };
-        mock.push(serviceRecord);
-        localStorage.setItem('fluxai_mock_extras', JSON.stringify(mock));
+        return null; // Fallback mock removido (Macrobloco 13.2)
     }
 
     // 2. Criar fatura avulsa
@@ -204,10 +196,10 @@ export async function activateExtraService({ project_id, contract_id, service_ty
             try {
                 await supabase.from('content_assets').insert(pautas);
             } catch (err) {
-                injectPautasLocal(pautas);
+                console.warn('[EXTRAS] Falha ao injetar pautas no Supabase.', err);
             }
         } else {
-            injectPautasLocal(pautas);
+            console.warn('[EXTRAS] Supabase indisponível, pautas não injetadas.');
         }
     }
 
@@ -223,11 +215,7 @@ export async function activateExtraService({ project_id, contract_id, service_ty
     return serviceRecord;
 }
 
-function injectPautasLocal(pautas) {
-    const mock = JSON.parse(localStorage.getItem('fluxai_mock_assets') || '[]');
-    pautas.forEach(p => mock.push({ id: 'a_ext_' + Date.now() + crypto.getRandomValues(new Uint32Array(1))[0].toString(36), ...p, created_at: new Date().toISOString() }));
-    localStorage.setItem('fluxai_mock_assets', JSON.stringify(mock));
-}
+// injectPautasLocal removida - Fallback mock neutralizado (Macrobloco 13.2)
 
 // ─────────────────────────────────────────────────────────────────
 // 4. ONBOARDING LINKING — Provisiona workspace completo
@@ -308,13 +296,7 @@ export async function getProjectFinancialAlert(project_id) {
     }
 
     if (payments.length === 0) {
-        // Fallback: calcular a partir dos mocks
-        const mockPayments = JSON.parse(localStorage.getItem('fluxai_mock_payments') || '[]');
-        const mockContracts = JSON.parse(localStorage.getItem('fluxai_mock_contracts') || '[]');
-        const projectContracts = mockContracts.filter(c => c.project_id === project_id);
-        payments = mockPayments.filter(p =>
-            projectContracts.some(c => c.id === p.contract_id) && p.status !== 'PAGO'
-        );
+        // Fallback mock removido (Macrobloco 13.2)
     }
 
     if (payments.length === 0) return null;

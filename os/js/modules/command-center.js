@@ -32,7 +32,7 @@ async function loadCommandCenter() {
             // 3: Relatórios Rascunho (Assumindo planejamento de assets)
             supabase.from('content_assets').select('id', { count: 'exact' }).eq('status', 'PLANEJAMENTO').then(res => res.error ? {count: 0, error: res.error} : res),
             // 4: Alertas Operacionais Críticos (Últimos Eventos)
-            supabase.from('operational_events').select('*').order('created_at', { ascending: false }).limit(5).then(res => res.error ? {data: [], error: res.error} : res),
+            supabase.from('operational_events').select('event_type, responsible, context, created_at').order('created_at', { ascending: false }).limit(5).then(res => res.error ? {data: [], error: res.error} : res),
             // 5: Tabela de Client Health
             supabase.from('operational_events').select('*, projects(company_name)').order('created_at', { ascending: false }).limit(10).then(res => res.error ? {data: [], error: res.error} : res)
         ];

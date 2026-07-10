@@ -387,11 +387,11 @@ async function loadClients() {
         
         if (supabase) {
             // Buscar dados da tabela projects (nova estrutura central)
-            const { data: projectsData, error: errProj } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+            const { data: projectsData, error: errProj } = await supabase.from('projects').select('id, company_name, name, status, segment, created_at').order('created_at', { ascending: false });
             
             // Fallbacks (para enriquecimento)
-            const { data: estrategiaData } = await supabase.from('CLIENTES_ESTRATEGIA').select('*');
-            const { data: contratosData } = await supabase.from('CONTRATOS_CLIENTES').select('*');
+            const { data: estrategiaData } = await supabase.from('CLIENTES_ESTRATEGIA').select('client_id, cliente_nome, objetivo_principal, plano_ativo');
+            const { data: contratosData } = await supabase.from('CONTRATOS_CLIENTES').select('client_id, status_contrato, tipo_contrato');
             
             if (projectsData && !errProj) {
                 clients = projectsData.map(row => {

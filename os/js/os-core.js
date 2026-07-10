@@ -135,10 +135,10 @@ export const OS_UI = {
             
             let href;
             if (item.id === 'client-portal') {
-                const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
+                const pid = OSState.get('activeProjectId') || '';
                 href = getRoute('client-portal', pid ? `?project_id=${encodeURIComponent(pid)}` : '');
             } else if (item.id === 'flux-calendar') {
-                const pid = OSState.get('activeProjectId') || localStorage.getItem('fluxai_current_project_id') || '';
+                const pid = OSState.get('activeProjectId') || '';
                 href = getRoute('flux-calendar', pid ? `?project=${encodeURIComponent(pid)}` : '');
             } else {
                 href = getRoute(encodeURIComponent(item.id));
@@ -210,7 +210,7 @@ export const OS_UI = {
             `font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid ${active ? color : 'var(--os-border)'}; background:${active ? color : 'rgba(255,255,255,0.04)'}; color:${active ? (color === 'var(--os-primary)' ? '#000' : '#fff') : 'var(--os-text-muted)'}; cursor:pointer; font-weight:800; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;`;
 
         // Mapear projeto ativo na topbar
-        const currentProjectId = localStorage.getItem('fluxai_current_project_id');
+        const currentProjectId = OSState.get('activeProjectId');
         let activeClientHtml = ""; 
         let activeProj = null; 
         let companyNameStr = 'TODOS OS CLIENTES';
@@ -332,7 +332,7 @@ const FLUXAI_ALLOWED_USERS = Object.freeze({
         full_name: 'Kássia Gomes',
         role: 'ADMIN',
         permissions: ['*'],
-        project_id: 'FLUXAI_LABS_001'
+        project_id: FLUXAI_LABS_PROJECT.id  // Workspace interno — não usar string literal
     }
 });
 
@@ -429,7 +429,7 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
             console.error('[RBAC] Bloqueio: Conta sem perfil operacional válido.', err.message);
             if (supabase) await supabase.auth.signOut();
             window.FLUXAI_RUNTIME_CONTEXT = null;
-            localStorage.removeItem('fluxai_current_project_id');
+            OSState.set('activeProjectId', null);
             const hasExt = window.location.pathname.endsWith('.html');
             window.location.replace((hasExt ? 'login.html' : 'login') + '?error=no_profile');
             return null;
@@ -534,7 +534,7 @@ export const OS_AUTH = {
         }
 
         window.FLUXAI_RUNTIME_CONTEXT = null;
-        localStorage.removeItem('fluxai_current_project_id');
+        OSState.set('activeProjectId', null);
         const supabase = getSupabase();
         if (supabase) {
             try {
@@ -559,7 +559,7 @@ export const OS_AUTH = {
         if (event === 'SIGNED_OUT' || event === 'TOKEN_REFRESHED' && !_session) {
             console.warn('[AUTH_GUARD] Sessão encerrada remotamente. Limpando contexto.');
             window.FLUXAI_RUNTIME_CONTEXT = null;
-            localStorage.removeItem('fluxai_current_project_id');
+            OSState.set('activeProjectId', null);
 
             // Redirecionar apenas se estiver em rota protegida
             const path = window.location.pathname.toLowerCase();

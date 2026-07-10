@@ -12,97 +12,16 @@ let iaBlocked = false;
 let automationsPaused = false;
 let currentUser = null;
 
-// Mock de detalhes adicionais de clientes para povoar o cockpit operacional
-const CLIENT_COCKPIT_MOCKS = {
-    'FLUXAI_LABS_001': {
-        name: 'FluxAI Labs',
-        segment: 'Tecnologia & IA',
-        startDate: '2025-01-01',
-        status: 'ativo',
-        contractType: 'Recorrente Mensal (Master Config)',
-        services: ['Gestão de Mídia Social', 'Camada GPT Autônoma', 'Criação de Landing Pages', 'Design de Criativos'],
-        extras: ['Upgrade Motor de Conteúdo (Aprovado)', 'Consultoria Avançada de IA (Aprovado)'],
-        scope: '3 publicações semanais (Reels/Carrossel), monitoramento diário de performance em Meta Ads, geração automatizada de relatórios executivos no D1 de cada ciclo e sincronização do Drive.',
-        iaMetrics: { limit: 20, approved: 12, review: 3, published: 9 },
-        metrics: [
-            { channel: 'Instagram', key: 'Seguidores', val: '12.4K', change: '+8.2%', alert: 'Estável' },
-            { channel: 'Meta Ads', key: 'ROAS Global', val: '4.8x', change: '+12.5%', alert: 'Excelente performance comercial' },
-            { channel: 'Google Analytics 4', key: 'Visitas Únicas', val: '42K', change: '+18.1%', alert: 'Crescimento de tráfego orgânico' }
-        ],
-        integrations: [
-            { name: 'Instagram Graph API', status: 'Conectado', token: 'ativo', manual: false, alert: 'Próxima renovação em 45 dias' },
-            { name: 'Meta Ads Manager API', status: 'Conectado', token: 'ativo', manual: false, alert: 'Sem pendências de faturamento' },
-            { name: 'Google Analytics 4 API', status: 'Conectado', token: 'ativo', manual: false, alert: 'Sincronização OK' },
-            { name: 'Google Tag Manager', status: 'Instalado', token: 'ativo', manual: false, alert: 'Tags ativas e disparando' },
-            { name: 'Microsoft Clarity', status: 'Conectado', token: 'ativo', manual: false, alert: 'Dados aquecidos' },
-            { name: 'Google Search Console', status: 'Conectado', token: 'ativo', manual: false, alert: 'Varredura OK' },
-            { name: 'Google Drive API', status: 'Conectado', token: 'ativo', manual: false, alert: 'Sincronização de arquivos ativa' }
-        ],
-        folders: {
-            root: 'https://drive.google.com/drive/folders/labs_root_id',
-            brand: 'https://drive.google.com/drive/folders/labs_brand_id',
-            contracts: 'https://drive.google.com/drive/folders/labs_contracts_id',
-            assets: 'https://drive.google.com/drive/folders/labs_assets_id'
-        }
-    },
-    'CLI_002': {
-        name: 'Empresa Alpha',
-        segment: 'Indústria High-Ticket',
-        startDate: '2025-03-15',
-        status: 'ativo',
-        contractType: 'Mensal Corporativo (Alpha Plus)',
-        services: ['Gestão de Mídia Social', 'Produção Audiovisual', 'Tráfego Pago Meta Ads'],
-        extras: ['Gravação Estúdio (Aprovado)'],
-        scope: '2 publicações semanais focadas em branding B2B, gestão ativa de contatos comerciais no CRM e campanhas focadas em atração de leads qualificados.',
-        iaMetrics: { limit: 10, approved: 4, review: 1, published: 3 },
-        metrics: [
-            { channel: 'Instagram', key: 'Seguidores', val: '4.2K', change: '+3.5%', alert: 'Engajamento abaixo da média' },
-            { channel: 'Meta Ads', key: 'Custo por Lead', val: 'R$ 14,20', change: '-5.2%', alert: 'CAC dentro do esperado' },
-            { channel: 'Google Analytics 4', key: 'Tempo de Sessão', val: '2m15s', change: '+0.8%', alert: 'Estável' }
-        ],
-        integrations: [
-            { name: 'Instagram Graph API', status: 'Conectado', token: 'ativo', manual: false, alert: 'OK' },
-            { name: 'Meta Ads Manager API', status: 'Conectado', token: 'ativo', manual: false, alert: 'OK' },
-            { name: 'Google Analytics 4 API', status: 'Conectado', token: 'ativo', manual: false, alert: 'OK' },
-            { name: 'Google Drive API', status: 'Conectado', token: 'ativo', manual: false, alert: 'Sincronização OK' }
-        ],
-        folders: {
-            root: 'https://drive.google.com/drive/folders/alpha_root_id',
-            brand: 'https://drive.google.com/drive/folders/alpha_brand_id',
-            contracts: 'https://drive.google.com/drive/folders/alpha_contracts_id',
-            assets: 'https://drive.google.com/drive/folders/alpha_assets_id'
-        }
-    },
-    'CLI_003': {
-        name: 'Consultoria Beta',
-        segment: 'Finanças & Gestão',
-        startDate: '2025-05-10',
-        status: 'inativo',
-        contractType: 'Avulso Estratégico',
-        services: ['Criação de DNA da Marca', 'Desenvolvimento de Prompts'],
-        extras: [],
-        scope: 'Onboarding estratégico e documentação estruturada do ecossistema de conteúdo.',
-        iaMetrics: { limit: 0, approved: 0, review: 0, published: 0 },
-        metrics: [
-            { channel: 'Instagram', key: 'Seguidores', val: '1.8K', change: '0.0%', alert: 'Inativo' }
-        ],
-        integrations: [
-            { name: 'Instagram Graph API', status: 'Não Configurado', token: 'ausente', manual: true, alert: 'Token expirado' }
-        ],
-        folders: {
-            root: '#',
-            brand: '#',
-            contracts: '#',
-            assets: '#'
-        }
-    }
-};
+// CLIENT_COCKPIT_MOCKS removido - Fallback mock neutralizado (Macrobloco 13.2)
+
+// Chave legada interna da FluxAI (workspace próprio)
+const FLUXAI_LABS_INTERNAL_ID = 'FLUXAI_LABS_001';
 
 function getClientConfigs() {
     let configs = localStorage.getItem('fluxai_client_configs');
     if (!configs) {
         const defaults = {
-            'FLUXAI_LABS_001': { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 20, extras: [] },
+            [FLUXAI_LABS_INTERNAL_ID]: { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 20, extras: [] },
             'CLI_002': { status: 'ativo', iaBlocked: false, automationsPaused: false, iaLimit: 10, extras: [] },
             'CLI_003': { status: 'inativo', iaBlocked: true, automationsPaused: true, iaLimit: 0, extras: [] }
         };
@@ -124,14 +43,23 @@ async function initPage() {
     OS_UI.renderSidebar('clientes', user.role);
     await OS_UI.renderTopbar();
 
-    // Obter cliente da URL
+    // Obter cliente da URL — sem fallback fixo
     const urlParams = new URLSearchParams(window.location.search);
-    let rawClientId = urlParams.get('client_id') || 'FLUXAI_LABS_001';
+    let rawClientId = urlParams.get('client_id') || null;
     
     // Mitigação de Prototype Pollution: Bloquear chaves perigosas
     if (rawClientId === '__proto__' || rawClientId === 'constructor' || rawClientId === 'prototype') {
-        rawClientId = 'FLUXAI_LABS_001';
+        rawClientId = null;
     }
+
+    if (!rawClientId) {
+        // Sem client_id na URL: redirecionar para lista de clientes sem assumir identidade
+        console.warn('[CockPit] Nenhum client_id fornecido na URL. Redirecionando para /os/clients.');
+        const hasExt = window.location.pathname.endsWith('.html');
+        window.location.replace(hasExt ? 'clients.html' : 'clients');
+        return;
+    }
+
     activeClientId = rawClientId;
 
     await loadClientData();
@@ -208,13 +136,13 @@ async function loadClientData() {
         let creditos = null;
 
         try {
-            const { data } = await authedClient.from('CONTRATOS_CLIENTES').select('*').eq('client_id', activeClientId).limit(1);
+            const { data } = await authedClient.from('CONTRATOS_CLIENTES').select('status_contrato, data_inicio, tipo_contrato').eq('client_id', activeClientId).limit(1);
             if (data && data.length > 0) contratos = data[0];
             console.log('[Cockpit-DIAG] CONTRATOS_CLIENTES fetching:', data);
         } catch(e) { console.warn('[COCKPIT] Erro em CONTRATOS_CLIENTES', e); }
 
         try {
-            const { data } = await authedClient.from('CLIENTES_ESTRATEGIA').select('*').eq('client_id', activeClientId).limit(1);
+            const { data } = await authedClient.from('CLIENTES_ESTRATEGIA').select('cliente_nome, segmento, objetivo_principal, nivel_percepcao_premium, responsavel_fluxai').eq('client_id', activeClientId).limit(1);
             if (data && data.length > 0) estrategia = data[0];
             console.log('[Cockpit-DIAG] CLIENTES_ESTRATEGIA fetching:', data);
         } catch(e) { console.warn('[COCKPIT] Erro em CLIENTES_ESTRATEGIA', e); }
@@ -285,14 +213,14 @@ async function loadClientData() {
             const today = new Date();
             const currentMesReferencia = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}`;
             
-            const { data } = await authedClient.from('IA_CREDITOS_CLIENTE').select('*').eq('client_id', activeClientId).eq('mes_referencia', currentMesReferencia).eq('status_limite', 'ativo');
+            const { data } = await authedClient.from('IA_CREDITOS_CLIENTE').select('limite_operacional_mensal, limite_ocupado, limite_disponivel_operacional, limite_published').eq('client_id', activeClientId).eq('mes_referencia', currentMesReferencia).eq('status_limite', 'ativo');
             creditos = data;
             console.log(`[Cockpit-DIAG] IA_CREDITOS_CLIENTE: qtd=${data?.length || 0} para ${currentMesReferencia}`, data && data.length > 0 ? data[0] : null);
         } catch(e) { console.error('[COCKPIT] Erro em IA_CREDITOS_CLIENTE', e); }
 
         console.log('[Cockpit] carregando planejamento de conteudo');
         try {
-            const { data: pautas } = await authedClient.from('PLANEJAMENTO_CONTEUDO').select('*').eq('client_id', activeClientId).order('data_prevista', { ascending: true });
+            const { data: pautas } = await authedClient.from('PLANEJAMENTO_CONTEUDO').select('planejamento_id, status_planejamento, tema, objetivo_conteudo, formato_conteudo').eq('client_id', activeClientId).order('data_prevista', { ascending: true });
             if (pautas) {
                 client.planejamento = pautas;
                 console.log(`[Cockpit-DIAG] PLANEJAMENTO_CONTEUDO fetching:`, pautas);
@@ -326,7 +254,7 @@ async function loadClientData() {
 
         try {
             console.log('[Cockpit] carregando serviços extras');
-            const { data: servicosExtras } = await authedClient.from('SERVICOS_EXTRAS_CLIENTES').select('*').eq('client_id', activeClientId);
+            const { data: servicosExtras } = await authedClient.from('SERVICOS_EXTRAS_CLIENTES').select('nome_servico, status_servico, valor_servico').eq('client_id', activeClientId);
             console.log(`[Cockpit-DIAG] SERVICOS_EXTRAS_CLIENTES: qtd=${servicosExtras?.length || 0}`, servicosExtras && servicosExtras.length > 0 ? servicosExtras[0] : null);
             renderServicosExtras(servicosExtras);
             if (servicosExtras && servicosExtras.length > 0) {
@@ -342,7 +270,7 @@ async function loadClientData() {
             if (currentUser && (currentUser.role === 'ADMIN' || currentUser.role === 'OPERATOR')) {
                 const financeiroWidget = document.getElementById('widget-financeiro');
                 if (financeiroWidget) financeiroWidget.style.display = 'block';
-                const { data: financeiro } = await authedClient.from('FINANCEIRO_CLIENTES').select('*').eq('client_id', activeClientId);
+                const { data: financeiro } = await authedClient.from('FINANCEIRO_CLIENTES').select('status_fatura, vencimento_fatura, valor_fatura, id_fatura_aas').eq('client_id', activeClientId);
                 console.log(`[Cockpit-DIAG] FINANCEIRO_CLIENTES: qtd=${financeiro?.length || 0}`, financeiro && financeiro.length > 0 ? financeiro[0] : null);
                 renderFinanceiro(financeiro);
             }
@@ -353,7 +281,7 @@ async function loadClientData() {
 
         try {
             console.log('[Cockpit] carregando demandas');
-            const { data: demandas } = await authedClient.from('DEMANDAS_CLIENTES').select('*').eq('client_id', activeClientId);
+            const { data: demandas } = await authedClient.from('DEMANDAS_CLIENTES').select('demanda_id, titulo_demanda, prioridade, prazo, status_demanda, data_criacao').eq('client_id', activeClientId);
             console.log(`[Cockpit-DIAG] DEMANDAS_CLIENTES: qtd=${demandas?.length || 0}`, demandas && demandas.length > 0 ? demandas[0] : null);
             renderDemandas(demandas);
         } catch(e) { 
@@ -363,7 +291,7 @@ async function loadClientData() {
 
         try {
             console.log('[Cockpit] carregando comunicações');
-            const { data: comunicacoes } = await authedClient.from('COMUNICACOES_CLIENTE').select('*').eq('client_id', activeClientId);
+            const { data: comunicacoes } = await authedClient.from('COMUNICACOES_CLIENTE').select('id, tipo, conteudo, data_envio, remetente, status_leitura').eq('client_id', activeClientId);
             console.log(`[Cockpit-DIAG] COMUNICACOES_CLIENTE: qtd=${comunicacoes?.length || 0}`, comunicacoes && comunicacoes.length > 0 ? comunicacoes[0] : null);
             renderComunicacoes(comunicacoes, currentUser?.role);
         } catch(e) { 
@@ -376,9 +304,7 @@ async function loadClientData() {
         client.metrics = []; 
     }
 
-    if (activeClientId !== 'FLUXAI_LABS_001' && Object.prototype.hasOwnProperty.call(CLIENT_COCKPIT_MOCKS, activeClientId)) {
-        client = CLIENT_COCKPIT_MOCKS[activeClientId];
-    }
+    // Fallback de mock legado removido
     
     currentClientData = client;
     
@@ -634,7 +560,7 @@ function mapAssetStatusToGia(status) {
 function updateIAMetricsDisplay() {
     if (!currentClientData) return;
 
-    if (activeClientId !== 'FLUXAI_LABS_001') {
+    if (activeClientId !== FLUXAI_LABS_INTERNAL_ID) {
         // IA Metrics are now fetched directly from Supabase (IA_CREDITOS_CLIENTE) in fetchClientData.
         // We do not override them with mock data anymore.
     }

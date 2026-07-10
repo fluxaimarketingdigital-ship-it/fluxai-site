@@ -68,9 +68,9 @@ async function loadFinanceData() {
     }
 
     try {
-        const { data: contratosRaw, error: cErr } = await supabase.from('CONTRATOS_CLIENTES').select('*');
-        const { data: financeiroRaw, error: pErr } = await supabase.from('FINANCEIRO_CLIENTES').select('*');
-        const { data: extrasRaw } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('*');
+        const { data: contratosRaw, error: cErr } = await supabase.from('CONTRATOS_CLIENTES').select('client_id, contract_value, status, due_day');
+        const { data: financeiroRaw, error: pErr } = await supabase.from('FINANCEIRO_CLIENTES').select('client_id, status_fatura, vencimento_fatura, valor_fatura');
+        const { data: extrasRaw } = await supabase.from('SERVICOS_EXTRAS_CLIENTES').select('client_id, service_value, workflow_status');
 
         if (cErr || pErr) throw cErr || pErr;
 
@@ -868,7 +868,7 @@ window.loadBankAccounts = async () => {
     let accounts = [];
     
     if (supabase) {
-        const { data } = await supabase.from('fluxai_bank_accounts').select('*').order('created_at', { ascending: false });
+        const { data } = await supabase.from('fluxai_bank_accounts').select('id, bank_name, agency, account_number, is_default').order('created_at', { ascending: false });
         if (data) accounts = data;
     }
     
