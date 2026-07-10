@@ -225,7 +225,8 @@ async function submitNewDemand() {
     btn.appendChild(icn);
     btn.appendChild(document.createTextNode(" CRIANDO..."));
 
-    const demandId = 'DEMANDA_' + Date.now() + '_' + Math.random().toString(36).substring(2, 5).toUpperCase();
+    const randomStr = crypto.getRandomValues(new Uint32Array(1))[0].toString(36).substring(0, 3).toUpperCase();
+    const demandId = 'DEMANDA_' + Date.now() + '_' + randomStr;
     const nowISO = new Date().toISOString();
     const userRole = OS_AUTH.user?.role || 'OPERATOR';
     const userName = OS_AUTH.user?.email || 'Operador';
