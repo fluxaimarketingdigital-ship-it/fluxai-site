@@ -398,8 +398,8 @@ async function loadClients() {
             // Tenta buscar da tabela projects (nova estrutura central)
             let { data: projectsData, error: errProj } = await supabase.from('projects').select('id, company_name, status, segment, created_at, metadata, workspace_type, is_billing_exempt').order('created_at', { ascending: false });
             
-            // Buscar da tabela legada
-            const { data: estrategiaData, error: errEst } = await supabase.from('CLIENTES_ESTRATEGIA').select('client_id, cliente_nome, objetivo_principal, plano_ativo, instagram, segmento');
+            // Buscar da tabela legada (corrigido: removido plano_ativo e instagram que não existem na tabela)
+            const { data: estrategiaData, error: errEst } = await supabase.from('CLIENTES_ESTRATEGIA').select('client_id, cliente_nome, objetivo_principal, segmento');
             const { data: contratosData } = await supabase.from('CONTRATOS_CLIENTES').select('client_id, status_contrato, tipo_contrato, observacao');
             
             if (errProj) {
