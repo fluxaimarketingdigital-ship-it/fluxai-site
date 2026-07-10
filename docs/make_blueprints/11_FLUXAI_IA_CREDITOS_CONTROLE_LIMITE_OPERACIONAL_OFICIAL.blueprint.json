@@ -109,18 +109,23 @@
                 "values": {
                     "0": "{{1.asset_id}}",
                     "1": "{{1.client_id}}",
-                    "2": "            ",
-                    "3": "{{upper(\"LIM_\" + 1.client_id + \"_\" + 1.mes_referencia + \"_\" + 1.tipo_entrega)}}",
+                    "2": "{{1.client_name}}",
+                    "3": "{{1.limite_id}}",
                     "4": "{{1.mes_referencia}}",
                     "5": "{{1.tipo_entrega}}",
                     "6": "{{1.origem_geracao}}",
                     "7": "{{1.solicitado_por}}",
                     "8": "{{1.responsavel_operacional}}",
                     "9": "{{1.status_geracao}}",
-                    "11": "sim",
-                    "12": "não",
-                    "13": "não",
-                    "14": "nao_necessaria",
+                    "10": "{{1.status_anterior}}",
+                    "11": "{{1.ocupa_limite_operacional}}",
+                    "12": "{{1.consumo_definitivo}}",
+                    "13": "{{1.libera_espaco}}",
+                    "14": "{{1.confirmacao_interna_liberacao}}",
+                    "15": "{{1.motivo_alteracao}}",
+                    "16": "{{1.link_resultado_drive}}",
+                    "17": "{{1.prompt_interno_id}}",
+                    "18": "{{1.observacao}}",
                     "19": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}",
                     "20": "{{ifempty(1.data_criacao; formatDate(now; \"YYYY-MM-DD HH:mm:ss\"))}}",
                     "21": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}"
@@ -643,6 +648,11 @@
                         {
                             "a": "E",
                             "b": "{{1.tipo_entrega}}",
+                            "o": "text:equal"
+                        },
+                        {
+                            "a": "A",
+                            "b": "{{1.limite_id}}",
                             "o": "text:equal"
                         }
                     ]
@@ -1409,15 +1419,15 @@
                                 "variables": [
                                     {
                                         "name": "limite_operacional_mensal",
-                                        "value": "{{9.`7`}}"
+                                        "value": "{{parseNumber(9.`7`)}}"
                                     },
                                     {
                                         "name": "limite_ocupado_atual",
-                                        "value": "{{9.`8`}}"
+                                        "value": "{{parseNumber(9.`8`)}}"
                                     },
                                     {
                                         "name": "limite_publicado_atual",
-                                        "value": "{{9.`9`}}"
+                                        "value": "{{parseNumber(9.`9`)}}"
                                     },
                                     {
                                         "name": "incremento_ocupado",
@@ -1607,7 +1617,7 @@
                                                     "15": "{{9.`15`}}",
                                                     "16": "{{9.`16`}}",
                                                     "17": "{{9.`17`}}",
-                                                    "18": "Limite operacional atualizado pelo cenário 11.",
+                                                    "18": "{{9.`18`}}",
                                                     "19": "{{9.`19`}}",
                                                     "20": "{{formatDate(now; \"YYYY-MM-DD HH:mm:ss\")}}"
                                                 },
@@ -3102,7 +3112,7 @@
                                             "version": 1,
                                             "parameters": {},
                                             "mapper": {
-                                                "body": "{\r\n  \"ok\": true,\r\n  \"status\": \"limite_operacional_atualizado\",\r\n  \"message\": \"Limite operacional de IA atualizado com sucesso.\",\r\n  \"client_id\": \"{{1.client_id}}\",\r\n  \"limite_id\": \"{{9.`0`}}\", \"client_name\": \"{{9.`2`}}\",\r\n  \"geracao_id\": \"{{1.asset_id}}\",\r\n  \"status_geracao\": \"{{1.status_geracao}}\",\r\n  \"limite_operacional_mensal\": \"{{10.limite_operacional_mensal}}\",\r\n  \"limite_ocupado\": \"{{10.limite_ocupado_final}}\",\r\n  \"limite_publicado\": \"{{10.limite_publicado_final}}\",\r\n  \"limite_disponivel_operacional\": \"{{10.limite_disponivel_final}}\"\r\n}",
+                                                "body": "{\r\n  \"ok\": true,\r\n  \"status\": \"limite_operacional_atualizado\",\r\n  \"message\": \"Limite operacional de IA atualizado com sucesso.\",\r\n  \"client_id\": \"{{1.client_id}}\",\r\n  \"limite_id\": \"{{1.limite_id}}\",\r\n  \"geracao_id\": \"{{1.asset_id}}\",\r\n  \"status_geracao\": \"{{1.status_geracao}}\",\r\n  \"limite_operacional_mensal\": \"{{10.limite_operacional_mensal}}\",\r\n  \"limite_ocupado\": \"{{10.limite_ocupado_final}}\",\r\n  \"limite_publicado\": \"{{10.limite_publicado_final}}\",\r\n  \"limite_disponivel_operacional\": \"{{10.limite_disponivel_final}}\"\r\n}",
                                                 "status": "200",
                                                 "headers": []
                                             },
@@ -3186,7 +3196,7 @@
                                                 ]
                                             },
                                             "mapper": {
-                                                "body": "{\r\n  \"ok\": false,\r\n  \"status\": \"limite_excedido\",\r\n  \"message\": \"Limite operacional mensal atingido. A geração não deve avançar sem ajuste interno ou serviço extra aprovado.\",\r\n  \"client_id\": \"{{1.client_id}}\",\r\n  \"limite_id\": \"{{9.`0`}}\",\r\n  \"limite_operacional_mensal\": \"{{10.limite_operacional_mensal}}\",\r\n  \"limite_ocupado_final\": \"{{10.limite_ocupado_final}}\",\r\n  \"limite_disponivel_operacional\": \"{{10.limite_disponivel_final}}\"\r\n}",
+                                                "body": "{\r\n  \"ok\": false,\r\n  \"status\": \"limite_excedido\",\r\n  \"message\": \"Limite operacional mensal atingido. A geração não deve avançar sem ajuste interno ou serviço extra aprovado.\",\r\n  \"client_id\": \"{{1.client_id}}\",\r\n  \"limite_id\": \"{{1.limite_id}}\",\r\n  \"limite_operacional_mensal\": \"{{10.limite_operacional_mensal}}\",\r\n  \"limite_ocupado_final\": \"{{10.limite_ocupado_final}}\",\r\n  \"limite_disponivel_operacional\": \"{{10.limite_disponivel_final}}\"\r\n}",
                                                 "status": "200",
                                                 "headers": []
                                             },
@@ -3273,7 +3283,7 @@
                                 ]
                             },
                             "mapper": {
-                                "body": "{\r\n  \"ok\": false,\r\n  \"status\": \"limite_nao_encontrado\",\r\n  \"message\": \"Nenhuma linha ativa de limite operacional foi encontrada para este cliente, mês e tipo de entrega.\",\r\n  \"client_id\": \"{{1.client_id}}\",\r\n  \"limite_id\": \"{{9.`0`}}\"\r\n}",
+                                "body": "{\r\n  \"ok\": false,\r\n  \"status\": \"limite_nao_encontrado\",\r\n  \"message\": \"Nenhuma linha ativa de limite operacional foi encontrada para este cliente, mês e tipo de entrega.\",\r\n  \"client_id\": \"{{1.client_id}}\",\r\n  \"limite_id\": \"{{1.limite_id}}\"\r\n}",
                                 "status": "200",
                                 "headers": []
                             },

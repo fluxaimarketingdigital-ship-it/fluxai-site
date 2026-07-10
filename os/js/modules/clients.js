@@ -45,7 +45,15 @@ function setupEventListeners() {
     const btnSave = document.getElementById('btn-save-extra');
     if (btnSave) {
         btnSave.addEventListener('click', async () => {
-            const clientId = document.getElementById('extra-client-id').value;
+            const identifier = document.getElementById('extra-client-id').value;
+            const selectedClient = localClients.find(c => c.project_id === identifier || c.client_id === identifier);
+            
+            if (!selectedClient || !selectedClient.client_id) {
+                alert("Cliente sem identificador operacional configurado.");
+                return;
+            }
+
+            const clientId = selectedClient.client_id;
             const catalogId = document.getElementById('extra-catalog-id').value;
             const status = document.getElementById('extra-status').value;
             const valorEst = document.getElementById('extra-valor-est').value;
@@ -136,10 +144,11 @@ function setupEventListeners() {
                     // Preparar payload para o webhook de aprovação real
                     const payload = {
                         id: "extra_app_" + crypto.getRandomValues(new Uint32Array(1))[0].toString(36),
-                        client_id: clientId,
-                        cliente_id: clientId,
-                        client_name: document.querySelector(`#extra-client-id option[value="${clientId}"]`)?.text || clientId,
-                        cliente_nome: document.querySelector(`#extra-client-id option[value="${clientId}"]`)?.text || clientId,
+                        project_id: selectedClient.project_id,
+                        client_id: selectedClient.client_id,
+                        cliente_id: selectedClient.client_id,
+                        client_name: selectedClient.cliente_nome,
+                        cliente_nome: selectedClient.cliente_nome,
                         service_id: catalogId,
                         servico_extra_id: catalogId,
                         tipo_servico: tipoServicoExt,
@@ -386,25 +395,58 @@ async function loadClients() {
         let clients = [];
         
         if (supabase) {
-            // Buscar dados da tabela projects (nova estrutura central)
-            const { data: projectsData, error: errProj } = await supabase.from('projects').select('id, company_name, name, status, segment, created_at').order('created_at', { ascending: false });
+            // Tenta buscar da tabela projects (nova estrutura central)
+            let { data: projectsData, error: errProj } = await supabase.from('projects').select('id, company_name, status, segment, created_at, metadata, workspace_type, is_billing_exempt').order('created_at', { ascending: false });
             
-            // Fallbacks (para enriquecimento)
-            const { data: estrategiaData } = await supabase.from('CLIENTES_ESTRATEGIA').select('client_id, cliente_nome, objetivo_principal, plano_ativo');
-            const { data: contratosData } = await supabase.from('CONTRATOS_CLIENTES').select('client_id, status_contrato, tipo_contrato');
+            // Buscar da tabela legada
+            const { data: estrategiaData, error: errEst } = await supabase.from('CLIENTES_ESTRATEGIA').select('client_id, cliente_nome, objetivo_principal, plano_ativo, instagram, segmento');
+            const { data: contratosData } = await supabase.from('CONTRATOS_CLIENTES').select('client_id, status_contrato, tipo_contrato, observacao');
             
-            if (projectsData && !errProj) {
+            if (errProj) {
+                console.error("Erro crítico na consulta da tabela projects:", errProj);
+                clients = []; // Em caso de erro (ex: 400, 406, RLS, schema), sem fallback silencioso
+            } else if (!projectsData || projectsData.length === 0) {
+                // Fallback temporário apenas quando projects retornar zero registros sem erro
+                if (estrategiaData && !errEst) {
+                    clients = estrategiaData.map(row => {
+                        const contrato = (contratosData || []).find(c => c.client_id === row.client_id) || {};
+                        return {
+                            project_id: null,
+                            client_id: row.client_id,
+                            cliente_nome: row.cliente_nome || row.client_id,
+                            segmento: row.segmento || 'Não Definido',
+                            status: 'ativo',
+                            workspace_type: 'client',
+                            source: 'CLIENTES_ESTRATEGIA',
+                            instagram: row.instagram || contrato.observacao || '@pendente',
+                            tokenStatus: 'OK',
+                            iaBlocked: false,
+                            automationsPaused: false,
+                            iaLimit: 10,
+                            createdAt: new Date().toISOString()
+                        };
+                    });
+                } else {
+                    console.error("Erro ao carregar clientes das tabelas legadas:", errEst);
+                }
+            } else {
                 clients = projectsData.map(row => {
-                    const strategy = (estrategiaData || []).find(s => s.client_id === row.id) || {};
-                    const contrato = (contratosData || []).find(c => c.client_id === row.id) || {};
+                    const legacyId = row.metadata?.legacy_client_id || null;
+                    const strategy = (estrategiaData || []).find(s => s.client_id === legacyId || s.client_id === row.id) || {};
+                    const contrato = (contratosData || []).find(c => c.client_id === legacyId || c.client_id === row.id) || {};
                     const meta = row.metadata || {};
                     
                     return {
-                        id: row.id,
-                        name: row.company_name || row.id,
+                        project_id: row.id,
+                        client_id: legacyId,
+                        id: legacyId || row.id,
+                        cliente_nome: row.company_name || legacyId || row.id,
+                        name: row.company_name || legacyId || row.id,
+                        segmento: row.segment || strategy.segmento || 'Não Definido',
                         status: row.status || 'rascunho',
+                        workspace_type: row.workspace_type,
+                        source: 'projects',
                         instagram: strategy.instagram || contrato.observacao || '@pendente',
-                        segment: row.segment || strategy.segmento || 'Não Definido',
                         tokenStatus: meta.tokenStatus || 'OK',
                         iaBlocked: !!meta.iaBlocked,
                         automationsPaused: !!meta.automationsPaused,
@@ -412,9 +454,6 @@ async function loadClients() {
                         createdAt: row.created_at
                     };
                 });
-            } else {
-                console.error("Erro ao carregar projects:", errProj);
-                clients = [];
             }
         } else {
             console.warn("Supabase não configurado. Retornando array vazio.");
@@ -425,7 +464,7 @@ async function loadClients() {
         // Carregar do catálogo de extras os seletores do modal
         const extraClientSelect = document.getElementById('extra-client-id');
         if (extraClientSelect) {
-            extraClientSelect.innerHTML = clients.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+            extraClientSelect.innerHTML = clients.map(c => `<option value="${c.project_id || c.client_id}">${c.cliente_nome}</option>`).join('');
         }
         
         const catalogSelect = document.getElementById('extra-catalog-id');
@@ -478,10 +517,10 @@ function renderClientsTable() {
     // 4. Filtrar por Busca Textual
     if (searchVal) {
         mapped = mapped.filter(c => {
-            return c.name.toLowerCase().includes(searchVal) ||
-                   c.id.toLowerCase().includes(searchVal) ||
-                   c.instagram.toLowerCase().includes(searchVal) ||
-                   c.segment.toLowerCase().includes(searchVal);
+            return (c.cliente_nome || '').toLowerCase().includes(searchVal) ||
+                   (c.client_id || c.project_id || '').toLowerCase().includes(searchVal) ||
+                   (c.instagram || '').toLowerCase().includes(searchVal) ||
+                   (c.segmento || '').toLowerCase().includes(searchVal);
         });
     }
 
@@ -516,12 +555,12 @@ function renderClientsTable() {
 
         html += `<tr>
             <td style="font-weight: 600; color: #fff;">
-                <a href="cliente-detalhe.html?client_id=${c.id}" style="color: var(--os-primary); text-decoration: none; font-weight: 700;">
-                    ${c.name}
+                <a href="cliente-detalhe.html?client_id=${c.client_id || c.project_id}" style="color: var(--os-primary); text-decoration: none; font-weight: 700;">
+                    ${c.cliente_nome}
                 </a>
-                <div style="font-size:0.65rem; color:var(--os-text-muted); margin-top:2px; font-weight:400;">Segmento: ${c.segment}</div>
+                <div style="font-size:0.65rem; color:var(--os-text-muted); margin-top:2px; font-weight:400;">Segmento: ${c.segmento}</div>
             </td>
-            <td style="color: var(--os-text-muted); font-family: var(--os-font-mono);">${c.id}</td>
+            <td style="color: var(--os-text-muted); font-family: var(--os-font-mono);">${c.client_id || 'N/A'}</td>
             <td>${c.instagram}</td>
             <td style="text-align: center;"><span class="badge-status ${tokenClass}">${c.tokenStatus}</span></td>
             <td style="text-align: center;"><span class="badge-status ${iaClass}">${iaText}</span></td>
@@ -531,26 +570,26 @@ function renderClientsTable() {
                 <div class="action-btn-group" style="justify-content: flex-end;">
                     <!-- Status toggles -->
                     ${c.status !== 'ativo' 
-                        ? `<button class="row-action-btn" onclick="window.mutateClient('${c.id}', 'status', 'ativo')">Ativar</button>` 
-                        : `<button class="row-action-btn" onclick="window.mutateClient('${c.id}', 'status', 'pausado')">Pausar</button>`
+                        ? `<button class="row-action-btn" onclick="window.mutateClient('${c.project_id || c.client_id}', 'status', 'ativo')">Ativar</button>` 
+                        : `<button class="row-action-btn" onclick="window.mutateClient('${c.project_id || c.client_id}', 'status', 'pausado')">Pausar</button>`
                     }
                     ${c.status !== 'inativo'
-                        ? `<button class="row-action-btn danger" onclick="window.mutateClient('${c.id}', 'status', 'inativo')">Arquivar</button>`
+                        ? `<button class="row-action-btn danger" onclick="window.mutateClient('${c.project_id || c.client_id}', 'status', 'inativo')">Arquivar</button>`
                         : ''
                     }
                     
                     <!-- IA toggle -->
-                    <button class="row-action-btn" onclick="window.mutateClient('${c.id}', 'ia', ${!c.iaBlocked})">
+                    <button class="row-action-btn" onclick="window.mutateClient('${c.project_id || c.client_id}', 'ia', ${!c.iaBlocked})">
                         ${c.iaBlocked ? 'Unblock IA' : 'Block IA'}
                     </button>
 
                     <!-- Auto toggle -->
-                    <button class="row-action-btn" onclick="window.mutateClient('${c.id}', 'auto', ${!c.automationsPaused})">
+                    <button class="row-action-btn" onclick="window.mutateClient('${c.project_id || c.client_id}', 'auto', ${!c.automationsPaused})">
                         ${c.automationsPaused ? 'Auto Play' : 'Auto Pause'}
                     </button>
                     
                     <!-- Limit increment -->
-                    <button class="row-action-btn" onclick="window.mutateClientLimit('${c.id}')" title="Incrementar limite operacional">
+                    <button class="row-action-btn" onclick="window.mutateClientLimit('${c.project_id || c.client_id}')" title="Incrementar limite operacional">
                         + Limite
                     </button>
                 </div>
@@ -581,12 +620,13 @@ function updateCounts() {
     document.getElementById('count-onboarding').innerText = onboarding;
 }
 
-window.mutateClient = async (clientId, property, value) => {
-    const clientIndex = localClients.findIndex(c => c.id === clientId);
+window.mutateClient = async (identifier, property, value) => {
+    const clientIndex = localClients.findIndex(c => c.project_id === identifier || c.client_id === identifier);
     if (clientIndex === -1) return;
     
     const client = localClients[clientIndex];
-    const clientName = client.name;
+    const clientName = client.cliente_nome;
+    const clientId = client.project_id || client.client_id;
     let logType = 'STATUS_CHANGED';
     let logPayload = { client: clientId, property, old_value: null, new_value: value };
     const role = currentUser ? currentUser.role : 'CLIENT';
@@ -683,17 +723,18 @@ window.mutateClient = async (clientId, property, value) => {
     }
 };
 
-window.mutateClientLimit = async (clientId) => {
+window.mutateClientLimit = async (identifier) => {
     const role = currentUser ? currentUser.role : 'CLIENT';
     if (role === 'CLIENT') {
         alert('Ação restrita: Apenas administradores e operadores podem ajustar limites de IA.');
         return;
     }
 
-    const clientIndex = localClients.findIndex(c => c.id === clientId);
+    const clientIndex = localClients.findIndex(c => c.project_id === identifier || c.client_id === identifier);
     if (clientIndex === -1) return;
     
     const client = localClients[clientIndex];
+    const clientId = client.project_id || client.client_id;
     const currentLimit = client.iaLimit !== undefined ? client.iaLimit : 10;
     const increment = prompt(`Informe a quantidade de limite operacional contratado a somar ao limite atual de ${currentLimit}:`, "5");
     

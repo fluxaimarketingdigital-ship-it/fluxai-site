@@ -2903,7 +2903,7 @@
         }
     ],
     "metadata": {
-        "instant": false,
+        "instant": true,
         "version": 1,
         "scenario": {
             "roundtrips": 1,
