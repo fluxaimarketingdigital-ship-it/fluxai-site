@@ -1,4 +1,7 @@
 {
+  "scripts": {
+    "build": "echo 'Deploy Vercel concluido'"
+  },
   "devDependencies": {
     "supabase": "^2.108.0"
   }
