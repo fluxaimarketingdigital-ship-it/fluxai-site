@@ -412,6 +412,45 @@ window.handleOnboarding = async function(e) {
     }
 
     const isOwner = projectId === 'FLUXAI_LABS_001'; // workspace interno da FluxAI
+    
+    // --> INSERÇÃO SÍNCRONA NO SUPABASE (NOVA ARQUITETURA) <--
+    let realUuid = crypto.randomUUID();
+    const supabase = getSupabase();
+    
+    if (supabase) {
+        if (window.ONBOARDING_MODE === 'new') {
+            try {
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GRAVANDO NO BANCO...';
+                const { error: dbError } = await supabase.from('projects').insert([{
+                    id: realUuid,
+                    company_name: raw.company_name,
+                    segment: raw.segment,
+                    status: isOwner ? 'ativo' : 'em_onboarding',
+                    workspace_type: isOwner ? 'admin' : 'client',
+                    metadata: { legacy_client_id: projectId },
+                    is_billing_exempt: isOwner
+                }]);
+                if (dbError) throw dbError;
+            } catch (err) {
+                console.error('[ONBOARDING] Erro ao inserir na tabela projects:', err);
+                alert("Falha crítica: Não foi possível registrar o cliente na nova tabela projects (Supabase).\nDetalhe: " + err.message);
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERRO NO BANCO';
+                btn.style.background = '#ef4444';
+                btn.disabled = false;
+                return; // Aborta envio ao Make
+            }
+        } else {
+            // Se for edit, tenta buscar o UUID existente para enviar ao webhook
+            try {
+                const { data: projData } = await supabase.from('projects').select('id').eq('metadata->>legacy_client_id', projectId).limit(1);
+                if (projData && projData.length > 0) {
+                    realUuid = projData[0].id;
+                }
+            } catch (e) {
+                console.warn('[ONBOARDING] Falha ao recuperar UUID do projeto em modo edit:', e);
+            }
+        }
+    }
 
     // Captura usuário autenticado para responsavel_fluxai
     const currentSessionUser = await OS_AUTH.check('ADMIN').catch(() => null);
@@ -425,8 +464,11 @@ window.handleOnboarding = async function(e) {
         // Controle de Modo (Novo ou Update)
         action: window.ONBOARDING_MODE === 'edit' ? 'update_client' : 'create_client',
         // Identidade
+        project_id:                 realUuid,
         client_id:                  projectId,
+        cliente_id:                 projectId, // fallback para legados Make
         client_name:                raw.company_name || "",
+        cliente_nome:               raw.company_name || "", // fallback para legados Make
         tipo_cliente:               isOwner ? "owner" : "cliente_pago",
         origem:                     "onboarding_os",
         status_cliente:             isOwner ? "ativo" : "em_onboarding",
