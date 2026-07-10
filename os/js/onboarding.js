@@ -413,31 +413,60 @@ window.handleOnboarding = async function(e) {
 
     const isOwner = projectId === 'FLUXAI_LABS_001'; // workspace interno da FluxAI
     
-    // --> INSERÇÃO SÍNCRONA NO SUPABASE (NOVA ARQUITETURA) <--
     let realUuid = crypto.randomUUID();
     const supabase = getSupabase();
     
     if (supabase) {
         if (window.ONBOARDING_MODE === 'new') {
+            // Anti-Duplicidade Técnica (Idempotência no backend)
+            let isTechnicalDupe = false;
             try {
-                if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GRAVANDO NO BANCO...';
-                const { error: dbError } = await supabase.from('projects').insert([{
-                    id: realUuid,
-                    company_name: raw.company_name,
-                    segment: raw.segment,
-                    status: isOwner ? 'ativo' : 'em_onboarding',
-                    workspace_type: isOwner ? 'admin' : 'client',
-                    metadata: { legacy_client_id: projectId },
-                    is_billing_exempt: isOwner
-                }]);
-                if (dbError) throw dbError;
+                if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> VERIFICANDO BANCO...';
+                const { data: existing, error: errExist } = await supabase.from('projects').select('id').eq('metadata->>legacy_client_id', projectId).limit(1);
+                
+                if (errExist) {
+                    throw errExist; // Error de RLS ou rede
+                }
+                
+                if (existing && existing.length > 0) {
+                    realUuid = existing[0].id;
+                    isTechnicalDupe = true;
+                    console.log('[ONBOARDING] Projeto técnico já existente; UUID reutilizado.', realUuid);
+                } 
             } catch (err) {
-                console.error('[ONBOARDING] Erro ao inserir na tabela projects:', err);
-                alert("Falha crítica: Não foi possível registrar o cliente na nova tabela projects (Supabase).\nDetalhe: " + err.message);
-                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERRO NO BANCO';
-                btn.style.background = '#ef4444';
-                btn.disabled = false;
+                console.error('[ONBOARDING] Erro ao verificar duplicidade técnica:', err);
+                alert("Falha crítica: Não foi possível verificar o banco (Supabase).\nDetalhe: " + err.message);
+                if (btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERRO DE REDE/BANCO';
+                    btn.style.background = '#ef4444';
+                    btn.disabled = false;
+                }
                 return; // Aborta envio ao Make
+            }
+
+            if (!isTechnicalDupe) {
+                try {
+                    if (btn) btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> GRAVANDO NO BANCO...';
+                    const { error: dbError } = await supabase.from('projects').insert([{
+                        id: realUuid,
+                        company_name: raw.company_name,
+                        segment: raw.segment,
+                        status: 'em_onboarding', // <-- inicial estado parcial para todos
+                        workspace_type: isOwner ? 'admin' : 'client',
+                        metadata: { legacy_client_id: projectId },
+                        is_billing_exempt: isOwner
+                    }]);
+                    if (dbError) throw dbError;
+                } catch (err) {
+                    console.error('[ONBOARDING] Erro ao inserir na tabela projects:', err);
+                    alert("Falha crítica: Não foi possível registrar o cliente na nova tabela projects (Supabase).\nDetalhe: " + err.message);
+                    if (btn) {
+                        btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERRO NO BANCO';
+                        btn.style.background = '#ef4444';
+                        btn.disabled = false;
+                    }
+                    return; // Aborta envio ao Make
+                }
             }
         } else {
             // Se for edit, tenta buscar o UUID existente para enviar ao webhook
@@ -619,6 +648,18 @@ window.handleOnboarding = async function(e) {
             if (typeof OS_LOGS_ENGINE !== 'undefined') {
                 OS_LOGS_ENGINE.userAction('ONBOARDING_OFFICIAL_SUCCESS', webhookPayload, false);
             }
+            
+            // --> ATUALIZAÇÃO SÍNCRONA NO SUPABASE (MUDANÇA DE ESTADO DEVIDO A SUCESSO) <--
+            if (supabase && window.ONBOARDING_MODE === 'new') {
+                try {
+                    await supabase.from('projects').update({
+                        status: 'ativo',
+                        metadata: { legacy_client_id: projectId, onboarding_status: 'completed', onboarding_completed_at: new Date().toISOString() }
+                    }).eq('id', realUuid);
+                } catch (e) {
+                    console.warn('[ONBOARDING] Aviso: falha ao atualizar status final de projects para ativo', e);
+                }
+            }
 
             const overlay = document.getElementById('deploy-overlay');
             const deployBar = document.getElementById('deploy-bar');
@@ -659,9 +700,23 @@ window.handleOnboarding = async function(e) {
             if (typeof OS_LOGS_ENGINE !== 'undefined') {
                 OS_LOGS_ENGINE.userAction('ONBOARDING_MAKE_DISPATCH_FAILED', { response: makeRes }, false);
             }
-            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> FALHA NO ENVIO AO MAKE';
-            btn.style.background = '#ef4444';
-            btn.disabled = false;
+            
+            // --> ATUALIZAÇÃO SÍNCRONA NO SUPABASE (MUDANÇA DE ESTADO DEVIDO A FALHA) <--
+            if (supabase && window.ONBOARDING_MODE === 'new') {
+                try {
+                    await supabase.from('projects').update({
+                        metadata: { legacy_client_id: projectId, onboarding_status: 'pending_make', last_onboarding_error: makeRes.data?.status || 'Erro interno Make' }
+                    }).eq('id', realUuid);
+                } catch (e) {
+                    console.warn('[ONBOARDING] Aviso: falha ao atualizar status de projects para pending_make', e);
+                }
+            }
+
+            if (btn) {
+                btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> FALHA NO ENVIO AO MAKE';
+                btn.style.background = '#ef4444';
+                btn.disabled = false;
+            }
             
             const overlay = document.getElementById('deploy-overlay');
             if (overlay) overlay.style.display = 'none';
@@ -681,9 +736,23 @@ window.handleOnboarding = async function(e) {
         if (typeof OS_LOGS_ENGINE !== 'undefined') {
             OS_LOGS_ENGINE.userAction('ONBOARDING_TOTAL_FAILURE', { error: err.message }, false);
         }
-        btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERRO CRÍTICO';
-        btn.style.background = '#ef4444';
-        btn.disabled = false;
+        
+        // --> ATUALIZAÇÃO SÍNCRONA NO SUPABASE (MUDANÇA DE ESTADO DEVIDO A EXCEÇÃO CRÍTICA) <--
+        if (supabase && window.ONBOARDING_MODE === 'new') {
+            try {
+                await supabase.from('projects').update({
+                    metadata: { legacy_client_id: projectId, onboarding_status: 'pending_make', last_onboarding_error: err.message || 'Timeout/Exceção de Rede' }
+                }).eq('id', realUuid);
+            } catch (e) {
+                console.warn('[ONBOARDING] Aviso: falha ao atualizar status de projects para pending_make', e);
+            }
+        }
+
+        if (btn) {
+            btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERRO CRÍTICO';
+            btn.style.background = '#ef4444';
+            btn.disabled = false;
+        }
         
         const overlay = document.getElementById('deploy-overlay');
         if (overlay) overlay.style.display = 'none';
