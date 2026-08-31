@@ -1,6 +1,11 @@
 import { INTEGRATIONS } from '../config/integrations.js';
 import { CONTACT_INFO } from '../config/constants.js';
 
+// 0. HANDLE SUPABASE PASSWORD RECOVERY REDIRECT
+if (window.location.hash && window.location.hash.includes('type=recovery')) {
+    window.location.replace('/os/login.html' + window.location.hash);
+}
+
 // Utilitário inline de sanitização para o site público (sem ESM externo)
 const UTM_PATTERN = /^[a-zA-Z0-9_\-\s]{0,100}$/;
 function safeUtmParam(key, fallback = '') {
