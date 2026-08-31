@@ -180,7 +180,7 @@
                                 
                                 <div class="grid-2">
                                     <div class="form-group">
-                                        <label>Nome do Responsável</label>
+                                        <label>Responsável Principal no Cliente</label>
                                         <input type="text" name="responsible_name" class="form-control" placeholder="Responsável Principal" />
                                     </div>
                                     <div class="form-group">
@@ -188,7 +188,7 @@
                                         <input type="text" name="company_name" class="form-control" placeholder="Nome Fantasia da Marca" />
                                     </div>
                                     <div class="form-group" style="grid-column: span 2;">
-                                        <label>URL da Logo da Marca (Opcional)</label>
+                                        <label>Logo principal para uso no FluxAI OS™ (opcional)</label>
                                         <input type="url" name="logo_url" class="form-control" placeholder="Ex: https://site.com/logo.png (Será usada no Portal do Cliente)" />
                                     </div>
                                 </div>
@@ -208,7 +208,7 @@
                                         </select>
                                     </div>
                                     <div class="form-group">
-                                        <label>Objetivo Principal</label>
+                                        <label>Objetivo principal para os próximos 90 dias</label>
                                         <select name="objective" class="form-control">
                                             <option value="">Selecione...</option>
                                             <option value="AUTHORITY">Posicionamento de Autoridade Absoluta</option>
@@ -257,12 +257,69 @@
                                         <input type="text" name="target_audience" class="form-control" placeholder="Ex: Fundadores B2B, CEOs de empresas de 5-50 funcionários." />
                                     </div>
                                     <div class="form-group">
-                                        <label>Persona Principal (ICP)</label>
+                                        <label>ICP / Cliente Ideal Principal</label>
                                         <input type="text" name="main_persona" class="form-control" placeholder="Ex: Dono de clínica 35-50 anos, fatura R$50k+/mês." />
+                                    </div>
+                                </div>
+
+                                <!-- ═══════════════════════════════════════════════════════════
+                                     NOVOS CAMPOS ADITIVOS — OPS-ACT-001-P4A-R2 FASE 3
+                                     Todos opcionais. Capturados via raw existente.
+                                     NÃO criam colunas novas no Supabase.
+                                     NÃO modificam Make/planilha diretamente.
+                                     Preservados em raw_payload_json e setup_completo.
+                                ═══════════════════════════════════════════════════════════ -->
+                                <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px; margin-top: 8px;">
+                                    <p style="font-size:0.65rem; text-transform:uppercase; letter-spacing:2px; color:var(--os-text-muted); font-weight:800; margin-bottom:20px;">Dados Complementares <span style="opacity:0.5;">(Opcionais)</span></p>
+
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Razão Social</label>
+                                            <input type="text" name="legal_name" class="form-control" placeholder="Ex: Clínica Exemplo Ltda." />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>CNPJ / CPF</label>
+                                            <input type="text" name="document_number" class="form-control" placeholder="00.000.000/0001-00" />
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>E-mail principal do cliente</label>
+                                        <input type="email" name="client_email" class="form-control" placeholder="contato@empresa.com.br" />
+                                    </div>
+
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Modelo de Negócio</label>
+                                            <select name="business_model" class="form-control">
+                                                <option value="">Selecione...</option>
+                                                <option value="B2B">B2B</option>
+                                                <option value="B2C">B2C</option>
+                                                <option value="B2B2C">B2B2C</option>
+                                                <option value="D2C">D2C</option>
+                                                <option value="Outro">Outro</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Área de Atuação</label>
+                                            <select name="geographic_scope" class="form-control">
+                                                <option value="">Selecione...</option>
+                                                <option value="Local">Local</option>
+                                                <option value="Regional">Regional</option>
+                                                <option value="Nacional">Nacional</option>
+                                                <option value="Internacional">Internacional</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label>Principal produto ou serviço que deseja vender</label>
+                                        <input type="text" name="main_offer" class="form-control" placeholder="Ex: Consulta de implante dentário — ticket R$ 8.000" />
                                     </div>
                                 </div>
                             </div>
                         </div>
+
 
                         <div class="onboarding-step" id="step-2">
                             <div class="form-section">

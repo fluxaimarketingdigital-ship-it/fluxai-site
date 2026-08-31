@@ -535,7 +535,7 @@ window.handleOnboarding = async function(e) {
         // Escopo de conteúdo
         reels_mes:                  raw.escopo_conteudo_reels_qty || "",
         carrosseis_mes:             raw.escopo_conteudo_carrossel_qty || "",
-        stories_mes:                raw.escopo_conteudo_stories_qty || "",
+        stories_mes:                raw.escopo_conteudo_story_qty || "",    // FIX OPS-ACT-001-P4A-R2 BUG2
         linkedin_mes:               raw.escopo_conteudo_linkedin_qty || "",
         frequencia_semanal:         raw.escopo_conteudo_weekly_freq || "",
 
@@ -555,7 +555,7 @@ window.handleOnboarding = async function(e) {
 
         // Assets
         drive_folder_url:           raw.asset_drive_link || "",
-        logo_url:                   raw.asset_logos || "",
+        logo_url:                   raw.logo_url || "",                    // FIX OPS-ACT-001-P4A-R2 BUG3 — raw.asset_logos preserved in raw_payload_json/setup_completo
         manual_id_visual_url:       raw.asset_brand_guidelines || "",
         videos_brutos_url:          raw.asset_videos || "",
         banco_fotos_url:            raw.asset_photos || "",
@@ -590,7 +590,7 @@ window.handleOnboarding = async function(e) {
         // Ativação
         status_acesso:              isOwner ? "criado" : "nao_criado",
         ia_bloqueada:               !isOwner,
-        risco_operacional:          raw.operational_risk || "",
+        risco_operacional:          raw.activation_operational_risk || "",  // FIX OPS-ACT-001-P4A-R2 BUG1
         pilar_foco_critico:         raw.priority_30d || "",
         primeira_entrega:           raw.first_delivery || "",
         dependencias_acesso:        Array.from(formData.getAll('activation_dependencies')).join(", ") || ""
