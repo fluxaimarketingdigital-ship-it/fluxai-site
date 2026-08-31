@@ -332,7 +332,21 @@ const FLUXAI_ALLOWED_USERS = Object.freeze({
         full_name: 'Kássia Gomes',
         role: 'ADMIN',
         permissions: ['*'],
-        project_id: FLUXAI_LABS_PROJECT.id  // Workspace interno — não usar string literal
+        project_id: FLUXAI_LABS_PROJECT.id
+    },
+    'admin@fluxai.com': {
+        id: 'ADMIN_002',
+        full_name: 'Admin FluxAI',
+        role: 'ADMIN',
+        permissions: ['*'],
+        project_id: FLUXAI_LABS_PROJECT.id
+    },
+    'kassia@fluxai.com': {
+        id: 'ADMIN_003',
+        full_name: 'Kássia Gomes',
+        role: 'ADMIN',
+        permissions: ['*'],
+        project_id: FLUXAI_LABS_PROJECT.id
     }
 });
 
@@ -371,8 +385,7 @@ window.OS_AUTH_BOOTSTRAP = async function(requiredRole = null, requiredPermissio
     }
 
     const email = sessionUser ? String(sessionUser.email || '').toLowerCase().trim() : null;
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-    const knownProfile = (email && isLocalhost) ? (FLUXAI_ALLOWED_USERS[email] || null) : null;
+    const knownProfile = email ? (FLUXAI_ALLOWED_USERS[email] || null) : null;
 
     console.log("[AUTH_BOOTSTRAP]", {
         route: window.location.pathname,
