@@ -22,6 +22,15 @@ async function initOnboarding() {
         check.onchange = renderDynamicFields;
     });
 
+    const infraChecks = document.querySelectorAll('input[name="infra_active_platforms"]');
+    infraChecks.forEach(check => {
+        check.addEventListener('change', () => {
+            if (typeof renderDigitalAssetsFields === 'function') {
+                renderDigitalAssetsFields();
+            }
+        });
+    });
+
     // Permitir clique direto nas bolinhas das etapas lá em cima
     const stepItems = document.querySelectorAll('.step-item');
     stepItems.forEach(item => {
@@ -214,6 +223,45 @@ function renderDynamicFields() {
     });
 }
 
+window.renderDigitalAssetsFields = function() {
+    const checks = document.querySelectorAll('input[name="infra_active_platforms"]:checked');
+    const selected = Array.from(checks).map(c => c.value);
+
+    const mappings = {
+        'Instagram': ['group-client_instagram_handle'],
+        'Facebook': ['group-client_facebook_page'],
+        'Website': ['group-client_website'],
+        'Domain': ['group-client_domain', 'group-domain_dns'],
+        'Meta Business': ['group-meta_business_id'],
+        'Meta Ads': ['group-meta_ad_account_id', 'group-meta_pixel_id'],
+        'Google Ads': ['group-google_ads_customer_id'],
+        'Google Analytics 4': ['group-ga4_property_id'],
+        'Google Tag Manager': ['group-gtm_container_id'],
+        'Google Search Console': ['group-search_console_property'],
+        'Google Business': ['group-google_business_profile'],
+        'LinkedIn': ['group-client_linkedin_url'],
+        'TikTok': ['group-client_tiktok_handle'],
+        'CRM': ['group-current_crm']
+    };
+
+    // Hide all groups first
+    const allGroups = new Set(Object.values(mappings).flat());
+    allGroups.forEach(groupId => {
+        const el = document.getElementById(groupId);
+        if (el) el.style.display = 'none';
+    });
+
+    // Show only the ones corresponding to selected platforms
+    selected.forEach(platform => {
+        if (mappings[platform]) {
+            mappings[platform].forEach(groupId => {
+                const el = document.getElementById(groupId);
+                if (el) el.style.display = 'block';
+            });
+        }
+    });
+}
+
 function validateOnboardingBeforeSubmit(raw) {
     const errors = [];
     
@@ -343,6 +391,10 @@ function setupModeToggle() {
                                 if (el) el.value = setup[key];
                             }
                         });
+                    }
+
+                    if (typeof renderDigitalAssetsFields === 'function') {
+                        renderDigitalAssetsFields();
                     }
                 }
             }
