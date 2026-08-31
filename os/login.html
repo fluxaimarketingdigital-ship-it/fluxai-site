@@ -251,6 +251,45 @@
                 this.style.color = type === 'text' ? 'var(--os-primary)' : 'var(--os-text-muted)';
             });
         }
+        const supabase = getSupabase();
+        if (supabase) {
+            supabase.auth.onAuthStateChange(async (event, session) => {
+                if (event === 'PASSWORD_RECOVERY') {
+                    document.getElementById('passwordResetModal').style.display = 'flex';
+                }
+            });
+
+            const resetForm = document.getElementById('passwordResetForm');
+            if (resetForm) {
+                resetForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const newPassword = document.getElementById('newPassword').value;
+                    const confirmPassword = document.getElementById('confirmNewPassword').value;
+
+                    if (newPassword !== confirmPassword) {
+                        alert('As senhas não coincidem!');
+                        return;
+                    }
+
+                    const btn = e.target.querySelector('button');
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = 'SALVANDO... <i class="fa-solid fa-spinner fa-spin"></i>';
+                    btn.disabled = true;
+
+                    const { error } = await supabase.auth.updateUser({ password: newPassword });
+
+                    if (error) {
+                        alert('Erro ao atualizar a senha: ' + error.message);
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    } else {
+                        alert('Senha atualizada com sucesso! Redirecionando...');
+                        document.getElementById('passwordResetModal').style.display = 'none';
+                        window.location.reload();
+                    }
+                });
+            }
+        }
     </script>
 </body>
 </html>
