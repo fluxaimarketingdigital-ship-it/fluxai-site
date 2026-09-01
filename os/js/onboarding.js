@@ -156,8 +156,10 @@ function renderDynamicFields() {
         return;
     }
     const selected = Array.from(document.querySelectorAll('input[name="modules"]:checked')).map(i => i.value);
+    container.innerHTML = '';
     
-    contain        'conteudo': `
+    const templates = {
+        'conteudo': `
             <div class="sub-fields" style="display:block; background:rgba(0,0,0,0.2); border:1px solid var(--os-border); padding:20px; border-radius:10px; margin-top:15px;">
                 <label style="color:var(--os-primary); font-size:0.75rem; font-weight:900; letter-spacing:1px;"><i class="fa-solid fa-pen-nib"></i> ENGENHARIA DE CONTEÚDO E ENTREGÁVEIS</label>
                 <div class="grid-2" style="margin-top:15px">
