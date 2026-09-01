@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FluxAI OS™ | Ativação Operacional</title>
+    <title>FluxAI OS™ | Onboarding Estratégico</title>
     <link rel="stylesheet" href="./styles/interface.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha384-PPIZEGYM1v8zp5Py7UjFb79S58UeqCL9pYVnVPURKEqvioPROaVAJKKLzvH2rDnI" crossorigin="anonymous" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -94,9 +94,9 @@
     </style>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="../assets/icons/favicon-os.png" />
-    <link rel="shortcut icon" href="../assets/icons/favicon-os.png" type="image/x-icon" />
-    <link rel="apple-touch-icon" href="../assets/icons/favicon-os.png" />
+    <link rel="icon" type="image/png" href="../assets/icons/favicon-32x32.png" />
+    <link rel="shortcut icon" href="../assets/icons/favicon-32x32.png" type="image/x-icon" />
+    <link rel="apple-touch-icon" href="../assets/icons/favicon-32x32.png" />
 </head>
 <body class="os-mode">
 
@@ -492,13 +492,13 @@
 
                         <div class="onboarding-step" id="step-3">
                             <div class="form-section">
-                                <h2><i class="fa-solid fa-layer-group"></i> Escopo & Ativação de Módulos</h2>
-                                <p>Ativação instantânea de serviços contratados e configurações operacionais.</p>
+                                <h2><i class="fa-solid fa-layer-group"></i> MÓDULOS / SERVIÇOS CONTRATADOS</h2>
+                                <p>Definição dos serviços contratados, entregáveis e parâmetros operacionais.</p>
 
                                 <div class="form-group">
-                                    <label>Módulos de Crescimento Operacional</label>
+                                    <label>Módulos / Serviços Contratados</label>
                                     <div class="checkbox-card-grid">
-                                        <label class="checkbox-card"><input type="checkbox" name="modules" value="conteudo" checked /> Instagram & Conteúdo</label>
+                                        <label class="checkbox-card"><input type="checkbox" name="modules" value="conteudo" /> Instagram & Conteúdo</label>
                                         <label class="checkbox-card"><input type="checkbox" name="modules" value="trafego" /> Tráfego Pago (Ads)</label>
                                         <label class="checkbox-card"><input type="checkbox" name="modules" value="branding" /> Branding & ID Visual</label>
                                         <label class="checkbox-card"><input type="checkbox" name="modules" value="crm" /> CRM & comercial</label>
@@ -645,6 +645,7 @@
                                     <div class="form-group">
                                         <label>Frequência Semanal de Postagem</label>
                                         <select name="post_frequency" class="form-control">
+                                            <option value="">Selecione...</option>
                                             <option value="3x">3 Ativos por Semana (Instagram)</option>
                                             <option value="5x">5 Ativos por Semana (Avançado)</option>
                                             <option value="7x">Diário (Posicionamento Intenso)</option>
@@ -653,6 +654,7 @@
                                     <div class="form-group">
                                         <label>SLA Acordado para Resposta / Ajustes</label>
                                         <select name="sla_minutes" class="form-control">
+                                            <option value="">Selecione...</option>
                                             <option value="30">SLA Ultra Rápido: Até 30 min</option>
                                             <option value="60">SLA Premium: Até 60 min (Recomendado)</option>
                                             <option value="180">SLA Padrão: Até 3 horas</option>
@@ -668,7 +670,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>WhatsApp do Decisor</label>
-                                        <input type="text" name="whatsapp_decisor" class="form-control" value="+55 " placeholder="+55 (DDD) 90000-0000" oninput="maskPhone(event)" />
+                                        <input type="text" name="whatsapp_decisor" class="form-control" value="" placeholder="+55 (DDD) 90000-0000" oninput="maskPhone(event)" />
                                     </div>
                                 </div>
 
@@ -690,6 +692,7 @@
                                         <div class="form-group">
                                             <label>Tipo de Contrato</label>
                                             <select name="tipo_contrato" class="form-control">
+                                                <option value="">Selecione...</option>
                                                 <option value="mensal">Mensal Premium (Recorrente)</option>
                                                 <option value="anual">Anual Premium (Fidelidade 12m)</option>
                                                 <option value="trimestral">Trimestral (3 meses)</option>
@@ -700,6 +703,7 @@
                                         <div class="form-group">
                                             <label>Plano / Pacote Contratado</label>
                                             <select name="plano_cliente" class="form-control">
+                                                <option value="">Selecione...</option>
                                                 <option value="essencial">Essencial (Starter)</option>
                                                 <option value="growth">Growth</option>
                                                 <option value="premium">Premium (Scale)</option>
@@ -729,6 +733,7 @@
                                         <div class="form-group">
                                             <label>Método de Pagamento</label>
                                             <select name="finance_payment_method" class="form-control">
+                                                <option value="">Selecione...</option>
                                                 <option value="Pix">Pix</option>
                                                 <option value="Cartão">Cartão de Crédito</option>
                                                 <option value="Boleto">Boleto Bancário</option>
@@ -737,6 +742,7 @@
                                         <div class="form-group">
                                             <label>Contrato Assinado?</label>
                                             <select name="finance_contract_signed" class="form-control">
+                                                <option value="">Selecione...</option>
                                                 <option value="Sim">Sim, assinado</option>
                                                 <option value="Não">Pendente de assinatura</option>
                                             </select>

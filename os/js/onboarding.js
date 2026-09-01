@@ -157,63 +157,62 @@ function renderDynamicFields() {
     }
     const selected = Array.from(document.querySelectorAll('input[name="modules"]:checked')).map(i => i.value);
     
-    container.innerHTML = '';
-    
-    const templates = {
-        'conteudo': `
+    contain        'conteudo': `
             <div class="sub-fields" style="display:block; background:rgba(0,0,0,0.2); border:1px solid var(--os-border); padding:20px; border-radius:10px; margin-top:15px;">
                 <label style="color:var(--os-primary); font-size:0.75rem; font-weight:900; letter-spacing:1px;"><i class="fa-solid fa-pen-nib"></i> ENGENHARIA DE CONTEÚDO E ENTREGÁVEIS</label>
                 <div class="grid-2" style="margin-top:15px">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Reels/Mês</label><input type="number" name="escopo_conteudo_reels_qty" class="form-control" placeholder="12" value="12"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Carrosséis/Mês</label><input type="number" name="escopo_conteudo_carrossel_qty" class="form-control" placeholder="8" value="8"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Reels/Mês</label><input type="number" min="0" name="escopo_conteudo_reels_qty" class="form-control" placeholder="0" value=""></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Carrosséis/Mês</label><input type="number" min="0" name="escopo_conteudo_carrossel_qty" class="form-control" placeholder="0" value=""></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Stories/Mês (Artes)</label><input type="number" name="escopo_conteudo_story_qty" class="form-control" placeholder="20" value="20"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Posts Estáticos/Mês</label><input type="number" name="escopo_conteudo_post_estatico_qty" class="form-control" placeholder="0" value="0"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Stories/Mês (Artes)</label><input type="number" min="0" name="escopo_conteudo_story_qty" class="form-control" placeholder="0" value=""></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Posts Estáticos/Mês</label><input type="number" min="0" name="escopo_conteudo_post_estatico_qty" class="form-control" placeholder="0" value=""></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Artigos/Mês</label><input type="number" name="escopo_conteudo_artigo_qty" class="form-control" placeholder="0" value="0"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. E-mails (Campanhas)/Mês</label><input type="number" name="escopo_conteudo_email_qty" class="form-control" placeholder="0" value="0"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Artigos/Mês</label><input type="number" min="0" name="escopo_conteudo_artigo_qty" class="form-control" placeholder="0" value=""></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. E-mails (Campanhas)/Mês</label><input type="number" min="0" name="escopo_conteudo_email_qty" class="form-control" placeholder="0" value=""></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Landing Pages/Mês</label><input type="number" name="escopo_conteudo_landing_page_qty" class="form-control" placeholder="0" value="0"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Anúncios (Criativos)/Mês</label><input type="number" name="escopo_conteudo_anuncio_qty" class="form-control" placeholder="0" value="0"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Landing Pages/Mês</label><input type="number" min="0" name="escopo_conteudo_landing_page_qty" class="form-control" placeholder="0" value=""></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Anúncios (Criativos)/Mês</label><input type="number" min="0" name="escopo_conteudo_anuncio_qty" class="form-control" placeholder="0" value=""></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Relatórios/Mês</label><input type="number" name="escopo_conteudo_relatorio_qty" class="form-control" placeholder="0" value="0"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Planejamento/Mês</label><input type="number" name="escopo_conteudo_planejamento_qty" class="form-control" placeholder="0" value="0"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Relatórios/Mês</label><input type="number" min="0" name="escopo_conteudo_relatorio_qty" class="form-control" placeholder="0" value=""></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Planejamento/Mês</label><input type="number" min="0" name="escopo_conteudo_planejamento_qty" class="form-control" placeholder="0" value=""></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. LinkedIn/Mês</label><input type="number" name="escopo_conteudo_linkedin_qty" class="form-control" placeholder="0" value="0"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Copy/Mês</label><input type="number" name="escopo_conteudo_copy_qty" class="form-control" placeholder="0" value="0"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. LinkedIn/Mês</label><input type="number" min="0" name="escopo_conteudo_linkedin_qty" class="form-control" placeholder="0" value=""></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Qtd. Copy/Mês</label><input type="number" min="0" name="escopo_conteudo_copy_qty" class="form-control" placeholder="0" value=""></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Frequência Semanal</label><input type="text" name="escopo_conteudo_weekly_freq" class="form-control" placeholder="Ex: 5x na semana" value="5x na semana"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Frequência Semanal</label><input type="text" name="escopo_conteudo_weekly_freq" class="form-control" placeholder="Ex: 5x na semana"></div>
                     <div class="form-group"></div>
+                </div>
+            </div>`,lass="form-group"></div>
                 </div>
             </div>`,
         'trafego': `
             <div class="sub-fields" style="display:block; background:rgba(0,0,0,0.2); border:1px solid var(--os-border); padding:20px; border-radius:10px; margin-top:15px;">
                 <label style="color:var(--os-primary); font-size:0.75rem; font-weight:900; letter-spacing:1px;"><i class="fa-solid fa-chart-line"></i> AQUISIÇÃO PAGA</label>
                 <div class="grid-2" style="margin-top:15px">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Verba Mensal Mídia</label><input type="number" name="escopo_trafego_monthly_budget" class="form-control" placeholder="R$ 3.000,00" value="3000"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Objetivo Principal</label><input type="text" name="escopo_trafego_primary_goal" class="form-control" placeholder="Ex: Geração de Leads High-Ticket" value="Leads High-Ticket"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Verba Mensal Mídia (R$)</label><input type="number" min="0" name="escopo_trafego_monthly_budget" class="form-control" placeholder="Ex: 3000"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Objetivo Principal</label><input type="text" name="escopo_trafego_primary_goal" class="form-control" placeholder="Ex: Geração de Leads"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Meta de CPL (R$)</label><input type="number" name="escopo_trafego_target_cpl" class="form-control" placeholder="15.00" value="15"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Meta de ROAS (x)</label><input type="number" name="escopo_trafego_target_roas" class="form-control" placeholder="3.5" value="3.5"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Meta de CPL (R$)</label><input type="number" min="0" name="escopo_trafego_target_cpl" class="form-control" placeholder="Ex: 15"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Meta de ROAS (x)</label><input type="number" min="0" step="0.1" name="escopo_trafego_target_roas" class="form-control" placeholder="Ex: 3.5"></div>
                 </div>
             </div>`,
         'crm': `
             <div class="sub-fields" style="display:block; background:rgba(0,0,0,0.2); border:1px solid var(--os-border); padding:20px; border-radius:10px; margin-top:15px;">
                 <label style="color:var(--os-primary); font-size:0.75rem; font-weight:900; letter-spacing:1px;"><i class="fa-solid fa-headset"></i> CRM & COMERCIAL</label>
                 <div class="grid-2" style="margin-top:15px">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">CRM Atual em uso</label><input type="text" name="escopo_crm_system" class="form-control" placeholder="RD Station, Pipedrive, Kommo..." value="Pipedrive"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">WhatsApp Comercial Base</label><input type="text" name="escopo_crm_whatsapp" class="form-control" placeholder="+55 (DDD) 90000-0000" value="+55 " oninput="maskPhone(event)"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">CRM Atual em uso</label><input type="text" name="escopo_crm_system" class="form-control" placeholder="RD Station, Pipedrive, Kommo..."></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">WhatsApp Comercial Base</label><input type="text" name="escopo_crm_whatsapp" class="form-control" placeholder="+55 (DDD) 90000-0000" value="" oninput="maskPhone(event)"></div>
                 </div>
                 <div class="grid-2">
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Tamanho da Equipe Comercial</label><input type="text" name="escopo_crm_sales_team" class="form-control" placeholder="Qtd Vendedores" value="3"></div>
-                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">SLA Comercial (minutos)</label><input type="text" name="escopo_crm_sla" class="form-control" placeholder="Ex: 15" value="15"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Tamanho da Equipe Comercial</label><input type="text" name="escopo_crm_sales_team" class="form-control" placeholder="Nº de Vendedores"></div>
+                    <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">SLA Comercial (minutos)</label><input type="text" name="escopo_crm_sla" class="form-control" placeholder="Ex: 15"></div>
                 </div>
             </div>`
     };
