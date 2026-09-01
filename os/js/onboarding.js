@@ -190,8 +190,6 @@ function renderDynamicFields() {
                     <div class="form-group"><label style="font-size:0.55rem; color:var(--os-text-muted);">Frequência Semanal</label><input type="text" name="escopo_conteudo_weekly_freq" class="form-control" placeholder="Ex: 5x na semana"></div>
                     <div class="form-group"></div>
                 </div>
-            </div>`,lass="form-group"></div>
-                </div>
             </div>`,
         'trafego': `
             <div class="sub-fields" style="display:block; background:rgba(0,0,0,0.2); border:1px solid var(--os-border); padding:20px; border-radius:10px; margin-top:15px;">
