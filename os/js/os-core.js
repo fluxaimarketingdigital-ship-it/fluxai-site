@@ -87,10 +87,10 @@ export const OS_UI = {
         logoDiv.style.cssText = 'display: flex; align-items: center; justify-content: center; padding: 10px 0;';
         
         const img = document.createElement('img');
-        img.src = './assets/logo.png';
+        img.src = '../assets/images/branding/FluxAI_Labs_Wordmark_Horizontal_Official_v1.png';
         img.alt = 'FluxAI Labs';
-        img.style.cssText = 'max-width: 140px; height: auto;';
-        // Simulating the onerror fallback visually since setting onerror securely is tricky
+        img.style.cssText = 'max-width: 140px; width: 100%; height: auto; object-fit: contain;';
+        img.onerror = () => { img.src = '../assets/images/branding/fluxai-symbol.png'; img.style.cssText = 'max-width: 48px; width: 100%; height: auto; object-fit: contain;'; };
         logoDiv.appendChild(img);
         
         const closeBtn = document.createElement('button');
