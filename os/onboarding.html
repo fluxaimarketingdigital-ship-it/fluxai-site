@@ -163,10 +163,14 @@
                         </div>
                         <div class="step-item" data-step="6">
                             <div class="step-dot">6</div>
-                            <span class="step-label">Operação</span>
+                            <span class="step-label">Integrações</span>
                         </div>
                         <div class="step-item" data-step="7">
                             <div class="step-dot">7</div>
+                            <span class="step-label">Operação</span>
+                        </div>
+                        <div class="step-item" data-step="8">
+                            <div class="step-dot">8</div>
                             <span class="step-label">Ativação</span>
                         </div>
                     </div>
@@ -594,6 +598,34 @@
                                     <label>Referências Visuais / Concorrentes Diretos</label>
                                     <input type="text" name="references" class="form-control" placeholder="Link de perfis referência ou concorrentes diretos" />
                                 </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Formatos Prioritários de Conteúdo</label>
+                                        <div class="checkbox-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px;">
+                                            <label><input type="checkbox" name="content_formats_priority" value="Reels"> Reels</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="Carrossel"> Carrossel</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="Stories"> Stories</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="Post Estático"> Post Estático</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="Artigo"> Artigo</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="E-mail"> E-mail</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="Landing Page"> Landing Page</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="LinkedIn"> LinkedIn</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="Vídeo Longo"> Vídeo Longo</label>
+                                            <label><input type="checkbox" name="content_formats_priority" value="Outro"> Outro</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Temas que a marca não deve abordar</label>
+                                        <textarea name="brand_topics_forbidden" class="form-control" placeholder="Ex: Política, Religião, Polêmicas do setor" style="height:60px; margin-bottom:15px;"></textarea>
+                                        
+                                        <label>Concorrentes diretos / referências de mercado</label>
+                                        <textarea name="competitor_references" class="form-control" placeholder="Quais marcas o cliente admira ou quer superar?" style="height:60px; margin-bottom:15px;"></textarea>
+
+                                        <label>Regras específicas para aprovação de conteúdo</label>
+                                        <textarea name="content_approval_notes" class="form-control" placeholder="Ex: CEO precisa aprovar todos os vídeos; Jurídico precisa revisar textos" style="height:60px;"></textarea>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -633,10 +665,87 @@
                                     <label>Documentação Adicional (Briefings, Certificados, Prêmios)</label>
                                     <input type="text" name="asset_documents" class="form-control" placeholder="Outros documentos e referências importantes na nuvem" />
                                 </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Fontes oficiais / tipografia da marca</label>
+                                        <input type="text" name="asset_fonts" class="form-control" placeholder="Links para download das fontes oficiais" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Templates editáveis / arquivos-mestre</label>
+                                        <input type="text" name="asset_templates" class="form-control" placeholder="Figma, Canva, PSD..." />
+                                    </div>
+                                </div>
+
+                                <div class="grid-2">
+                                    <div class="form-group">
+                                        <label>Campanhas e materiais anteriores</label>
+                                        <input type="text" name="asset_campaign_history" class="form-control" placeholder="Link para histórico de mídias" />
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Depoimentos / provas sociais</label>
+                                        <input type="text" name="asset_testimonials" class="form-control" placeholder="Pasta com prints e vídeos de clientes" />
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>Restrições de uso da marca</label>
+                                    <textarea name="asset_brand_restrictions" class="form-control" placeholder="Ex: Não usar logo no fundo preto, não usar fotos sem filtro X..." style="height:60px;"></textarea>
+                                </div>
                             </div>
                         </div>
 
                         <div class="onboarding-step" id="step-6">
+                            <div class="form-section">
+                                <h2><i class="fa-solid fa-link"></i> Integrações & Acessos</h2>
+                                <p>Status de acessos e referências seguras de credenciais.</p>
+
+                                <h3 style="font-size:0.85rem; color:var(--os-primary); margin-bottom:15px; margin-top:20px; text-transform:uppercase; font-weight:800;">Ecossistema Meta</h3>
+                                <div class="grid-2">
+                                    <div class="form-group"><label>Instagram</label><select name="integ_instagram_status" class="form-control integ-status" data-platform="Instagram"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Facebook</label><select name="integ_facebook_status" class="form-control integ-status" data-platform="Facebook"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Meta Business</label><select name="integ_meta_business_status" class="form-control integ-status" data-platform="Meta Business"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Meta Ads</label><select name="integ_meta_ads_status" class="form-control integ-status" data-platform="Meta Ads"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Pixel / Conversions API</label><select name="integ_meta_pixel_status" class="form-control integ-status" data-platform="Meta Ads"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>WhatsApp</label><select name="integ_whatsapp_status" class="form-control integ-status" data-platform="WhatsApp"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                </div>
+
+                                <h3 style="font-size:0.85rem; color:var(--os-primary); margin-bottom:15px; margin-top:20px; text-transform:uppercase; font-weight:800;">Ecossistema Google</h3>
+                                <div class="grid-2">
+                                    <div class="form-group"><label>Google Ads</label><select name="integ_google_ads_status" class="form-control integ-status" data-platform="Google Ads"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Google Analytics 4</label><select name="integ_ga4_status" class="form-control integ-status" data-platform="Google Analytics 4"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Google Tag Manager</label><select name="integ_gtm_status" class="form-control integ-status" data-platform="Google Tag Manager"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Search Console</label><select name="integ_search_console_status" class="form-control integ-status" data-platform="Google Search Console"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Google Business Profile</label><select name="integ_google_business_status" class="form-control integ-status" data-platform="Google Business"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                </div>
+
+                                <h3 style="font-size:0.85rem; color:var(--os-primary); margin-bottom:15px; margin-top:20px; text-transform:uppercase; font-weight:800;">Infraestrutura Web (Site)</h3>
+                                <div class="grid-2">
+                                    <div class="form-group"><label>Domain</label><select name="integ_domain_status" class="form-control integ-status" data-platform="Domain"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>DNS</label><select name="integ_dns_status" class="form-control integ-status" data-platform="Domain"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Hosting (Hospedagem)</label><select name="integ_hosting_status" class="form-control integ-status" data-platform="Website"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>CMS (WordPress, etc)</label><select name="integ_cms_status" class="form-control integ-status" data-platform="Website"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                </div>
+
+                                <h3 style="font-size:0.85rem; color:var(--os-primary); margin-bottom:15px; margin-top:20px; text-transform:uppercase; font-weight:800;">Sistemas & Automação</h3>
+                                <div class="grid-2">
+                                    <div class="form-group"><label>CRM (Acesso Plataforma)</label><select name="integ_crm_status" class="form-control integ-status" data-platform="CRM"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>CRM (Acesso API)</label><select name="integ_crm_api_status" class="form-control integ-status" data-platform="CRM"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Make</label><select name="integ_make_status" class="form-control integ-status"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>Zapier</label><select name="integ_zapier_status" class="form-control integ-status"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                    <div class="form-group"><label>n8n</label><select name="integ_n8n_status" class="form-control integ-status"><option value="NOT_REQUIRED">Não Necessário</option><option value="PENDING" selected>Pendente</option><option value="REQUESTED">Solicitado</option><option value="GRANTED">Concedido</option><option value="VALIDATED">Validado</option><option value="CONNECTED">Conectado</option><option value="ERROR">Erro</option></select></div>
+                                </div>
+
+                                <div class="form-group" style="margin-top: 30px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 24px;">
+                                    <label>Referência do cofre/gerenciador seguro</label>
+                                    <input type="text" name="credential_reference" class="form-control" placeholder="Ex: 1Password / Cliente X / Meta Ads" />
+                                    <input type="text" name="secret_ref" class="form-control" placeholder="Outra referência de armazenamento" style="margin-top:10px;" />
+                                    <p style="font-size:0.65rem; color:var(--os-text-muted); margin-top:5px; font-weight:800;">Informe somente a referência/localização. Nunca cole senha, token ou chave.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="onboarding-step" id="step-7">
                             <div class="form-section">
                                 <h2><i class="fa-solid fa-sliders"></i> Pontes Operacionais & Contrato</h2>
                                 <p>SLA, responsáveis de pilar, governança financeira e entregas.</p>
@@ -682,6 +791,35 @@
                                     <div class="form-group">
                                         <label>Responsável Estratégico (Marketing)</label>
                                         <input type="text" name="responsible_marketing" class="form-control" placeholder="Estrategista de Marca" />
+                                    </div>
+                                </div>
+
+                                <div style="border-top:1px solid rgba(255,255,255,0.05); padding-top:20px; margin-top:10px;">
+                                    <h3 style="font-size:0.85rem; color:var(--os-primary); margin-bottom:15px; text-transform:uppercase; font-weight:800;">Governança de Aprovação</h3>
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Aprovador Substituto</label>
+                                            <input type="text" name="backup_approval_responsible" class="form-control" placeholder="Nome do substituto" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Canal Oficial de Aprovação</label>
+                                            <select name="approval_channel" class="form-control">
+                                                <option value="FluxAI OS™">FluxAI OS™</option>
+                                                <option value="WhatsApp">WhatsApp</option>
+                                                <option value="E-mail">E-mail</option>
+                                                <option value="Outro">Outro</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Prazo Máximo para Aprovação (horas)</label>
+                                            <input type="number" min="0" name="approval_deadline_hours" class="form-control" placeholder="Ex: 48" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Regra em Caso de Ausência de Retorno</label>
+                                            <input type="text" name="approval_silence_rule" class="form-control" placeholder="Ex: Aprovação automática após 48h" />
+                                        </div>
                                     </div>
                                 </div>
 
@@ -739,6 +877,34 @@
                                                 <option value="Boleto">Boleto Bancário</option>
                                             </select>
                                         </div>
+                                    </div>
+                                    
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>E-mail Financeiro</label>
+                                            <input type="email" name="financial_email" class="form-control" placeholder="faturamento@cliente.com" />
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Responsável Financeiro</label>
+                                            <input type="text" name="financial_responsible" class="form-control" placeholder="Nome do Responsável" />
+                                        </div>
+                                    </div>
+
+                                    <div class="grid-2">
+                                        <div class="form-group">
+                                            <label>Emissão de Nota Fiscal Necessária?</label>
+                                            <select name="invoice_required" class="form-control">
+                                                <option value="Sim" selected>Sim</option>
+                                                <option value="Não">Não</option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Observações de Cobrança</label>
+                                            <input type="text" name="billing_notes" class="form-control" placeholder="Ex: Necessita de ordem de compra" />
+                                        </div>
+                                    </div>
+
+
                                         <div class="form-group">
                                             <label>Contrato Assinado?</label>
                                             <select name="finance_contract_signed" class="form-control">
@@ -823,7 +989,7 @@
                             </div>
                         </div>
 
-                        <div class="onboarding-step" id="step-7">
+                        <div class="onboarding-step" id="step-8">
                             <div class="form-section">
                                 <h2><i class="fa-solid fa-bolt"></i> Ativação da Infraestrutura Operacional</h2>
                                 <p>Definições de risco inicial e consolidação da IA estratégica.</p>
@@ -853,8 +1019,12 @@
                                     <div class="checkbox-card-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
                                         <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Acesso Instagram" /> Acesso Instagram</label>
                                         <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Acesso Gerenciador Meta" /> Acesso BM Meta</label>
+                                        <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Acesso Google Ads" /> Acesso Google Ads</label>
                                         <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Acesso Dominio DNS" /> DNS do Domínio</label>
+                                        <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Acesso CRM" /> Acesso ao CRM</label>
                                         <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Contrato Assinado" /> Contrato Físico</label>
+                                        <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Assets de Marca" /> Assets de Marca</label>
+                                        <label class="checkbox-card" style="border-color:#ef444430; color:#ef4444;"><input type="checkbox" name="activation_dependencies" value="Aprovação de Briefing" /> Aprovação de Briefing</label>
                                     </div>
                                 </div>
 
@@ -870,7 +1040,7 @@
 
                                 <div style="background: rgba(107,122,69,0.1); padding: 30px; border-radius: 12px; border: 1px dashed var(--os-primary); text-align: center;">
                                     <h3 style="color: var(--os-primary); margin-top: 0; font-size:1.1rem; font-weight:800;">PREPARAÇÃO SEGURA DO ECOSSISTEMA</h3>
-                                    <p style="margin-bottom: 25px; font-size:0.8rem; color:var(--os-text-muted);">Ao submeter, a FluxAI OS criará o cadastro operacional em modo rascunho, organizará as 7 camadas do onboarding e preparará a base estratégica para revisão interna.</p>
+                                    <p style="margin-bottom: 25px; font-size:0.8rem; color:var(--os-text-muted);">Ao submeter, a FluxAI OS criará o cadastro operacional em modo rascunho, organizará as 8 camadas do onboarding e preparará a base estratégica para revisão interna.</p>
                                     <button type="button" id="btn-disparar-infraestrutura" class="btn-save" style="max-width: 350px; margin: 0 auto; display:flex; align-items:center; justify-content:center; gap:10px;">
                                         <i class="fa-solid fa-clipboard-check"></i> SUBMETER PARA REVISÃO INTERNA
                                     </button>
@@ -884,7 +1054,7 @@
                             <i class="fa-solid fa-arrow-left"></i> Anterior
                         </button>
                         <div style="font-size: 0.7rem; color: var(--os-text-muted); font-weight: 800; letter-spacing: 1px;">
-                            ETAPA <span id="current-step-display">1</span> DE 7
+                            ETAPA <span id="current-step-display">1</span> DE 8
                         </div>
                         <button type="button" class="btn-wizard btn-next" id="btn-next" onclick="window.moveStep(1)">
                             Próximo <i class="fa-solid fa-arrow-right"></i>
@@ -899,7 +1069,7 @@
     <script type="module" src="./js/onboarding.js"></script>
     <script>
         let currentStep = 1;
-        const totalSteps = 7;
+        const totalSteps = 8;
 
         window.moveStep = function(delta) {
             const nextStep = currentStep + delta;

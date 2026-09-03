@@ -8,7 +8,7 @@ window.ONBOARDING_MODE = 'new';
 window.ONBOARDING_CLIENT_ID = null;
 
 let currentStep = 1;
-const totalSteps = 7;
+const totalSteps = 8;
 
 async function initOnboarding() {
     // Renderiza topbar imediatamente (não depende de auth)
@@ -257,6 +257,23 @@ window.renderDigitalAssetsFields = function() {
                 const el = document.getElementById(groupId);
                 if (el) el.style.display = 'block';
             });
+        }
+    });
+
+    // --- OPS-ACT-001-P4D-R1: Correlação Etapa 2 -> Etapa 6 ---
+    const step6Selects = document.querySelectorAll('#step-6 .integ-status');
+    step6Selects.forEach(select => {
+        const platform = select.getAttribute('data-platform');
+        if (platform) {
+            // Se a plataforma não foi marcada na Etapa 2, define como NOT_REQUIRED
+            if (!selected.includes(platform)) {
+                select.value = 'NOT_REQUIRED';
+            } else {
+                // Se foi marcada e estava como NOT_REQUIRED, volta para PENDING
+                if (select.value === 'NOT_REQUIRED') {
+                    select.value = 'PENDING';
+                }
+            }
         }
     });
 }
@@ -638,13 +655,69 @@ window.handleOnboarding = async function(e) {
         observacao_contrato:        raw.observacao_contrato || "",
 
         // Ativação
-        // Ativação
         status_acesso:              isOwner ? "criado" : "nao_criado",
         ia_bloqueada:               !isOwner,
         risco_operacional:          raw.activation_operational_risk || "",  // FIX OPS-ACT-001-P4A-R2 BUG1
         pilar_foco_critico:         raw.priority_30d || "",
         primeira_entrega:           raw.first_delivery || "",
-        dependencias_acesso:        Array.from(formData.getAll('activation_dependencies')).join(", ") || ""
+        dependencias_acesso:        Array.from(formData.getAll('activation_dependencies')).join(", ") || "",
+
+        // --- OPS-ACT-001-P4D: Novos campos de Conteúdo (Etapa 4) ---
+        content_formats_priority:   Array.from(formData.getAll('content_formats_priority')).join(", ") || "",
+        brand_topics_forbidden:     raw.brand_topics_forbidden || "",
+        competitor_references:      raw.competitor_references || "",
+        content_approval_notes:     raw.content_approval_notes || "",
+
+        // --- OPS-ACT-001-P4D: Novos campos de Assets (Etapa 5) ---
+        asset_fonts:                raw.asset_fonts || "",
+        asset_templates:            raw.asset_templates || "",
+        asset_campaign_history:     raw.asset_campaign_history || "",
+        asset_testimonials:         raw.asset_testimonials || "",
+        asset_brand_restrictions:   raw.asset_brand_restrictions || "",
+
+        // --- OPS-ACT-001-P4D-R1: Integrações & Acessos (Etapa 6) Expansão ---
+        integ_instagram_status:     raw.integ_instagram_status     || "PENDING",
+        integ_facebook_status:      raw.integ_facebook_status      || "PENDING",
+        integ_meta_business_status: raw.integ_meta_business_status || "PENDING",
+        integ_meta_ads_status:      raw.integ_meta_ads_status      || "PENDING",
+        integ_meta_pixel_status:    raw.integ_meta_pixel_status    || "PENDING",
+        integ_whatsapp_status:      raw.integ_whatsapp_status      || "PENDING",
+
+        integ_google_ads_status:    raw.integ_google_ads_status    || "PENDING",
+        integ_ga4_status:           raw.integ_ga4_status           || "PENDING",
+        integ_gtm_status:           raw.integ_gtm_status           || "PENDING",
+        integ_search_console_status:raw.integ_search_console_status|| "PENDING",
+        integ_google_business_status:raw.integ_google_business_status|| "PENDING",
+
+        integ_domain_status:        raw.integ_domain_status        || "PENDING",
+        integ_dns_status:           raw.integ_dns_status           || "PENDING",
+        integ_hosting_status:       raw.integ_hosting_status       || "PENDING",
+        integ_cms_status:           raw.integ_cms_status           || "PENDING",
+
+        integ_crm_status:           raw.integ_crm_status           || "PENDING",
+        integ_crm_api_status:       raw.integ_crm_api_status       || "PENDING",
+        integ_make_status:          raw.integ_make_status          || "PENDING",
+        integ_zapier_status:        raw.integ_zapier_status        || "PENDING",
+        integ_n8n_status:           raw.integ_n8n_status           || "PENDING",
+
+        credential_reference:       raw.credential_reference       || "",
+        secret_ref:                 raw.secret_ref                 || "",  // referencia segura — nunca senha real
+
+        // --- OPS-ACT-001-P4D: Financeiro e Aprovação complementares (Etapa 7) ---
+        financial_email:            raw.financial_email            || "",
+        financial_responsible:      raw.financial_responsible      || "",
+        invoice_required:           raw.invoice_required           || "Sim",
+        billing_notes:              raw.billing_notes              || "",
+        backup_approval_responsible: raw.backup_approval_responsible || "",
+        approval_channel:           raw.approval_channel           || "FluxAI OS™",
+        approval_deadline_hours:    raw.approval_deadline_hours    || "",
+        approval_silence_rule:      raw.approval_silence_rule      || "",
+
+        // --- OPS-ACT-001-P4D-R1: Campos de controle do setup ---
+        setup_completo:             JSON.stringify(raw), // P4D-R1: Semântica corrigida para JSON stringificado (permite repopular o modo Editar)
+        contracted_modules:         Array.from(formData.getAll('modules')),
+        recommended_modules:        [],
+        addon_modules:              []
     };
 
     // --- ENGENHARIA DO ARRAY DE SERVIÇOS (PARA ITERATOR DO MAKE) ---
@@ -688,7 +761,7 @@ window.handleOnboarding = async function(e) {
     console.log('ONBOARDING_PAYLOAD_PREVIEW (FASE 2A)', webhookPayload);
 
     let makeSuccess = false;
-    const alertContainer = document.querySelector('#step-7 .form-section');
+    const alertContainer = document.querySelector('#step-8 .form-section');
 
     try {
         // Disparo para o Make via Proxy Oficial (ROTA 09)
@@ -721,7 +794,7 @@ window.handleOnboarding = async function(e) {
             const logMessages = [
                 { progress: 10, text: `> [SISTEMA] Iniciando requisição segura para o Make (Fase 2A)...` },
                 { progress: 25, text: `> [SANEAMENTO] Bloqueando criação de usuário e permissões no Supabase.` },
-                { progress: 40, text: `> [WORKFLOW] Payload dividido em 7 camadas. ID Gerado: ${projectId}` },
+                { progress: 40, text: `> [WORKFLOW] Payload dividido em 8 camadas. ID Gerado: ${projectId}` },
                 { progress: 55, text: `> [WORKFLOW] Cliente classificado como 'em_onboarding'.` },
                 { progress: 70, text: `> [WORKFLOW] Contrato submetido como 'rascunho'.` },
                 { progress: 85, text: `> [WORKFLOW] Inteligência Artificial permanece 'bloqueada'.` },
