@@ -76,7 +76,44 @@ async function initOnboarding() {
     }
 
     setupModeToggle();
+    setupOwnerAutoFill();
 }
+
+function setupOwnerAutoFill() {
+    const companyInput = document.querySelector('input[name="company_name"]');
+    if (companyInput) {
+        companyInput.addEventListener('input', window.applyOwnerDefaults);
+    }
+}
+
+window.applyOwnerDefaults = function() {
+    const form = document.getElementById('onboardingForm');
+    if (!form) return;
+    const companyInput = form.querySelector('[name="company_name"]');
+    const isOwner = (companyInput && companyInput.value.trim() === "FluxAI Labs") || window.ONBOARDING_CLIENT_ID === 'FLUXAI_LABS_001';
+    
+    if (isOwner) {
+        if (!window.ownerDefaultsApplied) {
+            const setIfEmptyOrForce = (name, val) => {
+                const el = form.querySelector(`[name="${name}"]`);
+                if (el) el.value = val;
+            };
+            setIfEmptyOrForce('tipo_contrato', 'owner_internal');
+            setIfEmptyOrForce('plano_cliente', 'owner_internal');
+            setIfEmptyOrForce('monthly_fee', 0);
+            setIfEmptyOrForce('valor_setup', 0);
+            setIfEmptyOrForce('finance_payment_method', 'not_applicable');
+            setIfEmptyOrForce('finance_contract_signed', 'not_applicable');
+            setIfEmptyOrForce('invoice_required', 'Não');
+            setIfEmptyOrForce('creditos_ia_base_mes', 'owner_admin');
+            setIfEmptyOrForce('finance_min_duration', 'not_applicable');
+            window.ownerDefaultsApplied = true;
+        }
+    } else {
+        window.ownerDefaultsApplied = false;
+    }
+}
+
 
 window.moveStep = function(delta) {
     const nextStep = currentStep + delta;
@@ -411,6 +448,10 @@ function setupModeToggle() {
 
                     if (typeof renderDigitalAssetsFields === 'function') {
                         renderDigitalAssetsFields();
+                    }
+                    
+                    if (typeof window.applyOwnerDefaults === 'function') {
+                        window.applyOwnerDefaults();
                     }
                 }
             }
