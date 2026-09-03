@@ -358,18 +358,49 @@ function setupModeToggle() {
         searchContainer.style.display = 'block';
 
         const supabase = getSupabase();
-        if (!supabase) return;
+        if (!supabase) { select.innerHTML = '<option value="">Erro: Supabase indisponível</option>'; return; }
         
+        select.innerHTML = '<option value="">Carregando clientes...</option>';
         try {
-            const { data, error } = await supabase.from('CLIENTES_ESTRATEGIA').select('client_id, cliente_nome');
-            if (data) {
+            // [R2] Primary source: CLIENTES_ESTRATEGIA
+            const { data: estData, error: estErr } = await supabase.from('CLIENTES_ESTRATEGIA').select('client_id, cliente_nome');
+            if (estErr) console.warn('[EDIT-LIST] CLIENTES_ESTRATEGIA error:', estErr.message);
+            
+            let clients = (estData && estData.length > 0) ? estData : null;
+            
+            // [R2] Fallback: se CLIENTES_ESTRATEGIA está vazia, consulta 'projects'
+            if (!clients) {
+                console.warn('[EDIT-LIST] CLIENTES_ESTRATEGIA vazia. Usando fallback: projects.');
+                const { data: projData, error: projErr } = await supabase
+                    .from('projects')
+                    .select('id, company_name, metadata')
+                    .order('created_at', { ascending: false });
+                if (projErr) console.warn('[EDIT-LIST] projects fallback error:', projErr.message);
+                if (projData && projData.length > 0) {
+                    clients = projData.map(p => ({
+                        client_id: p.metadata?.legacy_client_id || p.id,
+                        cliente_nome: p.company_name || p.metadata?.legacy_client_id || p.id,
+                        _source: 'projects',
+                        _project_uuid: p.id
+                    }));
+                }
+            }
+
+            if (clients && clients.length > 0) {
                 select.innerHTML = '<option value="">Selecione o cliente...</option>';
-                data.forEach(c => {
-                    select.innerHTML += `<option value="${c.client_id}">${c.cliente_nome}</option>`;
+                clients.forEach(c => {
+                    const opt = document.createElement('option');
+                    opt.value = c.client_id;
+                    opt.textContent = c.cliente_nome;
+                    if (c._source === 'projects') opt.dataset.projectUuid = c._project_uuid;
+                    select.appendChild(opt);
                 });
+            } else {
+                select.innerHTML = '<option value="">Nenhum cliente encontrado</option>';
             }
         } catch (e) {
-            console.error(e);
+            console.error('[EDIT-LIST] Exceção:', e);
+            select.innerHTML = '<option value="">Erro ao carregar clientes</option>';
         }
     });
 
@@ -387,19 +418,57 @@ function setupModeToggle() {
             loadBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
             loadBtn.disabled = true;
 
-            // Fetch basic strategy data and the massive JSON payload
-            const { data: estData } = await supabase.from('CLIENTES_ESTRATEGIA').select('cliente_nome, segmento, objetivo_principal, responsavel_fluxai, setup_completo').eq('client_id', clientId).single();
+            let estData = null;
+            
+            // [R2] Primary: CLIENTES_ESTRATEGIA
+            const { data: estRow, error: estLoadErr } = await supabase
+                .from('CLIENTES_ESTRATEGIA')
+                .select('cliente_nome, segmento, objetivo_principal, responsavel_fluxai, setup_completo')
+                .eq('client_id', clientId)
+                .single();
+            if (estLoadErr) console.warn('[EDIT-LOAD] CLIENTES_ESTRATEGIA error:', estLoadErr.message);
+            estData = estRow || null;
+
+            // [R2] Fallback: se não achou em CLIENTES_ESTRATEGIA, busca em 'projects'
+            if (!estData) {
+                console.warn('[EDIT-LOAD] Registro não encontrado em CLIENTES_ESTRATEGIA. Fallback: projects.');
+                const selectedOpt = select.options[select.selectedIndex];
+                const projectUuid = selectedOpt?.dataset?.projectUuid;
+                
+                let projRow = null;
+                if (projectUuid) {
+                    const { data: pByUuid } = await supabase.from('projects').select('id, company_name, metadata').eq('id', projectUuid).single();
+                    projRow = pByUuid;
+                } else {
+                    // busca por legacy_client_id no metadata
+                    const { data: pRows } = await supabase.from('projects').select('id, company_name, metadata').limit(50);
+                    projRow = pRows?.find(p => p.metadata?.legacy_client_id === clientId) || null;
+                }
+
+                if (projRow) {
+                    // Reconstrói estData sintético para compatibilidade
+                    estData = {
+                        cliente_nome: projRow.company_name || clientId,
+                        segmento: projRow.metadata?.segment || '',
+                        objetivo_principal: projRow.metadata?.objective || '',
+                        responsavel_fluxai: projRow.metadata?.responsavel_fluxai || '',
+                        setup_completo: projRow.metadata?.raw_payload_json ? JSON.parse(projRow.metadata.raw_payload_json) : null
+                    };
+                    console.info('[EDIT-LOAD] Dados recuperados de projects (fallback):', projRow.id);
+                }
+            }
+
             if (estData) {
                 const form = document.getElementById('onboardingForm');
                 
-                // 1. Set the basic fields directly from the columns
+                // 1. Campos diretos das colunas
                 const setVal = (name, val) => { const el = form.querySelector(`[name="${name}"]`); if(el) el.value = val || ''; };
                 setVal('company_name', estData.cliente_nome);
                 setVal('segment', estData.segmento);
                 setVal('objective', estData.objetivo_principal);
                 setVal('responsible_name', estData.responsavel_fluxai);
 
-                // 2. Magic JSON Auto-fill: If the Make webhook saved the massive payload to setup_completo
+                // 2. Magic JSON Auto-fill via setup_completo
                 let setup = estData.setup_completo;
                 if (typeof setup === 'string') {
                     try { setup = JSON.parse(setup); } catch(e) {}
@@ -411,7 +480,6 @@ function setupModeToggle() {
                         if (!inputs.length) return;
                         
                         if (Array.isArray(val)) {
-                            // Handing checkbox arrays (like modules, infra_active_platforms)
                             inputs.forEach(input => {
                                 if ((input.type === 'checkbox' || input.type === 'radio') && val.includes(input.value)) {
                                     input.checked = true;
@@ -420,24 +488,16 @@ function setupModeToggle() {
                         } else {
                             const input = inputs[0];
                             if (input.type === 'checkbox' || input.type === 'radio') {
-                                // Se o valor for uma string separada por vírgula (ex: "conteudo, trafego"), transforma em array para comparar
                                 const valArray = typeof val === 'string' ? val.split(',').map(s => s.trim()) : [val];
-                                inputs.forEach(i => {
-                                    if (valArray.includes(i.value)) {
-                                        i.checked = true;
-                                    }
-                                });
+                                inputs.forEach(i => { if (valArray.includes(i.value)) i.checked = true; });
                             } else {
-                                // Standard input/textarea/select
                                 input.value = val;
                             }
                         }
                     });
                     
-                    // Se o form tem renderização dinâmica (módulos), chama a função para exibir
                     if (typeof renderDynamicFields === 'function') {
                         renderDynamicFields();
-                        // Refill dynamic fields after rendering
                         Object.keys(setup).forEach(key => {
                             if (key.startsWith('escopo_')) {
                                 const el = form.querySelector(`[name="${key}"]`);
@@ -454,11 +514,12 @@ function setupModeToggle() {
                         window.applyOwnerDefaults();
                     }
                 }
+                alert('Dados pré-carregados com sucesso. Você pode navegar pelas etapas e atualizar o que for necessário.');
+            } else {
+                alert('⚠️ Cliente não encontrado em nenhuma fonte de dados (CLIENTES_ESTRATEGIA e projects). Verifique se o onboarding foi concluído com sucesso.');
             }
-            
-            alert('Dados pré-carregados com sucesso. Você pode navegar pelas etapas e atualizar o que for necessário.');
         } catch(e) {
-            console.error(e);
+            console.error('[EDIT-LOAD] Exceção:', e);
         } finally {
             loadBtn.innerHTML = '<i class="fa-solid fa-download"></i> Carregar';
             loadBtn.disabled = false;
@@ -823,6 +884,53 @@ window.handleOnboarding = async function(e) {
                     }).eq('id', realUuid);
                 } catch (e) {
                     console.warn('[ONBOARDING] Aviso: falha ao atualizar status final de projects para ativo', e);
+                }
+            }
+            
+            // [R2] UPSERT em CLIENTES_ESTRATEGIA para garantir que o modo Editar funcione
+            if (supabase) {
+                try {
+                    const setupCompletoJson = raw; // já é o objeto do formulário
+                    const upsertPayload = {
+                        client_id:              projectId,
+                        cliente_nome:           raw.company_name || '',
+                        segmento:               raw.segment || '',
+                        objetivo_principal:     raw.objective || '',
+                        responsavel_fluxai:     responsavelFluxai,
+                        tipo_cliente:           isOwner ? 'owner' : 'cliente_pago',
+                        posicionamento_atual:   raw.positioning_current || '',
+                        posicionamento_desejado:raw.positioning_desired || '',
+                        proposta_valor:         raw.value_proposition || '',
+                        diferenciais:           raw.differentiators || '',
+                        publico_alvo:           raw.target_audience || '',
+                        persona_principal:      raw.main_persona || '',
+                        dor_principal:          raw.pain_points || '',
+                        desejo_principal:       raw.icp_main_desire || '',
+                        inimigo_comum:          raw.common_enemy || '',
+                        nivel_percepcao_premium:raw.awareness_level || '',
+                        objetivo_90_dias:       raw.objective || '',
+                        objetivo_mes_atual:     raw.current_month_goal || '',
+                        prioridade_estrategica: raw.strategic_priority || 'alta',
+                        tom_de_voz:             raw.voice_tone || '',
+                        palavras_evitar:        raw.forbidden_language || '',
+                        palavras_usar:          raw.desired_language || '',
+                        restricoes_comunicacao: raw.objections || '',
+                        observacoes_estrategicas:raw.strategic_notes || '',
+                        status_cliente:         isOwner ? 'ativo' : 'em_onboarding',
+                        setup_completo:         setupCompletoJson,
+                        data_criacao:           new Date().toISOString().split('T')[0],
+                        data_atualizacao:       new Date().toISOString().split('T')[0]
+                    };
+                    const { error: upsertErr } = await supabase
+                        .from('CLIENTES_ESTRATEGIA')
+                        .upsert([upsertPayload], { onConflict: 'client_id' });
+                    if (upsertErr) {
+                        console.warn('[ONBOARDING][R2] Aviso: falha ao gravar em CLIENTES_ESTRATEGIA:', upsertErr.message);
+                    } else {
+                        console.info('[ONBOARDING][R2] CLIENTES_ESTRATEGIA atualizada com sucesso para', projectId);
+                    }
+                } catch (e) {
+                    console.warn('[ONBOARDING][R2] Exceção ao gravar em CLIENTES_ESTRATEGIA:', e);
                 }
             }
 
