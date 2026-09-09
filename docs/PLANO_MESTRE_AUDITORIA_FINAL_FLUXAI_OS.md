@@ -1,4 +1,11 @@
-# FLUXAI OS™ — PLANO-MESTRE CONSOLIDADO
+# FLUXAI OS™ — PLANO-MESTRE CONSOLIDADO (Versão 2.0)
+*Versão Anterior: 1.0*
+
+> **NOTA OFICIAL DA CENTRAL DE CONTROLE**
+> Este documento não substitui o Plano-Mestre executivo oficial.
+> PLANO_TECNICO_DO_REPOSITORIO: `docs/PLANO_MESTRE_AUDITORIA_FINAL_FLUXAI_OS.md`
+> PLANO_MESTRE_EXECUTIVO_OFICIAL: `FluxAI_OS_Plano_Mestre_v043.xlsx`
+> O versionamento interno 1.0 → 2.0 do Markdown é independente da sequência executiva v041, v042, v043.
 
 ## 1. Diretriz geral
 O FluxAI OS™ é o Sistema Operacional de Crescimento da FluxAI Labs.
@@ -108,3 +115,19 @@ Este índice consolida os artefatos comprobatórios das auditorias executadas, s
 *   **Matriz Mestra de Cenários:** `docs/CHECKPOINT_MATRIZ_MESTRA_CENARIOS_MAKE.md`
 *   **Auditoria Proxy (Bloco 06):** Diretório `docs/staging/Bloco06/`
 *   **Implementação RLS (Bloco 04):** `supabase/migrations/20260626000001` a `04`
+*   **Auditoria Identity (Micro-Gate CORE-001.0):** `C:\Users\BRENDA\Desktop\FLUXAI_DISK_EVIDENCE\CORE_001_0`
+*   **Reconciliação Final de Infraestrutura (Gate 2.0C.4M.1A):** `D:\FLUXAI_DATA\03_EVIDENCIAS\FLUXAI_DISK_EVIDENCE\2026\GATE_2_0C_4M_1A`
+*   **Criação Template Oficial (Micro-Gate TBP-001):** `docs/TBP-001_TEMPLATE_OFICIAL_BLUEPRINT.md` e `docs/auditorias/MICRO_GATE_TBP_001_EVIDENCIAS.md`
+
+---
+
+## 6. Estado Oficial (Frente de Infraestrutura)
+*   **Status Atual:** CONCLUÍDO DEFINITIVAMENTE (Micro-Gate 2.0C.4M.1B).
+*   **Percentual da Frente:** 100%.
+*   **Arquitetura Base:** Auditoria CORE-001.0 finalizada. O Workspace e Identity Capability podem prosseguir em paralelo.
+
+## 7. Política Oficial de Armazenamento
+*   **Repositório Oficial:** `D:\FLUXAI_DATA` (Fonte oficial de todos os artefatos homologados).
+*   **Ambiente de Trabalho:** `C:` (Utilizado apenas para desenvolvimento, execução temporária e arquivos de trabalho).
+*   **Gestão de Espaço:** Arquivos homologados não deverão permanecer duplicados entre C: e D:.
+

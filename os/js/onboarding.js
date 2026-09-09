@@ -474,25 +474,32 @@ function setupModeToggle() {
                     try { setup = JSON.parse(setup); } catch(e) {}
                 }
                 if (setup && Object.keys(setup).length > 0) {
+                    const normalizeToArray = (value) => {
+                        if (Array.isArray(value)) return value;
+                        if (value === null || value === undefined || value === "") return [];
+                        if (typeof value === 'string') {
+                            if (value.includes(',')) return value.split(',').map(s => s.trim()).filter(s => s);
+                            return [value];
+                        }
+                        return [value];
+                    };
+
                     Object.keys(setup).forEach(key => {
                         const val = setup[key];
                         const inputs = form.querySelectorAll(`[name="${key}"]`);
                         if (!inputs.length) return;
                         
-                        if (Array.isArray(val)) {
-                            inputs.forEach(input => {
-                                if ((input.type === 'checkbox' || input.type === 'radio') && val.includes(input.value)) {
-                                    input.checked = true;
+                        const input = inputs[0];
+                        if (input.type === 'checkbox' || input.type === 'radio') {
+                            const valArray = normalizeToArray(val);
+                            inputs.forEach(i => {
+                                if (valArray.includes(i.value)) {
+                                    i.checked = true;
                                 }
                             });
                         } else {
-                            const input = inputs[0];
-                            if (input.type === 'checkbox' || input.type === 'radio') {
-                                const valArray = typeof val === 'string' ? val.split(',').map(s => s.trim()) : [val];
-                                inputs.forEach(i => { if (valArray.includes(i.value)) i.checked = true; });
-                            } else {
-                                input.value = val;
-                            }
+                            // Standard input/textarea/select
+                            input.value = Array.isArray(val) ? val.join(', ') : val;
                         }
                     });
                     
@@ -535,6 +542,15 @@ window.handleOnboarding = async function(e) {
     const form = document.getElementById('onboardingForm');
     const formData = new FormData(form);
     const raw = Object.fromEntries(formData.entries());
+
+    // FASE A - Correção de multi-select (Arrays reais no JSON final)
+    ['infra_active_platforms', 'modules', 'content_formats_priority', 'activation_dependencies'].forEach(field => {
+        if (formData.has(field)) {
+            raw[field] = formData.getAll(field);
+        } else {
+            raw[field] = [];
+        }
+    });
 
     const errors = validateOnboardingBeforeSubmit(raw);
     if (errors.length > 0) {
