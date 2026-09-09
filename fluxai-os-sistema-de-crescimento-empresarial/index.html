@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -13,287 +13,282 @@
     <meta property="og:type" content="article">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="robots" content="index, follow">
-    
+
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "Article",
       "headline": "Empresas não precisam de mais ferramentas. Precisam de um sistema de crescimento.",
-      "author": {
-        "@type": "Organization",
-        "name": "FluxAI Labs"
-      },
-      "publisher": {
-        "@type": "Organization",
-        "name": "FluxAI Labs"
-      }
+      "author": { "@type": "Organization", "name": "FluxAI Labs" },
+      "publisher": { "@type": "Organization", "name": "FluxAI Labs" }
     }
     </script>
-    
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
     <style>
         :root {
-            --bg-color: #0A0A0A;
-            --text-color: #E0E0E0;
-            --text-muted: #888888;
+            --bg: #0A0A0A;
+            --text: #E0E0E0;
+            --muted: #888;
             --accent: #2563EB;
-            --border: #333333;
-            --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-            --font-serif: 'Merriweather', serif;
+            --border: #222;
         }
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
         body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: var(--font-sans);
-            line-height: 1.6;
-            margin: 0;
-            padding: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', system-ui, sans-serif;
+            font-size: 1.05rem;
+            line-height: 1.7;
         }
-        header.global-header, footer.global-footer {
-            padding: 20px;
-            text-align: center;
+        a { color: inherit; }
+
+        /* HEADER */
+        .site-header {
             border-bottom: 1px solid var(--border);
+            padding: 18px 40px;
+            display: flex;
+            align-items: center;
         }
-        footer.global-footer {
-            border-top: 1px solid var(--border);
-            border-bottom: none;
-            margin-top: 60px;
-        }
-        main {
-            max-width: 880px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
+        .site-header img { height: 32px; filter: invert(1); }
+
+        /* MAIN */
+        main { max-width: 820px; margin: 0 auto; padding: 60px 24px 80px; }
+
+        /* BREADCRUMB */
         .breadcrumb {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 20px;
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 24px;
         }
+        .breadcrumb a { text-decoration: none; }
+        .breadcrumb a:hover { color: var(--text); }
+
+        /* CATEGORY */
         .category {
-            font-size: 0.85rem;
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            letter-spacing: 1.2px;
             text-transform: uppercase;
-            letter-spacing: 1px;
             color: var(--accent);
-            margin-bottom: 10px;
-            display: block;
+            margin-bottom: 16px;
         }
+
+        /* H1 */
         h1 {
-            font-size: 2.5rem;
-            line-height: 1.2;
-            margin-bottom: 20px;
+            font-size: clamp(1.8rem, 4vw, 2.6rem);
             font-weight: 700;
-            color: #FFFFFF;
+            line-height: 1.2;
+            color: #fff;
+            margin-bottom: 20px;
         }
+
+        /* LEAD */
         .lead {
-            font-size: 1.25rem;
-            color: var(--text-muted);
-            margin-bottom: 30px;
+            font-size: 1.2rem;
+            color: var(--muted);
+            margin-bottom: 28px;
         }
+
+        /* META */
         .meta {
-            font-size: 0.9rem;
-            color: var(--text-muted);
+            font-size: 0.86rem;
+            color: var(--muted);
             border-bottom: 1px solid var(--border);
-            padding-bottom: 20px;
-            margin-bottom: 40px;
+            padding-bottom: 24px;
+            margin-bottom: 48px;
         }
+
+        /* BODY TEXT */
+        p { margin-bottom: 22px; }
+
+        /* H2 */
         h2 {
-            font-size: 1.8rem;
-            margin-top: 50px;
-            margin-bottom: 20px;
-            color: #FFFFFF;
+            font-size: 1.7rem;
+            font-weight: 700;
+            color: #fff;
+            margin: 52px 0 18px;
+            line-height: 1.3;
         }
-        h3 {
-            font-size: 1.4rem;
-            margin-top: 40px;
-            margin-bottom: 15px;
-        }
-        p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-        .editorial-quote {
-            margin: 50px 0;
-            padding: 30px;
+
+        /* QUOTE */
+        .quote {
+            margin: 52px 0;
+            padding: 28px 32px;
             border-left: 4px solid var(--accent);
-            background: rgba(255, 255, 255, 0.02);
-            font-size: 1.5rem;
+            background: rgba(255,255,255,0.02);
+            font-size: 1.35rem;
             font-style: italic;
-            color: #FFFFFF;
+            color: #fff;
+            border-radius: 0 4px 4px 0;
         }
-        .product-image {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            margin: 40px 0;
-            border: 1px solid var(--border);
-        }
+
+        /* AI BOX */
         .box-ia {
-            background: rgba(37, 99, 235, 0.1);
-            border: 1px solid rgba(37, 99, 235, 0.3);
-            padding: 30px;
-            border-radius: 8px;
+            background: rgba(37,99,235,0.08);
+            border: 1px solid rgba(37,99,235,0.25);
+            padding: 28px 32px;
+            border-radius: 10px;
             margin: 40px 0;
         }
         .box-ia h3 {
-            margin-top: 0;
+            font-size: 1rem;
+            font-weight: 700;
             color: var(--accent);
+            margin-bottom: 12px;
         }
-        .benefits-list {
-            list-style: none;
-            padding: 0;
-            margin: 40px 0;
-        }
-        .benefit-item {
+
+        /* BENEFITS */
+        .benefits { list-style: none; margin: 40px 0; }
+        .benefit {
             display: flex;
+            gap: 22px;
             align-items: flex-start;
-            margin-bottom: 30px;
-            padding-bottom: 20px;
+            padding: 22px 0;
             border-bottom: 1px solid var(--border);
         }
-        .benefit-number {
-            font-size: 2rem;
+        .benefit:first-child { padding-top: 0; }
+        .num {
+            font-size: 1.9rem;
             font-weight: 700;
-            color: var(--text-muted);
-            margin-right: 20px;
+            color: var(--border);
             line-height: 1;
+            flex-shrink: 0;
+            min-width: 36px;
         }
-        .cta-section {
-            background: #111111;
-            padding: 50px;
-            border-radius: 12px;
-            text-align: center;
-            margin-top: 60px;
+
+        /* CTA */
+        .cta {
+            background: #111;
             border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 52px 40px;
+            text-align: center;
+            margin-top: 64px;
         }
-        .cta-section h2 {
-            margin-top: 0;
-        }
-        .cta-button {
+        .cta h2 { margin-top: 0; }
+        .cta p { color: var(--muted); }
+        .cta-btn {
             display: inline-block;
             background: var(--accent);
-            color: #FFFFFF;
-            padding: 15px 30px;
-            border-radius: 6px;
-            text-decoration: none;
+            color: #fff;
             font-weight: 600;
-            margin-top: 20px;
-            transition: background 0.3s;
+            padding: 14px 28px;
+            border-radius: 7px;
+            text-decoration: none;
+            margin-top: 22px;
+            transition: background 0.2s;
         }
-        .cta-button:hover {
-            background: #1D4ED8;
+        .cta-btn:hover { background: #1D4ED8; }
+
+        /* FOOTER */
+        .site-footer {
+            border-top: 1px solid var(--border);
+            padding: 28px 40px;
+            text-align: center;
+            font-size: 0.83rem;
+            color: var(--muted);
+            margin-top: 60px;
         }
-        @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
-            .cta-section { padding: 30px 20px; }
+
+        @media (max-width: 640px) {
+            .site-header, .site-footer { padding: 16px 20px; }
+            main { padding: 36px 18px 60px; }
+            .cta { padding: 36px 20px; }
+            .quote { padding: 20px 22px; font-size: 1.15rem; }
         }
     </style>
 </head>
 <body>
-    <header class="global-header">
-        <img src="/logo.svg" alt="FluxAI Labs" width="120" style="filter: invert(1);">
-    </header>
 
-    <main>
-        <article>
-            <nav class="breadcrumb">
-                <a href="/" style="color: inherit; text-decoration: none;">Home</a> / <a href="/insights" style="color: inherit; text-decoration: none;">Insights</a> / FluxAI OS
-            </nav>
+<header class="site-header">
+    <img src="/logo.svg" alt="FluxAI Labs">
+</header>
 
-            <header>
-                <span class="category">Tecnologia e Crescimento</span>
-                <h1>Empresas não precisam de mais ferramentas. Precisam de um sistema de crescimento.</h1>
-                <p class="lead">Empresas acumulam ferramentas para resolver problemas individuais. O desafio começa quando marketing, vendas, atendimento, operação e dados deixam de funcionar como partes de um mesmo sistema.</p>
-                <div class="meta">
-                    Por <strong>FluxAI Labs</strong> • Publicado em 09/09/2026 • Leitura: 5 min
-                </div>
-            </header>
+<main>
+    <article>
 
-            <img src="/placeholder-hero.jpg" alt="FluxAI OS, sistema de crescimento empresarial com inteligência artificial" class="product-image">
+        <nav class="breadcrumb">
+            <a href="/">Home</a> &rsaquo; <a href="/insights">Insights</a> &rsaquo; FluxAI OS
+        </nav>
 
-            <section>
-                <p>O mercado atual convenceu os negócios de que a solução para cada gargalo é uma nova assinatura de software. A consequência é um ecossistema fragmentado: dados desconectados, times desalinhados e processos operacionais que exigem intervenção humana constante apenas para manter as coisas funcionando.</p>
-                
-                <div class="editorial-quote">
-                    “Quando a tecnologia não possui arquitetura, ela apenas digitaliza a desorganização.”
-                </div>
+        <header>
+            <span class="category">Tecnologia e Crescimento</span>
+            <h1>Empresas não precisam de mais ferramentas. Precisam de um sistema de crescimento.</h1>
+            <p class="lead">Empresas acumulam ferramentas para resolver problemas individuais. O desafio começa quando marketing, vendas, atendimento, operação e dados deixam de funcionar como partes de um mesmo sistema.</p>
+            <div class="meta">Por <strong>FluxAI Labs</strong> &nbsp;·&nbsp; Publicado em 09/09/2026 &nbsp;·&nbsp; Leitura: 5 min</div>
+        </header>
 
-                <p>Nós da FluxAI Labs acreditamos que o crescimento sustentável não nasce do acúmulo de soluções isoladas, mas sim de uma base conectada onde cada engrenagem contribui para o fluxo geral da operação.</p>
+        <p>O mercado atual convenceu os negócios de que a solução para cada gargalo é uma nova assinatura de software. A consequência é um ecossistema fragmentado: dados desconectados, times desalinhados e processos operacionais que exigem intervenção humana constante apenas para manter as coisas funcionando.</p>
 
-                <h2 style="font-size: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">FLUXAI OS™</h2>
-                <h2 style="margin-top: 0;">O que é o FluxAI OS™?</h2>
-                <p>O FluxAI OS™ não é apenas um CRM ou um gestor de tarefas. Trata-se do sistema operacional de crescimento da sua empresa, projetado para centralizar as operações críticas de aquisição, atendimento e entrega em um ambiente inteligente e altamente configurável.</p>
+        <div class="quote">"Quando a tecnologia não possui arquitetura, ela apenas digitaliza a desorganização."</div>
 
-                <img src="/placeholder-dashboard.jpg" alt="Dashboard do FluxAI OS mostrando a visão unificada do negócio" class="product-image">
+        <p>Nós da FluxAI Labs acreditamos que o crescimento sustentável não nasce do acúmulo de soluções isoladas, mas sim de uma base conectada onde cada engrenagem contribui para o fluxo geral da operação.</p>
 
-                <h2>Principais benefícios do FluxAI OS™</h2>
-                <ul class="benefits-list">
-                    <li class="benefit-item">
-                        <div class="benefit-number">01</div>
-                        <div>
-                            <strong>Centralização das informações:</strong> Visão única e confiável sobre clientes, leads e operações, acabando com os silos de dados.
-                        </div>
-                    </li>
-                    <li class="benefit-item">
-                        <div class="benefit-number">02</div>
-                        <div>
-                            <strong>Redução de tarefas manuais:</strong> Fluxos de trabalho automatizados que devolvem tempo para a equipe focar no que é estratégico.
-                        </div>
-                    </li>
-                    <li class="benefit-item">
-                        <div class="benefit-number">03</div>
-                        <div>
-                            <strong>Mais controle sobre o processo comercial:</strong> Previsibilidade e clareza total em cada etapa do funil de vendas.
-                        </div>
-                    </li>
-                    <li class="benefit-item">
-                        <div class="benefit-number">04</div>
-                        <div>
-                            <strong>Marketing conectado ao crescimento:</strong> Campanhas e interações integradas diretamente ao resultado operacional.
-                        </div>
-                    </li>
-                    <li class="benefit-item">
-                        <div class="benefit-number">05</div>
-                        <div>
-                            <strong>Decisões orientadas por dados:</strong> Dashboards em tempo real que refletem a verdade da sua operação, sem maquiagens.
-                        </div>
-                    </li>
-                    <li class="benefit-item">
-                        <div class="benefit-number">06</div>
-                        <div>
-                            <strong>Continuidade operacional:</strong> A saída de um colaborador não interrompe o histórico nem o andamento das tarefas críticas.
-                        </div>
-                    </li>
-                    <li class="benefit-item">
-                        <div class="benefit-number">07</div>
-                        <div>
-                            <strong>Crescimento com estrutura:</strong> Escale seu faturamento sabendo que a infraestrutura suportará o novo volume.
-                        </div>
-                    </li>
-                </ul>
+        <h2>O que é o FluxAI OS™?</h2>
 
-                <div class="editorial-quote">
-                    “Ferramentas isoladas executam funções. Um sistema de crescimento cria continuidade.”
-                </div>
+        <p>O FluxAI OS™ não é apenas um CRM ou um gestor de tarefas. Trata-se do sistema operacional de crescimento da sua empresa, projetado para centralizar as operações críticas de aquisição, atendimento e entrega em um ambiente inteligente e altamente configurável.</p>
 
-                <h2>Qual é o papel da inteligência artificial?</h2>
-                <div class="box-ia">
-                    <h3>IA como alavanca operacional</h3>
-                    <p>No FluxAI OS™, tratamos a inteligência artificial não como um truque, mas como infraestrutura. <strong>IA amplia capacidade. Pessoas preservam contexto, julgamento e responsabilidade.</strong> A automação baseada em IA analisa, resume e prevê cenários para que seu time tome as decisões certas mais rápido.</p>
-                </div>
+        <h2>Principais benefícios do FluxAI OS™</h2>
 
-                <p>Nossa abordagem garante que a IA esteja embutida nos processos cotidianos — desde a qualificação de leads até a estruturação do sucesso do cliente — sem exigir que seus colaboradores se tornem engenheiros de dados.</p>
+        <ul class="benefits">
+            <li class="benefit">
+                <span class="num">01</span>
+                <div><strong>Centralização das informações:</strong> Visão única e confiável sobre clientes, leads e operações, acabando com os silos de dados.</div>
+            </li>
+            <li class="benefit">
+                <span class="num">02</span>
+                <div><strong>Redução de tarefas manuais:</strong> Fluxos de trabalho automatizados que devolvem tempo para a equipe focar no que é estratégico.</div>
+            </li>
+            <li class="benefit">
+                <span class="num">03</span>
+                <div><strong>Mais controle sobre o processo comercial:</strong> Previsibilidade e clareza total em cada etapa do funil de vendas.</div>
+            </li>
+            <li class="benefit">
+                <span class="num">04</span>
+                <div><strong>Marketing conectado ao crescimento:</strong> Campanhas e interações integradas diretamente ao resultado operacional.</div>
+            </li>
+            <li class="benefit">
+                <span class="num">05</span>
+                <div><strong>Decisões orientadas por dados:</strong> Dashboards em tempo real que refletem a verdade da sua operação, sem maquiagens.</div>
+            </li>
+            <li class="benefit">
+                <span class="num">06</span>
+                <div><strong>Continuidade operacional:</strong> A saída de um colaborador não interrompe o histórico nem o andamento das tarefas críticas.</div>
+            </li>
+            <li class="benefit">
+                <span class="num">07</span>
+                <div><strong>Crescimento com estrutura:</strong> Escale seu faturamento sabendo que a infraestrutura suportará o novo volume.</div>
+            </li>
+        </ul>
 
-                <div class="cta-section">
-                    <h2>Sua empresa tem ferramentas.<br>Mas elas funcionam como um sistema?</h2>
-                    <p>A FluxAI Labs estrutura sistemas de crescimento personalizados, conectando estratégia, marketing, operação, relacionamento, automação e inteligência de dados.</p>
-                    <p style="color: var(--text-muted); font-size: 0.95rem;">Mapeamos processos, ferramentas, gargalos e oportunidades de integração antes de propor qualquer automação.</p>
-                    <a href="/contato" class="cta-button">Solicite um diagnóstico da sua operação</a>
-                </div>
-            </section>
-        </article>
-    </main>
+        <div class="quote">"Ferramentas isoladas executam funções. Um sistema de crescimento cria continuidade."</div>
 
-    <footer class="global-footer">
-        <p style="color: var(--text-muted); font-size: 0.85rem;">&copy; 2026 FluxAI Labs. Todos os direitos reservados.</p>
-    </footer>
+        <h2>Qual é o papel da inteligência artificial?</h2>
+
+        <div class="box-ia">
+            <h3>IA como alavanca operacional</h3>
+            <p>No FluxAI OS™, tratamos a inteligência artificial não como um truque, mas como infraestrutura. <strong>IA amplia capacidade. Pessoas preservam contexto, julgamento e responsabilidade.</strong> A automação baseada em IA analisa, resume e prevê cenários para que seu time tome as decisões certas mais rápido.</p>
+        </div>
+
+        <p>Nossa abordagem garante que a IA esteja embutida nos processos cotidianos — desde a qualificação de leads até a estruturação do sucesso do cliente — sem exigir que seus colaboradores se tornem engenheiros de dados.</p>
+
+        <div class="cta">
+            <h2>Sua empresa tem ferramentas.<br>Mas elas funcionam como um sistema?</h2>
+            <p>A FluxAI Labs estrutura sistemas de crescimento personalizados, conectando estratégia, marketing, operação, relacionamento, automação e inteligência de dados.</p>
+            <p style="margin-top:10px; font-size:0.92rem;">Mapeamos processos, ferramentas, gargalos e oportunidades de integração antes de propor qualquer automação.</p>
+            <a href="/contato" class="cta-btn">Solicite um diagnóstico da sua operação</a>
+        </div>
+
+    </article>
+</main>
+
+<footer class="site-footer">
+    <p>&copy; 2026 FluxAI Labs. Todos os direitos reservados.</p>
+</footer>
+
 </body>
 </html>
