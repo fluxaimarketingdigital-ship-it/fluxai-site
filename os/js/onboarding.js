@@ -656,13 +656,26 @@ window.handleOnboarding = async function(e) {
             }
         } else {
             // Se for edit, tenta buscar o UUID existente para enviar ao webhook
+            let foundUuid = null;
             try {
                 const { data: projData } = await supabase.from('projects').select('id').eq('metadata->>legacy_client_id', projectId).limit(1);
                 if (projData && projData.length > 0) {
-                    realUuid = projData[0].id;
+                    foundUuid = projData[0].id;
                 }
             } catch (e) {
                 console.warn('[ONBOARDING] Falha ao recuperar UUID do projeto em modo edit:', e);
+            }
+
+            if (foundUuid) {
+                realUuid = foundUuid;
+            } else {
+                alert("Não foi possível resolver o projeto existente deste cliente.\nO envio foi bloqueado para evitar criação duplicada.");
+                if (btn) {
+                    btn.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i> ERRO DE IDENTIDADE';
+                    btn.style.background = '#ef4444';
+                    btn.disabled = false;
+                }
+                return; // BLOCK SUBMISSION (Guardrail)
             }
         }
     }
@@ -903,52 +916,7 @@ window.handleOnboarding = async function(e) {
                 }
             }
             
-            // [R2] UPSERT em CLIENTES_ESTRATEGIA para garantir que o modo Editar funcione
-            if (supabase) {
-                try {
-                    const setupCompletoJson = raw; // já é o objeto do formulário
-                    const upsertPayload = {
-                        client_id:              projectId,
-                        cliente_nome:           raw.company_name || '',
-                        segmento:               raw.segment || '',
-                        objetivo_principal:     raw.objective || '',
-                        responsavel_fluxai:     responsavelFluxai,
-                        tipo_cliente:           isOwner ? 'owner' : 'cliente_pago',
-                        posicionamento_atual:   raw.positioning_current || '',
-                        posicionamento_desejado:raw.positioning_desired || '',
-                        proposta_valor:         raw.value_proposition || '',
-                        diferenciais:           raw.differentiators || '',
-                        publico_alvo:           raw.target_audience || '',
-                        persona_principal:      raw.main_persona || '',
-                        dor_principal:          raw.pain_points || '',
-                        desejo_principal:       raw.icp_main_desire || '',
-                        inimigo_comum:          raw.common_enemy || '',
-                        nivel_percepcao_premium:raw.awareness_level || '',
-                        objetivo_90_dias:       raw.objective || '',
-                        objetivo_mes_atual:     raw.current_month_goal || '',
-                        prioridade_estrategica: raw.strategic_priority || 'alta',
-                        tom_de_voz:             raw.voice_tone || '',
-                        palavras_evitar:        raw.forbidden_language || '',
-                        palavras_usar:          raw.desired_language || '',
-                        restricoes_comunicacao: raw.objections || '',
-                        observacoes_estrategicas:raw.strategic_notes || '',
-                        status_cliente:         isOwner ? 'ativo' : 'em_onboarding',
-                        setup_completo:         setupCompletoJson,
-                        data_criacao:           new Date().toISOString().split('T')[0],
-                        data_atualizacao:       new Date().toISOString().split('T')[0]
-                    };
-                    const { error: upsertErr } = await supabase
-                        .from('CLIENTES_ESTRATEGIA')
-                        .upsert([upsertPayload], { onConflict: 'client_id' });
-                    if (upsertErr) {
-                        console.warn('[ONBOARDING][R2] Aviso: falha ao gravar em CLIENTES_ESTRATEGIA:', upsertErr.message);
-                    } else {
-                        console.info('[ONBOARDING][R2] CLIENTES_ESTRATEGIA atualizada com sucesso para', projectId);
-                    }
-                } catch (e) {
-                    console.warn('[ONBOARDING][R2] Exceção ao gravar em CLIENTES_ESTRATEGIA:', e);
-                }
-            }
+            // [R2] (Removido) UPSERT direto em CLIENTES_ESTRATEGIA agora desativado para reforçar SINGLE WRITE AUTHORITY do Make Scenario 09.
 
             const overlay = document.getElementById('deploy-overlay');
             const deployBar = document.getElementById('deploy-bar');

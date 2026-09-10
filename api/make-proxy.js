@@ -67,7 +67,18 @@ export default async function handler(req, res) {
 
     const userId = user?.id || 'fallback-test-user';
     const role = user?.app_metadata?.role || 'CLIENT';
-    const clientId = user?.user_metadata?.client_id || payload.client_id || null;
+    
+    // DB_SEC_001_HARDENING: identity contract remediation
+    let clientId = null;
+    const appAuthClientId = user?.app_metadata?.client_id || null;
+    
+    if (role === 'ADMIN' || role === 'OPERATOR') {
+        // Admins can execute operations on behalf of other clients using payload.client_id
+        clientId = payload.client_id || appAuthClientId || null;
+    } else {
+        // Clients are strictly bound to their app_metadata
+        clientId = appAuthClientId || payload.client_id || null;
+    }
 
     // 2. Gerar Hash de Request e Correlation ID
     const crypto = require('crypto');
