@@ -74,11 +74,14 @@
             background: rgba(142, 158, 104, 0.1);
         }
 
-        .wizard-footer { margin-top: 40px; background: rgba(10,10,10,0.8); border-top: 1px solid var(--os-border); padding: 20px 0; display: flex; justify-content: space-between; align-items: center; z-index: 100; }
-        .btn-wizard { padding: 14px 28px; border-radius: 8px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; transition: 0.2s; border: none; }
-        .btn-prev { background: transparent; color: var(--os-text-muted); }
+        .wizard-footer { margin-top: 36px; border-top: 1px solid rgba(255,255,255,0.05); padding: 24px 0 0 0; display: flex; justify-content: space-between; align-items: center; width: 100%; z-index: 100; }
+        .wizard-step-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.85rem; letter-spacing: 0.5px; }
+        .step-highlight { font-weight: 600; color: var(--os-primary); }
+        .step-total { font-weight: 400; color: rgba(255,255,255,0.5); }
+        .btn-wizard { padding: 14px 32px; border-radius: 8px; font-weight: 800; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; transition: 0.2s; border: none; }
+        .btn-prev { background: transparent; color: var(--os-text-muted); border: 1px solid transparent; }
         .btn-next { background: var(--os-primary); color: #fff; }
-        .btn-prev:hover { color: #fff; }
+        .btn-prev:hover { color: #fff; background: rgba(255,255,255,0.05); }
         .btn-next:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(107,122,69,0.3); }
 
         .sub-fields { margin-top: 15px; padding-left: 20px; border-left: 2px solid var(--os-primary); display: none; }
@@ -119,8 +122,8 @@
                 padding: 24px 18px;
             }
             .wizard-footer {
-                padding: 16px;
-                gap: 12px;
+                padding-top: 20px;
+                gap: 16px;
             }
         }
         @media (max-width: 600px) {
@@ -132,6 +135,27 @@
             }
             .checkbox-card-grid {
                 grid-template-columns: 1fr 1fr;
+            }
+            .wizard-footer {
+                flex-wrap: wrap;
+                padding-top: 24px;
+                gap: 16px;
+            }
+            .wizard-step-indicator {
+                width: 100%;
+                order: -1;
+            }
+            .btn-wizard {
+                flex: 1;
+                justify-content: center;
+                padding: 12px 16px;
+            }
+            #btn-disparar-infraestrutura {
+                flex: 1;
+                justify-content: center;
+                padding: 12px 16px;
+                width: 100%;
+                max-width: none !important;
             }
         }
         @media (max-width: 480px) {
@@ -1106,12 +1130,9 @@
                                     <div id="ia-roadmap-content" style="font-size:0.75rem; color:#eee; line-height:1.6; font-family:'JetBrains Mono', monospace;"></div>
                                 </div>
 
-                                <div style="background: rgba(107,122,69,0.1); padding: 30px; border-radius: 12px; border: 1px dashed var(--os-primary); text-align: center;">
+                                <div style="background: rgba(107,122,69,0.05); padding: 30px; border-radius: 12px; border: 1px dashed var(--os-border); text-align: center;">
                                     <h3 style="color: var(--os-primary); margin-top: 0; font-size:1.1rem; font-weight:800;">PREPARAÇÃO SEGURA DO ECOSSISTEMA</h3>
-                                    <p style="margin-bottom: 25px; font-size:0.8rem; color:var(--os-text-muted);">Ao submeter, a FluxAI OS criará o cadastro operacional em modo rascunho, organizará as 8 camadas do onboarding e preparará a base estratégica para revisão interna.</p>
-                                    <button type="button" id="btn-disparar-infraestrutura" class="btn-save" style="max-width: 350px; margin: 0 auto; display:flex; align-items:center; justify-content:center; gap:10px;">
-                                        <i class="fa-solid fa-clipboard-check"></i> SUBMETER PARA REVISÃO INTERNA
-                                    </button>
+                                    <p style="margin-bottom: 0; font-size:0.8rem; color:var(--os-text-muted);">Ao submeter, a FluxAI OS criará o cadastro operacional em modo rascunho, organizará as 8 camadas do onboarding e preparará a base estratégica para revisão interna.</p>
                                 </div>
                             </div>
                         </div>
@@ -1119,13 +1140,17 @@
 
                     <div class="wizard-footer">
                         <button type="button" class="btn-wizard btn-prev" id="btn-prev" onclick="window.moveStep(-1)" style="visibility: hidden;">
-                            <i class="fa-solid fa-arrow-left"></i> Anterior
+                            <i class="fa-solid fa-arrow-left"></i> Voltar
                         </button>
-                        <div style="font-size: 0.7rem; color: var(--os-text-muted); font-weight: 800; letter-spacing: 1px;">
-                            ETAPA <span id="current-step-display">1</span> DE 8
+                        <div class="wizard-step-indicator">
+                            <span class="step-highlight">ETAPA <span id="current-step-display">1</span></span>
+                            <span class="step-total">DE 8</span>
                         </div>
                         <button type="button" class="btn-wizard btn-next" id="btn-next" onclick="window.moveStep(1)">
                             Próximo <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                        <button type="button" id="btn-disparar-infraestrutura" class="btn-wizard btn-next" style="display:none; max-width: 300px; gap:10px;">
+                            Finalizar
                         </button>
                     </div>
 
@@ -1159,15 +1184,18 @@
             if(btnPrev) btnPrev.style.visibility = currentStep === 1 ? 'hidden' : 'visible';
             
             const btnNext = document.getElementById('btn-next');
+            const btnFinish = document.getElementById('btn-disparar-infraestrutura');
             if(btnNext) {
                 if (currentStep === totalSteps) {
                     btnNext.style.display = 'none';
+                    if (btnFinish) btnFinish.style.display = 'flex';
                     if (typeof window.generateIARoadmap === 'function') {
                         window.generateIARoadmap();
                     }
                 } else {
                     btnNext.style.display = 'flex';
                     btnNext.innerHTML = 'Próximo <i class="fa-solid fa-arrow-right"></i>';
+                    if (btnFinish) btnFinish.style.display = 'none';
                 }
             }
 
