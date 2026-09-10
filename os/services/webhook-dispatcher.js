@@ -75,14 +75,32 @@ export async function dispatchWebhook(route, payload, token = null) {
         headers['Authorization'] = `Bearer ${finalToken}`;
     }
 
-    // Injeta o client_id legado (ex: FLUXAI_LABS_001) no payload para no quebrar o ecossistema Make
+    // Injeta o client_id legado (ex: FLUXAI_LABS_001) no payload para não quebrar o ecossistema Make
     let finalPayload = { ...payload };
     const legacyClientId = typeof window !== 'undefined' && window.FLUXAI_RUNTIME_CONTEXT?.project_id;
     if (legacyClientId) {
         finalPayload.legacy_client_id = legacyClientId;
-        // Substitui tambm o client_id oficial pelo legado para garantir 100% de retrocompatibilidade com o Make
-        finalPayload.client_id = legacyClientId;
+        // DB_SEC_001_HARDENING: NUNCA sobrescrever o client_id de negócio com o contexto de runtime
+        // finalPayload.client_id = legacyClientId; (Removido - CAUSA RAIZ IDENTIFICADA)
     }
+
+    // --- PROXY OUTPUT CONTRACT (Guardrail para Edit Existing do Onboarding) ---
+    if (route === 'ROTA_OS_09_ONBOARDING' && payload.action === 'update_client') {
+        const canonicalClientId = typeof window !== 'undefined' && window.ONBOARDING_CLIENT_ID;
+        if (!finalPayload.client_id) {
+            console.error('[DISPATCHER] STOP: payload.client_id ausente no webhook de onboarding.');
+            return { ok: false, status: 400, error: 'Identidade Ausente (client_id)' };
+        }
+        if (canonicalClientId && finalPayload.client_id !== canonicalClientId) {
+            console.error(`[DISPATCHER] STOP: Identidade divergente. Esperado: ${canonicalClientId}, Recebido: ${finalPayload.client_id}`);
+            return { ok: false, status: 400, error: 'Conflito de Identidade Canônica' };
+        }
+        if (finalPayload.client_id === finalPayload.legacy_client_id && finalPayload.client_id !== canonicalClientId) {
+            console.error('[DISPATCHER] BLOCK SUBMISSION: Tentativa de sobrescrever client_id com legacy_client_id bloqueada.');
+            return { ok: false, status: 400, error: 'Identidade Protegida' };
+        }
+    }
+    // -------------------------------------------------------------------------
 
     // Garante que o ecossistema antigo do Make receba todos os mapeamentos críticos
     if (finalPayload.action && finalPayload.action.startsWith('IA_GENERATION')) {
