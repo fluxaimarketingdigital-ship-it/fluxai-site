@@ -61,10 +61,6 @@
     {
       "source": "/giaas",
       "destination": "/giaas.html"
-    },
-    {
-      "source": "/fluxai-os-sistema-de-crescimento-empresarial",
-      "destination": "/fluxai-os-sistema-de-crescimento-empresarial.html"
     }
   ],
   "headers": [
