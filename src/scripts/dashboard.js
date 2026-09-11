@@ -43,7 +43,7 @@ export const initDashboard = () => {
         }
     };
 
-    const loadModule = async (url, moduleId) => {
+    const loadModule = async (moduleId) => {
         if (cache[moduleId]) {
             updateDisplay(cache[moduleId].cloneNode(true));
             return;
@@ -62,11 +62,12 @@ export const initDashboard = () => {
                 <p class="safe-loading-msg"></p>
             </div>
         `;
-        loadingNode.querySelector('.safe-loading-msg').textContent = `Carregando infraestrutura de ${moduleId.replace(/-/g, ' ').toUpperCase()}...`;
+        loadingNode.querySelector('.safe-loading-msg').textContent = \`Carregando infraestrutura de \${moduleId.replace(/-/g, ' ').toUpperCase()}...\`;
         updateDisplay(loadingNode);
 
         try {
-            const fetchUrl = url.startsWith("/pages/") ? url : "/pages/" + url.split("/").pop().replace(".html", "") + ".html"; const response = await fetch(fetchUrl);
+            const fetchUrl = "/pages/" + moduleId + ".html";
+            const response = await fetch(fetchUrl);
             const html = await response.text();
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
@@ -102,10 +103,12 @@ export const initDashboard = () => {
                 const footer = document.createElement('div');
                 footer.className = 'display-footer';
                 footer.style.marginTop = '30px';
+                
+                // Novo CTA para o Painel Dinamico
                 const a = document.createElement('a');
-                a.className = 'btn btn-secondary';
-                a.href = url;
-                a.innerHTML = 'Explorar Arquitetura Completa <i class="fa-solid fa-arrow-right"></i>';
+                a.className = 'btn btn-primary btn-large';
+                a.href = "/#diagnostico";
+                a.innerHTML = 'Solicitar Diagnóstico Estratégico <i class="fa-solid fa-arrow-right"></i>';
                 footer.appendChild(a);
                 
                 formattedNode.appendChild(header);
@@ -117,37 +120,75 @@ export const initDashboard = () => {
             }
         } catch (error) {
             console.error("Erro ao carregar módulo:", error);
-            window.location.href = url; // Fallback
+            // Fallback seguro em caso de falha (Módulo Inválido)
+            const defaultItem = document.querySelector('.nav-item[data-module="command-center"]');
+            if (defaultItem) activateTab(defaultItem, true);
+        }
+    };
+
+    const activateTab = (item, isPopState = false) => {
+        const isMobile = window.innerWidth <= 1024;
+        const moduleId = item.getAttribute('data-module');
+
+        if (item.classList.contains('active')) return;
+
+        // Update Active State and Accessibility
+        navItems.forEach(nav => {
+            nav.classList.remove('active');
+            nav.setAttribute('aria-selected', 'false');
+            nav.setAttribute('tabindex', '-1');
+        });
+        item.classList.add('active');
+        item.setAttribute('aria-selected', 'true');
+        item.setAttribute('tabindex', '0');
+        item.focus();
+
+        loadModule(moduleId);
+
+        // History API setup
+        if (!isPopState) {
+            const newUrl = \`/?module=\${moduleId}#estruturas\`;
+            window.history.pushState({ moduleId }, '', newUrl);
+        }
+
+        // Mobile scroll to display
+        if (isMobile && !isPopState) {
+            display.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
     };
 
     navItems.forEach(item => {
+        // Inicializa o tabindex
+        if (!item.classList.contains('active')) {
+            item.setAttribute('tabindex', '-1');
+        } else {
+            item.setAttribute('tabindex', '0');
+        }
+
         item.addEventListener('click', (e) => {
-            // Check if it's a mobile screen to decide if we should scroll to display
-            const isMobile = window.innerWidth <= 1024;
-            
             e.preventDefault();
-            const url = item.getAttribute('href');
-            const moduleId = item.getAttribute('data-module');
+            activateTab(item);
+        });
+    });
 
-            if (item.classList.contains('active')) return;
+    // Keyboard navigation (ArrowUp, ArrowDown, Enter, Space)
+    const navItemsArray = Array.from(navItems);
+    navItems.forEach((item, index) => {
+        item.addEventListener('keydown', (e) => {
+            let targetIndex = null;
+            if (e.key === 'ArrowDown' || e.key === 'ArrowRight') {
+                e.preventDefault();
+                targetIndex = (index + 1) % navItemsArray.length;
+            } else if (e.key === 'ArrowUp' || e.key === 'ArrowLeft') {
+                e.preventDefault();
+                targetIndex = (index - 1 + navItemsArray.length) % navItemsArray.length;
+            } else if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                activateTab(item);
+            }
 
-            // Update Active State
-            navItems.forEach(nav => {
-                nav.classList.remove('active');
-                nav.setAttribute('aria-selected', 'false');
-            });
-            item.classList.add('active');
-            item.setAttribute('aria-selected', 'true');
-
-            loadModule(url, moduleId);
-
-            // History API
-            window.history.pushState({ moduleId }, '', url);
-
-            // Mobile scroll to display
-            if (isMobile) {
-                display.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (targetIndex !== null) {
+                navItemsArray[targetIndex].focus();
             }
         });
     });
@@ -155,20 +196,51 @@ export const initDashboard = () => {
     window.addEventListener('popstate', (e) => {
         const moduleId = e.state?.moduleId;
         if (moduleId) {
-            const targetItem = document.querySelector(`.nav-item[data-module="${moduleId}"]`);
+            const targetItem = document.querySelector(\`.nav-item[data-module="\${moduleId}"]\`);
             if (targetItem) {
-                // Trigger click without pushing to history again
-                const url = targetItem.getAttribute('href');
-                navItems.forEach(nav => {
-                    nav.classList.remove('active');
-                    nav.setAttribute('aria-selected', 'false');
-                });
-                targetItem.classList.add('active');
-                targetItem.setAttribute('aria-selected', 'true');
-                loadModule(url, moduleId);
+                activateTab(targetItem, true);
+            }
+        } else {
+            // Check se é carregamento de página anterior que tem o param na URL
+            const params = new URLSearchParams(window.location.search);
+            const mId = params.get('module');
+            if (mId) {
+                const targetItem = document.querySelector(\`.nav-item[data-module="\${mId}"]\`);
+                if (targetItem) activateTab(targetItem, true);
+            } else {
+                // Default fallback
+                const defaultItem = document.querySelector('.nav-item[data-module="command-center"]');
+                if (defaultItem) activateTab(defaultItem, true);
             }
         }
     });
+
+    // INIT CHECKS (Deep Link Support)
+    const initDeepLink = () => {
+        const params = new URLSearchParams(window.location.search);
+        const moduleParam = params.get('module');
+        if (moduleParam) {
+            const targetItem = document.querySelector(\`.nav-item[data-module="\${moduleParam}"]\`);
+            if (targetItem && !targetItem.classList.contains('active')) {
+                // Simula clique silencioso
+                activateTab(targetItem, true);
+                window.history.replaceState({ moduleId: moduleParam }, '', \`/?module=\${moduleParam}#estruturas\`);
+            } else if (!targetItem) {
+                // Invalid module fallback
+                const defaultItem = document.querySelector('.nav-item[data-module="command-center"]');
+                window.history.replaceState({ moduleId: 'command-center' }, '', '/?module=command-center#estruturas');
+            }
+        } else {
+            // Nenhum parametro: marca estado inicial para o popstate
+            const activeItem = document.querySelector('.nav-item.active');
+            if(activeItem) {
+                const moduleId = activeItem.getAttribute('data-module');
+                window.history.replaceState({ moduleId }, '', window.location.href);
+            }
+        }
+    };
+
+    initDeepLink();
 };
 
 document.addEventListener('DOMContentLoaded', initDashboard);
