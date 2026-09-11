@@ -2886,3 +2886,47 @@ body:not([data-theme="dark"]) .article-body blockquote,
 body:not([data-theme="dark"]) .article-body .quote {
     color: var(--text-muted) !important;
 }
+
+/* WEB-CONTENT-004-R3-A2: Residual Contrast Fixes for Light Mode */
+html[data-theme="light"] .article-body *:not(a):not(button):not(h1):not(h2):not(h3):not(.num):not(.category):not(i):not(svg):not(path),
+body:not([data-theme="dark"]) .article-body *:not(a):not(button):not(h1):not(h2):not(h3):not(.num):not(.category):not(i):not(svg):not(path) {
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="light"] .article-body h1,
+html[data-theme="light"] .article-body h2,
+html[data-theme="light"] .article-body h3,
+html[data-theme="light"] .article-body strong,
+html[data-theme="light"] .article-body b,
+body:not([data-theme="dark"]) .article-body h1,
+body:not([data-theme="dark"]) .article-body h2,
+body:not([data-theme="dark"]) .article-body h3,
+body:not([data-theme="dark"]) .article-body strong,
+body:not([data-theme="dark"]) .article-body b {
+    color: var(--secondary) !important;
+}
+
+html[data-theme="light"] .article-body .num,
+body:not([data-theme="dark"]) .article-body .num {
+    color: rgba(0,0,0,0.15) !important; /* contrast for large numbers */
+}
+
+html[data-theme="light"] .article-image figcaption,
+body:not([data-theme="dark"]) .article-image figcaption {
+    background: var(--bg-surface) !important;
+    border-top: 1px solid var(--border) !important;
+    color: var(--text-muted) !important;
+}
+
+html[data-theme="light"] .quote,
+body:not([data-theme="dark"]) .quote {
+    background: var(--bg-surface) !important;
+    color: var(--secondary) !important;
+    border-color: var(--primary) !important;
+}
+
+html[data-theme="light"] .box-ia,
+body:not([data-theme="dark"]) .box-ia {
+    background: rgba(107, 122, 69, 0.05) !important;
+    border: 1px solid rgba(107, 122, 69, 0.2) !important;
+}
