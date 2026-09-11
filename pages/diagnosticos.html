@@ -10,8 +10,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
-    <link rel="icon" type="image/webp" href="/assets/icons/favicon-main.webp" />
-
     <!-- FluxAI Tracking -->
     <script>
         window.dataLayer = window.dataLayer || [];
@@ -26,6 +24,12 @@
             window.dataLayer.push(payload);
         }
     </script>
+
+<link rel="icon" type="image/x-icon" href="/assets/icons/favicon.ico" />
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/icons/favicon-16x16.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/icons/favicon-32x32.png" />
+<link rel="icon" type="image/png" sizes="48x48" href="/assets/icons/favicon-48x48.png" />
+<link rel="apple-touch-icon" href="/assets/icons/apple-touch-icon.png" />
 </head>
 <body style="background: var(--bg-slate);">
 
@@ -125,11 +129,64 @@
     </div>
   </main>
 
-  <footer class="footer" style="padding: 60px 0; border-top: 1px solid var(--border); text-align: center;">
-    <div class="container">
-      <img src="/assets/images/branding/FluxAI_Labs_Wordmark_Horizontal_Official_v1.png" alt="FluxAI Labs" style="width: 140px; margin-bottom: 25px;" />
-      <p style="color: var(--text-muted); font-size: 0.9rem;">© 2026 FluxAI Labs. Diagnósticos Aplicados.</p>
+  <footer class="footer">
+    <div class="container footer-grid reveal">
+      <div class="footer-col brand">
+        <div class="system-status" style="color: rgba(255,255,255,0.4); margin-bottom: 20px;">
+          <span class="blink"></span> [FLUXAI LABS // INFRAESTRUTURA ESTRATÉGICA]
+        </div>
+        <img src="/assets/images/branding/FluxAI_Labs_Wordmark_Horizontal_Official_v1.png" alt="FluxAI Labs" class="footer-logo" style="width: 140px; margin-bottom: 25px;" loading="lazy" />
+        <p class="footer-desc">
+          Posicionamento, conteúdo e infraestrutura estratégica para marcas que querem crescer com inteligência.
+        </p>
+        <div class="footer-social">
+          <a href="https://www.instagram.com/fluxai.labs/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" onclick="trackEvent('outbound_click', { button_text: 'Instagram', destination: 'instagram' })"><i class="fa-brands fa-instagram"></i></a>
+          <a href="https://www.linkedin.com/company/fluxai-labs" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" onclick="trackEvent('outbound_click', { button_text: 'LinkedIn', destination: 'linkedin' })"><i class="fa-brands fa-linkedin-in"></i></a>
+          <a href="https://www.facebook.com/fluxailabs" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+        </div>
+      </div>
+
+      <div class="footer-col links">
+        <h4>Ecossistema</h4>
+        <a href="/pages/command-center.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.01 Command Center', destination: '/pages/command-center.html' })">MOD.01 Command Center</a>
+        <a href="/pages/content-engine.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.02 Content Engine', destination: '/pages/content-engine.html' })">MOD.02 Content Engine</a>
+        <a href="/pages/crm-intelligence.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.03 CRM Intelligence', destination: '/pages/crm-intelligence.html' })">MOD.03 CRM Intelligence</a>
+        <a href="/pages/automation-hub.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.04 Automation Hub', destination: '/pages/automation-hub.html' })">MOD.04 Automation Hub</a>
+        <a href="/pages/analytics-intelligence.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.05 Analytics Intelligence', destination: '/pages/analytics-intelligence.html' })">MOD.05 Analytics Intelligence</a>
+        <a href="/pages/governanca.html" onclick="trackEvent('module_page_click', { button_text: 'MOD.06 Governança Operacional', destination: '/pages/governanca.html' })">MOD.06 Governança Operacional</a>
+      </div>
+
+      <div class="footer-col links">
+        <h4>Operacional</h4>
+        <a href="/pages/diagnosticos.html">Diagnósticos</a>
+        <a href="/pages/mercados.html">Mercados</a>
+          <a href="/giaas.html" onclick="trackEvent('offer_click', { button_text: 'Sistema de Crescimento', button_id: 'footer_sistema_crescimento', cta_position: 'footer_operacional', destination: '/giaas.html' })">Sistema de Crescimento</a>
+        <a href="https://wa.me/5571981114694" target="_blank" rel="noopener noreferrer">Contato Direto</a>
+      </div>
+
+      <div class="footer-col contact">
+        <h4>Contato e Operação</h4>
+        <div class="footer-info">
+          <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 8px;"><strong>Marca:</strong> FluxAI Labs</p>
+          <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 8px;"><strong>Local:</strong> Salvador — Bahia — Brasil</p>
+          <p style="color: #94a3b8; font-size: 0.9rem; margin-bottom: 8px;"><strong>E-mail:</strong> fluxai.marketingdigital@gmail.com</p>
+          <p style="color: #94a3b8; font-size: 0.9rem; white-space: nowrap;"><strong>WhatsApp:</strong> 71 98111-4694</p>
+        </div>
+      </div>
     </div>
+
+    <div class="footer-bottom">
+      <div class="container footer-bottom-flex">
+        <p>© 2026 FluxAI Labs. Todos os direitos reservados.</p>
+        <div class="legal-links">
+          <span class="data-badge" style="position: static; opacity: 0.2; background: none; border: none;">[GOVERNANÇA // ESTRATÉGIA // TECNOLOGIA]</span>
+          <a href="#" id="openPrivacyModal" style="color: #64748b; text-decoration: underline; margin-left: 15px; cursor: pointer; font-size: 0.85rem;" onclick="trackEvent('footer_link_click', { button_text: 'Política de Privacidade' })">Política de Privacidade</a>
+        </div>
+        <a href="#topo" class="back-to-top" style="color: #64748b; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;" onclick="trackEvent('footer_link_click', { button_text: 'Voltar ao Topo' })">Voltar ao Topo <i class="fa-solid fa-arrow-up"></i></a>
+      </div>
+    </div>
+    
+    <div class="footer-watermark">FLUXAI LABS</div>
   </footer>
 
   <script type="module" src="/src/scripts/script.js"></script>
