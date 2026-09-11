@@ -2772,3 +2772,117 @@ section[id] {
   display: inline-flex;
   margin: 0 auto;
 }
+
+/* WEB-CONTENT-004-R3: INSIGHTS CARD & ARTICLE READABILITY */
+.eco-card.brand-card {
+    transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+    cursor: pointer;
+}
+.eco-card.brand-card:hover, .eco-card.brand-card:focus-within {
+    border-color: var(--primary);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-layered);
+}
+.btn-insights {
+    display: inline-flex;
+    background: var(--primary);
+    color: #fff !important;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-weight: 600;
+    margin-top: 20px;
+    text-decoration: none;
+    font-size: 0.95rem;
+    transition: opacity 0.2s;
+    align-items: center;
+}
+.btn-insights:hover {
+    opacity: 0.9;
+}
+
+/* Article Widths and Rhythm */
+.article-title {
+    max-width: 900px;
+    margin: 0 auto 20px auto;
+}
+.article-body > p,
+.article-body > h2,
+.article-body > h3,
+.article-body > .benefits,
+.article-body > .quote,
+.article-body > .box-ia,
+.article-body > header > .lead,
+.article-body > header > .meta,
+.article-body > header > .category {
+    max-width: 900px;
+    margin-inline: auto;
+}
+.article-image {
+    max-width: 1040px;
+    margin: 40px auto;
+    border-radius: 8px;
+    overflow: hidden;
+    text-align: center;
+}
+.article-image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 8px;
+}
+.article-cta {
+    max-width: 1040px;
+    margin: 60px auto;
+    padding: 60px 40px;
+    background: var(--bg-surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    text-align: center;
+}
+.article-cta h2, .article-cta p {
+    max-width: 800px;
+    margin-inline: auto;
+}
+.article-cta-btn {
+    display: inline-flex;
+    justify-content: center;
+    background: var(--primary);
+    color: #fff !important;
+    padding: 16px 32px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 700;
+    margin-top: 24px;
+    transition: transform 0.2s;
+}
+.article-cta-btn:hover {
+    transform: translateY(-2px);
+}
+
+/* Light mode overrides for Article to fix contrast */
+html[data-theme="light"] .article-body, 
+body:not([data-theme="dark"]) .article-body {
+    color: var(--text-muted);
+}
+html[data-theme="light"] .article-body h1,
+html[data-theme="light"] .article-body h2,
+html[data-theme="light"] .article-body h3,
+html[data-theme="light"] .article-title,
+body:not([data-theme="dark"]) .article-body h1,
+body:not([data-theme="dark"]) .article-body h2,
+body:not([data-theme="dark"]) .article-body h3,
+body:not([data-theme="dark"]) .article-title {
+    color: var(--secondary) !important;
+}
+html[data-theme="light"] .article-body p,
+html[data-theme="light"] .article-body li,
+html[data-theme="light"] .article-body .meta,
+html[data-theme="light"] .article-body blockquote,
+html[data-theme="light"] .article-body .quote,
+body:not([data-theme="dark"]) .article-body p,
+body:not([data-theme="dark"]) .article-body li,
+body:not([data-theme="dark"]) .article-body .meta,
+body:not([data-theme="dark"]) .article-body blockquote,
+body:not([data-theme="dark"]) .article-body .quote {
+    color: var(--text-muted) !important;
+}
