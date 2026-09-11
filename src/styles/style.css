@@ -2702,3 +2702,34 @@ a[href*="typebot.io"],
 .segments-editorial--centered { display: flex; justify-content: center; }
 .adherence-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; width: 100%; }
 .segment-number--check { font-size: 1.2rem; }
+
+/* INSTITUTIONAL HERO TOKENS (WEB-CONTENT-004-R1) */
+.inst-main {
+  padding-top: 140px;
+  padding-bottom: 80px;
+}
+@media (max-width: 768px) {
+  .inst-main { padding-top: 110px; padding-bottom: 60px; }
+}
+.inst-hero {
+  margin-bottom: 80px;
+}
+.inst-hero-title {
+  font-size: clamp(2.5rem, 6vw, 3.8rem);
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: var(--secondary);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.inst-hero-lead {
+  font-size: 1.25rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+  font-weight: 500;
+  max-width: 700px;
+  margin-bottom: 30px;
+}
+section[id] {
+  scroll-margin-top: 120px;
+}
