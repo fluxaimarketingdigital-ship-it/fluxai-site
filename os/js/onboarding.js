@@ -133,11 +133,14 @@ window.moveStep = function(delta) {
     document.getElementById('btn-prev').style.visibility = currentStep === 1 ? 'hidden' : 'visible';
     document.getElementById('btn-next').innerText = currentStep === totalSteps ? 'Concluir' : 'Próximo';
     
+    const btnFinish = document.getElementById('btn-disparar-infraestrutura');
     if (currentStep === totalSteps) {
         document.getElementById('btn-next').style.display = 'none';
+        if (btnFinish) btnFinish.style.display = 'flex';
         generateIARoadmap();
     } else {
         document.getElementById('btn-next').style.display = 'flex';
+        if (btnFinish) btnFinish.style.display = 'none';
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
