@@ -566,11 +566,18 @@ window.handleOnboarding = async function(e) {
     let projectId = window.ONBOARDING_CLIENT_ID;
 
     if (window.ONBOARDING_MODE === 'new' || !projectId) {
-        // Geração rigorosa de client_id com verificação anti-duplicidade
-        const safeName = (raw.company_name || 'CLIENTE_NOVO').toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
+        // [OPS-ACT-002B] Override Canônico de Identidade
+        const normalizeCompanyIdentityKey = (name) => (name || 'CLIENTE_NOVO').trim().toUpperCase().replace(/[^A-Z0-9]/g, '_').replace(/_+/g, '_').replace(/_$/, '');
+        const CANONICAL_CLIENT_ID_OVERRIDES = {
+            'EXECUTA_GROUP': 'EXECUTA_GROUP_003',
+            'FLUXAI_LABS': 'FLUXAI_LABS_001',
+            'FLUXAI': 'FLUXAI_LABS_001'
+        };
+
+        const safeName = normalizeCompanyIdentityKey(raw.company_name);
         
-        if (safeName === 'FLUXAI_LABS' || safeName === 'FLUXAI') {
-            projectId = 'FLUXAI_LABS_001'; // ID legado protegido do workspace interno
+        if (CANONICAL_CLIENT_ID_OVERRIDES[safeName]) {
+            projectId = CANONICAL_CLIENT_ID_OVERRIDES[safeName];
         } else {
             // Anti-Duplicidade: Verifica no Supabase
             const supabase = getSupabase();
