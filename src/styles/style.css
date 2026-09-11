@@ -2705,11 +2705,11 @@ a[href*="typebot.io"],
 
 /* INSTITUTIONAL HERO TOKENS (WEB-CONTENT-004-R1) */
 .inst-main {
-  padding-top: 140px;
+  padding-top: 175px;
   padding-bottom: 80px;
 }
 @media (max-width: 768px) {
-  .inst-main { padding-top: 110px; padding-bottom: 60px; }
+  .inst-main { padding-top: 130px; padding-bottom: 60px; }
 }
 .inst-hero {
   margin-bottom: 80px;
@@ -2732,4 +2732,43 @@ a[href*="typebot.io"],
 }
 section[id] {
   scroll-margin-top: 120px;
+}
+
+/* WEB-CONTENT-004-R2 */
+.btn-back-to-site {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 24px;
+  transition: color 0.2s;
+  text-decoration: none;
+}
+.btn-back-to-site:hover {
+  color: var(--primary);
+}
+.inst-final-cta {
+  text-align: center;
+  margin-inline: auto;
+  max-width: 800px;
+  padding: 60px 20px;
+  border-top: 1px solid var(--border);
+  margin-top: 60px;
+}
+.inst-final-cta h2, .inst-final-cta h3 {
+  color: var(--secondary) !important;
+  font-size: clamp(2rem, 5vw, 2.5rem) !important;
+  margin-bottom: 16px !important;
+}
+.inst-final-cta p {
+  color: var(--text-muted) !important;
+  font-size: 1.15rem !important;
+  max-width: 600px;
+  margin: 0 auto 30px auto !important;
+}
+.inst-final-cta .btn {
+  display: inline-flex;
+  margin: 0 auto;
 }
