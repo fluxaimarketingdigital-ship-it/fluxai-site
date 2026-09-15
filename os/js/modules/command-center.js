@@ -1,6 +1,11 @@
 import { OS_UI, OS_AUTH } from '../os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
 
+// ─── MULTI-CLIENT FILTER STATE ────────────────────────────────────────────────
+// selectedProjectId: null = Todos os clientes | string UUID = cliente específico
+let selectedProjectId = null;
+let clientRegistry = []; // [{ id: UUID, company_name: string, workspace_type: string }]
+
 async function initPage() {
     const user = await OS_AUTH.check('OPERATOR');
     if (!user) return;
@@ -8,94 +13,237 @@ async function initPage() {
     OS_UI.renderSidebar('command-center', user.role);
     await OS_UI.renderTopbar();
 
+    await loadClientRegistry();
+    renderClientFilter();
     await loadCommandCenter();
 }
 
+// ─── FASE 0: PRE-WRITE REAL DATA GUARD ───────────────────────────────────────
+// Carrega projetos reais do tipo CLIENT para popular o filtro.
+// Nunca usa lista hardcoded — sempre derivado do Supabase.
+async function loadClientRegistry() {
+    const supabase = getSupabase();
+    if (!supabase) return;
+
+    const { data, error } = await supabase
+        .from('projects')
+        .select('id, company_name, workspace_type, status')
+        .eq('workspace_type', 'CLIENT')
+        .eq('status', 'ATIVO')
+        .order('company_name', { ascending: true });
+
+    if (error) {
+        console.warn('[Command Center] Falha ao carregar registry de clientes:', error);
+        return;
+    }
+    clientRegistry = data || [];
+    console.log(`[Command Center] Client registry: ${clientRegistry.length} clientes ativos.`);
+}
+
+// ─── RENDER FILTRO GLOBAL DE CLIENTE ─────────────────────────────────────────
+function renderClientFilter() {
+    // Encontra ou cria o container do filtro
+    let filterBar = document.getElementById('cc-client-filter-bar');
+    if (!filterBar) {
+        const viewport = document.querySelector('.os-viewport');
+        const pageTitle = viewport ? viewport.querySelector('.os-page-title') : null;
+        filterBar = document.createElement('div');
+        filterBar.id = 'cc-client-filter-bar';
+        filterBar.style.cssText = `
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 0 4px 0;
+            flex-wrap: wrap;
+        `;
+        if (pageTitle && pageTitle.nextSibling) {
+            viewport.insertBefore(filterBar, pageTitle.nextSibling);
+        } else if (pageTitle) {
+            pageTitle.insertAdjacentElement('afterend', filterBar);
+        }
+    }
+
+    // Botão "Todos os clientes" sempre primeiro
+    const options = [
+        { id: null, label: 'Todos os clientes' },
+        ...clientRegistry.map(c => ({ id: c.id, label: c.company_name }))
+    ];
+
+    filterBar.innerHTML = `
+        <span style="font-size:0.7rem; color:var(--os-text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-right:4px;">Filtro Cliente:</span>
+        ${options.map(opt => `
+            <button
+                id="cc-filter-btn-${opt.id || 'all'}"
+                data-project-id="${opt.id || ''}"
+                onclick="window.__ccSelectClient('${opt.id || ''}')"
+                style="
+                    font-size: 0.7rem;
+                    padding: 4px 12px;
+                    border-radius: 20px;
+                    border: 1px solid ${selectedProjectId === opt.id ? 'var(--os-primary)' : 'rgba(255,255,255,0.1)'};
+                    background: ${selectedProjectId === opt.id ? 'rgba(var(--os-primary-rgb, 99,102,241), 0.15)' : 'transparent'};
+                    color: ${selectedProjectId === opt.id ? 'var(--os-primary)' : 'var(--os-text-muted)'};
+                    cursor: pointer;
+                    transition: all 0.2s;
+                    white-space: nowrap;
+                "
+                aria-pressed="${selectedProjectId === opt.id}"
+            >${opt.label}</button>
+        `).join('')}
+    `;
+
+    // Contexto visível
+    let contextBar = document.getElementById('cc-context-bar');
+    if (!contextBar) {
+        contextBar = document.createElement('div');
+        contextBar.id = 'cc-context-bar';
+        contextBar.style.cssText = 'font-size:0.68rem; color:var(--os-text-muted); padding: 2px 0 8px 0;';
+        filterBar.insertAdjacentElement('afterend', contextBar);
+    }
+    const ctxLabel = selectedProjectId
+        ? (clientRegistry.find(c => c.id === selectedProjectId)?.company_name || selectedProjectId)
+        : 'Todos os clientes';
+    contextBar.textContent = `Contexto atual: ${ctxLabel}`;
+}
+
+// Exposto globalmente para ser chamado pelos onclick dos botões
+window.__ccSelectClient = async function(projectIdRaw) {
+    selectedProjectId = projectIdRaw === '' ? null : projectIdRaw;
+    renderClientFilter(); // Atualiza visual dos botões
+    await loadCommandCenter(); // Recarrega dados com novo filtro
+};
+
+// ─── LOAD COMMAND CENTER (COM FILTRO) ─────────────────────────────────────────
 async function loadCommandCenter() {
     const supabase = getSupabase();
     if (!supabase) {
-        console.error("[Command Center] Cliente Supabase não disponível.");
-        // Remover loading em caso de falha crítica no cliente
-        document.getElementById('metrics-grid').innerHTML = '<div style="opacity: 0.5; padding: 20px; grid-column: span 12; color: var(--os-danger);">Falha de Conexão com Banco de Dados.</div>';
+        document.getElementById('metrics-grid').innerHTML =
+            '<div style="opacity: 0.5; padding: 20px; grid-column: span 12; color: var(--os-danger);">Falha de Conexão com Banco de Dados.</div>';
         return;
     }
 
+    // Loading state
+    document.getElementById('metrics-grid').innerHTML =
+        '<div style="opacity:0.3; padding:20px; grid-column:span 12; font-size:0.8rem;">Carregando...</div>';
+
     try {
-        // Envolve as queries em try/catch individuais para não quebrar a tela inteira se uma falhar
-        const queries = [
-            // 0: Clientes Ativos
-            supabase.from('projects').select('id', { count: 'exact' }).eq('status', 'ATIVO').eq('workspace_type', 'CLIENT').then(res => res.error ? {count: 0, error: res.error} : res),
-            // 1: Serviços Ativos (Contratos Ativos)
-            supabase.from('contracts').select('id', { count: 'exact' }).eq('status', 'ATIVO').then(res => res.error ? {count: 0, error: res.error} : res),
-            // 2: Auth Pendente (External Approvals)
-            supabase.from('external_approvals').select('id', { count: 'exact' }).eq('status', 'PENDENTE').then(res => res.error ? {count: 0, error: res.error} : res),
-            // 3: Relatórios Rascunho (Assumindo planejamento de assets)
-            supabase.from('content_assets').select('id', { count: 'exact' }).eq('status', 'PLANEJAMENTO').then(res => res.error ? {count: 0, error: res.error} : res),
-            // 4: Alertas Operacionais Críticos (Últimos Eventos)
-            supabase.from('operational_events').select('event_type, responsible, context, created_at').order('created_at', { ascending: false }).limit(5).then(res => res.error ? {data: [], error: res.error} : res),
-            // 5: Tabela de Client Health
-            supabase.from('operational_events').select('*, projects(company_name)').order('created_at', { ascending: false }).limit(10).then(res => res.error ? {data: [], error: res.error} : res)
-        ];
-
-        const results = await Promise.all(queries);
-
-        // Map Results
-        const activeClients = results[0].count || 0;
-        const activeServices = results[1].count || 0;
-        const pendingAuths = results[2].count || 0;
-        const draftReports = results[3].count || 0;
-        
-        // Métricas que ainda não possuem tabela definida na Fase 2
+        // ── CARDS GLOBAIS DE INFRAESTRUTURA ──────────────────────────────────
+        // APIs, Webhooks, Coletas, Rotas — não são client-scoped no data model atual.
+        // Permanecem globais (infraestrutura da agência).
         const apisOk = 0;
         const activeWebhooks = 0;
         const manualTasks = 0;
         const pausedRoutes = 0;
 
+        // ── QUERIES CLIENT-SCOPED ─────────────────────────────────────────────
+        // Quando selectedProjectId != null, filtramos por project_id.
+        // Quando null, retornamos contagem total (todos os clientes).
+
+        const buildClientFilter = (query, field = 'project_id') => {
+            return selectedProjectId ? query.eq(field, selectedProjectId) : query;
+        };
+
+        const queries = [
+            // 0: Clientes Ativos — HYBRID: quando "Todos" mostra contagem total; quando cliente mostra 1 ou 0
+            selectedProjectId
+                ? supabase.from('projects').select('id', { count: 'exact' })
+                    .eq('status', 'ATIVO').eq('workspace_type', 'CLIENT').eq('id', selectedProjectId)
+                    .then(res => res.error ? { count: 0, error: res.error } : res)
+                : supabase.from('projects').select('id', { count: 'exact' })
+                    .eq('status', 'ATIVO').eq('workspace_type', 'CLIENT')
+                    .then(res => res.error ? { count: 0, error: res.error } : res),
+
+            // 1: Serviços Ativos (Contratos) — CLIENT_SCOPED
+            buildClientFilter(
+                supabase.from('contracts').select('id', { count: 'exact' }).eq('status', 'ATIVO')
+            ).then(res => res.error ? { count: 0, error: res.error } : res),
+
+            // 2: Auth Pendente (External Approvals) — CLIENT_SCOPED
+            buildClientFilter(
+                supabase.from('external_approvals').select('id', { count: 'exact' }).eq('status', 'PENDENTE')
+            ).then(res => res.error ? { count: 0, error: res.error } : res),
+
+            // 3: Relatórios Rascunho — CLIENT_SCOPED
+            buildClientFilter(
+                supabase.from('content_assets').select('id', { count: 'exact' }).eq('status', 'PLANEJAMENTO')
+            ).then(res => res.error ? { count: 0, error: res.error } : res),
+
+            // 4: Alertas Operacionais — GLOBAL (operational_events não tem project_id definido)
+            supabase.from('operational_events').select('event_type, responsible, context, created_at')
+                .order('created_at', { ascending: false }).limit(5)
+                .then(res => res.error ? { data: [], error: res.error } : res),
+
+            // 5: Client Health — HYBRID: filtra por projeto quando selecionado
+            (() => {
+                let q = supabase.from('operational_events')
+                    .select('*, projects(company_name, id)')
+                    .order('created_at', { ascending: false }).limit(10);
+                if (selectedProjectId) {
+                    q = q.eq('project_id', selectedProjectId);
+                }
+                return q.then(res => res.error ? { data: [], error: res.error } : res);
+            })(),
+        ];
+
+        const results = await Promise.all(queries);
+
+        const activeClients = results[0].count ?? 0;
+        const activeServices = results[1].count ?? 0;
+        const pendingAuths = results[2].count ?? 0;
+        const draftReports = results[3].count ?? 0;
         const alertsData = results[4].data || [];
         const healthData = results[5].data || [];
 
-        // Log de erros silenciosos (Warnings)
-        results.forEach((r, i) => { if (r.error) console.warn(`[Command Center] Falha na query do índice ${i}:`, r.error); });
+        // Log warnings silenciosos
+        results.forEach((r, i) => {
+            if (r.error) console.warn(`[Command Center] Query ${i} warning:`, r.error);
+        });
 
-        // Render Cards
+        // ── RENDER CARDS ──────────────────────────────────────────────────────
+        const isFiltered = selectedProjectId !== null;
+        const filteredLabel = isFiltered
+            ? `<span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:2px;">escopo: cliente</span>`
+            : `<span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:2px;">todos os clientes</span>`;
+        const globalLabel = `<span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:2px;">infraestrutura global</span>`;
+
         const grid = document.getElementById('metrics-grid');
         grid.innerHTML = `
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">Clientes Ativos</span><i class="fa-solid fa-users" style="color:var(--os-primary)"></i></div>
-                <div class="os-metric"><div class="os-metric-value">${activeClients}</div></div>
+                <div class="os-metric"><div class="os-metric-value">${activeClients}</div>${filteredLabel}</div>
             </div>
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">Serviços Ativos</span><i class="fa-solid fa-briefcase" style="color:var(--os-primary)"></i></div>
-                <div class="os-metric"><div class="os-metric-value">${activeServices}</div></div>
+                <div class="os-metric"><div class="os-metric-value">${activeServices}</div>${filteredLabel}</div>
             </div>
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">APIs (Tokens OK)</span><i class="fa-solid fa-key" style="color:#10b981"></i></div>
-                <div class="os-metric"><div class="os-metric-value">${apisOk}</div></div>
+                <div class="os-metric"><div class="os-metric-value">${apisOk}</div>${globalLabel}</div>
             </div>
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">Webhooks Ativos</span><i class="fa-solid fa-network-wired" style="color:#10b981"></i></div>
-                <div class="os-metric"><div class="os-metric-value">${activeWebhooks}</div></div>
+                <div class="os-metric"><div class="os-metric-value">${activeWebhooks}</div>${globalLabel}</div>
             </div>
 
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">Coletas Manuais</span><i class="fa-solid fa-hand" style="color:#f59e0b"></i></div>
-                <div class="os-metric"><div class="os-metric-value">${manualTasks}</div></div>
+                <div class="os-metric"><div class="os-metric-value">${manualTasks}</div>${globalLabel}</div>
             </div>
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">Rotas Pausadas</span><i class="fa-solid fa-pause" style="color:#ef4444"></i></div>
-                <div class="os-metric"><div class="os-metric-value">${pausedRoutes}</div></div>
+                <div class="os-metric"><div class="os-metric-value">${pausedRoutes}</div>${globalLabel}</div>
             </div>
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">Auth Pendente</span><i class="fa-solid fa-triangle-exclamation" style="color:#f59e0b"></i></div>
-                <div class="os-metric"><div class="os-metric-value">${pendingAuths}</div></div>
+                <div class="os-metric"><div class="os-metric-value">${pendingAuths}</div>${filteredLabel}</div>
             </div>
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">Relatórios Rascunho</span><i class="fa-solid fa-file-signature" style="color:var(--os-primary)"></i></div>
-                <div class="os-metric"><div class="os-metric-value">${draftReports}</div></div>
+                <div class="os-metric"><div class="os-metric-value">${draftReports}</div>${filteredLabel}</div>
             </div>
         `;
 
-        // Render Alerts
+        // ── RENDER ALERTAS (global) ───────────────────────────────────────────
         const alertsContainer = document.getElementById('alerts-container');
         let alertsHtml = '';
         alertsData.forEach(a => {
@@ -111,18 +259,17 @@ async function loadCommandCenter() {
                 </div>
             </div>`;
         });
-        alertsContainer.innerHTML = alertsHtml || '<div style="opacity:0.3; text-align:center; padding:20px; font-size:0.7rem;">ESTADO OPERACIONAL ESTÁVEL</div>';
+        alertsContainer.innerHTML = alertsHtml ||
+            '<div style="opacity:0.3; text-align:center; padding:20px; font-size:0.7rem;">ESTADO OPERACIONAL ESTÁVEL</div>';
 
-        // Render Client Health Table
+        // ── RENDER CLIENT HEALTH ──────────────────────────────────────────────
         const healthContainer = document.getElementById('health-table-container');
-        
         if (healthData.length === 0) {
-            // Empty State Handling
             healthContainer.innerHTML = `
             <div style="padding: 40px; text-align: center; border: 1px dashed rgba(255,255,255,0.1); border-radius: 8px;">
                 <i class="fa-solid fa-shield-halved" style="font-size: 2.5rem; color: var(--os-text-muted); margin-bottom: 15px; opacity: 0.3;"></i>
                 <h3 style="margin: 0; font-size: 1rem; color: #fff;">Saúde Operacional Estável</h3>
-                <p style="color: var(--os-text-muted); font-size: 0.8rem; margin-top: 5px;">Nenhum alerta ou inconsistência mapeada no banco de dados.</p>
+                <p style="color: var(--os-text-muted); font-size: 0.8rem; margin-top: 5px;">Nenhum alerta ou inconsistência mapeada${isFiltered ? ' para este cliente' : ''}.</p>
             </div>`;
         } else {
             let healthHtml = `<div class="os-table-wrapper">
@@ -137,15 +284,13 @@ async function loadCommandCenter() {
                     </tr>
                 </thead>
                 <tbody>`;
-            
             healthData.forEach(s => {
                 const clientName = (s.projects && s.projects.company_name) ? s.projects.company_name : 'N/A';
                 const isError = s.event_type && (s.event_type.includes('FALHA') || s.event_type.includes('ERRO'));
                 const critText = isError ? 'ALTA' : 'BAIXA';
-                
-                let badgeStyle = isError ? 'background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);' 
-                                         : 'background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);';
-
+                const badgeStyle = isError
+                    ? 'background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);'
+                    : 'background: rgba(16, 185, 129, 0.1); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);';
                 healthHtml += `<tr>
                     <td class="cell-primary">${clientName}</td>
                     <td>SISTEMA</td>
@@ -159,9 +304,9 @@ async function loadCommandCenter() {
         }
 
     } catch (e) {
-        console.error("[Command Center] Erro Crítico:", e);
-        // Fallback visual em caso de exceção síncrona
-        document.getElementById('metrics-grid').innerHTML = '<div style="opacity: 0.5; padding: 20px; grid-column: span 12; color: var(--os-danger);">Erro ao renderizar Dashboard. Verifique o console.</div>';
+        console.error('[Command Center] Erro Crítico:', e);
+        document.getElementById('metrics-grid').innerHTML =
+            '<div style="opacity: 0.5; padding: 20px; grid-column: span 12; color: var(--os-danger);">Erro ao renderizar Dashboard. Verifique o console.</div>';
     }
 }
 
