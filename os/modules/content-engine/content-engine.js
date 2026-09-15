@@ -176,7 +176,7 @@ export async function initEngine() {
     try {
         window.switchTab = switchTab;
         
-        currentProject = localStorage.getItem('fluxai_current_project_id');
+        currentProject = (OSState.getActiveClient() === 'ALL_CLIENTS' ? '' : OSState.getActiveClient());
         await loadProjects();
         
         const filter = document.getElementById('project-filter');
@@ -212,13 +212,23 @@ export async function initEngine() {
         if (filter) {
             filter.onchange = async (e) => {
                 currentProject = e.target.value;
-                localStorage.setItem('fluxai_current_project_id', currentProject);
+                OSState.setActiveClient(currentProject || 'ALL_CLIENTS');
                 const btnCopy = document.getElementById('btn-copy-portal');
                 if (btnCopy) btnCopy.style.display = currentProject ? 'flex' : 'none';
-                await OS_UI.renderTopbar();
+                // A topbar já vai se atualizar reativamente devido ao OSState.subscribeActiveClient em os-core.js
                 loadContent();
             };
         }
+
+        // Subscribe to changes (caso ocorram externamente via console ou abas se estivesse em SPA)
+        OSState.subscribeActiveClient((newClient) => {
+            const actualClient = newClient === 'ALL_CLIENTS' ? '' : newClient;
+            if (currentProject !== actualClient) {
+                currentProject = actualClient;
+                if (filter) filter.value = currentProject;
+                loadContent();
+            }
+        });
 
         const btnAi = document.getElementById('btn-ai-planner');
         if (btnAi) {

@@ -2,8 +2,6 @@ import { OS_UI, OS_AUTH } from '../os-core.js';
 import { getSupabase } from '../../services/supabase-client.js';
 
 // ─── MULTI-CLIENT FILTER STATE ────────────────────────────────────────────────
-// selectedProjectId: null = Todos os clientes | string UUID = cliente específico
-let selectedProjectId = null;
 let clientRegistry = []; // [{ id: UUID, company_name: string, workspace_type: string }]
 
 async function initPage() {
@@ -16,6 +14,12 @@ async function initPage() {
     await loadClientRegistry();
     renderClientFilter();
     await loadCommandCenter();
+
+    // Re-render when active client changes globally
+    OSState.subscribeActiveClient(() => {
+        renderClientFilter();
+        loadCommandCenter();
+    });
 }
 
 // ─── FASE 0: PRE-WRITE REAL DATA GUARD ───────────────────────────────────────
@@ -63,33 +67,36 @@ function renderClientFilter() {
         }
     }
 
-    // Botão "Todos os clientes" sempre primeiro
+    const currentClient = OSState.getActiveClient();
     const options = [
-        { id: null, label: 'Todos os clientes' },
+        { id: 'ALL_CLIENTS', label: 'Todos os clientes' },
         ...clientRegistry.map(c => ({ id: c.id, label: c.company_name }))
     ];
 
     filterBar.innerHTML = `
         <span style="font-size:0.7rem; color:var(--os-text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-right:4px;">Filtro Cliente:</span>
-        ${options.map(opt => `
-            <button
-                id="cc-filter-btn-${opt.id || 'all'}"
-                data-project-id="${opt.id || ''}"
-                onclick="window.__ccSelectClient('${opt.id || ''}')"
-                style="
-                    font-size: 0.7rem;
-                    padding: 4px 12px;
-                    border-radius: 20px;
-                    border: 1px solid ${selectedProjectId === opt.id ? 'var(--os-primary)' : 'rgba(255,255,255,0.1)'};
-                    background: ${selectedProjectId === opt.id ? 'rgba(var(--os-primary-rgb, 99,102,241), 0.15)' : 'transparent'};
-                    color: ${selectedProjectId === opt.id ? 'var(--os-primary)' : 'var(--os-text-muted)'};
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    white-space: nowrap;
-                "
-                aria-pressed="${selectedProjectId === opt.id}"
-            >${opt.label}</button>
-        `).join('')}
+        <select
+            id="cc-client-select"
+            onchange="window.__ccSelectClient(this.value)"
+            style="
+                padding: 6px 12px;
+                border-radius: var(--os-radius-sm);
+                border: 1px solid var(--os-border);
+                background: rgba(255, 255, 255, 0.05);
+                color: var(--os-text);
+                font-family: inherit;
+                font-size: 0.8rem;
+                cursor: pointer;
+                outline: none;
+                min-width: 200px;
+            "
+        >
+            ${options.map(opt => `
+                <option value="${opt.id}" ${currentClient === opt.id ? 'selected' : ''}>
+                    ${opt.label}
+                </option>
+            `).join('')}
+        </select>
     `;
 
     // Contexto visível
@@ -100,17 +107,16 @@ function renderClientFilter() {
         contextBar.style.cssText = 'font-size:0.68rem; color:var(--os-text-muted); padding: 2px 0 8px 0;';
         filterBar.insertAdjacentElement('afterend', contextBar);
     }
-    const ctxLabel = selectedProjectId
-        ? (clientRegistry.find(c => c.id === selectedProjectId)?.company_name || selectedProjectId)
+    const ctxLabel = (currentClient !== 'ALL_CLIENTS')
+        ? (clientRegistry.find(c => c.id === currentClient)?.company_name || currentClient)
         : 'Todos os clientes';
     contextBar.textContent = `Contexto atual: ${ctxLabel}`;
 }
 
 // Exposto globalmente para ser chamado pelos onclick dos botões
-window.__ccSelectClient = async function(projectIdRaw) {
-    selectedProjectId = projectIdRaw === '' ? null : projectIdRaw;
-    renderClientFilter(); // Atualiza visual dos botões
-    await loadCommandCenter(); // Recarrega dados com novo filtro
+window.__ccSelectClient = function(projectIdRaw) {
+    OSState.setActiveClient(projectIdRaw);
+    // Nota: renderClientFilter() e loadCommandCenter() serão disparados automaticamente pelo OSState.subscribeActiveClient()
 };
 
 // ─── LOAD COMMAND CENTER (COM FILTRO) ─────────────────────────────────────────
@@ -136,18 +142,18 @@ async function loadCommandCenter() {
         const pausedRoutes = 0;
 
         // ── QUERIES CLIENT-SCOPED ─────────────────────────────────────────────
-        // Quando selectedProjectId != null, filtramos por project_id.
-        // Quando null, retornamos contagem total (todos os clientes).
+        const currentClient = OSState.getActiveClient();
+        const isAllClients = currentClient === 'ALL_CLIENTS';
 
         const buildClientFilter = (query, field = 'project_id') => {
-            return selectedProjectId ? query.eq(field, selectedProjectId) : query;
+            return !isAllClients ? query.eq(field, currentClient) : query;
         };
 
         const queries = [
             // 0: Clientes Ativos — HYBRID: quando "Todos" mostra contagem total; quando cliente mostra 1 ou 0
-            selectedProjectId
+            !isAllClients
                 ? supabase.from('projects').select('id', { count: 'exact' })
-                    .eq('status', 'ATIVO').in('workspace_type', ['CLIENT', 'INTERNAL_WORKSPACE', 'MASTER_ACCOUNT']).eq('id', selectedProjectId)
+                    .eq('status', 'ATIVO').in('workspace_type', ['CLIENT', 'INTERNAL_WORKSPACE', 'MASTER_ACCOUNT']).eq('id', currentClient)
                     .then(res => res.error ? { count: 0, error: res.error } : res)
                 : supabase.from('projects').select('id', { count: 'exact' })
                     .eq('status', 'ATIVO').in('workspace_type', ['CLIENT', 'INTERNAL_WORKSPACE', 'MASTER_ACCOUNT'])

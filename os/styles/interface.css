@@ -146,8 +146,9 @@ body.os-mode {
 .os-shell {
     display: grid;
     grid-template-columns: var(--os-sidebar-w) 1fr;
-    height: 100vh;
-    max-height: 100vh;
+    height: calc(100vh - var(--staging-banner-height, 0px));
+    max-height: calc(100vh - var(--staging-banner-height, 0px));
+    margin-top: var(--staging-banner-height, 0px);
     overflow: hidden;
     position: relative;
     z-index: 1;
