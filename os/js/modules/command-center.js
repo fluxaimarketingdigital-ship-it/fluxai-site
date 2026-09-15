@@ -28,7 +28,7 @@ async function loadClientRegistry() {
     const { data, error } = await supabase
         .from('projects')
         .select('id, company_name, workspace_type, status')
-        .eq('workspace_type', 'CLIENT')
+        .in('workspace_type', ['CLIENT', 'INTERNAL_WORKSPACE', 'MASTER_ACCOUNT'])
         .eq('status', 'ATIVO')
         .order('company_name', { ascending: true });
 
@@ -147,10 +147,10 @@ async function loadCommandCenter() {
             // 0: Clientes Ativos — HYBRID: quando "Todos" mostra contagem total; quando cliente mostra 1 ou 0
             selectedProjectId
                 ? supabase.from('projects').select('id', { count: 'exact' })
-                    .eq('status', 'ATIVO').eq('workspace_type', 'CLIENT').eq('id', selectedProjectId)
+                    .eq('status', 'ATIVO').in('workspace_type', ['CLIENT', 'INTERNAL_WORKSPACE', 'MASTER_ACCOUNT']).eq('id', selectedProjectId)
                     .then(res => res.error ? { count: 0, error: res.error } : res)
                 : supabase.from('projects').select('id', { count: 'exact' })
-                    .eq('status', 'ATIVO').eq('workspace_type', 'CLIENT')
+                    .eq('status', 'ATIVO').in('workspace_type', ['CLIENT', 'INTERNAL_WORKSPACE', 'MASTER_ACCOUNT'])
                     .then(res => res.error ? { count: 0, error: res.error } : res),
 
             // 1: Serviços Ativos (Contratos) — CLIENT_SCOPED

@@ -14,18 +14,17 @@ function makeSupabaseMock({ clientRegistry = [], counts = {}, healthData = [] } 
     });
     return {
         from: (table) => ({
-            select: (cols, opts) => ({
-                eq: () => ({
-                    eq: () => ({
-                        eq: () => ({ then: (fn) => Promise.resolve(fn({ count: counts[table] ?? 0, data: clientRegistry, error: null })) }),
-                        then: (fn) => Promise.resolve(fn({ count: counts[table] ?? 0, data: clientRegistry, error: null })),
-                    }),
-                    then: (fn) => Promise.resolve(fn({ count: counts[table] ?? 0, data: clientRegistry, error: null })),
-                    order: () => ({ limit: () => ({ then: (fn) => Promise.resolve(fn({ count: 0, data: healthData, error: null })) }) }),
-                }),
-                order: () => ({ limit: () => ({ then: (fn) => Promise.resolve(fn({ count: 0, data: healthData, error: null })) }) }),
-                then: (fn) => Promise.resolve(fn({ count: counts[table] ?? 0, data: clientRegistry, error: null })),
-            }),
+            select: (cols, opts) => {
+                const isHealth = table === 'operational_events';
+                const chain = {
+                    eq: () => chain,
+                    in: () => chain,
+                    order: () => chain,
+                    limit: () => chain,
+                    then: (fn) => Promise.resolve(fn({ count: counts[table] ?? 0, data: isHealth ? healthData : clientRegistry, error: null }))
+                };
+                return chain;
+            }
         }),
     };
 }
