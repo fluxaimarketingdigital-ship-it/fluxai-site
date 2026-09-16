@@ -210,11 +210,11 @@ export const OS_UI = {
             `font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid ${active ? color : 'var(--os-border)'}; background:${active ? color : 'rgba(255,255,255,0.04)'}; color:${active ? (color === 'var(--os-primary)' ? '#000' : '#fff') : 'var(--os-text-muted)'}; cursor:pointer; font-weight:800; text-transform:uppercase; letter-spacing:1px; transition:all 0.2s;`;
 
         // Mapear projeto ativo na topbar
-        const currentProjectId = OSState.get('activeProjectId');
+        const currentProjectId = OSState.getActiveClient();
         let activeClientHtml = ""; 
         let activeProj = null; 
         let companyNameStr = 'TODOS OS CLIENTES';
-        if (currentProjectId && currentProjectId !== 'todos') { 
+        if (currentProjectId && currentProjectId !== 'ALL_CLIENTS') { 
             const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]'); 
             const supabaseProjects = JSON.parse(localStorage.getItem('fluxai_supabase_projects') || '[]'); 
             activeProj = mockProjects.find(p => p.id === currentProjectId) || supabaseProjects.find(p => p.id === currentProjectId); 
@@ -232,7 +232,7 @@ export const OS_UI = {
                 <button onclick="window.__OSSetContext('LABS')" title="Workspace interno FluxAI" style="${btnStyle(context==='LABS','rgba(139,92,246,0.9)')}"> 
                     <i class="fa-solid fa-flask"></i> Labs 
                 </button> 
-                ${context === 'CLIENT' && activeProj ? ` 
+                ${activeProj ? ` 
                 <span style="font-size:0.58rem; padding:4px 11px; border-radius:3px; border:1px solid var(--os-primary); background:rgba(142,158,104,0.1); color:var(--os-primary); font-weight:800; text-transform:uppercase; letter-spacing:1px;"> 
                     <i class="fa-solid fa-briefcase"></i> <span id="safe-ctx-name"></span> 
                 </span>` : ''} 
@@ -627,6 +627,13 @@ window.triggerWhatsAppContact = (phone, message) => {
     alert(`Mensagem copiada para a área de transferência!\n\nRedirecionando para o WhatsApp Web para envio manual pelo operador.`);
     window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(message)}`, '_blank');
 };
+
+// Subscrever para mudanças do active client para re-renderizar a Topbar reativamente
+OSState.subscribeActiveClient(() => {
+    if (typeof OS_UI !== 'undefined') {
+        OS_UI.renderTopbar();
+    }
+});
 
 
 

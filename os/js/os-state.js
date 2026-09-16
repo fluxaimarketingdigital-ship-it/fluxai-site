@@ -114,26 +114,55 @@ export const OSState = {
     },
 
     /**
-     * Define o contexto de navegação (Master, Labs ou Cliente).
+     * Define o contexto de navegação operacional (Master, Labs ou Cliente).
      * Dispara re-render da topbar e sidebar automaticamente.
+     * Esta função não altera o Cliente Ativo (activeProjectId) para garantir 
+     * separação ortogonal entre Modo Operacional e Escopo de Cliente.
      * @param {'MASTER'|'LABS'|'CLIENT'} context
-     * @param {object|null} project — projeto ativo se context === 'CLIENT'
      */
-    setContext(context, project = null) {
+    setContext(context) {
         OSState.set('activeContext', context);
-        if (context === 'CLIENT' && project) {
-            OSState.set('activeProject', project);
-            OSState.set('activeProjectId', project.id);
-            localStorage.setItem('fluxai_current_project_id', project.id);
-        } else if (context === 'MASTER') {
+    },
+
+    /**
+     * Obtém o cliente ativo atual.
+     * Retorna o UUID do projeto ou 'ALL_CLIENTS'.
+     */
+    getActiveClient() {
+        return _state.activeProjectId || 'ALL_CLIENTS';
+    },
+
+    /**
+     * Define o contexto global de cliente.
+     * Separa a entidade de 'Cliente' do 'Modo Operacional'.
+     * @param {string|null} projectIdOrAll 'ALL_CLIENTS', null ou UUID
+     */
+    setActiveClient(projectIdOrAll) {
+        if (!projectIdOrAll || projectIdOrAll === 'ALL_CLIENTS' || projectIdOrAll === 'todos') {
             OSState.set('activeProject', null);
             OSState.set('activeProjectId', null);
             localStorage.removeItem('fluxai_current_project_id');
-        } else if (context === 'LABS') {
-            const labs = OSState.get('labsProject');
-            OSState.set('activeProject', labs);
-            OSState.set('activeProjectId', labs?.id || null);
+        } else {
+            // Se for um UUID, tentamos buscar dados completos do cache para preencher activeProject
+            let projectObj = null;
+            try {
+                const mockProjects = JSON.parse(localStorage.getItem('fluxai_mock_projects') || '[]');
+                const supabaseProjects = JSON.parse(localStorage.getItem('fluxai_supabase_projects') || '[]');
+                projectObj = mockProjects.find(p => p.id === projectIdOrAll) || supabaseProjects.find(p => p.id === projectIdOrAll);
+            } catch (e) {}
+
+            OSState.set('activeProject', projectObj || { id: projectIdOrAll });
+            OSState.set('activeProjectId', projectIdOrAll);
+            localStorage.setItem('fluxai_current_project_id', projectIdOrAll);
         }
+    },
+
+    /**
+     * Assina as mudanças de Cliente Ativo.
+     * @param {Function} callback 
+     */
+    subscribeActiveClient(callback) {
+        return OSState.subscribe('activeProjectId', callback);
     },
 
     /**

@@ -54,8 +54,9 @@ if (typeof window !== 'undefined') {
         globalThis.addEventListener('DOMContentLoaded', () => {
             const badge = document.createElement('div');
             badge.innerHTML = 'STG — AMBIENTE DE STAGING';
-            badge.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:red;color:white;text-align:center;z-index:999999;font-weight:bold;padding:5px;font-family:sans-serif;';
+            badge.style.cssText = 'position:fixed;top:0;left:0;width:100%;background:red;color:white;text-align:center;z-index:999999;font-weight:bold;padding:5px;font-family:sans-serif;height:28px;line-height:18px;box-sizing:border-box;';
             document.body.prepend(badge);
+            document.documentElement.style.setProperty('--staging-banner-height', '28px');
         });
     }
 }
