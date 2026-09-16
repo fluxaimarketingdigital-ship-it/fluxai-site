@@ -31,17 +31,19 @@ async function loadClientRegistry() {
     if (!supabase) return;
 
     const { data, error } = await supabase
-        .from('projects')
-        .select('id, company_name, workspace_type, status')
-        .in('workspace_type', ['CLIENT', 'INTERNAL_WORKSPACE', 'MASTER_ACCOUNT'])
-        .eq('status', 'ATIVO')
-        .order('company_name', { ascending: true });
+        .from('CLIENTES_ESTRATEGIA')
+        .select('*');
 
     if (error) {
         console.warn('[Command Center] Falha ao carregar registry de clientes:', error);
         return;
     }
-    clientRegistry = data || [];
+    clientRegistry = (data || []).map(p => ({
+        id: p.client_id,
+        company_name: p.cliente_nome || p.client_id,
+        workspace_type: 'CLIENT',
+        status: p.status
+    }));
     console.log(`[Command Center] Client registry: ${clientRegistry.length} clientes ativos.`);
 }
 
@@ -186,8 +188,8 @@ async function loadCommandCenter() {
                 let q = supabase.from('operational_events')
                     .select('*, projects(company_name, id)')
                     .order('created_at', { ascending: false }).limit(10);
-                if (selectedProjectId) {
-                    q = q.eq('project_id', selectedProjectId);
+                if (!isAllClients) {
+                    q = q.eq('project_id', currentClient);
                 }
                 return q.then(res => res.error ? { data: [], error: res.error } : res);
             })(),
@@ -218,7 +220,7 @@ async function loadCommandCenter() {
         });
 
         // ── RENDER CARDS ──────────────────────────────────────────────────────
-        const isFiltered = selectedProjectId !== null;
+        const isFiltered = !isAllClients;
         const filteredLabel = isFiltered
             ? `<span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:2px;">escopo: cliente</span>`
             : `<span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:2px;">todos os clientes</span>`;
