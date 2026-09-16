@@ -1,4 +1,5 @@
 import { OS_UI, OS_AUTH } from '../../js/os-core.js';
+import { OSState } from '../../js/os-state.js';
 import { getSupabase } from '../../services/supabase-client.js';
 import { contentEngineData } from './content-engine.data.js';
 import { StatusEngine, STATUS_SYSTEM } from '../../config/status-system.js';
@@ -503,7 +504,9 @@ async function loadContent() {
             query = query.or(`client_id.eq.${currentProject},client_id.eq.${mappedProjectId}`);
         }
 
-        const { data: contents, error } = await query.order('data_prevista', { ascending: true });
+        const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout de 10s atingido ao buscar pautas do Supabase.')), 10000));
+        const { data: contents, error } = await Promise.race([query.order('data_prevista', { ascending: true }), timeoutPromise]);
+        
         if (error) throw error;
 
         // Normalização: Garante que os componentes do sistema acessem as chaves .id e .status sem quebrar

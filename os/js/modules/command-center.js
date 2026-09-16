@@ -1,4 +1,5 @@
 import { OS_UI, OS_AUTH } from '../os-core.js';
+import { OSState } from '../os-state.js';
 import { getSupabase } from '../../services/supabase-client.js';
 
 // ─── MULTI-CLIENT FILTER STATE ────────────────────────────────────────────────
@@ -128,8 +129,9 @@ async function loadCommandCenter() {
         return;
     }
 
-    // Loading state
-    document.getElementById('metrics-grid').innerHTML =
+    // Loading state with timeout fallback indicator
+    const grid = document.getElementById('metrics-grid');
+    grid.innerHTML =
         '<div style="opacity:0.3; padding:20px; grid-column:span 12; font-size:0.8rem;">Carregando...</div>';
 
     try {
@@ -191,7 +193,17 @@ async function loadCommandCenter() {
             })(),
         ];
 
-        const results = await Promise.all(queries);
+        // Adiciona timeout para evitar loading infinito
+        const timeoutPromise = new Promise((resolve) => setTimeout(() => resolve('TIMEOUT'), 10000));
+        
+        const queriesPromise = Promise.all(queries);
+        const resultsRaw = await Promise.race([queriesPromise, timeoutPromise]);
+        
+        if (resultsRaw === 'TIMEOUT') {
+            throw new Error('Timeout de 10s atingido ao buscar dados do Supabase.');
+        }
+        
+        const results = resultsRaw;
 
         const activeClients = results[0].count ?? 0;
         const activeServices = results[1].count ?? 0;
@@ -312,7 +324,10 @@ async function loadCommandCenter() {
     } catch (e) {
         console.error('[Command Center] Erro Crítico:', e);
         document.getElementById('metrics-grid').innerHTML =
-            '<div style="opacity: 0.5; padding: 20px; grid-column: span 12; color: var(--os-danger);">Erro ao renderizar Dashboard. Verifique o console.</div>';
+            `<div style="padding: 20px; grid-column: span 12; border: 1px solid rgba(239, 68, 68, 0.3); background: rgba(239, 68, 68, 0.1); border-radius: 8px;">
+                <h3 style="color: #ef4444; margin: 0 0 10px 0; font-size: 1rem;"><i class="fa-solid fa-triangle-exclamation"></i> Falha ao Carregar Dados</h3>
+                <p style="color: var(--os-text-muted); font-size: 0.8rem; margin: 0;">Não foi possível hidratar as métricas no tempo esperado. Verifique o console ou tente recarregar.</p>
+            </div>`;
     }
 }
 
