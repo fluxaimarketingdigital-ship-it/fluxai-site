@@ -40,10 +40,14 @@ async function loadClientRegistry() {
     }
     clientRegistry = (data || []).map(p => ({
         id: p.client_id,
+        name: p.cliente_nome || p.client_id,
         company_name: p.cliente_nome || p.client_id,
         workspace_type: 'CLIENT',
         status: p.status
     }));
+    try {
+        localStorage.setItem('fluxai_supabase_projects', JSON.stringify(clientRegistry));
+    } catch(e) {}
     console.log(`[Command Center] Client registry: ${clientRegistry.length} clientes ativos.`);
 }
 
@@ -95,7 +99,7 @@ function renderClientFilter() {
             "
         >
             ${options.map(opt => `
-                <option value="${opt.id}" ${currentClient === opt.id ? 'selected' : ''}>
+                <option value="${opt.id}" ${currentClient === opt.id ? 'selected' : ''} style="color: #000; background: #fff;">
                     ${opt.label}
                 </option>
             `).join('')}
