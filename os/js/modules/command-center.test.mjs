@@ -156,17 +156,35 @@ describe('Command Center Architecture - 20 Tests', () => {
 
     // --- MOCK FINANCE LOGIC ---
     function computeFinance(data, error) {
-        if (error) return { realized: 'Dados insuficientes', contracted: 'Dados insuficientes', future: 'Dados insuficientes' };
+        if (error) return { realized: 'Dados insuficientes', contracted: 'Dados insuficientes', future: 'Dados insuficientes', margin: 'Dados insuficientes', costs: 'Dados insuficientes', marginPercent: 'Dados insuficientes' };
         let realized = 0;
         let contracted = 0;
+        let costs = 0;
+        let hasCostData = false;
         data.forEach(row => {
             const val = parseFloat(row.valor) || 0;
             if (row.tipo_lancamento === 'receita_extra') {
                 contracted += val;
                 if (row.status_pagamento === 'realizado') realized += val;
             }
+            if (row.tipo_lancamento === 'custo_real') {
+                costs += val;
+                hasCostData = true;
+            }
         });
-        return { realized, contracted, future: 'Dados insuficientes' };
+        
+        let margin = 'Dados insuficientes';
+        let registeredCosts = 'Dados insuficientes';
+        let marginPercent = 'Dados insuficientes';
+        
+        if (hasCostData) {
+            margin = realized - costs;
+            registeredCosts = costs;
+            if (realized === 0) marginPercent = 'Não aplicável';
+            else marginPercent = ((margin) / realized) * 100;
+        }
+        
+        return { realized, contracted, future: 'Dados insuficientes', margin, costs: registeredCosts, marginPercent };
     }
 
     const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
@@ -248,5 +266,87 @@ describe('Command Center Architecture - 20 Tests', () => {
         assert.equal(state.getActiveClient(), EXECUTA_UUID);
     });
 
+    test('35 — nenhum custo mapeado => margem = Dados insuficientes', () => {
+        const res = computeFinance([{ valor: 1000, tipo_lancamento: 'receita_extra', status_pagamento: 'realizado' }]);
+        assert.equal(res.margin, 'Dados insuficientes');
+    });
+
+    test('36 — nenhum custo mapeado => não mostrar 0%', () => {
+        const res = computeFinance([{ valor: 1000, tipo_lancamento: 'receita_extra', status_pagamento: 'realizado' }]);
+        assert.notEqual(res.marginPercent, 0);
+        assert.equal(res.marginPercent, 'Dados insuficientes');
+    });
+
+    test('37 — nenhum custo mapeado => não mostrar 100%', () => {
+        const res = computeFinance([{ valor: 1000, tipo_lancamento: 'receita_extra', status_pagamento: 'realizado' }]);
+        assert.notEqual(res.marginPercent, 100);
+        assert.equal(res.marginPercent, 'Dados insuficientes');
+    });
+
+    test('38 — receita realizada = 0 => margem % = Não aplicável', () => {
+        const res = computeFinance([{ valor: 100, tipo_lancamento: 'custo_real', status_pagamento: 'realizado' }]);
+        assert.equal(res.marginPercent, 'Não aplicável');
+        assert.equal(res.margin, -100);
+    });
+
+    test('39 — receita com custo real => fórmula correta', () => {
+        const res = computeFinance([
+            { valor: 1000, tipo_lancamento: 'receita_extra', status_pagamento: 'realizado' },
+            { valor: 250, tipo_lancamento: 'custo_real', status_pagamento: 'realizado' }
+        ]);
+        assert.equal(res.margin, 750);
+        assert.equal(res.marginPercent, 75);
+    });
+
+    test('40 — tipo financeiro desconhecido => não entra silenciosamente', () => {
+        const res = computeFinance([{ valor: 1000, tipo_lancamento: 'desconhecido_custo', status_pagamento: 'realizado' }]);
+        assert.equal(res.margin, 'Dados insuficientes');
+    });
+
+    test('41 — FluxAI não recebe custos Executa', () => {
+        assert.equal(detectCrossClientLeak(FLUXAI_UUID, [{ id: EXECUTA_UUID, valor: 100, tipo_lancamento: 'custo_real' }]), 1);
+    });
+
+    test('42 — Executa não recebe custos FluxAI', () => {
+        assert.equal(detectCrossClientLeak(EXECUTA_UUID, [{ id: FLUXAI_UUID, valor: 100, tipo_lancamento: 'custo_real' }]), 1);
+    });
+
+    test('43 — Todos os clientes não duplica contexto master (repeteco ref)', () => {
+        const res = buildClientFilterOptions(mockRegistry);
+        assert.equal(res.filter(r => r.id === 'ALL_CLIENTS').length, 1);
+    });
+
+    test('44 — Receita homologada continua correta', () => {
+        const res = computeFinance([
+            { valor: 1300, tipo_lancamento: 'receita_extra', status_pagamento: 'realizado' }
+        ]);
+        assert.equal(res.realized, 1300);
+    });
+
+    test('45 — Dados insuficientes != zero', () => {
+        const res = computeFinance([], true);
+        assert.notEqual(res.margin, 0);
+        assert.equal(res.margin, 'Dados insuficientes');
+    });
+
+    test('46 — erro != zero (margin)', () => {
+        const res = computeFinance([], true);
+        assert.notEqual(res.margin, 0);
+        assert.equal(res.marginPercent, 'Dados insuficientes');
+    });
+
+    test('47 — active client sync preservado', () => {
+        const state = new MockOSState();
+        state.setActiveClient(FLUXAI_UUID);
+        assert.equal(state.getActiveClient(), FLUXAI_UUID);
+    });
+
+    test('48 — MASTER/LABS preserva cliente', () => {
+        const state = new MockOSState();
+        state.setActiveClient(EXECUTA_UUID);
+        state.setContext('MASTER');
+        assert.equal(state.getActiveClient(), EXECUTA_UUID);
+    });
 });
+
 

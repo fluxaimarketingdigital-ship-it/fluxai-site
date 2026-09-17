@@ -249,6 +249,10 @@ async function loadCommandCenter() {
         let realizedRevenue = 0;
         let contractedRevenue = 0;
         let futureRevenueState = 'Dados insuficientes';
+        
+        let realizedCosts = 0;
+        let hasCostData = false;
+        
         let financeError = !!financeRes.error;
 
         if (!financeError) {
@@ -261,12 +265,33 @@ async function loadCommandCenter() {
                         realizedRevenue += val;
                     }
                 }
+                // No cost types mapped yet according to directive
+                // if (row.tipo_lancamento === 'custo_x') { hasCostData = true; ... }
             });
         }
 
         const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
         const realizedText = financeError ? '<span style="font-size:1.2rem;color:var(--os-warning);">Dados insuficientes</span>' : `<span style="color:var(--os-success);">${formatBRL(realizedRevenue)}</span>`;
         const contractedText = financeError ? '<span style="font-size:1.2rem;color:var(--os-warning);">Dados insuficientes</span>' : formatBRL(contractedRevenue);
+
+        let grossMarginText = '<span style="font-size:1.2rem;color:var(--os-warning);">Dados insuficientes</span>';
+        let registeredCostsText = '<span style="font-size:1.2rem;color:var(--os-warning);">Dados insuficientes</span>';
+        let marginPercentText = '';
+        
+        if (!financeError && hasCostData) {
+            const grossMargin = realizedRevenue - realizedCosts;
+            registeredCostsText = `<span style="color:var(--os-danger);">${formatBRL(realizedCosts)}</span>`;
+            grossMarginText = `<span style="color:${grossMargin >= 0 ? 'var(--os-success)' : 'var(--os-danger)'};">${formatBRL(grossMargin)}</span>`;
+            
+            if (realizedRevenue === 0) {
+                marginPercentText = '<span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:2px;">Não aplicável</span>';
+            } else {
+                const marginPercent = ((grossMargin) / realizedRevenue) * 100;
+                marginPercentText = `<span style="font-size:0.55rem; opacity:0.8; display:block; margin-top:2px; color:${marginPercent >= 0 ? 'var(--os-success)' : 'var(--os-danger)'};">${marginPercent.toFixed(1)}% de margem</span>`;
+            }
+        } else {
+            marginPercentText = '<span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:14px;">Sem custos suficientes cadastrados para cálculo</span>';
+        }
 
         // ── RENDER CARDS ──────────────────────────────────────────────────────
         const isFiltered = !isAllClients;
@@ -328,6 +353,15 @@ async function loadCommandCenter() {
                     <div class="os-widget os-widget-flat" style="grid-column: span 4; background: transparent; border-color: transparent;">
                         <div class="os-widget-header" style="margin-bottom: 4px;"><span class="os-widget-label" style="color:var(--os-text-muted);">Receita Futura</span></div>
                         <div class="os-metric"><div class="os-metric-value" style="font-size:1.2rem; margin-top:8px; color:var(--os-warning);">${futureRevenueState}</div><span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:14px;">a receber em períodos futuros</span></div>
+                    </div>
+                    
+                    <div class="os-widget os-widget-flat" style="grid-column: span 6; background: transparent; border-color: transparent; border-top: 1px solid var(--os-border); margin-top: 10px; padding-top: 15px;">
+                        <div class="os-widget-header" style="margin-bottom: 4px;"><span class="os-widget-label" style="color:var(--os-text-muted);">Custos Registrados</span></div>
+                        <div class="os-metric"><div class="os-metric-value" style="margin-top:8px;">${registeredCostsText}</div></div>
+                    </div>
+                    <div class="os-widget os-widget-flat" style="grid-column: span 6; background: transparent; border-color: transparent; border-top: 1px solid var(--os-border); margin-top: 10px; padding-top: 15px;">
+                        <div class="os-widget-header" style="margin-bottom: 4px;"><span class="os-widget-label" style="color:var(--os-text-muted);">Margem Bruta</span></div>
+                        <div class="os-metric"><div class="os-metric-value" style="margin-top:8px;">${grossMarginText}</div>${marginPercentText}</div>
                     </div>
                 </div>
             </div>
