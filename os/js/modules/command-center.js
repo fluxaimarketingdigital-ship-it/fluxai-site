@@ -197,6 +197,27 @@ async function loadCommandCenter() {
                 }
                 return q.then(res => res.error ? { data: [], error: res.error } : res);
             })(),
+
+            // 6: FINANCEIRO - RECEITA (NOVO)
+            (() => {
+                let q = supabase.from('FINANCEIRO_CLIENTES')
+                    .select('valor, tipo_lancamento, status_pagamento');
+                
+                if (isAllClients) {
+                    // ALL_CLIENTS -> apenas clientes comerciais listados no clientRegistry
+                    const canonicalClientIds = clientRegistry.map(c => c.id);
+                    if (canonicalClientIds.length > 0) {
+                        q = q.in('client_id', canonicalClientIds);
+                    } else {
+                        // Prevent fetching random non-commercial rows if registry is empty
+                        q = q.eq('client_id', 'NON_EXISTENT_FORCE_EMPTY');
+                    }
+                } else {
+                    // CLIENT-SCOPED
+                    q = q.eq('client_id', currentClient);
+                }
+                return q.then(res => res.error ? { error: res.error } : res);
+            })()
         ];
 
         // Adiciona timeout para evitar loading infinito
@@ -217,11 +238,35 @@ async function loadCommandCenter() {
         const draftReports = results[3].count ?? 0;
         const alertsData = results[4].data || [];
         const healthData = results[5].data || [];
+        const financeRes = results[6] || {};
 
         // Log warnings silenciosos
         results.forEach((r, i) => {
-            if (r.error) console.warn(`[Command Center] Query ${i} warning:`, r.error);
+            if (r && r.error) console.warn(`[Command Center] Query ${i} warning:`, r.error);
         });
+
+        // Computar Financeiro
+        let realizedRevenue = 0;
+        let contractedRevenue = 0;
+        let futureRevenueState = 'Dados insuficientes';
+        let financeError = !!financeRes.error;
+
+        if (!financeError) {
+            const financeData = financeRes.data || [];
+            financeData.forEach(row => {
+                const val = parseFloat(row.valor) || 0;
+                if (row.tipo_lancamento === 'receita_extra') {
+                    contractedRevenue += val;
+                    if (row.status_pagamento === 'realizado') {
+                        realizedRevenue += val;
+                    }
+                }
+            });
+        }
+
+        const formatBRL = (val) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(val);
+        const realizedText = financeError ? '<span style="font-size:1.2rem;color:var(--os-warning);">Dados insuficientes</span>' : `<span style="color:var(--os-success);">${formatBRL(realizedRevenue)}</span>`;
+        const contractedText = financeError ? '<span style="font-size:1.2rem;color:var(--os-warning);">Dados insuficientes</span>' : formatBRL(contractedRevenue);
 
         // ── RENDER CARDS ──────────────────────────────────────────────────────
         const isFiltered = !isAllClients;
@@ -264,6 +309,27 @@ async function loadCommandCenter() {
             <div class="os-widget" style="grid-column: span 3;">
                 <div class="os-widget-header"><span class="os-widget-label">Relatórios Rascunho</span><i class="fa-solid fa-file-signature" style="color:var(--os-primary)"></i></div>
                 <div class="os-metric"><div class="os-metric-value">${draftReports}</div>${filteredLabel}</div>
+            </div>
+
+            <!-- BLOCO FINANCEIRO -->
+            <div class="os-widget" style="grid-column: span 12; background: rgba(142, 158, 104, 0.05); border-color: var(--os-primary-border);">
+                <div class="os-widget-header" style="margin-bottom: var(--os-space-3);">
+                    <span class="os-widget-label"><i class="fa-solid fa-money-bill-wave" style="margin-right:8px;"></i> Financeiro Comercial</span>
+                </div>
+                <div class="os-widget-grid" style="margin-top: 0;">
+                    <div class="os-widget os-widget-flat" style="grid-column: span 4; background: transparent; border-color: transparent;">
+                        <div class="os-widget-header" style="margin-bottom: 4px;"><span class="os-widget-label" style="color:var(--os-text-muted);">Receita Realizada</span></div>
+                        <div class="os-metric"><div class="os-metric-value">${realizedText}</div><span style="font-size:0.55rem; opacity:0.5; display:block;">recebido no período</span></div>
+                    </div>
+                    <div class="os-widget os-widget-flat" style="grid-column: span 4; background: transparent; border-color: transparent;">
+                        <div class="os-widget-header" style="margin-bottom: 4px;"><span class="os-widget-label" style="color:var(--os-text-muted);">Receita Contratada</span></div>
+                        <div class="os-metric"><div class="os-metric-value">${contractedText}</div><span style="font-size:0.55rem; opacity:0.5; display:block;">valor registrado/contratado</span></div>
+                    </div>
+                    <div class="os-widget os-widget-flat" style="grid-column: span 4; background: transparent; border-color: transparent;">
+                        <div class="os-widget-header" style="margin-bottom: 4px;"><span class="os-widget-label" style="color:var(--os-text-muted);">Receita Futura</span></div>
+                        <div class="os-metric"><div class="os-metric-value" style="font-size:1.2rem; margin-top:8px; color:var(--os-warning);">${futureRevenueState}</div><span style="font-size:0.55rem; opacity:0.5; display:block; margin-top:14px;">a receber em períodos futuros</span></div>
+                    </div>
+                </div>
             </div>
         `;
 
