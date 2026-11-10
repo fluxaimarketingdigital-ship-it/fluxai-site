@@ -16,6 +16,11 @@
 !/insights/
 !/insights/**
 
+# FluxAI NEXO Backup — public OAuth disclosure pages
+!/nexo-backup.html
+!/nexo-backup/
+!/nexo-backup/**
+
 # Public directories
 !/assets/
 !/assets/**
